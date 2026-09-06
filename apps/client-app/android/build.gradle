@@ -1,0 +1,44 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'com.google.gms:google-services:4.4.2'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+apply from: "variables.gradle"
+
+/**
+ * Build chiqishi iCloud sinxronlanadigan papkadan tashqariga olib chiqiladi.
+ *
+ * Loyiha ~/Desktop ichida, Desktop esa iCloud Drive bilan sinxronlanadi.
+ * iCloud `build/` papkasidagi fayllarni ham sinxronlaydi va konflikt yuz
+ * berganda "splash 2.png" ko'rinishidagi dublikatlar yaratadi. Android
+ * resurs fayl nomlarida bo'shliqqa ruxsat bermaydi, natijada
+ * `parseDebugLocalResources` vazifasi yiqiladi.
+ *
+ * ~/Library/Caches iCloud tomonidan sinxronlanmaydi — muammo takrorlanmaydi.
+ */
+def buildOutputRoot = new File(System.getProperty('user.home'), 'Library/Caches/hizmat24-android-build')
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    layout.buildDirectory.set(new File(buildOutputRoot, project.path.replace(':', '/').replaceFirst('^/', '')))
+}
+
+task clean(type: Delete) {
+    delete rootProject.layout.buildDirectory
+}

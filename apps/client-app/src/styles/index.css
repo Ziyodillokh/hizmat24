@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Ranglar RGB KANALLARI sifatida saqlanadi ("255 255 255"), hex sifatida emas.
+ * Sababi: Tailwind'ning shaffoflik utilitalari (`bg-primary/[0.14]`) rangni
+ * `rgb(... / <alpha-value>)` shaklida kutadi; hex yozilsa utilita jimgina
+ * tushib qoladi va CSS umuman chiqmaydi.
+ *
+ * To'liq palitra `applyTheme()` tomonidan ish vaqtida yoziladi (src/lib/theme.ts).
+ * Bu yerda faqat birinchi render uchun zaxira qiymatlar.
+ */
+:root {
+  color-scheme: light;
+  --color-surface: 255 255 255;
+  --color-surface-sunken: 241 247 247;
+  --color-border: 226 236 236;
+  --color-text-primary: 4 48 47;
+  --color-canvas: 230 247 247;
+  --color-overlay: rgba(4, 48, 47, 0.45);
+  --elevation-e1: 0 1px 2px rgba(6, 44, 44, 0.06);
+  --elevation-e2: 0 4px 12px rgba(6, 44, 44, 0.08);
+  --elevation-e3: 0 12px 24px rgba(6, 44, 44, 0.1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-surface: 14 43 44;
+  --color-surface-sunken: 18 64 63;
+  --color-border: 30 79 78;
+  --color-text-primary: 242 250 250;
+  --color-canvas: 127 165 165;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+}
+
+/*
+ * Suziluvchi ildiz shrift o'lchami.
+ *
+ * 4.07vw — 393px etalon kenglikda aynan 16px beradi (7-bo'lim). Tor
+ * telefonlarda matn proporsional kichrayadi, keng telefonlarda esa 16px dan
+ * oshmaydi: aks holda katta ekranda yozuvlar keraksiz yiriklashib ketardi.
+ */
+html {
+  font-size: clamp(14px, 4.07vw, 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter Variable', Inter, 'SF Pro Text', system-ui, sans-serif;
+  background: rgb(var(--color-canvas));
+  color: rgb(var(--color-text-primary));
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures — narx, reyting, taymer va identifikatorlar uchun (5-bo'lim). */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Skeleton shimmer (12.1-band). */
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    rgb(var(--color-surface-sunken)) 0%,
+    rgb(var(--color-border)) 50%,
+    rgb(var(--color-surface-sunken)) 100%
+  );
+  background-size: 200% 100%;
+}

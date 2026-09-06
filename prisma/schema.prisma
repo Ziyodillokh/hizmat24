@@ -1,0 +1,377 @@
+// Hizmat24 — mijoz ilovasi backend uchun ma'lumotlar modeli.
+// Barcha pul qiymatlari — butun sonda, faqat UZS (so'm). Valyuta maydoni yo'q.
+// Barcha vaqtlar UTC'da saqlanadi (@db.Timestamptz), mijozga Asia/Tashkent'da qaytariladi.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────── enums ──
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum ComplexityLevel {
+  SIMPLE
+  COMPLEX
+}
+
+enum MasterExperienceLevel {
+  NEW
+  EXPERIENCED
+}
+
+enum MasterStatus {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+enum OrderStatus {
+  DRAFT
+  SEARCHING
+  SEARCHING_QUEUED
+  ASSIGNED
+  MASTER_EN_ROUTE
+  ARRIVED_PENDING_CONFIRMATION
+  IN_PROGRESS
+  COMPLETED_BY_MASTER
+  RATED
+  CLOSED
+  CANCELLED
+  SAFETY_FLAGGED
+}
+
+enum CancelledBy {
+  CLIENT
+  MASTER
+  SYSTEM
+}
+
+enum NotificationType {
+  MASTER_ASSIGNED
+  MASTER_EN_ROUTE
+  MASTER_ARRIVED
+  QUEUE_POSITION_UPDATE
+  ORDER_IN_PROGRESS
+  ORDER_COMPLETED_BY_MASTER
+  ORDER_CANCELLED
+  SAFETY_ALERT_RECEIVED
+  MATCHING_ESCALATED
+}
+
+enum SafetyAlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum AuditAction {
+  ORDER_STATUS_CHANGED
+  SAFETY_FLAG_RAISED
+  MASTER_ASSIGNED
+  MASTER_ACK_TIMEOUT
+  MATCHING_ESCALATED
+  ORDER_CANCELLED
+}
+
+enum ActorType {
+  CLIENT
+  MASTER
+  SYSTEM
+  ADMIN
+}
+
+// ────────────────────────────────────────────────────────────── models ──
+
+model User {
+  id             String     @id @default(uuid()) @db.Uuid
+  phoneNumber    String     @unique @map("phone_number") @db.VarChar(20)
+  fullName       String?    @map("full_name") @db.VarChar(120)
+  status         UserStatus @default(ACTIVE)
+  /// Oxirgi ishlatilgan manzil — { label, lat, lng, ... }
+  defaultAddress Json?      @map("default_address")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  orders        Order[]
+  ratings       Rating[]
+  notifications Notification[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+/// Xizmat guruhi ("Elektrik xizmatlari", "Santexnika") — mijoz ilovasidagi
+/// bosh sahifa plitkalari va kategoriya ekrani shu jadvaldan quriladi.
+/// Taksonomiya admin panel orqali boshqariladi, ilovada hardcode qilinmaydi.
+model ServiceGroup {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(120)
+  /// Ilova ikonani shu kalit bo'yicha tanlaydi (vektor, temaga moslashadi).
+  iconKey   String   @map("icon_key") @db.VarChar(60)
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  categories ServiceCategory[]
+
+  @@index([isActive, sortOrder])
+  @@map("service_groups")
+}
+
+model ServiceCategory {
+  id              String          @id @default(uuid()) @db.Uuid
+  name            String          @unique @db.VarChar(120)
+  description     String?         @db.VarChar(500)
+  /// Guruhsiz xizmatlar ham bo'lishi mumkin — shuning uchun nullable.
+  groupId         String?         @map("group_id") @db.Uuid
+  /// So'mda, butun son. Admin panel orqali tahrirlanadi — hech qachon hardcode qilinmaydi.
+  basePrice       Int             @map("base_price")
+  complexityLevel ComplexityLevel @default(SIMPLE) @map("complexity_level")
+  sortOrder       Int             @default(0) @map("sort_order")
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  group   ServiceGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  orders  Order[]
+  masters MasterServiceCategory[]
+
+  @@index([isActive])
+  @@index([groupId, sortOrder])
+  @@map("service_categories")
+}
+
+model Master {
+  id                   String                @id @default(uuid()) @db.Uuid
+  fullName             String                @map("full_name") @db.VarChar(120)
+  phoneNumber          String                @unique @map("phone_number") @db.VarChar(20)
+  photoUrl             String?               @map("photo_url") @db.VarChar(500)
+  experienceLevel      MasterExperienceLevel @default(NEW) @map("experience_level")
+  hasGovCertificate    Boolean               @default(false) @map("has_gov_certificate")
+  ratingAvg            Decimal               @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount          Int                   @default(0) @map("rating_count")
+  completedOrdersCount Int                   @default(0) @map("completed_orders_count")
+  status               MasterStatus          @default(OFFLINE)
+  /// Admin qo'lda bloklaganda false — avtomatik chetlatish YO'Q (biznes-qoida 5.4)
+  isActive             Boolean               @default(true) @map("is_active")
+  lastLat              Float?                @map("last_lat")
+  lastLng              Float?                @map("last_lng")
+  lastLocationAt       DateTime?             @map("last_location_at") @db.Timestamptz(3)
+  createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  orders     Order[]
+  ratings    Rating[]
+  categories MasterServiceCategory[]
+
+  @@index([status, isActive])
+  @@map("masters")
+}
+
+model MasterServiceCategory {
+  masterId   String @map("master_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+
+  master   Master          @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([masterId, categoryId])
+  @@index([categoryId])
+  @@map("master_service_categories")
+}
+
+model Order {
+  id             String      @id @default(uuid()) @db.Uuid
+  clientId       String      @map("client_id") @db.Uuid
+  masterId       String?     @map("master_id") @db.Uuid
+  categoryId     String      @map("category_id") @db.Uuid
+  description    String      @db.Text
+  /// Surat/video havolalari (S3-compatible storage)
+  attachmentUrls String[]    @map("attachment_urls")
+  isUrgent       Boolean     @default(false) @map("is_urgent")
+  /// Buyurtma yaratilgan paytdagi narx (so'mda) — kategoriya narxi keyin o'zgarsa ham o'zgarmaydi
+  price          Int
+  status         OrderStatus @default(SEARCHING)
+
+  queuePosition Int? @map("queue_position")
+  etaMinutes    Int? @map("eta_minutes")
+
+  /// { label, lat, lng, entrance?, floor?, apartment?, comment? }
+  clientAddress Json  @map("client_address")
+  addressLat    Float @map("address_lat")
+  addressLng    Float @map("address_lng")
+
+  cancelReason String?      @map("cancel_reason") @db.VarChar(500)
+  cancelledBy  CancelledBy? @map("cancelled_by")
+  cancelledAt  DateTime?    @map("cancelled_at") @db.Timestamptz(3)
+
+  /// Tayinlash tsikli nazorati (3.4 — max 5 urinish, keyin admin panelga eskalatsiya)
+  assignmentAttempts Int       @default(0) @map("assignment_attempts")
+  assignedAt         DateTime? @map("assigned_at") @db.Timestamptz(3)
+  masterAckedAt      DateTime? @map("master_acked_at") @db.Timestamptz(3)
+  enRouteAt          DateTime? @map("en_route_at") @db.Timestamptz(3)
+  arrivedAt          DateTime? @map("arrived_at") @db.Timestamptz(3)
+  startedAt          DateTime? @map("started_at") @db.Timestamptz(3)
+  completedAt        DateTime? @map("completed_at") @db.Timestamptz(3)
+  closedAt           DateTime? @map("closed_at") @db.Timestamptz(3)
+
+  /// Idempotentlik (biznes-qoida 5.6) — bir xil kalit bilan qayta yuborilsa dublikat yaratilmaydi
+  idempotencyKey String? @map("idempotency_key") @db.VarChar(120)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  client        User                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  master        Master?              @relation(fields: [masterId], references: [id], onDelete: Restrict)
+  category      ServiceCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  rating        Rating?
+  notifications Notification[]
+  safetyAlerts  SafetyAlert[]
+  statusHistory OrderStatusHistory[]
+
+  @@unique([clientId, idempotencyKey], name: "order_client_idempotency")
+  @@index([status, isUrgent, createdAt])
+  @@index([clientId, createdAt])
+  @@index([masterId])
+  @@map("orders")
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  actorType  ActorType    @map("actor_type")
+  actorId    String?      @map("actor_id") @db.Uuid
+  reason     String?      @db.VarChar(500)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
+}
+
+model Rating {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @unique @map("order_id") @db.Uuid
+  clientId  String   @map("client_id") @db.Uuid
+  masterId  String   @map("master_id") @db.Uuid
+  stars     Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  client User   @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  master Master @relation(fields: [masterId], references: [id], onDelete: Restrict)
+
+  @@index([masterId])
+  @@map("ratings")
+}
+
+model Notification {
+  id      String           @id @default(uuid()) @db.Uuid
+  userId  String           @map("user_id") @db.Uuid
+  orderId String?          @map("order_id") @db.Uuid
+  type    NotificationType
+  payload Json
+  sentAt  DateTime         @default(now()) @map("sent_at") @db.Timestamptz(3)
+  readAt  DateTime?        @map("read_at") @db.Timestamptz(3)
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, sentAt])
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+/// Push token ro'yxati (FCM) — offline yetkazib berish uchun
+model DeviceToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique @db.VarChar(500)
+  platform  String   @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+/// "Boshqa odam keldi" signali — admin/support uchun yuqori ustuvorlikdagi navbat
+model SafetyAlert {
+  id         String            @id @default(uuid()) @db.Uuid
+  orderId    String            @map("order_id") @db.Uuid
+  clientId   String            @map("client_id") @db.Uuid
+  masterId   String?           @map("master_id") @db.Uuid
+  status     SafetyAlertStatus @default(OPEN)
+  clientNote String?           @map("client_note") @db.VarChar(1000)
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  resolvedAt DateTime?         @map("resolved_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@map("safety_alerts")
+}
+
+/// Append-only audit log. UPDATE/DELETE DB trigger orqali bloklangan (migratsiyaga qarang).
+model AuditLog {
+  id         String      @id @default(uuid()) @db.Uuid
+  action     AuditAction
+  orderId    String?     @map("order_id") @db.Uuid
+  actorType  ActorType   @map("actor_type")
+  actorId    String?     @map("actor_id") @db.Uuid
+  fromStatus String?     @map("from_status") @db.VarChar(50)
+  toStatus   String?     @map("to_status") @db.VarChar(50)
+  metadata   Json?
+  ipAddress  String?     @map("ip_address") @db.VarChar(64)
+  userAgent  String?     @map("user_agent") @db.VarChar(300)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+model OtpRequest {
+  id          String    @id @default(uuid()) @db.Uuid
+  phoneNumber String    @map("phone_number") @db.VarChar(20)
+  codeHash    String    @map("code_hash") @db.VarChar(128)
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  consumedAt  DateTime? @map("consumed_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([phoneNumber, createdAt])
+  @@map("otp_requests")
+}
+
+/// Refresh token rotation + reuse detection
+model RefreshToken {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  tokenHash    String    @unique @map("token_hash") @db.VarChar(128)
+  familyId     String    @map("family_id") @db.Uuid
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(3)
+  replacedById String?   @map("replaced_by_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}

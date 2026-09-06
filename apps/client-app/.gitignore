@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+*.log
+
+# Capacitor Android loyihasi generatsiya qilinadi (`npx cap add android`),
+# lekin qo'lda kiritilgan sozlamalar (kotlin-bom, ikonalar) saqlanishi kerak —
+# shuning uchun faqat build natijalari chiqariladi.
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/

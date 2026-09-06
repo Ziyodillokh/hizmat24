@@ -1,0 +1,96 @@
+import { COLOR_TOKENS, RAW_COLOR_TOKENS } from './src/tokens/colors';
+import { TYPOGRAPHY } from './src/tokens/typography';
+import { SPACING, RADIUS, LAYOUT } from './src/tokens/spacing';
+
+/**
+ * Tailwind konfiguratsiyasi tokenlardan quriladi. Standart palitra
+ * (slate-500, teal-400 va h.k.) butunlay o'chirilgan — 3.4-band bo'yicha
+ * token jadvalidan tashqari rang ishlatib bo'lmaydi.
+ */
+/**
+ * Ranglar `rgb(var(--color-x) / <alpha-value>)` shaklida beriladi — shunda
+ * `bg-primary/[0.14]` kabi shaffoflik utilitalari ishlaydi. To'g'ridan-to'g'ri
+ * `var(--color-x)` yozilsa, Tailwind rangni tahlil qila olmay utilitani
+ * butunlay tashlab yuboradi (CSS umuman chiqmaydi).
+ */
+const colors = Object.fromEntries(
+  COLOR_TOKENS.map((token) => [
+    token,
+    RAW_COLOR_TOKENS.includes(token)
+      ? `var(--color-${token})`
+      : `rgb(var(--color-${token}) / <alpha-value>)`,
+  ]),
+);
+
+const fontSize = Object.fromEntries(
+  Object.entries(TYPOGRAPHY).map(([name, t]) => [
+    name,
+    [t.size, { lineHeight: t.line, fontWeight: String(t.weight), letterSpacing: t.tracking }],
+  ]),
+);
+
+const spacing = Object.fromEntries(SPACING.map((v) => [String(v), `${v}px`]));
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    // `colors` — kengaytma emas, to'liq almashtirish: standart palitra yo'qoladi.
+    colors: { transparent: 'transparent', current: 'currentColor', ...colors },
+    fontSize,
+    borderRadius: RADIUS,
+    extend: {
+      spacing: {
+        ...spacing,
+        'status-bar': `${LAYOUT.statusBar}px`,
+        header: `${LAYOUT.header}px`,
+        'tab-bar': `${LAYOUT.tabBar}px`,
+        'home-indicator': `${LAYOUT.homeIndicator}px`,
+        'bottom-reserve': `${LAYOUT.contentBottomReserve}px`,
+        touch: `${LAYOUT.minTouchTarget}px`,
+        // Notch va home indicator zonalari — qiymati qurilmaga qarab o'zgaradi,
+        // shuning uchun px emas, `env()` orqali beriladi.
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+      },
+      width: { frame: `${LAYOUT.frameWidth}px` },
+      height: { frame: `${LAYOUT.frameHeight}px` },
+      fontFamily: {
+        sans: ['Inter Variable', 'Inter', 'SF Pro Text', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        e1: 'var(--elevation-e1)',
+        e2: 'var(--elevation-e2)',
+        e3: 'var(--elevation-e3)',
+      },
+      keyframes: {
+        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+        'radar-ping': {
+          '0%': { transform: 'scale(0.6)', opacity: '0.24' },
+          '100%': { transform: 'scale(1.6)', opacity: '0' },
+        },
+        'step-pulse': {
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.24' },
+          '50%': { transform: 'scale(1.35)', opacity: '0.05' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-4px)' },
+          '75%': { transform: 'translateX(4px)' },
+        },
+        indeterminate: {
+          '0%': { left: '-30%' },
+          '100%': { left: '100%' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.2s linear infinite',
+        'radar-ping': 'radar-ping 2s ease-out infinite',
+        'step-pulse': 'step-pulse 2s ease-in-out infinite',
+        shake: 'shake 0.3s ease-in-out',
+        indeterminate: 'indeterminate 1.4s ease-in-out infinite',
+      },
+    },
+  },
+  plugins: [],
+};
