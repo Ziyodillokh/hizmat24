@@ -5,11 +5,11 @@ import { Icon } from '@/components/Icon';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/formatters';
-import { productIcon } from '@/lib/productIcons';
+import { productImage } from '@/lib/marketImages';
 import { formatOpenHours, isOpenNow } from '@/lib/shopHours';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { SHOPS } from '@/mocks/shops';
-import { findProduct } from '@/mocks/products';
+import { shopProducts } from '@/mocks/products';
 
 /**
  * Mahsulot sahifasi.
@@ -31,7 +31,9 @@ export function ProductDetail() {
   const shop = SHOPS.find((item) => item.id === shopId);
   if (!shop) return <Navigate to="/app/market" replace />;
 
-  const product = productId ? findProduct(shop.id, shop.category, productId) : undefined;
+  const catalogue = shopProducts(shop.id, shop.category);
+  const index = catalogue.findIndex((item) => item.id === productId);
+  const product = index >= 0 ? catalogue[index] : undefined;
   if (!product) return <Navigate to={`/app/market/${shop.id}`} replace />;
 
   const isOpen = isOpenNow(shop, now);
@@ -65,15 +67,12 @@ export function ProductDetail() {
         </StickyFooter>
       }
     >
-      <div className="-mx-20 flex h-[200px] items-center justify-center bg-surface-sunken">
-        <Icon
-          icon={productIcon(product.iconKey)}
-          size={96}
-          weight="duotone"
-          className="text-primary/[0.5]"
-          aria-hidden
-        />
-      </div>
+      <img
+        src={productImage(shop.category, index)}
+        alt=""
+        aria-hidden
+        className="-mx-20 h-[220px] w-[calc(100%+40px)] max-w-none object-cover"
+      />
 
       <h1 className="mt-16 text-h2 text-text-primary">{product.name}</h1>
       {/*

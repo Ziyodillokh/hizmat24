@@ -2,7 +2,7 @@ import type { KeyboardEvent } from 'react';
 import { MapPin, Star, Truck } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
-import { shopCategoryIcon } from '@/lib/shopIcons';
+import { shopCover } from '@/lib/marketImages';
 import type { ShopCategory } from '@/mocks/shops';
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -60,13 +60,17 @@ export function ShopCard({
       onKeyDown={isInteractive ? handleKeyDown : undefined}
       className={cn('overflow-hidden p-0', className)}
     >
-      <div className="relative flex h-[96px] items-center justify-center bg-surface-sunken">
-        <Icon
-          icon={shopCategoryIcon(category)}
-          size={48}
-          weight="duotone"
-          className="text-primary/[0.45]"
+      <div className="relative h-[96px] bg-surface-sunken">
+        <img
+          src={shopCover(category)}
+          alt=""
           aria-hidden
+          className="h-full w-full object-cover"
+        />
+        {/* Fotoning ustidagi yorliqlar oʻqilishi uchun pastdan yengil parda. */}
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-on-primary/[0.45] to-transparent"
         />
 
         <span
@@ -78,7 +82,7 @@ export function ShopCard({
           {isOpen ? 'Ochiq' : 'Yopiq'}
         </span>
 
-        <span className="absolute bottom-12 left-12 rounded-full bg-surface-elevated/[0.88] px-8 py-2 text-badge text-text-secondary">
+        <span className="absolute bottom-12 left-12 rounded-full bg-surface-elevated/[0.92] px-8 py-2 text-badge text-text-secondary">
           {category}
         </span>
       </div>

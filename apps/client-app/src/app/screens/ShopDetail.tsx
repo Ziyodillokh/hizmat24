@@ -6,7 +6,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
-import { shopCategoryIcon } from '@/lib/shopIcons';
+import { shopCover, productImage } from '@/lib/marketImages';
 import { formatOpenHours, isOpenNow } from '@/lib/shopHours';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { SHOPS } from '@/mocks/shops';
@@ -33,15 +33,12 @@ export function ShopDetail() {
     <ScreenShell
       header={<Header variant="inner" title={shop.name} onBack={() => navigate('/app/market')} />}
     >
-      <div className="-mx-20 flex h-[140px] items-center justify-center bg-surface-sunken">
-        <Icon
-          icon={shopCategoryIcon(shop.category)}
-          size={64}
-          weight="duotone"
-          className="text-primary/[0.45]"
-          aria-hidden
-        />
-      </div>
+      <img
+        src={shopCover(shop.category)}
+        alt=""
+        aria-hidden
+        className="-mx-20 h-[160px] w-[calc(100%+40px)] max-w-none object-cover"
+      />
 
       <div className="mt-16 flex items-start justify-between gap-12">
         <div className="min-w-0 flex-1">
@@ -98,13 +95,13 @@ export function ShopDetail() {
       <p className="mt-2 text-body-sm text-text-secondary">{products.length} ta mahsulot</p>
 
       <ul className="mt-12 grid grid-cols-2 items-stretch gap-12">
-        {products.map((product) => (
+        {products.map((product, index) => (
           <li key={product.id} className="min-w-0">
             <ProductCard
               name={product.name}
               price={product.price}
               unit={product.unit}
-              iconKey={product.iconKey}
+              imageUrl={productImage(shop.category, index)}
               onSelect={() => navigate(`/app/market/${shop.id}/${product.id}`)}
             />
           </li>

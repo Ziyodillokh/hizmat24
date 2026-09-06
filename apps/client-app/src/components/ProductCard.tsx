@@ -1,9 +1,7 @@
 import type { KeyboardEvent } from 'react';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/formatters';
-import { productIcon } from '@/lib/productIcons';
 import { Card } from './Card';
-import { Icon } from './Icon';
 
 /**
  * Mahsulot kartasi — doʻkon sahifasidagi ikki ustunli katakcha.
@@ -22,12 +20,13 @@ export interface ProductCardProps {
   name: string;
   price: number;
   unit: string;
-  iconKey: string;
+  /** Ilova ichiga joylangan rasm. */
+  imageUrl: string;
   onSelect?: () => void;
   className?: string;
 }
 
-export function ProductCard({ name, price, unit, iconKey, onSelect, className }: ProductCardProps) {
+export function ProductCard({ name, price, unit, imageUrl, onSelect, className }: ProductCardProps) {
   const isInteractive = Boolean(onSelect);
 
   const formatted = formatPrice(price);
@@ -48,14 +47,8 @@ export function ProductCard({ name, price, unit, iconKey, onSelect, className }:
       onKeyDown={isInteractive ? handleKeyDown : undefined}
       className={cn('flex h-full flex-col overflow-hidden p-0', className)}
     >
-      <div className="flex aspect-square items-center justify-center bg-surface-sunken">
-        <Icon
-          icon={productIcon(iconKey)}
-          size={40}
-          weight="duotone"
-          className="text-primary/[0.5]"
-          aria-hidden
-        />
+      <div className="aspect-square bg-surface-sunken">
+        <img src={imageUrl} alt="" aria-hidden className="h-full w-full object-cover" />
       </div>
 
       <div className="flex flex-1 flex-col p-12">

@@ -14,6 +14,11 @@ ma'lumotlar modeli va `libs/shared-kernel` umumiy bo'ladi.
 
 > Mobil ilova hozircha mock ma'lumotlarda ishlaydi — backendga ulanish keyingi bosqichda.
 
+Market boʻlimidagi doʻkon va mahsulot rasmlari — Unsplash'dan olingan
+vaqtinchalik oʻrindoshlar (`apps/client-app/src/assets/market`). Unsplash
+litsenziyasi bepul foydalanishga ruxsat beradi, lekin ishga tushirishdan
+oldin ular doʻkonlarning oʻz fotolariga almashtirilishi kerak.
+
 ## Mijoz ilovasi (`apps/client-app`)
 
 ```bash
