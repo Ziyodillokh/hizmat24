@@ -37,6 +37,7 @@ import {
 } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
 import { MASTERS } from '@/mocks/masters';
+import { USER } from '@/mocks/user';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
 import { useTheme } from '../theme-context';
@@ -56,7 +57,7 @@ export function OrdersTab() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Buyurtmalarim" />}
+      header={<Header variant="inner" title="Buyurtmalar" />}
       footer={<AppTabBar active="orders" />}
     >
       <SegmentControl
@@ -271,10 +272,13 @@ export function ProfileTab() {
         foydalanuvchining OʻZ profili, oʻz raqamini yashirishning maʼnosi yoʻq.
       */}
       <div className="mt-8 flex items-center gap-16">
-        <Avatar size={64} />
+        <Avatar name={USER.fullName} size={64} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-h3 text-text-primary">{formatPhone(phoneNumber)}</p>
-          <p className="mt-2 text-body-sm text-text-secondary">Hizmat24 mijozi</p>
+          {/* Bosh sahifa bilan bir xil: ism birinchi, raqam ikkinchi qatorda. */}
+          <p className="truncate text-h3 text-text-primary">{USER.fullName}</p>
+          <p className="mt-2 truncate text-body-sm text-text-secondary">
+            {formatPhone(phoneNumber)}
+          </p>
         </div>
       </div>
 

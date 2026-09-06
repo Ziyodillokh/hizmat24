@@ -8,12 +8,12 @@ import { Icon, type IconSize } from './Icon';
  * `radius/full`. Variantlar: `initial` (ism bosh harfi) va `icon` (neytral shaxs ikonasi).
  * `image` varianti chizilmaydi — rasm maydoni mavjud emas (14.4-band, 34-punkt).
  */
-export type AvatarSize = 44 | 64 | 80 | 120;
+export type AvatarSize = 36 | 44 | 64 | 80 | 120;
 
 export type AvatarVariant = 'initial' | 'icon';
 
 /** Har bir avatar oʻlchamiga mos ikona oʻlchami (6.4-band shkalasi ichida). */
-const ICON_SIZE: Record<AvatarSize, IconSize> = { 44: 24, 64: 32, 80: 40, 120: 64 };
+const ICON_SIZE: Record<AvatarSize, IconSize> = { 36: 20, 44: 24, 64: 32, 80: 40, 120: 64 };
 
 const VARIANT_CLASSES: Record<AvatarVariant, string> = {
   initial: 'bg-primary-surface text-primary-pressed ring-1 ring-inset ring-primary/[0.24] shadow-e1',

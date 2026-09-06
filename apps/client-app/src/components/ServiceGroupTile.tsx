@@ -66,7 +66,7 @@ export function ServiceGroupTile({
     <button
       type="button"
       className={cn(
-        'flex w-full flex-col items-center gap-8 text-center',
+        'flex w-full flex-col items-center gap-4 text-center',
         'transition-transform duration-press ease-emphasized active:scale-[0.94]',
         className,
       )}
@@ -76,7 +76,7 @@ export function ServiceGroupTile({
         className={cn(
           // 9.5-banddagi 72px. Tor ekranlarda (320–360px) doira ustun kengligiga
           // qarab siqiladi, shuning uchun `max-w` — qatʼiy `w` emas.
-          'flex aspect-square w-full max-w-[72px] items-center justify-center rounded-full',
+          'flex aspect-square w-full max-w-[64px] items-center justify-center rounded-full',
           // Grid doiralari e2 darajasida (6.3-band): Light — oq doira va soya,
           // Dark — toʻldirilgan teal va ingichka chegara. Ikkalasini ham
           // `category-circle` tokeni beradi.

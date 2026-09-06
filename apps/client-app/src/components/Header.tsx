@@ -88,14 +88,19 @@ export function Header({
   if (variant === 'inner') {
     return (
       <header className={rootClasses}>
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label="Orqaga"
-          className="flex h-touch w-touch shrink-0 items-center justify-start"
-        >
-          <Icon icon={ArrowLeft} size={24} className={BELL_CLASSES[tone]} />
-        </button>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Orqaga"
+            className="flex h-touch w-touch shrink-0 items-center justify-start"
+          >
+            <Icon icon={ArrowLeft} size={24} className={BELL_CLASSES[tone]} />
+          </button>
+        ) : (
+          // Joy saqlanadi — sarlavha markazda qoladi.
+          <span className="h-touch w-touch shrink-0" aria-hidden />
+        )}
         <h2 className={cn('min-w-0 flex-1 truncate text-center text-h3', TITLE_CLASSES[tone])}>
           {title}
         </h2>

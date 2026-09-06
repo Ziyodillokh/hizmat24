@@ -122,14 +122,22 @@ export const LIGHT: Palette = {
   // boʻlib qolgandi. Chuqur va past xromali maydon ikkala temada bir xil
   // ishlaydi, ustiga oq matn qoʻyishga imkon beradi va yorqin turkuazni
   // yana AKSENT (ikona, narx, aktiv tab, CTA) holiga qaytaradi.
-  'surface-hero-top': '#0F7A76',
-  'surface-hero': '#0E6462',
-  'surface-hero-deep': '#0A4746',
+  // Referens dizayn bo'yicha tepa blok YORQIN turkuaz. Faqat bitta yon
+  // berish bor: eng yorqin nuqta biroz to'qlashtirildi, chunki oq matn
+  // #1EC8C8 ustida 1,9:1 beradi — telefonda quyoshda o'qib bo'lmaydi.
+  // #14AEAB da qalin oq sarlavha 3,0:1 ga chiqadi va tus baribir yorqin
+  // turkuaz bo'lib qoladi.
+  'surface-hero-top': '#22CFCC',
+  'surface-hero': '#14AEAB',
+  // Banner tepа blokdan to'qroq — referensdagi kabi.
+  'surface-hero-deep': '#0B7E7C',
   // Light temada bu doira OQ edi — oq sahifa ustida u umuman koʻrinmasdi
   // (soya 4% boʻlgani uchun chegara ham sezilmasdi). Endi yengil turkuaz tus:
   // `primary` (#10A3A0) ikonasi bilan kontrast 3,4:1, doira esa yuzadan ajraladi.
-  'category-circle': '#D2EBE9',
-  'category-circle-top': '#EDF9F8',
+  // Referensda doiralar OQ va yumshoq soyali. Sahifa foni #F2F7F7 bo'lgani
+  // uchun oq doira undan ajralib turadi.
+  'category-circle': '#FFFFFF',
+  'category-circle-top': '#FFFFFF',
   primary: '#10A3A0',
   'primary-pressed': '#0B7C7B',
   'on-primary': '#04302F',

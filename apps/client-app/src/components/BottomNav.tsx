@@ -18,7 +18,7 @@ interface TabDefinition {
 /** Tartib ham, yorliqlar ham 8.2-banddagi jadvaldan — oʻzgartirilmaydi. */
 const TABS: readonly TabDefinition[] = [
   { key: 'home', label: 'Bosh sahifa', icon: House },
-  { key: 'orders', label: 'Buyurtmalarim', icon: ClipboardList },
+  { key: 'orders', label: 'Buyurtmalar', icon: ClipboardList },
   { key: 'notifications', label: 'Bildirishnomalar', icon: Bell },
   { key: 'profile', label: 'Profil', icon: User },
 ];
@@ -26,12 +26,15 @@ const TABS: readonly TabDefinition[] = [
 type TabState = 'active' | 'inactive';
 
 /**
- * Faol ikona TOʻLDIRILMAYDI — faqat rang va stroke oʻzgaradi (6.4-band).
- * `[stroke-width:2]` kerak, chunki `Icon` 24px uchun 1.75 beradi va
- * CSS xossasi SVG atributidan ustun turadi.
+ * Faol ikona toʻldiriladi: referens maketda aktiv tab shakl bilan ham,
+ * rang bilan ham ajralib turadi. Faqat rangga tayanish — ilova butunlay
+ * turkuaz boʻlgani uchun — eng sezilmas koʻrsatkich.
  */
 const ICON_CLASSES: Record<TabState, string> = {
-  active: 'text-primary [stroke-width:2]',
+  // To'liq to'ldirish `ClipboardList` va `Bell` ning ichki chiziqlarini
+  // yo'q qilib, ularni bitta bo'lakka aylantirardi. Past alfali to'ldirish
+  // shaklni "og'irlashtiradi", lekin detalni saqlaydi.
+  active: 'fill-primary/[0.22] text-primary [stroke-width:2]',
   inactive: 'text-text-secondary',
 };
 
@@ -103,18 +106,7 @@ export function BottomNav({ active, unreadCount = 0, onSelect, className }: Bott
                 // bogʻlanmagan obyekt qilib koʻrsatardi.
                 className="flex h-full w-full flex-col items-center justify-center gap-4 px-4"
               >
-                {/*
-                  Aktiv tab ostidagi tabletka — ikkinchi signal. Ilgari aktivlik
-                  faqat RANG bilan berilardi, ilova esa butunlay turkuaz:
-                  eng arzon va eng sezilmas koʻrsatkich.
-                */}
-                <span
-                  className={cn(
-                    'relative flex h-[28px] w-[44px] items-center justify-center rounded-full',
-                    'transition-colors duration-state ease-std',
-                    state === 'active' ? 'bg-primary/[0.14]' : 'bg-transparent',
-                  )}
-                >
+                <span className="relative flex h-[28px] w-[44px] items-center justify-center">
                   <Icon icon={tab.icon} size={24} className={ICON_CLASSES[state]} />
                   {tab.key === 'notifications' && (
                     <UnreadBadge

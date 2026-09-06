@@ -41,7 +41,7 @@ export function SearchField({
         placeholder={placeholder}
         className={cn(
           // Oʻng padding: 16 chekka + 20 ikona + 12 boʻshliq = 48.
-          'h-[56px] w-full rounded-md px-16 pr-48 text-body-lg text-text-primary outline-none',
+          'h-[56px] w-full rounded-full px-20 pr-48 text-body-lg text-text-primary outline-none',
           'placeholder:text-text-secondary',
           'focus:border-2 focus:border-primary',
           FIELD_FOCUS_RING_CLASSES,
@@ -53,7 +53,10 @@ export function SearchField({
         icon={Search}
         size={20}
         aria-hidden
-        className="pointer-events-none absolute right-16 top-1/2 -translate-y-1/2 text-text-secondary"
+        className={cn(
+          'pointer-events-none absolute right-20 top-1/2 -translate-y-1/2',
+          floating ? 'text-primary' : 'text-text-secondary',
+        )}
       />
     </div>
   );

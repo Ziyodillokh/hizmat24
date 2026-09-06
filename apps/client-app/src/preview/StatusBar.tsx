@@ -13,7 +13,11 @@ export function StatusBar() {
   const mode = useViewportMode();
 
   if (mode === 'device') {
-    return <div className="shrink-0 pt-safe-top" aria-hidden />;
+    // Faqat `env(safe-area-inset-top)` yetarli emas: Capacitor
+    // `overlaysWebView: false` bilan ishlaganda WebView status bardan PASTDA
+    // boshlanadi va inset 0 ga teng boʻladi — kontent ekran chetiga
+    // yopishib qolardi. Shuning uchun ustiga qatʼiy 12px qoʻshiladi.
+    return <div className="shrink-0 pt-[calc(env(safe-area-inset-top)+12px)]" aria-hidden />;
   }
 
   return (

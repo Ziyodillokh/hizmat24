@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react';
+import { Icon } from '@/components/Icon';
 import { WorkerIllustration } from '@/components/WorkerIllustration';
 import { cn } from '@/lib/cn';
 
@@ -24,20 +26,21 @@ function BannerContent() {
         toʻliq. SVG `xMidYMax` bilan tekislanadi, yaʼni ortiqcha boʻshliq faqat
         tepadan olinadi va byust pastki chetga tegib turadi.
       */}
-      <span className="relative h-full w-[40%] shrink-0 self-end">
+      <span className="relative h-full w-[34%] shrink-0 self-end">
         <WorkerIllustration className="absolute bottom-0 h-full w-full text-on-primary-deep" />
       </span>
 
-      <span className="flex min-w-0 flex-1 flex-col items-start justify-center py-16 pr-16">
+      <span className="flex min-w-0 flex-1 flex-col items-start justify-center py-12 pr-16">
         {/* Bosh harflar bilan yozilgan sarlavha ("YORDAM KERAKMI?") reklama
             bannerga oʻxshab qolardi — oddiy gap koʻrinishi tinchroq va
             ishonchliroq oʻqiladi. */}
-        <span className="text-h2 text-on-primary-deep">Yordam kerakmi?</span>
-        <span className="mt-4 text-body text-on-primary-deep">Ishonchli ustani toping</span>
+        <span className="text-h2 uppercase text-on-primary-deep">Yordam kerakmi?</span>
+        <span className="mt-2 text-body-sm text-on-primary-deep">Ishonchli mutaxassisni toping</span>
         {/* Toʻldirilgan oq tugma: ilgari u 20% shaffof oq edi va oʻchirilgan
             tugmaga oʻxshab koʻrinardi. */}
-        <span className="mt-12 inline-flex h-[36px] items-center rounded-xs bg-on-primary-deep px-16 text-button-sm text-primary-deep">
-          Ustani chaqirish
+        <span className="mt-8 inline-flex h-[34px] shrink-0 items-center gap-4 whitespace-nowrap rounded-full bg-on-primary-deep px-12 text-button-sm text-primary-deep">
+          Hozir buyurtma berish
+          <Icon icon={ArrowRight} size={16} aria-hidden />
         </span>
       </span>
     </>
@@ -46,8 +49,8 @@ function BannerContent() {
 
 export function HomeBanner({ onSelect, className }: HomeBannerProps) {
   const classes = cn(
-    'hero-field flex w-full items-stretch overflow-hidden rounded-lg text-left',
-    'aspect-[100/42]',
+    'banner-field flex w-full items-stretch overflow-hidden rounded-lg text-left',
+    'h-[140px]',
     className,
   );
 

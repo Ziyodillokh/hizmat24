@@ -15,6 +15,7 @@
   color-scheme: light;
   --color-surface: 242 247 247;
   --color-surface-elevated: 255 255 255;
+  --color-surface-hero: 20 174 171;
   --color-surface-sunken: 229 239 239;
   --color-border: 220 232 232;
   --color-text-primary: 4 48 47;
@@ -96,6 +97,20 @@ body {
         168deg,
         rgb(var(--color-surface-hero)) 0%,
         rgb(var(--color-surface-hero-deep)) 100%
+      );
+  }
+
+  /*
+   * Banner maydoni — tepa blokdan bir pogʻona toʻqroq, shunda banner uning
+   * ustida yotgandek koʻrinadi (referensdagi qatlamlanish).
+   */
+  .banner-field {
+    background-color: rgb(var(--color-surface-hero-deep));
+    background-image:
+      radial-gradient(
+        120% 130% at 88% -25%,
+        rgb(var(--color-surface-hero) / 0.6) 0%,
+        rgb(var(--color-surface-hero) / 0) 62%
       );
   }
 
