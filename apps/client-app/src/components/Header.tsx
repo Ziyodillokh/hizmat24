@@ -29,7 +29,7 @@ type HeaderTone = 'surface' | 'hero';
  */
 const GREETING_CLASSES: Record<HeaderTone, string> = {
   surface: 'text-text-secondary',
-  hero: 'text-on-primary-deep/[0.78]',
+  hero: 'text-on-primary-deep',
 };
 
 const TITLE_CLASSES: Record<HeaderTone, string> = {
@@ -39,7 +39,7 @@ const TITLE_CLASSES: Record<HeaderTone, string> = {
 
 const BELL_CLASSES: Record<HeaderTone, string> = {
   surface: 'text-text-secondary',
-  hero: 'text-on-primary-deep/[0.85]',
+  hero: 'text-on-primary-deep',
 };
 
 export interface HeaderProps {
@@ -139,11 +139,7 @@ export function Header({
         <p className={cn('truncate text-overline uppercase', GREETING_CLASSES[tone])}>
           {greeting(now ?? new Date())}
         </p>
-        {/*
-          `h3`, `h2` emas: maskalangan raqam ("+998 90 *** ** 67") 22px qalin
-          holda bosh sahifadagi eng katta matnga aylanib, eʼtiborni xizmatlardan
-          oʻgʻirlab olardi. Salomlashuv bilan birga u ikkilamchi maʼlumot.
-        */}
+        {/* Ism — bosh sahifadagi shaxsiy blokning asosiy matni. */}
         <p className={cn('mt-2 truncate text-h2', TITLE_CLASSES[tone])}>{identity}</p>
       </div>
       <button
@@ -154,7 +150,15 @@ export function Header({
       >
         <span className="relative">
           <Icon icon={Bell} size={24} className={BELL_CLASSES[tone]} />
-          <UnreadBadge count={unreadCount} className="absolute -right-8 -top-8 ring-surface-hero" />
+          {/*
+            Halqa YOʻQ: u qatʼiy rangda chiziladi, hero esa gradient — natijada
+            badge atrofida fonga mos kelmaydigan halqa paydo boʻlardi. Badge
+            qoʻngʻiroqdan tashqariga chiqarilgan, shuning uchun halqa kerak emas.
+          */}
+          <UnreadBadge
+            count={unreadCount}
+            className="absolute -right-12 -top-8 ring-0"
+          />
         </span>
       </button>
     </header>

@@ -6,6 +6,11 @@ import { Icon } from './Icon';
 /**
  * Pastki navigatsiya — beshta boʻlim.
  *
+ * Xavfsiz zonani (home indicator) bu komponent EGALLAMAYDI — uni
+ * `ScreenShell` dagi `BottomInset` beradi. Ikkalasi ham qoʻyganda 34px
+ * ikki marta zahiralanardi va bu bosh sahifani past ekranlarda scrollga
+ * majbur qilardi.
+ *
  * Yorliqlar QISQA: 360px ekranda beshta tabga 72px dan tushadi va
  * "Mutaxassislar" yoki "Bosh sahifa" kabi uzun soʻz kesilib qolardi.
  * Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
@@ -37,12 +42,12 @@ const ICON_CLASSES: Record<TabState, string> = {
   // Toʻldirish endi Phosphor ogʻirligi orqali beriladi (`weight="fill"`) —
   // u glifning ichki detalini saqlagan holda shaklni toʻldiradi. Lucide'da
   // bu mumkin emasdi: `fill-*` utilitasi konturni bitta boʻlakka aylantirardi.
-  active: 'text-primary',
+  active: 'text-primary-pressed',
   inactive: 'text-text-secondary',
 };
 
 const LABEL_CLASSES: Record<TabState, string> = {
-  active: 'text-primary font-semibold',
+  active: 'text-primary-pressed font-semibold',
   inactive: 'text-text-secondary',
 };
 
@@ -118,7 +123,7 @@ export function BottomNav({ active, onSelect, className }: BottomNavProps) {
                   className={cn(
                     'absolute inset-x-0 top-0 mx-auto h-[3px] w-[24px] rounded-b-full',
                     'transition-colors duration-state ease-std',
-                    state === 'active' ? 'bg-primary' : 'bg-transparent',
+                    state === 'active' ? 'bg-primary-pressed' : 'bg-transparent',
                   )}
                 />
 
@@ -138,8 +143,6 @@ export function BottomNav({ active, onSelect, className }: BottomNavProps) {
           );
         })}
       </ul>
-      {/* Home indicator zonasi — kontent shu yerga chizilmaydi (9.14-band). */}
-      <div className="h-home-indicator" aria-hidden />
     </nav>
   );
 }

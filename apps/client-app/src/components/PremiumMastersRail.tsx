@@ -49,6 +49,7 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
           key={master.id}
           type="button"
           onClick={() => onSelect(master.id)}
+          aria-label={`${master.fullName} — ${master.profession}`}
           className="flex w-[64px] shrink-0 flex-col items-center gap-4 transition-transform duration-press ease-emphasized active:scale-[0.94]"
         >
           {/*

@@ -7,6 +7,8 @@ const ROOT_ROUTES = new Set([
   '/app',
   '/app/home',
   '/app/orders',
+  '/app/market',
+  '/app/masters',
   '/app/notifications',
   '/app/profile',
 ]);

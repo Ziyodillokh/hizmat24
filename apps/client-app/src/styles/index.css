@@ -88,6 +88,18 @@ body {
   .hero-field {
     background-color: rgb(var(--color-surface-hero));
     background-image:
+      /*
+       * Tepadagi yumshoq quyuqlashtirish. Usiz oq matn yorqin turkuaz
+       * ustida 2,7:1 berardi — katta qalin matn uchun ham talab qilinadigan
+       * 3:1 dan past. Parda faqat sarlavha qatori ortida ishlaydi va
+       * maydonning umumiy tusini oʻzgartirmaydi.
+       */
+      linear-gradient(
+        180deg,
+        rgb(var(--color-on-primary) / 0.26) 0%,
+        rgb(var(--color-on-primary) / 0.1) 34%,
+        rgb(var(--color-on-primary) / 0) 58%
+      ),
       radial-gradient(
         130% 90% at 18% -12%,
         rgb(var(--color-surface-hero-top) / 0.9) 0%,

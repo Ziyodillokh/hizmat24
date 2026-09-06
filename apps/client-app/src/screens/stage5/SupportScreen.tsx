@@ -15,33 +15,54 @@ export type SupportVariant = 'default' | 'with-order';
 
 export interface SupportScreenProps {
   variant?: SupportVariant;
+  /** Berilmasa sarlavhada orqaga strelkasi chizilmaydi. */
+  onBack?: () => void;
 }
 
 interface ChannelItem {
   icon: IconGlyph;
   label: string;
   value: string;
+  /** Bosilganda ochiladigan manzil: `tel:` yoki Telegram. */
+  href: string;
 }
 
+/*
+ * Qatorlar HAQIQATAN ochiladi. Ilgari ular oddiy `<button>` edi va hech
+ * qanday `onClick` yoʻq edi: foydalanuvchi shevronni koʻrib bosardi, hech
+ * nima boʻlmasdi. Ishlamaydigan boshqaruv ilovani buzuq koʻrsatadi.
+ */
 const CHANNELS: ChannelItem[] = [
-  { icon: Phone, label: "Telefon orqali bogʻlanish", value: '+998 71 200 24 24' },
-  { icon: PaperPlaneTilt, label: 'Telegram orqali yozish', value: '@hizmat24_support' },
+  {
+    icon: Phone,
+    label: 'Telefon orqali bogʻlanish',
+    value: '+998 71 200 24 24',
+    href: 'tel:+998712002424',
+  },
+  {
+    icon: PaperPlaneTilt,
+    label: 'Telegram orqali yozish',
+    value: '@hizmat24_support',
+    href: 'https://t.me/hizmat24_support',
+  },
 ];
 
-export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
+export function SupportScreen({ variant = 'default', onBack }: SupportScreenProps) {
   const order = ORDERS_BY_ID['o-progress'];
 
   return (
-    <ScreenShell header={<Header variant="inner" title="Qoʻllab-quvvatlash xizmati" />}>
+    <ScreenShell
+      header={<Header variant="inner" title="Qoʻllab-quvvatlash xizmati" onBack={onBack} />}
+    >
       <p className="mt-4 text-body text-text-secondary">
         Savolingiz boʻlsa, quyidagi usullardan biri orqali bogʻlaning.
       </p>
 
       <nav className="mt-20">
         {CHANNELS.map((channel) => (
-          <button
+          <a
             key={channel.label}
-            type="button"
+            href={channel.href}
             className="flex min-h-touch w-full items-center gap-12 border-b border-border px-4 py-16 text-left last:border-b-0"
           >
             <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-surface-sunken">
@@ -52,7 +73,7 @@ export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
               <span className="block text-body-sm text-text-secondary">{channel.value}</span>
             </span>
             <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />
-          </button>
+          </a>
         ))}
       </nav>
 

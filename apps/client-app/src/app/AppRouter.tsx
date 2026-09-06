@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { DeviceView } from '@/preview/DeviceView';
 import { AppLaunch } from './AppLaunch';
 import { PageTransition } from './PageTransition';
@@ -21,6 +21,15 @@ import { ProductDetail } from './screens/ProductDetail';
 import { ShopDetail } from './screens/ShopDetail';
 import { MastersTab } from './screens/MastersTab';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
+
+/**
+ * `SupportScreen` preview galereyasida ham ishlatiladi va u yerda marshrut
+ * yoʻq, shuning uchun orqaga qaytish shu oʻramchida beriladi.
+ */
+function SupportRoute() {
+  const navigate = useNavigate();
+  return <SupportScreen onBack={() => navigate(-1)} />;
+}
 
 /** Login qilmagan foydalanuvchini kirish oqimiga qaytaradi (1-boʻlim, 14-qoida). */
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -222,7 +231,7 @@ function AppRoutes() {
             path="support"
             element={
               <RequireAuth>
-                <SupportScreen />
+                <SupportRoute />
               </RequireAuth>
             }
           />
