@@ -92,7 +92,7 @@ export function HomeTab() {
             />
           </div>
 
-          <div className="px-20 pt-12">
+          <div className="px-20 pt-12 [@media(max-height:800px)]:pt-8">
             <HomeBanner onSelect={() => navigate('/app/services')} />
           </div>
         </div>
@@ -124,8 +124,10 @@ export function HomeTab() {
           </section>
         )}
 
-        <h2 className="pt-12 text-h3 text-text-primary">Mashhur xizmatlar</h2>
-        <div className="mt-8 grid grid-cols-4 gap-8 gap-y-8">
+        <h2 className="pt-12 text-h3 text-text-primary [@media(max-height:800px)]:pt-8">
+          Mashhur xizmatlar
+        </h2>
+        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12 [@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:gap-y-8">
           {groups.map((group) => (
             <ServiceGroupTile
               key={group.id}
@@ -144,7 +146,9 @@ export function HomeTab() {
           />
         </div>
 
-        <h2 className="pt-8 text-h3 text-text-primary">Sizga tavsiya etiladiganlar</h2>
+        <h2 className="pt-12 text-h3 text-text-primary [@media(max-height:800px)]:pt-8">
+          Sizga tavsiya etiladiganlar
+        </h2>
         <ul className="mt-8 grid grid-cols-2 items-stretch gap-12">
           {SUGGESTED_MASTERS.map((master) => (
             <li key={master.id} className="min-w-0">

@@ -9,9 +9,10 @@ import { Avatar } from './Avatar';
  * faqat tarifni sotib olgan ustalar shu qatorga tushadi va mijoz ilovani
  * ochishi bilan ularni koʻradi.
  *
- * Halqa OLTIN rangda: turkuaz hero maydoni ustida brend rangidagi halqa
- * fonga singib ketardi, oltin esa "premium" ni bir qarashda aytadi va
- * ilovadagi yulduz/reyting oilasi bilan bitta tusda.
+ * Halqa OLTIN rangda (`illus-hi-vis`, #F5B942): turkuaz hero ustida brend
+ * rangidagi halqa fonga singib ketardi. Reyting yulduzining rangi (`star`)
+ * bu yerda toʻgʻri kelmadi — u toʻq jigarrang-sariq va halqa "premium"
+ * emas, zanglagan koʻrinardi.
  *
  * Qator hero blokining ichida turadi, shuning uchun yorliqlar oq rangda.
  */
@@ -48,17 +49,17 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
           key={master.id}
           type="button"
           onClick={() => onSelect(master.id)}
-          className="flex w-[60px] shrink-0 flex-col items-center gap-2 transition-transform duration-press ease-emphasized active:scale-[0.94]"
+          className="flex w-[64px] shrink-0 flex-col items-center gap-4 transition-transform duration-press ease-emphasized active:scale-[0.94]"
         >
           {/*
-            Ikki qatlamli halqa: tashqarida oltin gradient, ichkarida hero
-            rangidagi 2px tirqish. Tirqishsiz halqa fotoga yopishib, qalin
-            chekka boʻlib koʻrinadi.
+            Oltin halqa va uning ichida SHAFFOF tirqish.
+            Ilgari tirqish `surface-hero` qatʼiy rangida edi, hero esa
+            gradient — tirqish fonga mos kelmay, doira atrofida notoʻgʻri
+            rangdagi ikkinchi halqa boʻlib koʻrinardi. Shaffof tirqishda
+            fonning oʻzi koʻrinadi va halqa qayerda tursa ham toʻgʻri chiqadi.
           */}
-          <span className="rounded-full bg-gradient-to-br from-star to-illus-hi-vis p-[2px]">
-            <span className="block rounded-full border-2 border-surface-hero">
-              <Avatar name={master.fullName} src={master.photoUrl} size={44} />
-            </span>
+          <span className="rounded-full border-[2.5px] border-illus-hi-vis p-[3px]">
+            <Avatar name={master.fullName} src={master.photoUrl} size={48} />
           </span>
 
           <span className="w-full truncate text-center text-caption text-on-primary-deep/[0.92]">

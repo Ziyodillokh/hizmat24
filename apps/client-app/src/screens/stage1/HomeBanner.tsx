@@ -32,7 +32,7 @@ function BannerContent() {
         src={workerPhoto}
         alt=""
         aria-hidden
-        className="absolute bottom-0 left-8 h-[106px] w-auto"
+        className="absolute bottom-0 left-8 h-[116px] w-auto [@media(max-height:800px)]:h-[100px]"
       />
 
       {/* Chapdagi ~40% ustaga qoldiriladi. */}
@@ -52,7 +52,8 @@ function BannerContent() {
 
 export function HomeBanner({ onSelect, className }: HomeBannerProps) {
   const classes = cn(
-    'banner-field relative block h-[112px] w-full overflow-hidden rounded-lg text-left',
+    'banner-field relative block h-[124px] w-full overflow-hidden rounded-lg text-left',
+    '[@media(max-height:800px)]:h-[106px]',
     className,
   );
 

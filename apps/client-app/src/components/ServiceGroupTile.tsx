@@ -76,7 +76,8 @@ export function ServiceGroupTile({
         className={cn(
           // 9.5-banddagi 72px. Tor ekranlarda (320–360px) doira ustun kengligiga
           // qarab siqiladi, shuning uchun `max-w` — qatʼiy `w` emas.
-          'flex aspect-square w-full max-w-[52px] items-center justify-center rounded-full',
+          'flex aspect-square w-full max-w-[58px] items-center justify-center rounded-full',
+          '[@media(max-height:800px)]:max-w-[50px]',
           // Grid doiralari e2 darajasida (6.3-band): Light — oq doira va soya,
           // Dark — toʻldirilgan teal va ingichka chegara. Ikkalasini ham
           // `category-circle` tokeni beradi.
