@@ -5,9 +5,9 @@ import { Icon, type IconSize } from './Icon';
 
 /**
  * Yulduzli reyting — spetsifikatsiya 9.11-bandi.
- * Read-only: ro'yxatda 14px (`sm`), usta profilida 18px (`md`).
+ * Read-only: roʻyxatda 14px (`sm`), usta profilida 18px (`md`).
  * Interaktiv (19-ekran): 40px (`lg`), oraliq 8px.
- * To'ldirilgan = `star`, bo'sh = `star-empty` — ikkalasi ham TO'LDIRILGAN, kontur emas.
+ * Toʻldirilgan = `star`, boʻsh = `star-empty` — ikkalasi ham TOʻLDIRILGAN, kontur emas.
  */
 export type StarRatingSize = 'sm' | 'md' | 'lg';
 
@@ -16,8 +16,8 @@ const MAX_STARS = 5;
 const STAR_VALUES = [1, 2, 3, 4, 5];
 
 /**
- * `md` uchun 18px kerak, lekin Icon shkalasida 18 yo'q (6.4-band) — shuning uchun
- * eng yaqin shkala qiymati beriladi va aniq o'lcham klass orqali qotiriladi.
+ * `md` uchun 18px kerak, lekin Icon shkalasida 18 yoʻq (6.4-band) — shuning uchun
+ * eng yaqin shkala qiymati beriladi va aniq oʻlcham klass orqali qotiriladi.
  */
 const SIZE_CLASSES: Record<StarRatingSize, { icon: IconSize; box: string; gap: string }> = {
   sm: { icon: 14, box: '', gap: 'gap-2' },
@@ -29,9 +29,9 @@ export interface StarRatingProps {
   /** Reyting qiymati (0–5). Interaktiv rejimda — tanlangan yulduzlar soni. */
   value: number;
   size?: StarRatingSize;
-  /** Reyting raqamini yulduzlar yonida ko'rsatish (faqat read-only rejimda). */
+  /** Reyting raqamini yulduzlar yonida koʻrsatish (faqat read-only rejimda). */
   showValue?: boolean;
-  /** Berilsa komponent interaktiv bo'ladi (19-ekran, 40px yulduzlar). */
+  /** Berilsa komponent interaktiv boʻladi (19-ekran, 40px yulduzlar). */
   onChange?: (value: number) => void;
   className?: string;
 }
@@ -45,7 +45,7 @@ export function StarRating({ value, size = 'sm', showValue = false, onChange, cl
       key={star}
       icon={Star}
       size={icon}
-      // `fill-current` — 9.11-band talabi: bo'sh yulduz ham to'ldirilgan, faqat rangi boshqa.
+      // `fill-current` — 9.11-band talabi: boʻsh yulduz ham toʻldirilgan, faqat rangi boshqa.
       className={cn('fill-current', box, star <= filledCount ? 'text-star' : 'text-star-empty')}
     />
   );
@@ -61,8 +61,8 @@ export function StarRating({ value, size = 'sm', showValue = false, onChange, cl
             aria-checked={star === filledCount}
             aria-label={`${star} yulduz`}
             onClick={() => onChange(star)}
-            // p-2 bilan teginish maydoni 44x44 bo'ladi, yulduzlar orasidagi
-            // ko'rinadigan oraliq esa 8px bo'lib qoladi (6.1 va 9.11-bandlar).
+            // p-2 bilan teginish maydoni 44x44 boʻladi, yulduzlar orasidagi
+            // koʻrinadigan oraliq esa 8px boʻlib qoladi (6.1 va 9.11-bandlar).
             className="inline-flex p-2 transition-transform active:scale-[0.92]"
           >
             {renderStar(star)}

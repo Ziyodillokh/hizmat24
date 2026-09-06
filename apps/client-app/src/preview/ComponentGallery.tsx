@@ -53,14 +53,14 @@ function Gallery() {
         <GalleryRow label="Variantlar">
           <div className="w-[200px]"><Button variant="primary">Ustani chaqirish</Button></div>
           <div className="w-[200px]"><Button variant="secondary">Bekor qilish</Button></div>
-          <div className="w-[200px]"><Button variant="ghost">O&apos;zgartirish</Button></div>
+          <div className="w-[200px]"><Button variant="ghost">Oʻzgartirish</Button></div>
           <div className="w-[200px]"><Button variant="destructive">Tasdiqlash</Button></div>
-          <div className="w-[240px]"><Button variant="destructive-outline">Yo&apos;q, bu boshqa odam</Button></div>
+          <div className="w-[240px]"><Button variant="destructive-outline">Yoʻq, bu boshqa odam</Button></div>
         </GalleryRow>
         <GalleryRow label="Holatlar">
           <div className="w-[200px]"><Button disabled>Davom etish</Button></div>
           <div className="w-[200px]"><Button loading>Davom etish</Button></div>
-          <div className="w-[160px]"><Button size="small">Barchasini ko&apos;rish</Button></div>
+          <div className="w-[160px]"><Button size="small">Barchasini koʻrish</Button></div>
         </GalleryRow>
       </GallerySection>
 
@@ -94,10 +94,10 @@ function Gallery() {
           <ServiceGroupTile label="Santexnika" icon={Droplet} />
         </div>
         <div className="w-[340px]">
-          <ServiceCard name="Rozetka o'rnatish" description="Bitta nuqta" price={80_000} icon={Plug} onSelect={() => undefined} />
+          <ServiceCard name="Rozetka oʻrnatish" description="Bitta nuqta" price={80_000} icon={Plug} onSelect={() => undefined} />
         </div>
         <div className="w-[340px]">
-          <ServiceCard name="Lyustra o'rnatish" description={null} price={120_000} icon={Plug} />
+          <ServiceCard name="Lyustra oʻrnatish" description={null} price={120_000} icon={Plug} />
         </div>
       </GallerySection>
 
@@ -122,14 +122,14 @@ function Gallery() {
             <MasterCard name="Akmal Rahimov" profession="Santexnik" rating={4.8} completedOrders={142} experience="experienced" isCertified onOpen={() => undefined} />
           </div>
           <div className="w-[340px]">
-            <MasterCard name="Bekzod To'raev" profession="Elektrik" rating={4.2} completedOrders={9} compact />
+            <MasterCard name="Bekzod Toʻraev" profession="Elektrik" rating={4.2} completedOrders={9} compact />
           </div>
         </GalleryRow>
       </GallerySection>
 
       <GallerySection title="9.8 / 9.13 · Buyurtma va bildirishnoma qatorlari">
         <div className="w-[340px]">
-          <OrderCard serviceIcon={Droplet} serviceName="Kran ta'mirlash" status={ORDER_STATUS.CLOSED} createdAt={NOW} now={NOW} price={100_000} onSelect={() => undefined} />
+          <OrderCard serviceIcon={Droplet} serviceName="Kran taʼmirlash" status={ORDER_STATUS.CLOSED} createdAt={NOW} now={NOW} price={100_000} onSelect={() => undefined} />
         </div>
         <div className="w-[340px]">
           <NotificationRow type="MASTER_ARRIVED" title="Usta yetib keldi" body="Iltimos, kelgan ustani tasdiqlang" createdAt={NOW} now={NOW} isUnread />
@@ -153,7 +153,7 @@ function Gallery() {
         <GalleryRow label="InfoChip">
           <InfoChip icon={Clock} tone="primary">Taxminiy vaqt: 15 daqiqa</InfoChip>
           <InfoChip icon={Zap} tone="warning">Shoshilinch</InfoChip>
-          <InfoChip>~3-o&apos;rin</InfoChip>
+          <InfoChip>~3-oʻrin</InfoChip>
         </GalleryRow>
         <GalleryRow label="SegmentControl">
           <div className="w-[340px]">
@@ -193,25 +193,25 @@ function Gallery() {
 
       <GallerySection title="9.18 / 9.25 / 9.26 · Banner va toast">
         <div className="w-[340px]"><Banner variant="info">Usta ishni boshladi</Banner></div>
-        <div className="w-[340px]"><Banner variant="warning">Buyurtma berilgandan keyin uni tahrirlab bo&apos;lmaydi.</Banner></div>
-        <div className="w-[340px]"><Banner variant="danger">Kelgan odam suratdagi ustaga o&apos;xshamasa, tugmani bosing.</Banner></div>
+        <div className="w-[340px]"><Banner variant="warning">Buyurtma berilgandan keyin uni tahrirlab boʻlmaydi.</Banner></div>
+        <div className="w-[340px]"><Banner variant="danger">Kelgan odam suratdagi ustaga oʻxshamasa, tugmani bosing.</Banner></div>
         <div className="w-[340px]"><Toast message="Buyurtma holati yangilandi" /></div>
         <div className="w-[340px] relative h-[36px]"><ConnectionBanner state="reconnecting" /></div>
         <div className="w-[340px] relative h-[36px]"><ConnectionBanner state="stalled" onRefresh={() => undefined} /></div>
       </GallerySection>
 
-      <GallerySection title="9.20 / 9.29 · Skeleton, bo'sh holat, radar">
+      <GallerySection title="9.20 / 9.29 · Skeleton, boʻsh holat, radar">
         <GalleryRow label="Skeleton">
           <SkeletonCircle size={44} />
           <div className="w-[200px]"><SkeletonText lines={3} /></div>
           <Skeleton width={120} height={52} radius="md" />
         </GalleryRow>
-        <GalleryRow label="Bo'sh holat">
+        <GalleryRow label="Boʻsh holat">
           <div className="w-[340px]">
-            <EmptyState icon={Inbox} title="Bildirishnomalar yo'q" description="Buyurtma bergach, holat o'zgarishlari shu yerda ko'rinadi" />
+            <EmptyState icon={Inbox} title="Bildirishnomalar yoʻq" description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi" />
           </div>
           <div className="w-[340px]">
-            <EmptyState icon={Search} title="Hech narsa topilmadi" action={{ label: "Barcha xizmatlarni ko'rish", onClick: () => undefined }} />
+            <EmptyState icon={Search} title="Hech narsa topilmadi" action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => undefined }} />
           </div>
         </GalleryRow>
         <GalleryRow label="Radar">
@@ -243,7 +243,7 @@ export function ComponentGallery() {
       <Link to="/" className="text-body text-primary">← Barcha ekranlar</Link>
       <h1 className="mt-12 text-h2 text-text-primary">Komponentlar kutubxonasi</h1>
       <p className="mt-4 text-body text-text-secondary">
-        Spetsifikatsiyaning 9-bo&apos;limi — har bir komponent barcha holatlari bilan.
+        Spetsifikatsiyaning 9-boʻlimi — har bir komponent barcha holatlari bilan.
       </p>
 
       <div className="mt-24 flex flex-wrap items-start gap-[120px]">

@@ -17,8 +17,7 @@ export function GroupServicesTab() {
   const { setDraftCategory } = useApp();
 
   const group = SERVICE_GROUPS.find((item) => item.id === groupId) ?? SERVICE_GROUPS[0];
-  const icon = serviceIcon(group.iconKey);
-
+  
   const select = (categoryId: string) => {
     setDraftCategory(categoryId);
     navigate('/app/new/details');
@@ -33,7 +32,7 @@ export function GroupServicesTab() {
               name={category.name}
               description={category.description}
               price={category.basePrice}
-              icon={icon}
+              icon={serviceIcon(category.iconKey ?? group.iconKey)}
               onSelect={() => select(category.id)}
             />
           </li>
@@ -74,7 +73,7 @@ export function AllServicesTab() {
         <EmptyState
           icon={SearchX}
           title="Hech narsa topilmadi"
-          action={{ label: "Barcha xizmatlarni ko'rish", onClick: () => setQuery('') }}
+          action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => setQuery('') }}
           inline
         />
       ) : (

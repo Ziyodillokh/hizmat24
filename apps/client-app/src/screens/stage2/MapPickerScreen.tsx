@@ -14,11 +14,11 @@ import { ORDERS_BY_ID } from '@/mocks/orders';
  * 09 · Xaritada manzil tanlash (2-qadam).
  *
  * Manzil majburiy va ikki qismdan iborat: xarita nuqtasi + matnli manzil
- * (1-bo'lim, 10-qoida). Shuning uchun nuqta tasdiqlanmaguncha "Shu yerda"
- * tugmasi ishlamaydi va matn aniqlanmagan holatda panel shimmer ko'rsatadi.
+ * (1-boʻlim, 10-qoida). Shuning uchun nuqta tasdiqlanmaguncha "Shu yerda"
+ * tugmasi ishlamaydi va matn aniqlanmagan holatda panel shimmer koʻrsatadi.
  *
- * Qadam indikatori bu ekranda chizilmaydi: 11-bo'limdagi "Ko'rinadi" ro'yxatida
- * u yo'q va to'liq ekran xaritada unga joy qolmaydi.
+ * Qadam indikatori bu ekranda chizilmaydi: 11-boʻlimdagi "Koʻrinadi" roʻyxatida
+ * u yoʻq va toʻliq ekran xaritada unga joy qolmaydi.
  */
 export type MapPickerVariant =
   | 'default'
@@ -36,8 +36,8 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
 
   const isMapLoading = variant === 'map-loading';
   const isAddressLoading = variant === 'address-loading';
-  // Ruxsat yo'q yoki xato bo'lsa tasdiqlanadigan nuqta ham, manzil matni ham yo'q —
-  // shuning uchun pin va panel butunlay yashiriladi (bo'sh panel chizilmaydi).
+  // Ruxsat yoʻq yoki xato boʻlsa tasdiqlanadigan nuqta ham, manzil matni ham yoʻq —
+  // shuning uchun pin va panel butunlay yashiriladi (boʻsh panel chizilmaydi).
   const isBlocked = variant === 'no-permission' || variant === 'error';
 
   return (
@@ -51,7 +51,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
       {isMapLoading && (
         <>
           <Skeleton width="100%" height="100%" radius="xs" className="absolute inset-0" />
-          {/* Spinner faqat to'rt joyda ruxsat etilgan, shulardan biri — 09-ekran xaritasi (12.1-band). */}
+          {/* Spinner faqat toʻrt joyda ruxsat etilgan, shulardan biri — 09-ekran xaritasi (12.1-band). */}
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-primary">
             <Spinner size={32} />
           </span>
@@ -72,7 +72,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
           </Banner>
           <div className="mt-16 flex flex-col gap-12">
             <Button variant="secondary">Sozlamalarni ochish</Button>
-            <Button variant="ghost">Manzilni qo&apos;lda kiritish</Button>
+            <Button variant="ghost">Manzilni qoʻlda kiritish</Button>
           </div>
         </div>
       )}
@@ -80,7 +80,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
       {variant === 'error' && (
         <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 px-20">
           <Banner variant="danger" icon={TriangleAlert}>
-            Xatolik yuz berdi. Birozdan so&apos;ng qayta urinib ko&apos;ring.
+            Xatolik yuz berdi. Birozdan soʻng qayta urinib koʻring.
           </Banner>
           <Button variant="secondary" className="mt-16">
             Qayta urinish
@@ -90,10 +90,10 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
 
       {!isMapLoading && !isBlocked && (
         // Tugma va panel bitta pastki ustunda: shunda tugma paneldan 16px yuqorida
-        // turadi va joylashuvi shkaladan tashqari qiymatga bog'lanmaydi.
+        // turadi va joylashuvi shkaladan tashqari qiymatga bogʻlanmaydi.
         <div className="absolute bottom-0 left-0 right-0">
           <div className="flex justify-end px-20 pb-16">
-            {/* Dumaloq 48px tugma — matn yorlig'i faqat ekran o'quvchisi uchun (8.2-jadval). */}
+            {/* Dumaloq 48px tugma — matn yorligʻi faqat ekran oʻquvchisi uchun (8.2-jadval). */}
             <button
               type="button"
               aria-label="Mening joylashuvim"
@@ -105,7 +105,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
 
           <section className="rounded-t-xl bg-surface-modal p-20 shadow-e3">
             {isAddressLoading ? (
-              // Manzil aniqlanmoqda — panel tuzilishi o'zgarmaydi, faqat matn o'rnida shimmer.
+              // Manzil aniqlanmoqda — panel tuzilishi oʻzgarmaydi, faqat matn oʻrnida shimmer.
               <div className="flex h-24 items-center">
                 <Skeleton width="80%" height={16} />
               </div>

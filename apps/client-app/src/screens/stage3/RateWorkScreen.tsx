@@ -17,8 +17,8 @@ const RATING_LABELS = ['Yomon', 'Qoniqarli', 'Yaxshi', 'Juda yaxshi', 'Ajoyib'] 
 /**
  * 19 · Ishni baholang.
  *
- * Baholangach buyurtma DARHOL "Yakunlandi" holatiga o'tadi va chek ekrani
- * ochiladi; baho tahrirlanmaydi va qayta yuborilmaydi (1-bo'lim, 7-qoida).
+ * Baholangach buyurtma DARHOL "Yakunlandi" holatiga oʻtadi va chek ekrani
+ * ochiladi; baho tahrirlanmaydi va qayta yuborilmaydi (1-boʻlim, 7-qoida).
  */
 export type RateWorkVariant = 'empty' | 'selected' | 'submitting' | 'error';
 
@@ -78,9 +78,9 @@ export function RateWorkScreen({ variant = 'selected' }: RateWorkScreenProps) {
       />
 
       {/*
-        Xato holatida server matni `info` banner sifatida ko'rsatiladi va ekran
-        avtomatik chek ekraniga o'tadi — baho baribir qabul qilingan bo'lishi
-        mumkin, shuning uchun bu xato emas (11-bo'lim, 19-ekran).
+        Xato holatida server matni `info` banner sifatida koʻrsatiladi va ekran
+        avtomatik chek ekraniga oʻtadi — baho baribir qabul qilingan boʻlishi
+        mumkin, shuning uchun bu xato emas (11-boʻlim, 19-ekran).
       */}
       {variant === 'error' && (
         <Banner variant="info" className="mt-16">

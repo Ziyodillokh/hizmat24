@@ -15,11 +15,18 @@ export type ButtonVariant =
   | 'destructive'
   | 'destructive-outline';
 
+/**
+ * Bosilganda FILL ham, SIYOH ham almashadi. Ilgari faqat fon toʻqlashardi va
+ * `on-primary` (#04302F) `primary-pressed` (#0B7C7B) ustida 2,85:1 berardi —
+ * yaʼni tugma bosilgan zahoti OʻQILMAYDIGAN boʻlib qolardi. Oq siyoh 5,02:1.
+ */
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-on-primary active:bg-primary-pressed',
+  primary:
+    'bg-primary text-on-primary shadow-primary-lift active:bg-primary-pressed active:text-on-primary-deep active:shadow-e1',
   secondary: 'bg-transparent text-primary border-[1.5px] border-primary active:bg-primary/10',
   ghost: 'bg-transparent text-primary active:bg-primary/10',
-  destructive: 'bg-danger-fill text-on-primary-deep active:opacity-90',
+  destructive:
+    'bg-danger-fill text-on-primary-deep shadow-danger-lift active:opacity-90 active:shadow-e1',
   'destructive-outline':
     'bg-transparent text-danger border-[1.5px] border-danger active:bg-danger/10',
 };
@@ -27,7 +34,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   variant?: ButtonVariant;
   size?: 'default' | 'small';
-  /** Yuklanish holati: spinner + matn; tugma kengligi O'ZGARMAYDI. */
+  /** Yuklanish holati: spinner + matn; tugma kengligi OʻZGARMAYDI. */
   loading?: boolean;
   loadingLabel?: string;
   fullWidth?: boolean;
@@ -55,13 +62,21 @@ export function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex items-center justify-center gap-8 transition-transform',
-        'active:scale-[0.98] disabled:active:scale-100',
-        size === 'default' ? 'h-[52px] rounded-md px-20 text-button' : 'h-[36px] rounded-xs px-16 text-button-sm',
+        'inline-flex items-center justify-center gap-8',
+        'transition-[transform,background-color,color,box-shadow] duration-press ease-emphasized',
+        'active:scale-[0.97] disabled:active:scale-100',
+        // `min-h`: uzun oʻzbekcha yorliq ikki satrga sigʻsa tugma oʻssin,
+        // matn kesilmasin.
+        size === 'default'
+          ? 'min-h-[52px] rounded-md px-20 py-12 text-button'
+          : 'min-h-[36px] rounded-xs px-16 py-8 text-button-sm',
         fullWidth && 'w-full',
         VARIANT_CLASSES[variant],
-        // Disabled har doim bir xil ko'rinadi — variantdan qat'i nazar (9.1-band).
-        isDisabled && 'bg-border-strong/[0.38] text-text-disabled border-transparent active:bg-border-strong/[0.38]',
+        // Disabled har doim bir xil koʻrinadi — variantdan qatʼi nazar (9.1-band).
+        // Oʻchirilgan holat: ilgari `border-strong/[0.38]` toʻldirilgan kulrang
+        // plastinka edi va yorligʻi 2,05:1 — boʻsh quti boʻlib koʻrinardi.
+        isDisabled &&
+          'border border-border bg-surface-sunken text-text-disabled shadow-none active:bg-surface-sunken active:text-text-disabled active:shadow-none',
         className,
       )}
       {...rest}
@@ -74,7 +89,9 @@ export function Button({
       ) : (
         <>
           {leadingIcon && <Icon icon={leadingIcon} size={20} />}
-          <span className="truncate">{children}</span>
+          {/* `truncate` EMAS: uzun oʻzbekcha chaqiriq ("Qoʻllab-quvvatlashga
+              murojaat") 360px ekranda uch nuqta bilan kesilardi. */}
+          <span className="text-center leading-tight">{children}</span>
         </>
       )}
     </button>

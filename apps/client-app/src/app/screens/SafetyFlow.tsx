@@ -25,10 +25,10 @@ function VerificationChip({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * 16 · Ustani tasdiqlang + 17 · Xavfsizlik tasdig'i.
+ * 16 · Ustani tasdiqlang + 17 · Xavfsizlik tasdigʻi.
  *
- * Bloklovchi ekran: bekor qilish tugmasi ham, orqaga qaytish ham yo'q.
- * Ikkala tugma bir xil o'lchamda va og'irlikda — dark pattern taqiqlanadi.
+ * Bloklovchi ekran: bekor qilish tugmasi ham, orqaga qaytish ham yoʻq.
+ * Ikkala tugma bir xil oʻlchamda va ogʻirlikda — dark pattern taqiqlanadi.
  */
 export function ConfirmMasterFlow() {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ export function ConfirmMasterFlow() {
         </div>
 
         <Banner variant="warning" icon={ShieldAlert} className="mt-24 w-full">
-          Kelgan odam suratdagi ustaga o&apos;xshamasa — «Yo&apos;q, bu boshqa odam» tugmasini
+          Kelgan odam suratdagi ustaga oʻxshamasa — «Yoʻq, bu boshqa odam» tugmasini
           bosing.
         </Banner>
       </main>
@@ -96,7 +96,7 @@ export function ConfirmMasterFlow() {
             className="h-[56px]"
             onClick={() => setRejectOpen(true)}
           >
-            Yo&apos;q, bu boshqa odam
+            Yoʻq, bu boshqa odam
           </Button>
         </div>
       </div>
@@ -107,10 +107,10 @@ export function ConfirmMasterFlow() {
         <div className="flex flex-col items-center">
           <Icon icon={AlertTriangle} size={48} className="text-danger" />
           <h3 className="mt-16 text-center text-h3 text-text-primary">
-            Bu amalni bekor qilib bo&apos;lmaydi
+            Bu amalni bekor qilib boʻlmaydi
           </h3>
           <p className="mt-8 text-center text-body text-text-secondary">
-            Buyurtma to&apos;xtatiladi va operator siz bilan bog&apos;lanadi.
+            Buyurtma toʻxtatiladi va operator siz bilan bogʻlanadi.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export function SafetyAlertResult() {
         <Icon icon={ShieldAlert} size={72} className="text-danger" />
         <h1 className="mt-24 text-center text-h1 text-text-primary">Signalingiz qabul qilindi</h1>
         <p className="mt-8 text-center text-body text-text-secondary">
-          Operatorimiz hoziroq siz bilan bog&apos;lanadi
+          Operatorimiz hoziroq siz bilan bogʻlanadi
         </p>
 
         <div className="mt-24 w-full rounded-sm bg-surface-sunken p-16 text-center">
@@ -173,7 +173,7 @@ export function SafetyAlertResult() {
       <div className="shrink-0 px-20 pb-12 pt-24">
         <div className="flex flex-col gap-12">
           <Button variant="primary" onClick={() => navigate('/app/support')}>
-            Qo&apos;llab-quvvatlashga murojaat
+            Qoʻllab-quvvatlashga murojaat
           </Button>
           <Button variant="ghost" onClick={() => navigate('/app/home')}>
             Bosh sahifaga

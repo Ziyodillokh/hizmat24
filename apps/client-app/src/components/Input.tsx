@@ -10,17 +10,17 @@ import { cn } from '@/lib/cn';
  */
 export type FieldState = 'default' | 'error' | 'disabled';
 
-/** Input va Textarea 9.2-bandda bitta komponent sifatida ta'riflangan — uslub umumiy. */
+/** Input va Textarea 9.2-bandda bitta komponent sifatida taʼriflangan — uslub umumiy. */
 export const FIELD_BASE_CLASSES =
   'w-full rounded-md bg-surface-sunken px-16 text-body-lg text-text-primary outline-none transition-colors placeholder:text-text-secondary';
 
 /**
  * Fokus halqasi — 9.2-band: "tashqi 4px `primary` 20% halqa".
  *
- * `ring-primary/20` YOZIB BO'LMAYDI: rang tokenlari `var(--color-*)` shaklida
+ * `ring-primary/20` YOZIB BOʻLMAYDI: rang tokenlari `var(--color-*)` shaklida
  * berilgani uchun Tailwind opacity modifikatorini hisoblab chiqara olmaydi va
- * Halqa rangi ANIQ berilishi shart: berilmasa `--tw-ring-color` Tailwind'ning
- * standart `blue-500` qiymatiga tushib qoladi, ya'ni token jadvalida yo'q rang
+ * Halqa rangi ANIQ berilishi shart: berilmasa `--tw-ring-color` Tailwindʼning
+ * standart `blue-500` qiymatiga tushib qoladi, yaʼni token jadvalida yoʻq rang
  * (3.4-band, 14.7-band 47-punkt).
  */
 export const FIELD_FOCUS_RING_CLASSES =
@@ -34,13 +34,13 @@ export const FIELD_STATE_CLASSES: Record<FieldState, string> = {
 
 export function resolveFieldState(isDisabled?: boolean, hasError?: boolean): FieldState {
   if (isDisabled) return 'disabled';
-  // Disabled maydon xatoni ko'rsatmaydi — u tahrirlanmaydi, shuning uchun tartib shu.
+  // Disabled maydon xatoni koʻrsatmaydi — u tahrirlanmaydi, shuning uchun tartib shu.
   if (hasError) return 'error';
   return 'default';
 }
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Xato matni — berilsa maydon `error` holatiga o'tadi va matn ostida chiziladi. */
+  /** Xato matni — berilsa maydon `error` holatiga oʻtadi va matn ostida chiziladi. */
   error?: string;
 }
 

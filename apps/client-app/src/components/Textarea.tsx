@@ -4,16 +4,16 @@ import { FIELD_BASE_CLASSES, FIELD_STATE_CLASSES, resolveFieldState } from './In
 
 /**
  * Textarea — spetsifikatsiya 9.2-bandi.
- * Min balandlik 120px, ichida pastki o'ngda belgilar hisoblagichi
+ * Min balandlik 120px, ichida pastki oʻngda belgilar hisoblagichi
  * (`caption`, `text-secondary`). Maksimumga yetganda hisoblagich `danger`
- * rangga o'tadi (08-ekran holatlari: "2000/2000, hisoblagich danger").
+ * rangga oʻtadi (08-ekran holatlari: "2000/2000, hisoblagich danger").
  */
 export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'> {
   /** Boshqariladigan qiymat — hisoblagich aynan shundan sanaladi. */
   value: string;
-  /** Berilsa, pastki o'ngda "N/maksimum" hisoblagichi chiziladi. */
+  /** Berilsa, pastki oʻngda "N/maksimum" hisoblagichi chiziladi. */
   maxLength?: number;
-  /** Xato matni — berilsa maydon `error` holatiga o'tadi (9.2-band). */
+  /** Xato matni — berilsa maydon `error` holatiga oʻtadi (9.2-band). */
   error?: string;
 }
 
@@ -36,7 +36,7 @@ export function Textarea({ value, maxLength, error, disabled, className, id, ...
           aria-describedby={error ? errorId : undefined}
           className={cn(
             FIELD_BASE_CLASSES,
-            // Pastki padding hisoblagich uchun joy qoldiradi (16 padding + 16 hisoblagich + 8 bo'shliq).
+            // Pastki padding hisoblagich uchun joy qoldiradi (16 padding + 16 hisoblagich + 8 boʻshliq).
             'block min-h-[120px] resize-none py-16 pb-40',
             FIELD_STATE_CLASSES[state],
             className,

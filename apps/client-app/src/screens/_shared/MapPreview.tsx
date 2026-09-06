@@ -3,17 +3,17 @@ import { Icon } from '@/components/Icon';
 import { cn } from '@/lib/cn';
 
 /**
- * Mock xarita — haqiqiy xarita kutubxonasi ulanmagan, shuning uchun ko'cha
- * to'ri CSS bilan chiziladi. Yangi rang kiritilmaydi: faqat `surface-sunken`,
+ * Mock xarita — haqiqiy xarita kutubxonasi ulanmagan, shuning uchun koʻcha
+ * toʻri CSS bilan chiziladi. Yangi rang kiritilmaydi: faqat `surface-sunken`,
  * `border` va `border-strong` tokenlari (3.4-band).
  *
  * Uchta ekranda kerak (09, 10, 11, 23), shuning uchun bitta joyda —
  * takrorlanmasin.
  */
 export interface MapPreviewProps {
-  /** To'liq ekran (09) yoki karta ichidagi preview (10, 11, 23). */
+  /** Toʻliq ekran (09) yoki karta ichidagi preview (10, 11, 23). */
   size?: 'preview' | 'full';
-  /** 09-ekranda xarita yuklanayotganda yoki ruxsat yo'q bo'lganda pin chizilmaydi. */
+  /** 09-ekranda xarita yuklanayotganda yoki ruxsat yoʻq boʻlganda pin chizilmaydi. */
   showPin?: boolean;
   className?: string;
 }
@@ -23,7 +23,7 @@ const GRID: Record<'preview' | 'full', { cols: string; cells: number; road: stri
   full: { cols: 'grid-cols-4 grid-rows-6', cells: 24, road: 'top-[38%]' },
 };
 
-/** Pin uchi xarita markazida turadi, shakli tepaga qarab o'sadi. */
+/** Pin uchi xarita markazida turadi, shakli tepaga qarab oʻsadi. */
 function CenterPin({ size }: { size: 32 | 48 }) {
   return (
     <Icon
@@ -52,7 +52,7 @@ export function MapPreview({ size = 'preview', showPin = true, className }: MapP
         ))}
       </div>
 
-      {/* Asosiy ko'chalar — to'r bir tekis panjara bo'lib qolmasligi uchun. */}
+      {/* Asosiy koʻchalar — toʻr bir tekis panjara boʻlib qolmasligi uchun. */}
       <span aria-hidden className={cn('absolute left-0 h-4 w-full bg-border-strong', grid.road)} />
       {size === 'full' && (
         <span aria-hidden className="absolute left-[62%] top-0 h-full w-4 bg-border-strong" />

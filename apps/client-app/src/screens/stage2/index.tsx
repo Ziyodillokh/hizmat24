@@ -8,7 +8,7 @@ import { MapPickerScreen } from './MapPickerScreen';
 import { AddressDetailsScreen } from './AddressDetailsScreen';
 import { ConfirmOrderScreen } from './ConfirmOrderScreen';
 
-/** Bosqich 2 — kirish va manzil oqimi (13-bo'lim). */
+/** Bosqich 2 — kirish va manzil oqimi (13-boʻlim). */
 const STAGE_2: ScreenEntry[] = [
   { id: '01', name: 'Sessiyani tiklash', stage: 2, component: SessionRestoreScreen },
 
@@ -19,7 +19,7 @@ const STAGE_2: ScreenEntry[] = [
     component: () => <OnboardingScreen variant="error" /> },
 
   { id: '03', name: 'Telefon raqami', stage: 2, component: PhoneNumberScreen },
-  { id: '03', name: 'Telefon raqami', stage: 2, variant: "To'ldirilgan",
+  { id: '03', name: 'Telefon raqami', stage: 2, variant: "Toʻldirilgan",
     component: () => <PhoneNumberScreen variant="filled" /> },
   { id: '03', name: 'Telefon raqami', stage: 2, variant: 'Xato',
     component: () => <PhoneNumberScreen variant="error" /> },
@@ -29,13 +29,13 @@ const STAGE_2: ScreenEntry[] = [
   { id: '04', name: 'Tasdiqlash kodi', stage: 2, component: OtpScreen },
   { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: 'Yuborilmoqda',
     component: () => <OtpScreen variant="submitting" /> },
-  { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: "Kod noto'g'ri",
+  { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: "Kod notoʻgʻri",
     component: () => <OtpScreen variant="invalid" /> },
   { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: 'Muddati tugagan',
     component: () => <OtpScreen variant="expired" /> },
   { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: 'Urinishlar tugadi',
     component: () => <OtpScreen variant="attempts-exhausted" /> },
-  { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: "Juda ko'p urinish",
+  { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: "Juda koʻp urinish",
     component: () => <OtpScreen variant="too-many-attempts" /> },
   { id: '04', name: 'Tasdiqlash kodi', stage: 2, variant: 'SMS yuborilmadi',
     component: () => <OtpScreen variant="sms-failed" /> },
@@ -49,13 +49,13 @@ const STAGE_2: ScreenEntry[] = [
     component: () => <MapPickerScreen variant="map-loading" /> },
   { id: '09', name: 'Manzilni tanlang', stage: 2, variant: 'Manzil aniqlanmoqda',
     component: () => <MapPickerScreen variant="address-loading" /> },
-  { id: '09', name: 'Manzilni tanlang', stage: 2, variant: "Ruxsat yo'q",
+  { id: '09', name: 'Manzilni tanlang', stage: 2, variant: "Ruxsat yoʻq",
     component: () => <MapPickerScreen variant="no-permission" /> },
   { id: '09', name: 'Manzilni tanlang', stage: 2, variant: 'Xato',
     component: () => <MapPickerScreen variant="error" /> },
 
   { id: '10', name: 'Manzil tafsilotlari', stage: 2, component: AddressDetailsScreen },
-  { id: '10', name: 'Manzil tafsilotlari', stage: 2, variant: "Bo'sh",
+  { id: '10', name: 'Manzil tafsilotlari', stage: 2, variant: "Boʻsh",
     component: () => <AddressDetailsScreen variant="empty" /> },
   { id: '10', name: 'Manzil tafsilotlari', stage: 2, variant: 'Qisqa manzil',
     component: () => <AddressDetailsScreen variant="short-address" /> },
@@ -65,7 +65,7 @@ const STAGE_2: ScreenEntry[] = [
     component: () => <ConfirmOrderScreen variant="submitting" /> },
   { id: '11', name: 'Buyurtmani tasdiqlash', stage: 2, variant: 'Server xatosi',
     component: () => <ConfirmOrderScreen variant="server-error" /> },
-  { id: '11', name: 'Buyurtmani tasdiqlash', stage: 2, variant: "Juda ko'p urinish",
+  { id: '11', name: 'Buyurtmani tasdiqlash', stage: 2, variant: "Juda koʻp urinish",
     component: () => <ConfirmOrderScreen variant="rate-limited" /> },
   { id: '11', name: 'Buyurtmani tasdiqlash', stage: 2, variant: 'Javob bermadi',
     component: () => <ConfirmOrderScreen variant="timeout" /> },

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { Search, Wrench, XCircle, Zap } from 'lucide-react';
+import { Search, Timer, Wrench, XCircle } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -25,8 +25,8 @@ import type { LiveOrder } from '../types';
 const REASONS = [
   'Fikrimdan qaytdim',
   'Juda uzoq kutdim',
-  "Muammo o'zi hal bo'ldi",
-  "Narx to'g'ri kelmadi",
+  "Muammo oʻzi hal boʻldi",
+  "Narx toʻgʻri kelmadi",
   'Boshqa sabab',
 ] as const;
 
@@ -43,7 +43,7 @@ function Summary({ order }: { order: LiveOrder }) {
       </div>
       <p className="text-body-sm text-text-secondary">{order.address.label}</p>
       {order.isUrgent && (
-        <InfoChip icon={Zap} tone="warning" className="mt-4 self-start">
+        <InfoChip icon={Timer} tone="warning" className="mt-4 self-start">
           Shoshilinch
         </InfoChip>
       )}
@@ -52,12 +52,12 @@ function Summary({ order }: { order: LiveOrder }) {
 }
 
 /**
- * Demo boshqaruvi — backend ulanmagunicha holatni qo'lda surish uchun.
+ * Demo boshqaruvi — backend ulanmagunicha holatni qoʻlda surish uchun.
  *
  * Ataylab mahsulot tugmalaridan farq qiladi: uzuq chegara va ikkilamchi rang.
  * Ilgari ular oddiy `ghost` tugma edi va `primary` rangda chiqib, haqiqiy
- * amal kabi ko'rinardi — foydalanuvchi ularni ilovaning bir qismi deb
- * o'ylashi mumkin edi.
+ * amal kabi koʻrinardi — foydalanuvchi ularni ilovaning bir qismi deb
+ * oʻylashi mumkin edi.
  */
 function DemoAction({ label, onClick }: { label: string; onClick: () => void }) {
   return (
@@ -85,7 +85,7 @@ export function OrderTracking() {
   const order = orderId ? findOrder(orderId) : undefined;
   if (!order) return <Navigate to="/app/home" replace />;
 
-  // Usta yetib kelgan bo'lsa — bloklovchi ekran majburan ochiladi.
+  // Usta yetib kelgan boʻlsa — bloklovchi ekran majburan ochiladi.
   if (order.status === ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION) {
     return <Navigate to={`/app/order/${order.id}/confirm-master`} replace />;
   }
@@ -121,7 +121,7 @@ export function OrderTracking() {
                 href={`tel:${order.master.phoneNumber}`}
                 className="flex h-[52px] w-full items-center justify-center rounded-md bg-primary px-20 text-button text-on-primary"
               >
-                Qo&apos;ng&apos;iroq qilish
+                Qoʻngʻiroq qilish
               </a>
             )}
             {canCancel(order.status) && (
@@ -151,7 +151,7 @@ export function OrderTracking() {
       {order.status === ORDER_STATUS.SEARCHING_QUEUED && (
         <div className="mt-32 flex flex-col items-center">
           <p className="text-display text-text-primary tabular">~{order.queuePosition}</p>
-          <p className="mt-8 text-body text-text-primary">Navbatdagi o&apos;rningiz</p>
+          <p className="mt-8 text-body text-text-primary">Navbatdagi oʻrningiz</p>
           <p className="mt-4 text-body-sm text-text-secondary">
             Taxminiy kutish: {formatDuration(20)}
           </p>
@@ -218,7 +218,7 @@ export function OrderTracking() {
 
       {order.status === ORDER_STATUS.SAFETY_FLAGGED && (
         <Banner variant="danger" className="mt-24">
-          Buyurtma xavfsizlik tekshiruvida. Operatorimiz siz bilan bog&apos;lanadi.
+          Buyurtma xavfsizlik tekshiruvida. Operatorimiz siz bilan bogʻlanadi.
         </Banner>
       )}
 
@@ -271,7 +271,7 @@ export function OrderTracking() {
             Ha, bekor qilish
           </Button>
           <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
-            Yo&apos;q
+            Yoʻq
           </Button>
         </div>
       </Modal>

@@ -5,8 +5,8 @@ import { Spinner } from '@/components/Spinner';
  * 01 · Sessiyani tiklash.
  *
  * Haqiqiy ilova ochilganda darhol kontent chizmaydi: saqlangan sessiya
- * o'qiladi, native splash yopiladi va shundan keyin ekran ko'rsatiladi.
- * Bu bo'lmasa ilova "web sahifa" kabi keskin paydo bo'ladi.
+ * oʻqiladi, native splash yopiladi va shundan keyin ekran koʻrsatiladi.
+ * Bu boʻlmasa ilova "web sahifa" kabi keskin paydo boʻladi.
  */
 const MIN_SPLASH_MS = 550;
 
@@ -14,8 +14,8 @@ export function AppLaunch({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Minimal ko'rsatish vaqti: sessiya tez o'qilsa ham ekran "sakramasin".
-    // Native splash'ni App.tsx yopadi — u marshrutdan qat'i nazar ishlaydi.
+    // Minimal koʻrsatish vaqti: sessiya tez oʻqilsa ham ekran "sakramasin".
+    // Native splashʼni App.tsx yopadi — u marshrutdan qatʼi nazar ishlaydi.
     // Bu yerda faqat ilova ichidagi ishga tushish ekrani boshqariladi.
     const timer = window.setTimeout(() => setIsReady(true), MIN_SPLASH_MS);
 

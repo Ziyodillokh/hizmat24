@@ -8,9 +8,9 @@ import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
 /**
  * 07a · Guruh xizmatlari.
  *
- * Qidiruv paneli YO'Q — guruh ichidagi ro'yxat qisqa.
- * Bo'sh holat ham chizilmaydi: server xizmati yo'q guruhni umuman qaytarmaydi,
- * shuning uchun bu ekran hech qachon bo'sh bo'lmaydi.
+ * Qidiruv paneli YOʻQ — guruh ichidagi roʻyxat qisqa.
+ * Boʻsh holat ham chizilmaydi: server xizmati yoʻq guruhni umuman qaytarmaydi,
+ * shuning uchun bu ekran hech qachon boʻsh boʻlmaydi.
  */
 export interface GroupServicesScreenProps {
   groupId?: string;

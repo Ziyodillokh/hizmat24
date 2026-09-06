@@ -10,10 +10,10 @@ import { formatDuration } from '@/lib/formatters';
 import { ORDERS_BY_ID } from '@/mocks/orders';
 
 /**
- * 15 · Usta yo'lda.
+ * 15 · Usta yoʻlda.
  *
- * Xarita, ustaning harakatlanuvchi markeri va "yo'lga chiqdi 14:32" kabi
- * timeline CHIZILMAYDI — bu ma'lumotlar mijozga berilmaydi (14.1-band, 7–8-punkt).
+ * Xarita, ustaning harakatlanuvchi markeri va "yoʻlga chiqdi 14:32" kabi
+ * timeline CHIZILMAYDI — bu maʼlumotlar mijozga berilmaydi (14.1-band, 7–8-punkt).
  */
 export type EnRouteVariant = 'default' | 'no-eta' | 'offline';
 
@@ -33,7 +33,7 @@ export function EnRouteScreen({ variant = 'default' }: EnRouteScreenProps) {
         <StickyFooter>
           <div className="flex flex-col gap-12">
             {isMasterPhoneVisible(order.status) && master?.phoneNumber && (
-              <Button variant="primary">Qo&apos;ng&apos;iroq qilish</Button>
+              <Button variant="primary">Qoʻngʻiroq qilish</Button>
             )}
             {canCancel(order.status) && <Button variant="secondary">Bekor qilish</Button>}
             <p className="text-center text-body-sm text-text-secondary">
@@ -68,7 +68,7 @@ export function EnRouteScreen({ variant = 'default' }: EnRouteScreenProps) {
             <p className="text-h3 text-text-primary">
               {formatDuration(etaMinutes)}da yetib keladi
             </p>
-            {/* Progress hech qachon 100% ko'rsatmaydi — maksimum 92%. */}
+            {/* Progress hech qachon 100% koʻrsatmaydi — maksimum 92%. */}
             <ProgressBar value={72} className="mt-12" />
           </>
         )}

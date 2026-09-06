@@ -25,12 +25,19 @@ export function StepDots({ currentStep, className }: StepDotsProps) {
           <span
             key={label}
             aria-hidden
-            // Bajarilgan va joriy qadam bir xil ko'rinadi (9.24-band).
-            className={cn('h-8 w-8 rounded-full', index <= currentStep ? 'bg-primary' : 'bg-border')}
+            // Bajarilgan va joriy qadam bir xil koʻrinadi (9.24-band).
+            /* Uchta bir xil nuqta oʻlik bezak: qaysi biri joriy ekani
+               koʻrinmasdi. Joriy qadam choʻziladi, bajarilgani soʻniydi. */
+            className={cn(
+              'h-8 rounded-full transition-all duration-state ease-std',
+              index === currentStep && 'w-20 bg-primary',
+              index < currentStep && 'w-8 bg-primary/[0.40]',
+              index > currentStep && 'w-8 bg-border-strong',
+            )}
           />
         ))}
       </div>
-      <span className="text-caption font-semibold text-text-primary">
+      <span className="text-overline uppercase text-text-secondary">
         {STEP_DOT_LABELS[currentStep]}
       </span>
     </div>

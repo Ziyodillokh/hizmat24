@@ -9,8 +9,8 @@ import { ORDERS_BY_ID, NOW } from '@/mocks/orders';
 /**
  * 20 · Chek.
  *
- * Manzil, ish davomiyligi, to'lov usuli, soliq bo'linmasi, "PDF yuklab olish"
- * va "Ulashish" CHIZILMAYDI — bu ma'lumotlar mavjud emas (14.4-band, 33-punkt).
+ * Manzil, ish davomiyligi, toʻlov usuli, soliq boʻlinmasi, "PDF yuklab olish"
+ * va "Ulashish" CHIZILMAYDI — bu maʼlumotlar mavjud emas (14.4-band, 33-punkt).
  */
 export type ReceiptVariant = 'full' | 'partial' | 'loading';
 
@@ -18,7 +18,7 @@ export interface ReceiptScreenProps {
   variant?: ReceiptVariant;
 }
 
-/** Chek qatori — yorliq chapda, qiymat o'ngda; qiymat yo'q bo'lsa "—". */
+/** Chek qatori — yorliq chapda, qiymat oʻngda; qiymat yoʻq boʻlsa "—". */
 function ReceiptRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-16 py-12">

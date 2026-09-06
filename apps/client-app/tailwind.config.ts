@@ -62,7 +62,25 @@ export default {
         e1: 'var(--elevation-e1)',
         e2: 'var(--elevation-e2)',
         e3: 'var(--elevation-e3)',
+        // Asosiy amal o'z rangida soya tashlaydi — shunda tugma sahifadan
+        // ko'tarilib turadi. Alfa `rgb(var(--x) / a)` shaklida, ya'ni
+        // token shartnomasi buzilmaydi va ikkala tema avtomatik ergashadi.
+        'primary-lift':
+          '0 6px 16px -6px rgb(var(--color-primary) / 0.45), 0 2px 4px -1px rgb(var(--color-shadow) / 0.12)',
+        'danger-lift':
+          '0 6px 16px -6px rgb(var(--color-danger-fill) / 0.40), 0 2px 4px -1px rgb(var(--color-shadow) / 0.12)',
       },
+      /*
+       * Ilgari konfiguratsiyada davomiylik umuman yo'q edi va har bir
+       * `transition-*` Tailwind'ning 150ms standartida ishlardi: 340px karta
+       * ham, 24px yulduz ham bir xil tezlikda. Butun ilova bo'ylab bir xil
+       * xronometraj — interfeysni hech kim qo'lida his qilmaganining belgisi.
+       */
+      transitionTimingFunction: {
+        std: 'cubic-bezier(0.2, 0, 0, 1)',
+        emphasized: 'cubic-bezier(0.32, 0.72, 0, 1)',
+      },
+      transitionDuration: { press: '110ms', state: '180ms', enter: '260ms' },
       keyframes: {
         shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
         'radar-ping': {

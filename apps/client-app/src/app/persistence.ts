@@ -5,12 +5,12 @@ import type { LiveOrder } from './types';
  * Ilova holatini qurilmada saqlash.
  *
  * Haqiqiy ilova yopilib qayta ochilganda foydalanuvchini kirish ekraniga
- * qaytarmaydi va aktiv buyurtmasini yo'qotmaydi. Backend ulanmagunicha
+ * qaytarmaydi va aktiv buyurtmasini yoʻqotmaydi. Backend ulanmagunicha
  * shu vazifani `localStorage` bajaradi.
  */
 const STORAGE_KEY = 'hizmat24:session:v1';
 
-/** Saqlanadigan shakl — `Date` JSON'da satrga aylanadi, qayta o'qishda tiklanadi. */
+/** Saqlanadigan shakl — `Date` JSONʼda satrga aylanadi, qayta oʻqishda tiklanadi. */
 interface StoredOrder extends Omit<LiveOrder, 'createdAt' | 'completedAt'> {
   createdAt: string;
   completedAt: string | null;
@@ -34,8 +34,8 @@ const isOrderStatus = (value: unknown): value is OrderStatus =>
   typeof value === 'string' && value in ORDER_STATUS;
 
 /**
- * O'qishda ma'lumot ishonchsiz deb qaraladi: saqlangan shakl eski versiyadan
- * qolgan yoki buzilgan bo'lishi mumkin, shuning uchun har bir buyurtma
+ * Oʻqishda maʼlumot ishonchsiz deb qaraladi: saqlangan shakl eski versiyadan
+ * qolgan yoki buzilgan boʻlishi mumkin, shuning uchun har bir buyurtma
  * tekshiriladi va yaroqsizlari tashlab yuboriladi.
  */
 function reviveOrder(raw: unknown): LiveOrder | null {
@@ -93,7 +93,7 @@ export function saveSession(session: RestoredSession): void {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch {
-    // Xotira to'lgan yoki yopiq bo'lsa ham ilova ishlashda davom etadi.
+    // Xotira toʻlgan yoki yopiq boʻlsa ham ilova ishlashda davom etadi.
   }
 }
 
@@ -101,6 +101,6 @@ export function clearSession(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // e'tiborsiz
+    // eʼtiborsiz
   }
 }

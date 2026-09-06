@@ -14,7 +14,7 @@ import { ORDERS_BY_ID, NOW } from '@/mocks/orders';
  * 14 · Usta topildi.
  *
  * Bu ekran istalgan payt 12-ekranning "Boshqa usta qidirilmoqda" holatiga
- * qaytishi mumkin — bu xato emas, oqimning normal qismi (1-bo'lim, 15-qoida).
+ * qaytishi mumkin — bu xato emas, oqimning normal qismi (1-boʻlim, 15-qoida).
  */
 export type MasterFoundVariant = 'default' | 'no-eta' | 'no-photo';
 
@@ -33,9 +33,9 @@ export function MasterFoundScreen({ variant = 'default' }: MasterFoundScreenProp
       footer={
         <StickyFooter>
           <div className="flex flex-col gap-12">
-            {/* Telefon ko'rinmasa tugma disabled emas, BUTUNLAY yashiriladi (14.2-band, 11-punkt). */}
+            {/* Telefon koʻrinmasa tugma disabled emas, BUTUNLAY yashiriladi (14.2-band, 11-punkt). */}
             {isMasterPhoneVisible(order.status) && master?.phoneNumber && (
-              <Button variant="primary">Qo&apos;ng&apos;iroq qilish</Button>
+              <Button variant="primary">Qoʻngʻiroq qilish</Button>
             )}
             {canCancel(order.status) && <Button variant="secondary">Bekor qilish</Button>}
           </div>
@@ -57,7 +57,7 @@ export function MasterFoundScreen({ variant = 'default' }: MasterFoundScreenProp
         />
       )}
 
-      {/* Taxminiy vaqt yo'q bo'lsa chip butunlay yashiriladi — "0 daqiqa" yozilmaydi. */}
+      {/* Taxminiy vaqt yoʻq boʻlsa chip butunlay yashiriladi — "0 daqiqa" yozilmaydi. */}
       {etaMinutes !== null && (
         <InfoChip icon={Clock} tone="primary" className="mt-16">
           Taxminiy vaqt: {formatDuration(etaMinutes)}

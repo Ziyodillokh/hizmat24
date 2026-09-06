@@ -5,12 +5,12 @@ import { cn } from '@/lib/cn';
  * h=40, radius/full, fon `surface-sunken`. Tanlangan segment `surface-elevated`
  * + e1, matn `body-sm`/600 `text-primary`; tanlanmagan `text-secondary`/400.
  *
- * Qator HAR DOIM gorizontal scroll qiladi. Ilgari "4 tagacha segment sig'adi"
- * deb hisoblanardi va ular `flex-1` bilan cho'zilardi, lekin `whitespace-nowrap`
- * elementni o'z matnidan tor qila olmaydi: 390px ekranda "Barchasi · Aktiv ·
+ * Qator HAR DOIM gorizontal scroll qiladi. Ilgari "4 tagacha segment sigʻadi"
+ * deb hisoblanardi va ular `flex-1` bilan choʻzilardi, lekin `whitespace-nowrap`
+ * elementni oʻz matnidan tor qila olmaydi: 390px ekranda "Barchasi · Aktiv ·
  * Yakunlangan · Bekor qilingan" qatori konteynerdan oshib ketib, oxirgi
- * segment kesilib qolardi. Yorliq uzunligi tilga bog'liq, shuning uchun
- * sig'ish-sig'masligini sanoq bo'yicha taxmin qilib bo'lmaydi.
+ * segment kesilib qolardi. Yorliq uzunligi tilga bogʻliq, shuning uchun
+ * sigʻish-sigʻmasligini sanoq boʻyicha taxmin qilib boʻlmaydi.
  */
 export interface SegmentOption<T extends string> {
   value: T;
@@ -36,7 +36,7 @@ export function SegmentControl<T extends string>({
       role="tablist"
       className={cn(
         'flex h-40 items-stretch gap-2 rounded-full bg-surface-sunken p-2',
-        // Scroll paneli ilovada ko'rinmaydi — u sahifa ritmini buzadi.
+        // Scroll paneli ilovada koʻrinmaydi — u sahifa ritmini buzadi.
         'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className,
       )}
@@ -52,9 +52,9 @@ export function SegmentControl<T extends string>({
             aria-selected={isSelected}
             onClick={() => onChange(option.value)}
             className={cn(
-              'shrink-0 whitespace-nowrap rounded-full px-16 text-body-sm transition-colors',
+              'shrink-0 whitespace-nowrap rounded-full px-16 text-body-sm transition-colors duration-state ease-std',
               isSelected
-                ? 'bg-surface-elevated font-semibold text-text-primary shadow-e1'
+                ? 'bg-surface-elevated font-semibold text-text-primary shadow-e2'
                 : 'text-text-secondary',
             )}
           >

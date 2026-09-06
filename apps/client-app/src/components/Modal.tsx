@@ -4,11 +4,11 @@ import { cn } from '@/lib/cn';
 /**
  * Modal — spetsifikatsiya 9.17-bandi.
  * Ekran markazida, radius/xl, e3, fon `surface-modal`, padding 20px,
- * ostida `overlay`. Gorizontal chetlar — ekran padding'i (20px).
+ * ostida `overlay`. Gorizontal chetlar — ekran paddingʻi (20px).
  */
 export interface ModalProps {
   open: boolean;
-  /** Modal sarlavhasi — `h3` (5-bo'lim tipografikasi). */
+  /** Modal sarlavhasi — `h3` (5-boʻlim tipografikasi). */
   title?: string;
   /** Overlay bosilganda chaqiriladi. */
   onClose?: () => void;

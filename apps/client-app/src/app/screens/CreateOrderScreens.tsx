@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LocateFixed, Zap } from 'lucide-react';
+import { LocateFixed, Timer } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -66,16 +66,16 @@ export function OrderDetailsStep() {
       <StepDots currentStep={0} />
 
       {/*
-        Nom `truncate` emas: "O'zgartirish" tugmasi qisqarmagani uchun uzun
-        xizmat nomi "Rozetka o'rna…" bo'lib kesilardi. Endi nom ikki satrgacha
-        o'sadi, amal esa oddiy matnli havola — u kamroq joy egallaydi.
+        Nom `truncate` emas: "Oʻzgartirish" tugmasi qisqarmagani uchun uzun
+        xizmat nomi "Rozetka oʻrna…" boʻlib kesilardi. Endi nom ikki satrgacha
+        oʻsadi, amal esa oddiy matnli havola — u kamroq joy egallaydi.
       */}
       <Card className="mt-20 flex items-center gap-12 p-12">
         <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-surface-sunken">
           <Icon icon={serviceIcon(category.iconKey)} size={24} className="text-primary" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-body-lg font-semibold text-text-primary">
+          <p className="line-clamp-2 text-title text-text-primary">
             {category.name}
           </p>
           <p className="truncate text-body-sm text-text-secondary">
@@ -87,7 +87,7 @@ export function OrderDetailsStep() {
           onClick={() => navigate('/app/services')}
           className="shrink-0 text-caption text-primary"
         >
-          O&apos;zgartirish
+          Oʻzgartirish
         </button>
       </Card>
 
@@ -241,7 +241,7 @@ export function ConfirmStep() {
     return (
       <ScreenShell header={<Header variant="inner" title="Buyurtmani tasdiqlash" onBack={() => navigate('/app/home')} />}>
         <Banner variant="warning" className="mt-16">
-          Buyurtma ma&apos;lumotlari to&apos;liq emas
+          Buyurtma maʼlumotlari toʻliq emas
         </Banner>
       </ScreenShell>
     );
@@ -276,7 +276,7 @@ export function ConfirmStep() {
       <Card className="mt-12">
         <p className="text-body text-text-primary">{draft.description}</p>
         {draft.isUrgent && (
-          <InfoChip icon={Zap} tone="warning" className="mt-12">
+          <InfoChip icon={Timer} tone="warning" className="mt-12">
             Shoshilinch
           </InfoChip>
         )}
@@ -287,7 +287,7 @@ export function ConfirmStep() {
         <p className="mt-12 text-body text-text-primary">{address.label}</p>
         {hasDetails && (
           <p className="mt-4 text-body-sm text-text-secondary">
-            {/* Raqamlar yorliqsiz berilsa "2 · 3-qavat · 45" ma'nosiz o'qiladi. */}
+            {/* Raqamlar yorliqsiz berilsa "2 · 3-qavat · 45" maʼnosiz oʻqiladi. */}
             {[
               address.entrance && `${address.entrance}-podez`,
               address.floor && `${address.floor}-qavat`,
@@ -300,7 +300,7 @@ export function ConfirmStep() {
       </Card>
 
       <Banner variant="warning" className="mt-16">
-        Buyurtma berilgandan keyin uni tahrirlab bo&apos;lmaydi.
+        Buyurtma berilgandan keyin uni tahrirlab boʻlmaydi.
       </Banner>
 
       <div className="h-bottom-reserve" aria-hidden />

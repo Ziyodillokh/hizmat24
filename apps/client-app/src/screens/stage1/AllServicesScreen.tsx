@@ -11,8 +11,8 @@ import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 
 /**
  * 07 · Barcha xizmatlar.
- * Tekis ro'yxat, guruhga bo'linmasdan. Qidiruv — SERVER qidiruvi emas,
- * bir marta yuklangan ro'yxat ustidan MAHALLIY filtr (06/07-ekran izohi).
+ * Tekis roʻyxat, guruhga boʻlinmasdan. Qidiruv — SERVER qidiruvi emas,
+ * bir marta yuklangan roʻyxat ustidan MAHALLIY filtr (06/07-ekran izohi).
  */
 export type AllServicesState = 'ready' | 'loading' | 'no-results';
 
@@ -59,7 +59,7 @@ export function AllServicesScreen({ initialState = 'ready' }: AllServicesScreenP
         <EmptyState
           icon={SearchX}
           title="Hech narsa topilmadi"
-          action={{ label: "Barcha xizmatlarni ko'rish", onClick: () => setQuery('') }}
+          action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => setQuery('') }}
           inline
         />
       ) : (

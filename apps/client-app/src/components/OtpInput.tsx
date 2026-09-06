@@ -40,7 +40,7 @@ function resolveBoxState(
 ): BoxState {
   if (state === 'disabled') return 'disabled';
   if (state === 'error') return 'error';
-  // Kursor to'ldirilmagan birinchi katakda turadi; kod to'liq bo'lsa — oxirgisida.
+  // Kursor toʻldirilmagan birinchi katakda turadi; kod toʻliq boʻlsa — oxirgisida.
   const caretIndex = Math.min(value.length, OTP_LENGTH - 1);
   if (isFocused && index === caretIndex) return 'focus';
   return value[index] ? 'filled' : 'empty';
@@ -53,7 +53,7 @@ export function OtpInput({
   autoFocus = false,
   className,
 }: OtpInputProps) {
-  // Sof UI holati: halqa faqat haqiqiy fokusda ko'rinadi.
+  // Sof UI holati: halqa faqat haqiqiy fokusda koʻrinadi.
   const [isFocused, setIsFocused] = useState(false);
   const isDisabled = state === 'disabled';
 
@@ -72,7 +72,7 @@ export function OtpInput({
           className={cn(
             // 6 katak × 48px + 5 × 8px = 328px — bu 360px telefonda kontent
             // kengligidan (320px) oshib ketadi. Shuning uchun katak etalon
-            // o'lchamgacha o'sadi, undan tor ekranda esa teng siqiladi.
+            // oʻlchamgacha oʻsadi, undan tor ekranda esa teng siqiladi.
             'tabular flex h-[56px] min-w-0 flex-1 basis-0 items-center justify-center',
             'max-w-48 rounded-md text-h2',
             BOX_CLASSES[resolveBoxState(index, value, state, isFocused)],
@@ -82,7 +82,7 @@ export function OtpInput({
         </span>
       ))}
 
-      {/* Bitta ko'rinmas input — klaviatura, paste va SMS avto-to'ldirish shu orqali ishlaydi. */}
+      {/* Bitta koʻrinmas input — klaviatura, paste va SMS avto-toʻldirish shu orqali ishlaydi. */}
       <input
         type="text"
         inputMode="numeric"

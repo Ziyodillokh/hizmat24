@@ -16,9 +16,9 @@ import { ORDERS_BY_ID } from '@/mocks/orders';
 /**
  * 11 · Buyurtmani tasdiqlash (3-qadam).
  *
- * Buyurtma yaratilgach tahrirlanmaydi (1-bo'lim, 9-qoida), shuning uchun bu
- * ekran — o'zgartirish mumkin bo'lgan OXIRGI nuqta: har bir xulosa bloki
- * yonida "O'zgartirish" turadi va pastda ogohlantiruvchi banner beriladi.
+ * Buyurtma yaratilgach tahrirlanmaydi (1-boʻlim, 9-qoida), shuning uchun bu
+ * ekran — oʻzgartirish mumkin boʻlgan OXIRGI nuqta: har bir xulosa bloki
+ * yonida "Oʻzgartirish" turadi va pastda ogohlantiruvchi banner beriladi.
  */
 export type ConfirmOrderVariant =
   | 'default'
@@ -29,18 +29,18 @@ export type ConfirmOrderVariant =
 
 export interface ConfirmOrderScreenProps {
   variant?: ConfirmOrderVariant;
-  /** "Shoshilinch" yoqilmagan bo'lsa chip umuman chizilmaydi. */
+  /** "Shoshilinch" yoqilmagan boʻlsa chip umuman chizilmaydi. */
   isUrgent?: boolean;
-  /** Kirish/qavat/xonadon kiritilmagan bo'lsa qatorlar yashiriladi (11-ekran). */
+  /** Kirish/qavat/xonadon kiritilmagan boʻlsa qatorlar yashiriladi (11-ekran). */
   hasAddressDetails?: boolean;
 }
 
-/** 08-ekranda kiritilgan tavsif — 3 satrdan uzun, klipni ko'rsatish uchun. */
+/** 08-ekranda kiritilgan tavsif — 3 satrdan uzun, klipni koʻrsatish uchun. */
 const DESCRIPTION =
-  "Oshxonadagi kran bir necha kundan beri oqmoqda, tagida suv to'planyapti va shkaf ostini namlab yubordi. Ertalab jo'mrakni yopganimda ham tomchilash to'xtamadi, shuning uchun prokladkani almashtirish kerak deb o'ylayman.";
+  "Oshxonadagi kran bir necha kundan beri oqmoqda, tagida suv toʻplanyapti va shkaf ostini namlab yubordi. Ertalab joʻmrakni yopganimda ham tomchilash toʻxtamadi, shuning uchun prokladkani almashtirish kerak deb oʻylayman.";
 
 /**
- * Server matni maketda 2 satrgacha blok sifatida ko'rsatiladi (12.3-band, A qism)
+ * Server matni maketda 2 satrgacha blok sifatida koʻrsatiladi (12.3-band, A qism)
  * va UI tomonidan qayta yozilmaydi.
  */
 const SERVER_ERROR_TEXT =
@@ -52,12 +52,12 @@ const RETRY_COUNTDOWN = '00:42';
 function EditButton() {
   return (
     <Button variant="ghost" size="small" fullWidth={false}>
-      O&apos;zgartirish
+      Oʻzgartirish
     </Button>
   );
 }
 
-/** Manzil tafsiloti qatori: qiymat yo'q bo'lsa qator butunlay chizilmaydi. */
+/** Manzil tafsiloti qatori: qiymat yoʻq boʻlsa qator butunlay chizilmaydi. */
 function AddressDetailRow({ label, value }: { label: string; value?: string }) {
   if (!value) return null;
 
@@ -70,9 +70,9 @@ function AddressDetailRow({ label, value }: { label: string; value?: string }) {
 }
 
 /**
- * Xato bloklari — 12.3-band. Server matni o'zgartirilmaydi; "Qayta urinish"
- * tugmasi faqat so'rov vaqti tugagan holatda qo'yiladi, cooldown holatida esa
- * darhol urinish yangi xato beradi, shuning uchun o'rniga taymer ko'rsatiladi.
+ * Xato bloklari — 12.3-band. Server matni oʻzgartirilmaydi; "Qayta urinish"
+ * tugmasi faqat soʻrov vaqti tugagan holatda qoʻyiladi, cooldown holatida esa
+ * darhol urinish yangi xato beradi, shuning uchun oʻrniga taymer koʻrsatiladi.
  */
 function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
   if (variant === 'server-error') {
@@ -86,7 +86,7 @@ function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
   if (variant === 'rate-limited') {
     return (
       <Banner variant="danger" icon={CircleAlert} className="mt-16">
-        <p>Juda ko&apos;p urinish. Bir oz kuting va qayta urinib ko&apos;ring.</p>
+        <p>Juda koʻp urinish. Bir oz kuting va qayta urinib koʻring.</p>
         <InfoChip icon={Clock} className="mt-12">
           {RETRY_COUNTDOWN}
         </InfoChip>
@@ -97,7 +97,7 @@ function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
   if (variant === 'timeout') {
     return (
       <Banner variant="danger" icon={CircleAlert} className="mt-16">
-        <p>Server javob bermadi. Qayta urinib ko&apos;ring.</p>
+        <p>Server javob bermadi. Qayta urinib koʻring.</p>
         <Button variant="secondary" size="small" fullWidth={false} className="mt-12">
           Qayta urinish
         </Button>
@@ -122,7 +122,7 @@ export function ConfirmOrderScreen({
       header={<Header variant="inner" title="Buyurtmani tasdiqlash" />}
       footer={
         <StickyFooter>
-          {/* Bosilishi bilan DARHOL disabled bo'ladi — takroriy buyurtma yaratilmasin. */}
+          {/* Bosilishi bilan DARHOL disabled boʻladi — takroriy buyurtma yaratilmasin. */}
           <Button variant="primary" loading={isSubmitting}>
             Ustani chaqirish
           </Button>
@@ -173,7 +173,7 @@ export function ConfirmOrderScreen({
         )}
       </Card>
 
-      {/* 4-blok: "Shoshilinch" faqat yoqilgan bo'lsa ko'rinadi. */}
+      {/* 4-blok: "Shoshilinch" faqat yoqilgan boʻlsa koʻrinadi. */}
       {isUrgent && (
         <InfoChip icon={Zap} tone="warning" className="mt-12">
           Shoshilinch
@@ -181,7 +181,7 @@ export function ConfirmOrderScreen({
       )}
 
       <Banner variant="warning" icon={TriangleAlert} className="mt-24">
-        Buyurtma berilgandan keyin uni tahrirlab bo&apos;lmaydi.
+        Buyurtma berilgandan keyin uni tahrirlab boʻlmaydi.
       </Banner>
 
       <SubmitError variant={variant} />

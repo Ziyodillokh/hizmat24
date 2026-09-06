@@ -11,7 +11,7 @@ const address = {
   apartment: '17',
 };
 
-/** Telefon faqat 4 holatda ko'rinadi (1-bo'lim, 3-qoida) — mock ham shu qoidaga bo'ysunadi. */
+/** Telefon faqat 4 holatda koʻrinadi (1-boʻlim, 3-qoida) — mock ham shu qoidaga boʻysunadi. */
 function withPhoneVisibility(master: Master | null, status: OrderStatus): Master | null {
   if (!master) return null;
 
@@ -46,7 +46,7 @@ interface OrderSeed {
 const SEEDS: OrderSeed[] = [
   {
     id: 'o-searching', shortId: 'HZ-104857', status: ORDER_STATUS.SEARCHING,
-    categoryName: "Kran ta'mirlash", categoryIconKey: 'plumber', price: 100_000, master: null,
+    categoryName: "Kran taʼmirlash", categoryIconKey: 'plumber', price: 100_000, master: null,
   },
   {
     id: 'o-queued', shortId: 'HZ-104858', status: ORDER_STATUS.SEARCHING_QUEUED,
@@ -55,17 +55,17 @@ const SEEDS: OrderSeed[] = [
   },
   {
     id: 'o-assigned', shortId: 'HZ-104859', status: ORDER_STATUS.ASSIGNED,
-    categoryName: "Kran ta'mirlash", categoryIconKey: 'plumber', price: 100_000,
+    categoryName: "Kran taʼmirlash", categoryIconKey: 'plumber', price: 100_000,
     master: MASTERS.akmal, etaMinutes: 15,
   },
   {
     id: 'o-enroute', shortId: 'HZ-104860', status: ORDER_STATUS.MASTER_EN_ROUTE,
-    categoryName: "Rozetka o'rnatish", categoryIconKey: 'electrician', price: 80_000,
+    categoryName: "Rozetka oʻrnatish", categoryIconKey: 'electrician', price: 80_000,
     master: MASTERS.dilshod, etaMinutes: 15,
   },
   {
     id: 'o-arrived', shortId: 'HZ-104861', status: ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION,
-    categoryName: "Lyustra o'rnatish", categoryIconKey: 'electrician', price: 120_000,
+    categoryName: "Lyustra oʻrnatish", categoryIconKey: 'electrician', price: 120_000,
     master: MASTERS.dilshod,
   },
   {
@@ -75,22 +75,22 @@ const SEEDS: OrderSeed[] = [
   },
   {
     id: 'o-completed', shortId: 'HZ-104863', status: ORDER_STATUS.COMPLETED_BY_MASTER,
-    categoryName: "Unitaz o'rnatish", categoryIconKey: 'plumber', price: 250_000,
+    categoryName: "Unitaz oʻrnatish", categoryIconKey: 'plumber', price: 250_000,
     master: MASTERS.akmal,
   },
   {
     id: 'o-closed', shortId: 'HZ-104790', status: ORDER_STATUS.CLOSED,
-    categoryName: "Konditsioner o'rnatish", categoryIconKey: 'appliance', price: 400_000,
+    categoryName: "Konditsioner oʻrnatish", categoryIconKey: 'appliance', price: 400_000,
     master: MASTERS.dilshod, daysAgo: 4, rating: { stars: 5, comment: 'Tez va sifatli ishladi' },
   },
   {
     id: 'o-cancelled', shortId: 'HZ-104712', status: ORDER_STATUS.CANCELLED,
     categoryName: 'Avtomat almashtirish', categoryIconKey: 'electrician', price: 150_000,
-    master: null, daysAgo: 11, cancelReason: "Muammo o'zi hal bo'ldi", cancelledBy: 'CLIENT',
+    master: null, daysAgo: 11, cancelReason: "Muammo oʻzi hal boʻldi", cancelledBy: 'CLIENT',
   },
   {
     id: 'o-flagged', shortId: 'HZ-104655', status: ORDER_STATUS.SAFETY_FLAGGED,
-    categoryName: "Mebel yig'ish", categoryIconKey: 'carpenter', price: 180_000,
+    categoryName: "Mebel yigʻish", categoryIconKey: 'carpenter', price: 180_000,
     master: MASTERS.bekzod, daysAgo: 20,
   },
 ];
@@ -105,7 +105,7 @@ function build(seed: OrderSeed): Order {
     status: seed.status,
     categoryName: seed.categoryName,
     categoryIconKey: seed.categoryIconKey,
-    description: "Oshxonadagi kran oqmoqda, tagida suv to'planyapti. Ertalabdan beri davom etyapti.",
+    description: "Oshxonadagi kran oqmoqda, tagida suv toʻplanyapti. Ertalabdan beri davom etyapti.",
     price: seed.price,
     isUrgent: seed.isUrgent ?? false,
     address,
@@ -135,5 +135,5 @@ export const ORDER_HISTORY = [...ORDERS].sort(
   (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
 );
 
-/** Demo sana — `Date.now()` o'rniga, maketlar barqaror bo'lishi uchun. */
+/** Demo sana — `Date.now()` oʻrniga, maketlar barqaror boʻlishi uchun. */
 export const NOW = BASE_DATE;

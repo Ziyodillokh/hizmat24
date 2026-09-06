@@ -7,9 +7,9 @@ import { CreateOrderScreen } from './CreateOrderScreen';
 import { MasterFoundScreen } from './MasterFoundScreen';
 
 /**
- * Bosqich 1 ekranlari (13-bo'lim).
- * Har bir holat varianti alohida yozuv sifatida ro'yxatdan o'tadi — 7-bo'limga
- * ko'ra ular alohida frame bo'lishi kerak.
+ * Bosqich 1 ekranlari (13-boʻlim).
+ * Har bir holat varianti alohida yozuv sifatida roʻyxatdan oʻtadi — 7-boʻlimga
+ * koʻra ular alohida frame boʻlishi kerak.
  */
 const STAGE_1: ScreenEntry[] = [
   { id: '06', name: 'Bosh sahifa', stage: 1, component: HomeScreen },
@@ -26,7 +26,7 @@ const STAGE_1: ScreenEntry[] = [
     component: () => <HomeScreen variant="no-active-order" />,
   },
   {
-    id: '06', name: 'Bosh sahifa', stage: 1, variant: "Bo'sh",
+    id: '06', name: 'Bosh sahifa', stage: 1, variant: "Boʻsh",
     component: () => <HomeScreen variant="no-orders" />,
   },
   {
@@ -42,7 +42,7 @@ const STAGE_1: ScreenEntry[] = [
 
   { id: '07', name: 'Barcha xizmatlar', stage: 1, component: AllServicesScreen },
   {
-    id: '07', name: 'Barcha xizmatlar', stage: 1, variant: "Natija yo'q",
+    id: '07', name: 'Barcha xizmatlar', stage: 1, variant: "Natija yoʻq",
     component: () => <AllServicesScreen initialState="no-results" />,
   },
   {
@@ -52,7 +52,7 @@ const STAGE_1: ScreenEntry[] = [
 
   { id: '08', name: 'Buyurtma berish', stage: 1, component: CreateOrderScreen },
   {
-    id: '08', name: 'Buyurtma berish', stage: 1, variant: "Bo'sh",
+    id: '08', name: 'Buyurtma berish', stage: 1, variant: "Boʻsh",
     component: () => <CreateOrderScreen variant="empty" />,
   },
   {

@@ -68,7 +68,7 @@ export function OrdersTab() {
       {orders.length === 0 ? (
         <EmptyState
           icon={ClipboardList}
-          title="Hozircha buyurtmalaringiz yo'q"
+          title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
           inline
@@ -113,11 +113,11 @@ export function NotificationsTab() {
       {unreadCount > 0 && (
         <div className="flex items-center justify-between gap-12 pt-4">
           <p className="shrink-0 text-caption text-text-secondary">
-            {unreadCount} ta o&apos;qilmagan
+            {unreadCount} ta oʻqilmagan
           </p>
           {/*
             Oddiy matnli amal: `Button` `button` shkalasida (16px/600) chiqib,
-            sahifa sarlavhasidan ham baland ko'rinardi va yon yorliqni ikki
+            sahifa sarlavhasidan ham baland koʻrinardi va yon yorliqni ikki
             satrga surib yuborardi.
           */}
           <button
@@ -125,7 +125,7 @@ export function NotificationsTab() {
             onClick={markNotificationsRead}
             className="shrink-0 text-caption text-primary"
           >
-            Barchasini o&apos;qildi
+            Barchasini oʻqildi
           </button>
         </div>
       )}
@@ -133,8 +133,8 @@ export function NotificationsTab() {
       {notifications.length === 0 ? (
         <EmptyState
           icon={BellOff}
-          title="Bildirishnomalar yo'q"
-          description="Buyurtma bergach, holat o'zgarishlari shu yerda ko'rinadi"
+          title="Bildirishnomalar yoʻq"
+          description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
           inline
         />
       ) : (
@@ -165,7 +165,7 @@ interface MenuItem {
   label: string;
   hint?: string;
   onSelect?: () => void;
-  /** Chevron o'rniga chiziladigan boshqaruv (masalan tema almashtirgichi). */
+  /** Chevron oʻrniga chiziladigan boshqaruv (masalan tema almashtirgichi). */
   control?: ReactNode;
 }
 
@@ -175,8 +175,8 @@ interface MenuSection {
 }
 
 /**
- * Sozlama qatorlari bitta kartaga yig'iladi — alohida suzuvchi qatorlar
- * o'rniga guruhlangan ro'yxat mobil ilovalarda tanish va tartibli ko'rinadi.
+ * Sozlama qatorlari bitta kartaga yigʻiladi — alohida suzuvchi qatorlar
+ * oʻrniga guruhlangan roʻyxat mobil ilovalarda tanish va tartibli koʻrinadi.
  */
 function MenuGroup({ section }: { section: MenuSection }) {
   return (
@@ -206,7 +206,7 @@ function MenuGroup({ section }: { section: MenuSection }) {
               )}
               {item.control ??
                 (isInteractive && (
-                  <Icon icon={ChevronRight} size={20} className="shrink-0 text-text-disabled" />
+                  <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
                 ))}
             </Row>
           );
@@ -252,7 +252,7 @@ export function ProfileTab() {
       items: [
         {
           icon: Headset,
-          label: "Qo'llab-quvvatlash xizmati",
+          label: "Qoʻllab-quvvatlash xizmati",
           onSelect: () => navigate('/app/support'),
         },
         { icon: Info, label: 'Ilova haqida', hint: '1.0.0' },
@@ -267,8 +267,8 @@ export function ProfileTab() {
     >
       {/*
         Foydalanuvchi bloki chapga tekislangan: markazlashgan katta avatar
-        ekranning yarmini bo'sh qoldirardi. Raqam maskalanmaydi — bu
-        foydalanuvchining O'Z profili, o'z raqamini yashirishning ma'nosi yo'q.
+        ekranning yarmini boʻsh qoldirardi. Raqam maskalanmaydi — bu
+        foydalanuvchining OʻZ profili, oʻz raqamini yashirishning maʼnosi yoʻq.
       */}
       <div className="mt-8 flex items-center gap-16">
         <Avatar size={64} />
@@ -338,16 +338,16 @@ export function MasterProfile() {
               href={`tel:${master.phoneNumber}`}
               className="flex h-[52px] w-full items-center justify-center rounded-md bg-primary px-20 text-button text-on-primary"
             >
-              Qo&apos;ng&apos;iroq qilish
+              Qoʻngʻiroq qilish
             </a>
           ) : (
             <div className="flex flex-col gap-12">
               <p className="text-center text-body-sm text-text-secondary">
-                Ish yakunlangan — savol bo&apos;lsa qo&apos;llab-quvvatlash xizmatiga murojaat
+                Ish yakunlangan — savol boʻlsa qoʻllab-quvvatlash xizmatiga murojaat
                 qiling
               </p>
               <Button variant="ghost" onClick={() => navigate('/app/support')}>
-                Qo&apos;llab-quvvatlashga murojaat
+                Qoʻllab-quvvatlashga murojaat
               </Button>
             </div>
           )}
@@ -356,7 +356,7 @@ export function MasterProfile() {
     >
       <div className="mt-16 flex flex-col items-center">
         {/* 120px avatar ekranning uchdan birini egallardi — 80px hero blokni
-            ixchamlashtiradi va ostidagi ma'lumotga joy ochadi. */}
+            ixchamlashtiradi va ostidagi maʼlumotga joy ochadi. */}
         <Avatar name={master.fullName} size={80} />
         <h1 className="mt-12 text-center text-h2 text-text-primary">{master.fullName}</h1>
         <p className="mt-2 text-body text-text-secondary">{master.profession}</p>
@@ -368,9 +368,9 @@ export function MasterProfile() {
       </div>
 
       {/*
-        Reyting va bajarilgan ishlar ko'rsatkichlari. Ilgari ular sarlavha
-        ostida oddiy matn bo'lib turardi va ekranning pastki yarmi butunlay
-        bo'sh qolardi — bu sahifani tugallanmagandek ko'rsatardi.
+        Reyting va bajarilgan ishlar koʻrsatkichlari. Ilgari ular sarlavha
+        ostida oddiy matn boʻlib turardi va ekranning pastki yarmi butunlay
+        boʻsh qolardi — bu sahifani tugallanmagandek koʻrsatardi.
       */}
       <div className="mt-20 grid grid-cols-2 gap-12">
         <div className="rounded-lg border border-border bg-surface-elevated px-16 py-12">
@@ -384,25 +384,25 @@ export function MasterProfile() {
       </div>
 
       {/*
-        Tekshiruv ma'lumoti — foydalanuvchi ustaga nega ishonishi mumkinligini
-        tushuntiradi va sahifaning pastki qismini mazmun bilan to'ldiradi.
-        Ilgari bu yerda faqat bo'sh maydon turardi.
+        Tekshiruv maʼlumoti — foydalanuvchi ustaga nega ishonishi mumkinligini
+        tushuntiradi va sahifaning pastki qismini mazmun bilan toʻldiradi.
+        Ilgari bu yerda faqat boʻsh maydon turardi.
       */}
       <div className="mt-12 rounded-lg border border-border bg-surface-elevated px-16 py-12">
         <div className="flex items-start gap-12">
           <Icon icon={ShieldCheck} size={20} className="mt-2 shrink-0 text-success" />
           <div className="min-w-0 flex-1">
-            <p className="text-body-lg font-semibold text-text-primary">Shaxsi tasdiqlangan</p>
+            <p className="text-title text-text-primary">Shaxsi tasdiqlangan</p>
             <p className="mt-2 text-body-sm text-text-secondary">
               {master.hasGovCertificate
-                ? "Davlat sertifikati va pasport ma'lumotlari tekshirilgan"
-                : "Pasport ma'lumotlari tekshirilgan"}
+                ? "Davlat sertifikati va pasport maʼlumotlari tekshirilgan"
+                : "Pasport maʼlumotlari tekshirilgan"}
             </p>
           </div>
         </div>
 
         <p className="mt-12 border-t border-border pt-12 text-body-sm text-text-secondary">
-          Usta kelganda uning ismi va rasmini shu sahifadagi ma&apos;lumot bilan solishtiring.
+          Usta kelganda uning ismi va rasmini shu sahifadagi maʼlumot bilan solishtiring.
         </p>
       </div>
 

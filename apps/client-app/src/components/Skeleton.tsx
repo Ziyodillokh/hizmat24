@@ -2,8 +2,8 @@ import { cn } from '@/lib/cn';
 
 /**
  * Skeleton — spetsifikatsiya 9.20 va 12.1-bandlari.
- * Kontent shakli takrorlanadi: `surface-sunken` to'ldirish, `radius/xs`,
- * shimmer chapdan o'ngga. Ro'yxat va kontent yuklanishida faqat skeleton
+ * Kontent shakli takrorlanadi: `surface-sunken` toʻldirish, `radius/xs`,
+ * shimmer chapdan oʻngga. Roʻyxat va kontent yuklanishida faqat skeleton
  * ishlatiladi, spinner emas (12.1-band).
  */
 export type SkeletonRadius = 'xs' | 'sm' | 'md' | 'lg' | 'full';
@@ -30,7 +30,7 @@ export interface SkeletonProps {
 
 /**
  * Skeleton elementi dekorativ — ekran darajasidagi "Yuklanmoqda…" xabari
- * o'qiladi, shuning uchun bu yerda `aria-hidden`.
+ * oʻqiladi, shuning uchun bu yerda `aria-hidden`.
  */
 export function Skeleton({ width = '100%', height = 12, radius = 'xs', className }: SkeletonProps) {
   return (
@@ -46,7 +46,7 @@ export interface SkeletonTextProps {
   lines?: number;
   /** Bitta satr balandligi (piksel). */
   lineHeight?: number;
-  /** Oxirgi satr qisqaroq — haqiqiy matn oqimiga o'xshaydi. */
+  /** Oxirgi satr qisqaroq — haqiqiy matn oqimiga oʻxshaydi. */
   lastLineWidth?: string;
   className?: string;
 }
@@ -71,7 +71,7 @@ export function SkeletonText({
 }
 
 export interface SkeletonCircleProps {
-  /** Diametr (piksel) — avatar o'lchamlari: 44, 64, 80, 120 (9.28-band). */
+  /** Diametr (piksel) — avatar oʻlchamlari: 44, 64, 80, 120 (9.28-band). */
   size?: number;
   className?: string;
 }

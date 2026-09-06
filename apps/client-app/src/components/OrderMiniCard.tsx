@@ -13,25 +13,25 @@ import { StatusChip } from './StatusChip';
  * elementi.
  *
  * MUHIM: bu USTA kartasi EMAS (14.1-band). Mijoz ustani tanlamaydi — tizim
- * o'zi tayinlaydi, shuning uchun kartada usta ismi, reytingi va "ustani
- * tanlash" tugmasi bo'lmaydi. Referensdan faqat VIZUAL naqsh olinadi:
- * kvadrat ikona bloki, ustidagi matn va pastda to'liq kenglikdagi tugma.
+ * oʻzi tayinlaydi, shuning uchun kartada usta ismi, reytingi va "ustani
+ * tanlash" tugmasi boʻlmaydi. Referensdan faqat VIZUAL naqsh olinadi:
+ * kvadrat ikona bloki, ustidagi matn va pastda toʻliq kenglikdagi tugma.
  */
 
 /**
- * Karta ~165px kenglikda turadi, shuning uchun ichki ustun `min-w-0` bo'lishi
+ * Karta ~165px kenglikda turadi, shuning uchun ichki ustun `min-w-0` boʻlishi
  * shart: aks holda uzun xizmat nomi flex elementini kengaytirib, kartani
  * gridan chiqarib yuboradi.
  */
 const INFO_CLASSES = 'flex min-w-0 flex-col items-start gap-8 text-left';
 
 /**
- * 8.4-band: narx raqami `price` (tabular figures) bilan, yonidagi "so'm" esa
- * `currency` `text-secondary` bilan chiziladi. Matnning o'zi formatPrice() dan
- * keladi — bu yerda faqat tipografiya uchun bo'laklarga ajratiladi, qo'lda
- * formatlash yo'q.
+ * 8.4-band: narx raqami `price` (tabular figures) bilan, yonidagi "soʻm" esa
+ * `currency` `text-secondary` bilan chiziladi. Matnning oʻzi formatPrice() dan
+ * keladi — bu yerda faqat tipografiya uchun boʻlaklarga ajratiladi, qoʻlda
+ * formatlash yoʻq.
  */
-const CURRENCY_LABEL = "so'm";
+const CURRENCY_LABEL = "soʻm";
 
 function splitFormattedPrice(amount: number): { value: string; currency: string } {
   const formatted = formatPrice(amount);
@@ -44,10 +44,10 @@ function splitFormattedPrice(amount: number): { value: string; currency: string 
 export interface OrderMiniCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */
   serviceIcon: LucideIcon;
-  /** Xizmat nomi serverdan keladi, UI o'z matnini to'qimaydi. */
+  /** Xizmat nomi serverdan keladi, UI oʻz matnini toʻqimaydi. */
   serviceName: string;
   status: OrderStatus;
-  /** So'mdagi butun summa — formatlash faqat formatPrice() orqali (8.4-band). */
+  /** Soʻmdagi butun summa — formatlash faqat formatPrice() orqali (8.4-band). */
   price: number;
   /** Tugma matni chaqiruvchi ekrandan keladi — holatga mos yorliq (23-ekran). */
   actionLabel: string;
@@ -71,7 +71,7 @@ export function OrderMiniCard({
   const info: ReactNode = (
     <>
       {/*
-        Referensdagi kvadrat avatar o'rni. Yuza `surface-sunken` — karta ustida
+        Referensdagi kvadrat avatar oʻrni. Yuza `surface-sunken` — karta ustida
         ikkala temada ham ajralib turadi (3.1 va 3.2-bandlar).
       */}
       <span
@@ -81,14 +81,14 @@ export function OrderMiniCard({
         <Icon icon={serviceIcon} size={24} className="text-primary" />
       </span>
 
-      {/* Tor kartada nom ikki qatorgacha o'sadi, undan keyin kesiladi. */}
+      {/* Tor kartada nom ikki qatorgacha oʻsadi, undan keyin kesiladi. */}
       <span className="line-clamp-2 w-full text-body-lg text-text-primary">{serviceName}</span>
 
       {/*
-        Chip standart balandligi 28px va matni bitta qatorga mo'ljallangan.
-        Tor ustunda uzun yorliq ("Ish yakunlandi — baholang") sig'maydi, shuning
+        Chip standart balandligi 28px va matni bitta qatorga moʻljallangan.
+        Tor ustunda uzun yorliq ("Ish yakunlandi — baholang") sigʻmaydi, shuning
         uchun balandlik erkin qoldiriladi: matn kesilmaydi, ikkinchi qatorga
-        o'tadi.
+        oʻtadi.
       */}
       <StatusChip status={status} className="h-auto min-h-[28px] max-w-full py-4" />
     </>
@@ -96,13 +96,13 @@ export function OrderMiniCard({
 
   return (
     <Card
-      // Grid qatorida ikkala karta bir xil balandlikda cho'ziladi; `h-full`
-      // bo'lmasa tugmalar turli sathda qolib ketadi.
+      // Grid qatorida ikkala karta bir xil balandlikda choʻziladi; `h-full`
+      // boʻlmasa tugmalar turli sathda qolib ketadi.
       className={cn('flex h-full flex-col gap-12', className)}
     >
       {/*
-        Butun karta emas, faqat ma'lumot qismi bosiladi: shunda tugma tugma
-        ichida joylashmaydi va ekran o'quvchi ikkala amalni alohida e'lon qiladi.
+        Butun karta emas, faqat maʼlumot qismi bosiladi: shunda tugma tugma
+        ichida joylashmaydi va ekran oʻquvchi ikkala amalni alohida eʼlon qiladi.
       */}
       {onSelect ? (
         <button

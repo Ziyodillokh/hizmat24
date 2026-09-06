@@ -9,7 +9,7 @@ import { cn } from '@/lib/cn';
  */
 export interface SheetProps {
   open: boolean;
-  /** Modal sarlavhasi — `h3` (5-bo'lim tipografikasi). */
+  /** Modal sarlavhasi — `h3` (5-boʻlim tipografikasi). */
   title?: string;
   /** Overlay bosilganda chaqiriladi. */
   onClose?: () => void;
@@ -27,7 +27,7 @@ export function Sheet({ open, title, onClose, className, children }: SheetProps)
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        // Rang shu yerda beriladi, o'lcham esa matn elementlarida — `twMerge`
+        // Rang shu yerda beriladi, oʻlcham esa matn elementlarida — `twMerge`
         // ikkalasini bitta guruh deb hisoblab, biridan voz kechadi.
         className={cn('relative rounded-t-xl bg-surface-modal p-20 text-text-primary shadow-e3', className)}
       >

@@ -2,11 +2,11 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
 /**
- * Ekranlar orasidagi o'tish.
+ * Ekranlar orasidagi oʻtish.
  *
  * Haqiqiy ilovada yangi ekran keskin almashmaydi. Bu yerda yengil fade +
  * pastdan siljish ishlatiladi: u tez (160ms) va navigatsiyani sekinlashtirmaydi,
- * lekin o'tishni "ilova" qilib ko'rsatadi.
+ * lekin oʻtishni "ilova" qilib koʻrsatadi.
  */
 export function PageTransition({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();

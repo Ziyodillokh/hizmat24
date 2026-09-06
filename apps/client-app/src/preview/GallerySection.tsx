@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-/** Galereya bo'limi — dev qobig'i, mahsulot qismi emas. */
+/** Galereya boʻlimi — dev qobigʻi, mahsulot qismi emas. */
 export function GallerySection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-32">

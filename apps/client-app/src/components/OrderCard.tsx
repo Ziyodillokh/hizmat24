@@ -8,16 +8,16 @@ import { Icon } from './Icon';
 import { StatusChip } from './StatusChip';
 
 /**
- * Buyurtma kartasi (ro'yxat elementi) — spetsifikatsiya 9.8-bandi.
- * Chapda 44px xizmat turi ikonasi · o'ngda nom (h3), sana (caption), narx (price)
- * · yuqori o'ngda status chipi · eng o'ngda shevron.
+ * Buyurtma kartasi (roʻyxat elementi) — spetsifikatsiya 9.8-bandi.
+ * Chapda 44px xizmat turi ikonasi · oʻngda nom (h3), sana (caption), narx (price)
+ * · yuqori oʻngda status chipi · eng oʻngda shevron.
  */
 
 /**
- * 8.4-band: raqam `price`, "so'm" esa `currency` `text-secondary` bilan chiziladi.
+ * 8.4-band: raqam `price`, "soʻm" esa `currency` `text-secondary` bilan chiziladi.
  * Format formatPrice() dan keladi — bu yerda faqat tipografiya uchun ajratiladi.
  */
-const CURRENCY_LABEL = "so'm";
+const CURRENCY_LABEL = "soʻm";
 
 function splitFormattedPrice(amount: number): { value: string; currency: string } {
   const formatted = formatPrice(amount);
@@ -30,7 +30,7 @@ function splitFormattedPrice(amount: number): { value: string; currency: string 
 export interface OrderCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */
   serviceIcon: LucideIcon;
-  /** Xizmat nomi serverdan keladi, UI o'z matnini to'qimaydi. */
+  /** Xizmat nomi serverdan keladi, UI oʻz matnini toʻqimaydi. */
   serviceName: string;
   status: OrderStatus;
   createdAt: Date;
@@ -54,7 +54,7 @@ export function OrderCard({
   const isInteractive = Boolean(onSelect);
   const { value, currency } = splitFormattedPrice(price);
 
-  // Karta div bo'lgani uchun klaviatura bilan ochish qo'lda ulanadi.
+  // Karta div boʻlgani uchun klaviatura bilan ochish qoʻlda ulanadi.
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!onSelect) return;
     if (event.key !== 'Enter' && event.key !== ' ') return;

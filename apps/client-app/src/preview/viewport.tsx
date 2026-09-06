@@ -2,9 +2,9 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 
 /**
  * Ekran qayerda chizilyapti:
- *  - `frame`  — desktop preview'dagi 393×852 maketa ramkasi (soxta status bar bilan);
- *  - `device` — haqiqiy qurilma, to'liq ekran. Bunda soxta status bar CHIZILMAYDI
- *    (telefonning o'zinikisi bor) va uning o'rniga xavfsiz zona bo'shlig'i qo'yiladi.
+ *  - `frame`  — desktop previewʼdagi 393×852 maketa ramkasi (soxta status bar bilan);
+ *  - `device` — haqiqiy qurilma, toʻliq ekran. Bunda soxta status bar CHIZILMAYDI
+ *    (telefonning oʻzinikisi bor) va uning oʻrniga xavfsiz zona boʻshligʻi qoʻyiladi.
  */
 export type ViewportMode = 'frame' | 'device';
 
@@ -17,9 +17,9 @@ export function ViewportProvider({ mode, children }: { mode: ViewportMode; child
 }
 
 /**
- * Maketa ramkasi sig'adigan eng kichik kenglik: frame 393px + ikki tomondan
- * 24px havo. Undan tor oynada ramka o'rniga qurilma rejimi ko'rsatiladi —
- * aks holda telefonda gorizontal scroll paydo bo'lardi.
+ * Maketa ramkasi sigʻadigan eng kichik kenglik: frame 393px + ikki tomondan
+ * 24px havo. Undan tor oynada ramka oʻrniga qurilma rejimi koʻrsatiladi —
+ * aks holda telefonda gorizontal scroll paydo boʻlardi.
  */
 const FRAME_FIT_WIDTH = 393 + 48;
 

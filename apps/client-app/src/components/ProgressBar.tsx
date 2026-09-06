@@ -2,11 +2,11 @@ import { cn } from '@/lib/cn';
 
 /**
  * Chiziqli progress bar — spetsifikatsiya 9.23-bandi.
- * h=6, radius/full, fon `border`, to'ldirish `primary`.
+ * h=6, radius/full, fon `border`, toʻldirish `primary`.
  */
 
 /**
- * 15-ekran talabi: progress hech qachon 100% ko'rsatmaydi, chunki yetib kelish
+ * 15-ekran talabi: progress hech qachon 100% koʻrsatmaydi, chunki yetib kelish
  * vaqti taxminiy. Cheklov komponent ichida — chaqiruvchi tomon buni buzolmaydi.
  */
 const MAX_PERCENT = 92;
@@ -20,9 +20,9 @@ const clampPercent = (value: number): number => {
 };
 
 export interface ProgressBarProps {
-  /** 0–100 oralig'idagi qiymat; komponent ichida 92% bilan cheklanadi. */
+  /** 0–100 oraligʻidagi qiymat; komponent ichida 92% bilan cheklanadi. */
   value?: number;
-  /** Aniq foiz noma'lum bo'lganda — chapdan o'ngga suriluvchi blok. */
+  /** Aniq foiz nomaʼlum boʻlganda — chapdan oʻngga suriluvchi blok. */
   indeterminate?: boolean;
   className?: string;
 }

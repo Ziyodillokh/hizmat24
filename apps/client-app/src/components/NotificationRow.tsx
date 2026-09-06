@@ -16,8 +16,8 @@ import { Icon } from './Icon';
 
 /**
  * Bildirishnoma qatori — spetsifikatsiya 9.13-bandi, tur xaritasi 25-ekrandan.
- * Chapda 40px doira ikona · o'ngda sarlavha (body-lg/600), matn (body-sm,
- * 2 satrgacha) va nisbiy vaqt (caption). O'qilmagan: primary 6% fon + 6px nuqta.
+ * Chapda 40px doira ikona · oʻngda sarlavha (body-lg/600), matn (body-sm,
+ * 2 satrgacha) va nisbiy vaqt (caption). Oʻqilmagan: primary 6% fon + 6px nuqta.
  */
 
 /** 25-ekran jadvalidagi 9 ta tur. Serverdan shu nomlar keladi. */
@@ -52,18 +52,18 @@ export const NOTIFICATION_ICONS: Record<NotificationType, NotificationVisual> = 
   OPERATOR_SEARCHING: { icon: Headset, tone: 'warning' },
 };
 
-/** Doira foni — rang 14% opacity, ikona to'liq rangda (9.9/9.12 bilan bir xil qoida). */
+/** Doira foni — rang 14% opacity, ikona toʻliq rangda (9.9/9.12 bilan bir xil qoida). */
 const TONE_CLASSES: Record<NotificationTone, string> = {
-  primary: 'bg-primary/[0.14] text-primary',
-  warning: 'bg-warning/[0.14] text-warning',
-  success: 'bg-success/[0.14] text-success',
-  danger: 'bg-danger/[0.14] text-danger',
-  secondary: 'bg-text-secondary/[0.14] text-text-secondary',
+  primary: 'bg-primary-surface text-primary-pressed',
+  warning: 'bg-warning-surface text-warning',
+  success: 'bg-success-surface text-success',
+  danger: 'bg-danger-surface text-danger',
+  secondary: 'bg-neutral-surface text-text-secondary',
 };
 
 export interface NotificationRowProps {
   type: NotificationType;
-  /** Sarlavha va matn serverdan tayyor keladi — UI o'z matnini to'qimaydi (25-ekran). */
+  /** Sarlavha va matn serverdan tayyor keladi — UI oʻz matnini toʻqimaydi (25-ekran). */
   title: string;
   body: string;
   createdAt: Date;
@@ -93,7 +93,7 @@ export function NotificationRow({
       className={cn(
         'relative flex w-full items-start gap-12 rounded-lg p-16 text-left',
         'transition-transform active:scale-[0.99]',
-        // O'qilmagan qator: yengil primary fon + chap chekkadagi nuqta uchun joy.
+        // Oʻqilmagan qator: yengil primary fon + chap chekkadagi nuqta uchun joy.
         isUnread ? 'bg-primary/[0.06] pl-24' : 'bg-transparent',
         className,
       )}
@@ -116,7 +116,7 @@ export function NotificationRow({
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block text-body-lg font-semibold text-text-primary">{title}</span>
+        <span className="block text-title text-text-primary">{title}</span>
         <span className="mt-4 block line-clamp-2 text-body-sm text-text-secondary">{body}</span>
         <span className="mt-8 block text-caption text-text-secondary">
           {formatDateTime(createdAt, now)}

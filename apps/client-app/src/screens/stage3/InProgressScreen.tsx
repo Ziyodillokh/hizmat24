@@ -13,8 +13,8 @@ import { ORDERS_BY_ID, NOW } from '@/mocks/orders';
 /**
  * 18 · Ish jarayonida.
  *
- * Sof kuzatuv ekrani: bekor qilish tugmasi ham, boshqa holat o'zgartiruvchi
- * tugma ham YO'Q — keyingi holatni ilova o'zi kutadi (14.3-band, 12-punkt).
+ * Sof kuzatuv ekrani: bekor qilish tugmasi ham, boshqa holat oʻzgartiruvchi
+ * tugma ham YOʻQ — keyingi holatni ilova oʻzi kutadi (14.3-band, 12-punkt).
  */
 export type InProgressVariant = 'default' | 'offline';
 
@@ -33,9 +33,9 @@ export function InProgressScreen({ variant = 'default' }: InProgressScreenProps)
         <StickyFooter>
           <div className="flex flex-col gap-12">
             {isMasterPhoneVisible(order.status) && master?.phoneNumber && (
-              <Button variant="primary">Qo&apos;ng&apos;iroq qilish</Button>
+              <Button variant="primary">Qoʻngʻiroq qilish</Button>
             )}
-            <Button variant="ghost">Qo&apos;llab-quvvatlashga murojaat</Button>
+            <Button variant="ghost">Qoʻllab-quvvatlashga murojaat</Button>
           </div>
         </StickyFooter>
       }

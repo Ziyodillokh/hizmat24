@@ -11,21 +11,21 @@ export type BannerVariant = 'info' | 'warning' | 'danger';
 
 /**
  * 9.18-band: fon = variant rangi 12% shaffoflikda.
- * Shaffoflik Tailwind'ning standart `/[0.NN]` modifikatori orqali beriladi:
+ * Shaffoflik Tailwindʼning standart `/[0.NN]` modifikatori orqali beriladi:
  * rang tokenlari RGB kanallari sifatida saqlanadi va `rgb(var(--color-x) / <alpha>)`
  * shaklida ochiladi (tokens/colors.ts, tailwind.config.ts). Yangi rang kiritilmaydi (3.4-band).
  */
 const VARIANT_CLASSES: Record<BannerVariant, { wrap: string; icon: string }> = {
   info: {
-    wrap: 'border-primary bg-primary/[0.12]',
+    wrap: 'border-primary bg-primary-surface',
     icon: 'text-primary',
   },
   warning: {
-    wrap: 'border-warning bg-warning/[0.12]',
+    wrap: 'border-warning bg-warning-surface',
     icon: 'text-warning',
   },
   danger: {
-    wrap: 'border-danger bg-danger/[0.12]',
+    wrap: 'border-danger bg-danger-surface',
     icon: 'text-danger',
   },
 };

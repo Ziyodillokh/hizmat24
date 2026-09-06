@@ -21,7 +21,7 @@ import { UNREAD_COUNT } from '@/mocks/notifications';
 /**
  * 24 · Buyurtmalarim.
  *
- * Filtrlar KLIENT tomonda ishlaydi — server bo'limlari emas. Ro'yxat
+ * Filtrlar KLIENT tomonda ishlaydi — server boʻlimlari emas. Roʻyxat
  * yangi-dan-eski tartibda keladi va UI uni QAYTA SARALAMAYDI
  * (14.5-band, 37-punkt).
  */
@@ -81,7 +81,7 @@ export function MyOrdersScreen({ variant = 'ready', initialFilter = 'all' }: MyO
       ) : variant === 'empty' ? (
         <EmptyState
           icon={ClipboardList}
-          title="Hozircha buyurtmalaringiz yo'q"
+          title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
         />

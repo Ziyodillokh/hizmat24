@@ -1,7 +1,7 @@
 import type { OrderStatus } from '@/lib/orderStateMachine';
 import type { Master, OrderAddress } from '@/mocks/types';
 
-/** Buyurtma qoralamasi — 08→09→10→11 oqimi davomida to'ldiriladi. */
+/** Buyurtma qoralamasi — 08→09→10→11 oqimi davomida toʻldiriladi. */
 export interface OrderDraft {
   categoryId: string | null;
   description: string;

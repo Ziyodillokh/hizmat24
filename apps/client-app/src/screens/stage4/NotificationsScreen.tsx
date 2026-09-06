@@ -13,8 +13,8 @@ import { NOW } from '@/mocks/orders';
 /**
  * 25 · Bildirishnomalar.
  *
- * Sarlavha va matn serverdan TAYYOR keladi — UI o'z matnini to'qimaydi.
- * Push yetkazilmagan bo'lsa ham xabar shu ro'yxatda ko'rinadi (TZ 4-bo'lim).
+ * Sarlavha va matn serverdan TAYYOR keladi — UI oʻz matnini toʻqimaydi.
+ * Push yetkazilmagan boʻlsa ham xabar shu roʻyxatda koʻrinadi (TZ 4-boʻlim).
  */
 export type NotificationsVariant = 'ready' | 'all-read' | 'empty' | 'loading' | 'offline';
 
@@ -33,12 +33,12 @@ export function NotificationsScreen({ variant = 'ready' }: NotificationsScreenPr
     >
       {variant === 'offline' && <ConnectionBanner state="reconnecting" />}
 
-      {/* O'qilmagan bo'lmasa qator ham, tugma ham BUTUNLAY yashiriladi. */}
+      {/* Oʻqilmagan boʻlmasa qator ham, tugma ham BUTUNLAY yashiriladi. */}
       {unread > 0 && (
         <div className="flex items-center justify-between gap-12">
-          <p className="text-caption text-text-secondary">{unread} ta o&apos;qilmagan</p>
+          <p className="text-caption text-text-secondary">{unread} ta oʻqilmagan</p>
           <Button variant="ghost" size="small" fullWidth={false}>
-            Barchasini o&apos;qilgan deb belgilash
+            Barchasini oʻqilgan deb belgilash
           </Button>
         </div>
       )}
@@ -58,8 +58,8 @@ export function NotificationsScreen({ variant = 'ready' }: NotificationsScreenPr
       ) : items.length === 0 ? (
         <EmptyState
           icon={BellOff}
-          title="Bildirishnomalar yo'q"
-          description="Buyurtma bergach, holat o'zgarishlari shu yerda ko'rinadi"
+          title="Bildirishnomalar yoʻq"
+          description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
           inline
         />
       ) : (

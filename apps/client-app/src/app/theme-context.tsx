@@ -3,13 +3,13 @@ import type { ThemeName } from '@/tokens/colors';
 import { useThemePreference } from './useThemePreference';
 
 /**
- * Tema tanlovi butun ilova bo'ylab bitta manbadan keladi.
+ * Tema tanlovi butun ilova boʻylab bitta manbadan keladi.
  *
  * Ilgari tema faqat `AppRouter` ichida yashardi va uni almashtirish uchun
  * ekran ustida suzuvchi tugma turardi — u har bir sahifada header ustiga
- * chiqib, ilovani prototipga o'xshatardi. Endi almashtirgich Profil
- * sahifasidagi oddiy sozlama qatoriga ko'chdi, shuning uchun holat
- * kontekst orqali bo'lishiladi.
+ * chiqib, ilovani prototipga oʻxshatardi. Endi almashtirgich Profil
+ * sahifasidagi oddiy sozlama qatoriga koʻchdi, shuning uchun holat
+ * kontekst orqali boʻlishiladi.
  */
 interface ThemeContextValue {
   theme: ThemeName;

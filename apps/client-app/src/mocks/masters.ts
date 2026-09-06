@@ -23,7 +23,7 @@ export const MASTERS: Record<string, Master> = {
   },
   bekzod: {
     id: 'm-bekzod',
-    fullName: "Bekzod To'raev",
+    fullName: "Bekzod Toʻraev",
     profession: 'Elektrik',
     experienceLevel: 'NEW',
     hasGovCertificate: false,

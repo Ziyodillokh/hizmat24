@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { getScreens, screenKey, screenTitle } from './registry';
 
 /**
- * Preview navigatori — dev qobig'i, mahsulotning qismi EMAS.
- * Ekranlar bosqichlar bo'yicha guruhlanadi (13-bo'lim).
+ * Preview navigatori — dev qobigʻi, mahsulotning qismi EMAS.
+ * Ekranlar bosqichlar boʻyicha guruhlanadi (13-boʻlim).
  */
 const STAGE_TITLES: Record<number, string> = {
   1: "Bosqich 1 — Dizayn tizimi va asosiy ekranlar",

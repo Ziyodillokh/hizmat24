@@ -6,9 +6,9 @@ import type { ThemeName } from '@/tokens/colors';
 import { LAYOUT } from '@/tokens/spacing';
 
 /**
- * Preview qobig'i: ekranni 393×852 frame ichida ko'rsatadi (7-bo'lim).
- * Har bir frame o'z temasini mustaqil qo'llaydi — shuning uchun Dark va Light
- * variantlarni yonma-yon ko'rish mumkin.
+ * Preview qobigʻi: ekranni 393×852 frame ichida koʻrsatadi (7-boʻlim).
+ * Har bir frame oʻz temasini mustaqil qoʻllaydi — shuning uchun Dark va Light
+ * variantlarni yonma-yon koʻrish mumkin.
  */
 export interface PhoneFrameProps {
   theme: ThemeName;

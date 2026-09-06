@@ -11,7 +11,7 @@ import { STEPPER_LABELS, getStepperState, type OrderStatus } from '@/lib/orderSt
  * Ilgari beshta yorliq nuqtalar ostiga absolyut joylashtirilardi: 390px
  * ekranda "Qabul qilindi" va "Yakunlandi" konteyner chetidan chiqib kesilar,
  * uzunroqlari esa ikki satrga sinib, qator balandligini buzardi. Foydalanuvchiga
- * baribir faqat JORIY bosqich nomi kerak — qolganini nuqtalar ko'rsatadi.
+ * baribir faqat JORIY bosqich nomi kerak — qolganini nuqtalar koʻrsatadi.
  *
  * Bosqich holati faqat getStepperState() orqali aniqlanadi.
  */
@@ -63,8 +63,8 @@ export function Stepper({ status, className }: StepperProps) {
                 aria-current={state === 'current' ? 'step' : undefined}
               >
                 {state === 'current' && (
-                  // Tashqi 4px halqa: 24% shaffoflik `step-pulse` keyframe'ining
-                  // boshlang'ich opacity qiymatidan keladi, shuning uchun fon to'liq `primary`.
+                  // Tashqi 4px halqa: 24% shaffoflik `step-pulse` keyframeʼining
+                  // boshlangʻich opacity qiymatidan keladi, shuning uchun fon toʻliq `primary`.
                   <span
                     aria-hidden
                     className="absolute -inset-4 animate-step-pulse rounded-full bg-primary"
@@ -77,13 +77,13 @@ export function Stepper({ status, className }: StepperProps) {
                   )}
                 >
                   {state === 'completed' && (
-                    // Icon o'ramchisi 10px o'lchamni bilmaydi — klass orqali aniq 10px beriladi.
-                    // Rang `on-primary`: 4-bo'lim 1-qoidasi yorqin teal ustida oq matnni taqiqlaydi.
+                    // Icon oʻramchisi 10px oʻlchamni bilmaydi — klass orqali aniq 10px beriladi.
+                    // Rang `on-primary`: 4-boʻlim 1-qoidasi yorqin teal ustida oq matnni taqiqlaydi.
                     <Icon icon={Check} size={16} className="h-[10px] w-[10px] text-on-primary" />
                   )}
                 </span>
-                {/* Yorliq matni ekranda ko'rinmaydi, lekin skrin-riderga bosqich
-                    nomini yetkazadi — nuqtalarning o'zi ma'no bermaydi. */}
+                {/* Yorliq matni ekranda koʻrinmaydi, lekin skrin-riderga bosqich
+                    nomini yetkazadi — nuqtalarning oʻzi maʼno bermaydi. */}
                 <span className="sr-only">{label}</span>
               </div>
             </Fragment>
@@ -92,7 +92,7 @@ export function Stepper({ status, className }: StepperProps) {
       </div>
 
       <div className="mt-12 flex items-baseline justify-between gap-12">
-        <p className="min-w-0 truncate text-body-lg font-semibold text-text-primary">
+        <p className="min-w-0 truncate text-title text-text-primary">
           {currentLabel}
         </p>
         <p className="tabular shrink-0 text-caption text-text-secondary">

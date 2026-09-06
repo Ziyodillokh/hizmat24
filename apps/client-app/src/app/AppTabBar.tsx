@@ -9,7 +9,7 @@ const ROUTES: Record<TabKey, string> = {
   profile: '/app/profile',
 };
 
-/** Tab bar — marshrutga ulangan; ekranlar uni to'g'ridan-to'g'ri chizmaydi. */
+/** Tab bar — marshrutga ulangan; ekranlar uni toʻgʻridan-toʻgʻri chizmaydi. */
 export function AppTabBar({ active }: { active: TabKey }) {
   const navigate = useNavigate();
   const { unreadCount } = useApp();

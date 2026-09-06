@@ -6,17 +6,17 @@
 const NBSP = ' ';
 
 /**
- * 8.4-band: "150 000 so'm" — mingliklar probel bilan, kasr YO'Q, "so'm" kichik harf.
+ * 8.4-band: "150 000 soʻm" — mingliklar probel bilan, kasr YOʻQ, "soʻm" kichik harf.
  * `UZS`, `сум`, `150,000`, `150.000`, `150K` taqiqlanadi.
  */
 export function formatPrice(amount: number): string {
   const digits = Math.round(amount)
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, NBSP);
-  return `${digits}${NBSP}so'm`;
+  return `${digits}${NBSP}soʻm`;
 }
 
-/** Bosh sahifa va xizmatlar ro'yxatida — aniq summa emas (14.6-band, 45-punkt). */
+/** Bosh sahifa va xizmatlar roʻyxatida — aniq summa emas (14.6-band, 45-punkt). */
 export const formatApproxPrice = (amount: number): string => `taxminan ${formatPrice(amount)}`;
 
 export const formatPriceFrom = (amount: number): string => `${formatPrice(amount)}dan`;
@@ -24,7 +24,7 @@ export const formatPriceFrom = (amount: number): string => `${formatPrice(amount
 export const formatPriceRange = (min: number, max: number): string =>
   `${Math.round(min).toString().replace(/\B(?=(\d{3})+(?!\d))/g, NBSP)}${NBSP}–${NBSP}${formatPrice(max)}`;
 
-/** 8.5-band: bitta kasr xona, o'nlik ajratkich — VERGUL. Server 4.75 bersa ham 4,8. */
+/** 8.5-band: bitta kasr xona, oʻnlik ajratkich — VERGUL. Server 4.75 bersa ham 4,8. */
 export const formatRating = (value: number): string => value.toFixed(1).replace('.', ',');
 
 /** 8.5-band: 24 soatlik format, AM/PM taqiqlanadi. */
@@ -54,7 +54,7 @@ export function formatDateTime(date: Date, now: Date): string {
     : `${date.getFullYear()}-yil ${day}, ${formatTime(date)}`;
 }
 
-/** Ro'yxatlar uchun qisqa shakl. */
+/** Roʻyxatlar uchun qisqa shakl. */
 export const formatShortDate = (date: Date): string =>
   `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`;
 
@@ -67,10 +67,10 @@ export function formatDuration(minutes: number): string {
   return rest === 0 ? `${hours} soat` : `${hours} soat ${rest} daqiqa`;
 }
 
-/** `~` faqat vaqt va navbat o'rni uchun (8.5-band). */
+/** `~` faqat vaqt va navbat oʻrni uchun (8.5-band). */
 export const formatApproxDuration = (minutes: number): string => `~${formatDuration(minutes)}`;
 
-export const formatQueuePosition = (position: number): string => `~${position}-o'rin`;
+export const formatQueuePosition = (position: number): string => `~${position}-oʻrin`;
 
 /** 8.3-band: "+998 90 *** ** 67". */
 export function maskPhone(phone: string): string {
@@ -79,14 +79,14 @@ export function maskPhone(phone: string): string {
   return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} *** ** ${digits.slice(10, 12)}`;
 }
 
-/** 04-ekranda raqam to'liq ko'rsatiladi (8.3-band istisnosi). */
+/** 04-ekranda raqam toʻliq koʻrsatiladi (8.3-band istisnosi). */
 export function formatPhone(phone: string): string {
   const digits = phone.replace(/\D/g, '');
   if (digits.length !== 12) return phone;
   return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 10)} ${digits.slice(10, 12)}`;
 }
 
-/** Ma'lumot yo'q bo'lganda — "N/A" emas (8.5-band). */
+/** Maʼlumot yoʻq boʻlganda — "N/A" emas (8.5-band). */
 export const EMPTY_VALUE = '—';
 
 export const orEmpty = (value: string | null | undefined): string => value ?? EMPTY_VALUE;

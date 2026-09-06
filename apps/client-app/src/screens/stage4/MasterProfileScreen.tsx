@@ -11,8 +11,8 @@ import { MASTERS } from '@/mocks/masters';
 /**
  * 27 · Usta profili — READ-ONLY.
  *
- * Sharhlar ro'yxati, narxlar, ish jadvali, portfolio, "kuzatish"/"saqlash"
- * tugmalari YO'Q. Reyting yonida "N ta baho" ham yozilmaydi
+ * Sharhlar roʻyxati, narxlar, ish jadvali, portfolio, "kuzatish"/"saqlash"
+ * tugmalari YOʻQ. Reyting yonida "N ta baho" ham yozilmaydi
  * (14.1-band, 5–6-punkt).
  */
 export type MasterProfileVariant = 'with-phone' | 'without-phone' | 'loading';
@@ -24,7 +24,7 @@ export interface MasterProfileScreenProps {
 export function MasterProfileScreen({ variant = 'with-phone' }: MasterProfileScreenProps) {
   const master = MASTERS.akmal;
 
-  // Telefon ko'rinishi buyurtma holatiga bog'liq — profil o'zi hal qilmaydi.
+  // Telefon koʻrinishi buyurtma holatiga bogʻliq — profil oʻzi hal qilmaydi.
   const orderStatus =
     variant === 'with-phone' ? ORDER_STATUS.MASTER_EN_ROUTE : ORDER_STATUS.CLOSED;
   const canCall = isMasterPhoneVisible(orderStatus) && Boolean(master.phoneNumber);
@@ -48,15 +48,15 @@ export function MasterProfileScreen({ variant = 'with-phone' }: MasterProfileScr
       footer={
         <StickyFooter>
           {canCall ? (
-            <Button variant="primary">Qo&apos;ng&apos;iroq qilish</Button>
+            <Button variant="primary">Qoʻngʻiroq qilish</Button>
           ) : (
-            /* Telefon yo'q bo'lsa tugma disabled EMAS — butunlay yashiriladi. */
+            /* Telefon yoʻq boʻlsa tugma disabled EMAS — butunlay yashiriladi. */
             <div className="flex flex-col gap-12">
               <p className="text-center text-body-sm text-text-secondary">
-                Ish yakunlangan — savol bo&apos;lsa qo&apos;llab-quvvatlash xizmatiga murojaat
+                Ish yakunlangan — savol boʻlsa qoʻllab-quvvatlash xizmatiga murojaat
                 qiling
               </p>
-              <Button variant="ghost">Qo&apos;llab-quvvatlashga murojaat</Button>
+              <Button variant="ghost">Qoʻllab-quvvatlashga murojaat</Button>
             </div>
           )}
         </StickyFooter>

@@ -10,22 +10,22 @@ import './screens/registerScreens';
 
 /**
  * Ilova ikki rejimda ishlaydi:
- *  - APK ichida (native) — faqat ilovaning o'zi, `/app` dan boshlanadi;
- *  - brauzerda — qo'shimcha preview galereyasi ham mavjud.
+ *  - APK ichida (native) — faqat ilovaning oʻzi, `/app` dan boshlanadi;
+ *  - brauzerda — qoʻshimcha preview galereyasi ham mavjud.
  *
- * Native'da ildiz yo'l preview galereyasiga tushib qolsa, foydalanuvchi
- * ilovani umuman ko'rmaydi — shuning uchun u darhol `/app` ga yo'naltiriladi.
+ * Nativeʼda ildiz yoʻl preview galereyasiga tushib qolsa, foydalanuvchi
+ * ilovani umuman koʻrmaydi — shuning uchun u darhol `/app` ga yoʻnaltiriladi.
  */
 export function App() {
   useEffect(() => {
-    // Preview qobig'i Light temada; ilova rejimi o'z temasini o'zi qo'llaydi.
+    // Preview qobigʻi Light temada; ilova rejimi oʻz temasini oʻzi qoʻllaydi.
     if (!isNative()) applyTheme('light');
   }, []);
 
   /*
    * Splash HAR QANDAY holatda yopiladi — marshrutga, tarmoqqa yoki ilova
-   * holatiga bog'liq emas. Ilgari uni faqat `/app` ichidagi komponent
-   * yopardi, shuning uchun boshqa yo'lda ilova splash'da qotib qolardi.
+   * holatiga bogʻliq emas. Ilgari uni faqat `/app` ichidagi komponent
+   * yopardi, shuning uchun boshqa yoʻlda ilova splashʼda qotib qolardi.
    */
   useEffect(() => {
     void hideSplash();

@@ -8,9 +8,9 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
  * 03 · Telefon raqami.
  *
  * Kirish oqimining birinchi kiritish ekrani: foydalanuvchi raqamini yozadi va
- * shu raqamga SMS kod yuboriladi. Server xatosi bo'lsa ham bu ekranda qotib
- * qolmaydi — oqim 04-ekranga o'tadi va u yerda `warning` banner ko'rsatiladi
- * (11-bo'lim, 03-ekran).
+ * shu raqamga SMS kod yuboriladi. Server xatosi boʻlsa ham bu ekranda qotib
+ * qolmaydi — oqim 04-ekranga oʻtadi va u yerda `warning` banner koʻrsatiladi
+ * (11-boʻlim, 03-ekran).
  */
 export type PhoneNumberVariant = 'empty' | 'filled' | 'error' | 'submitting';
 
@@ -18,10 +18,10 @@ export interface PhoneNumberScreenProps {
   variant?: PhoneNumberVariant;
 }
 
-/** 11-bo'lim: `+998` dan keyin 9 xona to'lmaguncha tugma disabled. */
+/** 11-boʻlim: `+998` dan keyin 9 xona toʻlmaguncha tugma disabled. */
 const PHONE_DIGITS = 9;
 
-/** 8.2-band: bu matn "O'z xato matnlarimiz" ro'yxatidan, o'zgartirilmaydi. */
+/** 8.2-band: bu matn "Oʻz xato matnlarimiz" roʻyxatidan, oʻzgartirilmaydi. */
 const PHONE_ERROR = "Telefon raqamini +998 XX XXX XX XX formatida kiriting";
 
 const INITIAL_DIGITS: Record<PhoneNumberVariant, string> = {
@@ -31,7 +31,7 @@ const INITIAL_DIGITS: Record<PhoneNumberVariant, string> = {
   submitting: '901234567',
 };
 
-/** `90 123 45 67` maskasi — bo'sh guruhlar chizilmaydi, kursor sakramaydi. */
+/** `90 123 45 67` maskasi — boʻsh guruhlar chizilmaydi, kursor sakramaydi. */
 function applyMask(digits: string): string {
   return [digits.slice(0, 2), digits.slice(2, 5), digits.slice(5, 7), digits.slice(7, 9)]
     .filter((group) => group.length > 0)
@@ -62,7 +62,7 @@ export function PhoneNumberScreen({ variant = 'filled' }: PhoneNumberScreenProps
 
       {/*
         Bu matn disabled tugmaning tushuntiruvchi yozuvi vazifasini ham bajaradi
-        (4-bo'lim, 5-qoida): nima uchun raqam kerakligi ekranda doim ko'rinadi.
+        (4-boʻlim, 5-qoida): nima uchun raqam kerakligi ekranda doim koʻrinadi.
       */}
       <p className="mt-8 text-body text-text-secondary">
         Tasdiqlash kodi SMS orqali yuboriladi
@@ -70,7 +70,7 @@ export function PhoneNumberScreen({ variant = 'filled' }: PhoneNumberScreenProps
 
       {/*
         `+998` prefiksi QOTIRILGAN: u inputning qiymati emas, shuning uchun
-        o'chirib bo'lmaydi va maskaga aralashmaydi (11-bo'lim, 03-ekran).
+        oʻchirib boʻlmaydi va maskaga aralashmaydi (11-boʻlim, 03-ekran).
       */}
       <div className="relative mt-24">
         <span

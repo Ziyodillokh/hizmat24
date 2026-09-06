@@ -12,7 +12,7 @@ import { ORDERS_BY_ID, NOW } from '@/mocks/orders';
  * 12 · Usta qidirilmoqda.
  *
  * Uchta holat majburiy. `other-master` — bu XATO EMAS: usta javob bermaganda
- * buyurtma qidiruvga qaytadi, bu oqimning normal qismi (1-bo'lim, 15-qoida),
+ * buyurtma qidiruvga qaytadi, bu oqimning normal qismi (1-boʻlim, 15-qoida),
  * shuning uchun rang neytral, qizil emas.
  */
 export type SearchingVariant = 'searching' | 'operator' | 'other-master';
@@ -39,7 +39,7 @@ export function SearchingScreen({ variant = 'searching' }: SearchingScreenProps)
           <div className="flex flex-col gap-12">
             {/* Operator holatida ham bekor qilish ALBATTA faol qoladi. */}
             <Button variant="secondary">Bekor qilish</Button>
-            {isOperator && <Button variant="ghost">Qo&apos;llab-quvvatlashga murojaat</Button>}
+            {isOperator && <Button variant="ghost">Qoʻllab-quvvatlashga murojaat</Button>}
           </div>
         </StickyFooter>
       }
@@ -47,7 +47,7 @@ export function SearchingScreen({ variant = 'searching' }: SearchingScreenProps)
       <Stepper status={order.status} className="-mx-20" />
 
       <div className="mt-32 flex flex-col items-center">
-        {/* Operator holatida radar TO'XTAYDI — statik operator ikonasi qoladi. */}
+        {/* Operator holatida radar TOʻXTAYDI — statik operator ikonasi qoladi. */}
         <RadarBlock
           variant={isOperator ? 'static' : 'animated'}
           icon={isOperator ? Headset : Search}
@@ -66,10 +66,10 @@ export function SearchingScreen({ variant = 'searching' }: SearchingScreenProps)
         )}
       </div>
 
-      {/* Operator holatida taxminiy vaqt va navbat raqami KO'RSATILMAYDI. */}
+      {/* Operator holatida taxminiy vaqt va navbat raqami KOʻRSATILMAYDI. */}
       {isOperator && (
         <Banner variant="warning" className="mt-24">
-          Hozircha bo&apos;sh usta yo&apos;q — operatorimiz buyurtmangizni qo&apos;lda ko&apos;rib
+          Hozircha boʻsh usta yoʻq — operatorimiz buyurtmangizni qoʻlda koʻrib
           chiqadi
         </Banner>
       )}

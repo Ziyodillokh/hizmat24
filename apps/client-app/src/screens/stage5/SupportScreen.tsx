@@ -6,10 +6,10 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { ORDERS_BY_ID } from '@/mocks/orders';
 
 /**
- * 30 · Qo'llab-quvvatlash xizmati.
+ * 30 · Qoʻllab-quvvatlash xizmati.
  *
- * Buyurtma ekranidan ochilganda buyurtma raqami avtomatik to'ldiriladi —
- * foydalanuvchi uni qo'lda ko'chirib yozmasin.
+ * Buyurtma ekranidan ochilganda buyurtma raqami avtomatik toʻldiriladi —
+ * foydalanuvchi uni qoʻlda koʻchirib yozmasin.
  */
 export type SupportVariant = 'default' | 'with-order';
 
@@ -24,7 +24,7 @@ interface ChannelItem {
 }
 
 const CHANNELS: ChannelItem[] = [
-  { icon: Phone, label: "Telefon orqali bog'lanish", value: '+998 71 200 24 24' },
+  { icon: Phone, label: "Telefon orqali bogʻlanish", value: '+998 71 200 24 24' },
   { icon: Send, label: 'Telegram orqali yozish', value: '@hizmat24_support' },
 ];
 
@@ -32,9 +32,9 @@ export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
   const order = ORDERS_BY_ID['o-progress'];
 
   return (
-    <ScreenShell header={<Header variant="inner" title="Qo'llab-quvvatlash xizmati" />}>
+    <ScreenShell header={<Header variant="inner" title="Qoʻllab-quvvatlash xizmati" />}>
       <p className="mt-4 text-body text-text-secondary">
-        Savolingiz bo&apos;lsa, quyidagi usullardan biri orqali bog&apos;laning.
+        Savolingiz boʻlsa, quyidagi usullardan biri orqali bogʻlaning.
       </p>
 
       <nav className="mt-20">
@@ -51,7 +51,7 @@ export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
               <span className="block text-body-lg text-text-primary">{channel.label}</span>
               <span className="block text-body-sm text-text-secondary">{channel.value}</span>
             </span>
-            <Icon icon={ChevronRight} size={20} className="text-text-disabled" />
+            <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
           </button>
         ))}
       </nav>

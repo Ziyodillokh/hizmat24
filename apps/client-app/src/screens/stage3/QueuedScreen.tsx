@@ -13,8 +13,8 @@ import { ORDERS_BY_ID, NOW } from '@/mocks/orders';
 /**
  * 13 · Siz navbatdasiz.
  *
- * Asosiy element — navbat O'RNI, taxminiy vaqt emas. Raqam jonli sanoq bilan
- * yangilanmaydi: u faqat haqiqatan o'zgarganda o'zgaradi va uzoq vaqt qotib
+ * Asosiy element — navbat OʻRNI, taxminiy vaqt emas. Raqam jonli sanoq bilan
+ * yangilanmaydi: u faqat haqiqatan oʻzgarganda oʻzgaradi va uzoq vaqt qotib
  * turishi normal (14.6-band, 44-punkt).
  */
 export type QueuedVariant = 'position' | 'no-estimate' | 'operator' | 'offline';
@@ -34,7 +34,7 @@ export function QueuedScreen({ variant = 'position' }: QueuedScreenProps) {
         <StickyFooter>
           <div className="flex flex-col gap-12">
             <Button variant="secondary">Bekor qilish</Button>
-            {isOperator && <Button variant="ghost">Qo&apos;llab-quvvatlashga murojaat</Button>}
+            {isOperator && <Button variant="ghost">Qoʻllab-quvvatlashga murojaat</Button>}
           </div>
         </StickyFooter>
       }
@@ -50,14 +50,14 @@ export function QueuedScreen({ variant = 'position' }: QueuedScreenProps) {
             <RadarBlock variant="static" icon={Headset} />
           </div>
           <Banner variant="warning" className="mt-24">
-            Hozircha bo&apos;sh usta yo&apos;q — operatorimiz buyurtmangizni qo&apos;lda ko&apos;rib
+            Hozircha boʻsh usta yoʻq — operatorimiz buyurtmangizni qoʻlda koʻrib
             chiqadi
           </Banner>
         </>
       ) : (
         <div className="mt-32 flex flex-col items-center">
           <p className="text-display text-text-primary tabular">~{order.queuePosition}</p>
-          <p className="mt-8 text-body text-text-primary">Navbatdagi o&apos;rningiz</p>
+          <p className="mt-8 text-body text-text-primary">Navbatdagi oʻrningiz</p>
           <p className="mt-4 text-body-sm text-text-secondary">
             {variant === 'no-estimate'
               ? 'Hisoblanmoqda'

@@ -181,7 +181,7 @@ describe('getDetailActions (23-ekran jadvali)', () => {
     }
   });
 
-  it("qo'ng'iroq tugmasi FAQAT telefon ko'rinadigan holatlarda chiqadi", () => {
+  it("qoʻngʻiroq tugmasi FAQAT telefon koʻrinadigan holatlarda chiqadi", () => {
     for (const status of ALL) {
       const hasCall = getDetailActions(status).includes('call');
       // "Usta yetib keldi" — bloklovchi ekran: telefon bor, lekin tugmalar boshqa.

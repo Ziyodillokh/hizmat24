@@ -5,7 +5,7 @@ export const USER: UserProfile = {
   phoneNumber: '+998901234567',
 };
 
-/** 8.3-band: ism bo'lmagan holat varianti ham kerak. */
+/** 8.3-band: ism boʻlmagan holat varianti ham kerak. */
 export const USER_WITHOUT_NAME: UserProfile = {
   fullName: null,
   phoneNumber: '+998901234567',

@@ -4,45 +4,58 @@
 
 /*
  * Ranglar RGB KANALLARI sifatida saqlanadi ("255 255 255"), hex sifatida emas.
- * Sababi: Tailwind'ning shaffoflik utilitalari (`bg-primary/[0.14]`) rangni
+ * Sababi: Tailwindʼning shaffoflik utilitalari (`bg-primary/[0.14]`) rangni
  * `rgb(... / <alpha-value>)` shaklida kutadi; hex yozilsa utilita jimgina
  * tushib qoladi va CSS umuman chiqmaydi.
  *
- * To'liq palitra `applyTheme()` tomonidan ish vaqtida yoziladi (src/lib/theme.ts).
+ * Toʻliq palitra `applyTheme()` tomonidan ish vaqtida yoziladi (src/lib/theme.ts).
  * Bu yerda faqat birinchi render uchun zaxira qiymatlar.
  */
 :root {
   color-scheme: light;
-  --color-surface: 255 255 255;
-  --color-surface-sunken: 241 247 247;
-  --color-border: 226 236 236;
+  --color-surface: 242 247 247;
+  --color-surface-elevated: 255 255 255;
+  --color-surface-sunken: 229 239 239;
+  --color-border: 220 232 232;
   --color-text-primary: 4 48 47;
+  --color-success: 4 120 87;
+  --color-warning: 154 84 8;
+  --color-danger: 200 30 30;
   --color-canvas: 230 247 247;
   --color-overlay: rgba(4, 48, 47, 0.45);
-  --elevation-e1: 0 1px 2px rgba(6, 44, 44, 0.06);
-  --elevation-e2: 0 4px 12px rgba(6, 44, 44, 0.08);
-  --elevation-e3: 0 12px 24px rgba(6, 44, 44, 0.1);
+  --elevation-e1: 0 1px 1px rgba(6, 44, 44, 0.04), 0 2px 6px -1px rgba(6, 44, 44, 0.07);
+  --elevation-e2: 0 1px 2px rgba(6, 44, 44, 0.05), 0 8px 20px -6px rgba(6, 44, 44, 0.12);
+  --elevation-e3: 0 2px 4px rgba(6, 44, 44, 0.07), 0 20px 40px -12px rgba(6, 44, 44, 0.2);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
   --color-surface: 14 43 44;
-  --color-surface-sunken: 18 64 63;
+  --color-surface-elevated: 19 58 59;
+  --color-surface-sunken: 10 35 36;
   --color-border: 30 79 78;
   --color-text-primary: 242 250 250;
+  --color-success: 52 211 153;
+  --color-warning: 251 191 36;
+  --color-danger: 252 165 165;
   --color-canvas: 127 165 165;
   --color-overlay: rgba(0, 0, 0, 0.6);
+  /* Bu blok elevatsiya zaxiralarini umuman bermas edi — birinchi renderda
+     Dark tema Light soyalarini olib qolardi. */
+  --elevation-e1: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --elevation-e2: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 6px 16px -4px rgba(0, 0, 0, 0.45);
+  --elevation-e3: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 20px 40px -12px rgba(0, 0, 0, 0.6);
 }
 
 /*
- * Suziluvchi ildiz shrift o'lchami.
+ * Suziluvchi ildiz shrift oʻlchami.
  *
- * 4.07vw — 393px etalon kenglikda aynan 16px beradi (7-bo'lim). Tor
+ * 4.07vw — 393px etalon kenglikda aynan 16px beradi (7-boʻlim). Tor
  * telefonlarda matn proporsional kichrayadi, keng telefonlarda esa 16px dan
  * oshmaydi: aks holda katta ekranda yozuvlar keraksiz yiriklashib ketardi.
  */
 html {
-  font-size: clamp(14px, 4.07vw, 16px);
+  font-size: clamp(15px, 4.07vw, 16px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -56,12 +69,51 @@ body {
   background: rgb(var(--color-canvas));
   color: rgb(var(--color-text-primary));
   -webkit-font-smoothing: antialiased;
+  /* Interʼning ss02 toʻplami: serifli bosh I va dumli kichik l. Oʻzbek matni
+     I va l ga toʻyingan — usiz "Ilova" soʻzi "llova" boʻlib oʻqiladi. */
+  font-feature-settings: 'ss02' 1;
 }
 
-/* Tabular figures — narx, reyting, taymer va identifikatorlar uchun (5-bo'lim). */
+@layer components {
+  /*
+   * Hero maydoni — ilovaning imzosi. Bitta chuqur teal material ikki
+   * masshtabda: tepadagi blok va bosh sahifadagi banner. Yumshoq yorugʻlik
+   * dogʻi chap yuqoridan tushadi, shuning uchun maydon tekis plastinka emas.
+   *
+   * Tailwind `backgroundImage` utilitasi emas, chunki `cn()` dagi
+   * `tailwind-merge` `bg-` guruhlarini rang deb hisoblab, uni `bg-surface`
+   * bilan birga yozilganda jimgina tashlab yuborishi mumkin.
+   */
+  .hero-field {
+    background-color: rgb(var(--color-surface-hero));
+    background-image:
+      radial-gradient(
+        130% 90% at 18% -12%,
+        rgb(var(--color-surface-hero-top) / 0.9) 0%,
+        rgb(var(--color-surface-hero-top) / 0) 62%
+      ),
+      linear-gradient(
+        168deg,
+        rgb(var(--color-surface-hero)) 0%,
+        rgb(var(--color-surface-hero-deep)) 100%
+      );
+  }
+
+  /* Kategoriya doirasi: tepadan yorugʻlik tushgan gumbaz, tekis dog' emas. */
+  .disc-lit {
+    background-color: rgb(var(--color-category-circle));
+    background-image: radial-gradient(
+      120% 100% at 50% 0%,
+      rgb(var(--color-category-circle-top)) 0%,
+      rgb(var(--color-category-circle) / 0) 72%
+    );
+  }
+}
+
+/* Tabular figures — narx, reyting, taymer va identifikatorlar uchun (5-boʻlim). */
 .tabular {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum' 1;
+  font-feature-settings: 'tnum' 1, 'ss02' 1;
 }
 
 /* Skeleton shimmer (12.1-band). */

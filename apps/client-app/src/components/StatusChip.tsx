@@ -4,14 +4,14 @@ import { STATUS_CHIPS, type ChipTone, type OrderStatus } from '@/lib/orderStateM
 /**
  * Status chipi — spetsifikatsiya 9.9-bandi.
  * h=28, radius/full, padding 12, matn 12/16/500, chapda 6px nuqta.
- * Fon = rang 14% opacity, matn = to'liq rang.
+ * Fon = rang 14% opacity, matn = toʻliq rang.
  */
 const TONE_CLASSES: Record<ChipTone, { wrap: string; dot: string }> = {
-  primary: { wrap: 'bg-primary/[0.14] text-primary', dot: 'bg-primary' },
-  warning: { wrap: 'bg-warning/[0.14] text-warning', dot: 'bg-warning' },
-  success: { wrap: 'bg-success/[0.14] text-success', dot: 'bg-success' },
-  danger: { wrap: 'bg-danger/[0.14] text-danger', dot: 'bg-danger' },
-  neutral: { wrap: 'bg-border-strong/[0.14] text-text-secondary', dot: 'bg-text-secondary' },
+  primary: { wrap: 'bg-primary-surface text-primary-pressed', dot: 'bg-primary' },
+  warning: { wrap: 'bg-warning-surface text-warning', dot: 'bg-warning' },
+  success: { wrap: 'bg-success-surface text-success', dot: 'bg-success' },
+  danger: { wrap: 'bg-danger-surface text-danger', dot: 'bg-danger' },
+  neutral: { wrap: 'bg-neutral-surface text-text-secondary', dot: 'bg-text-secondary' },
 };
 
 export interface StatusChipProps {

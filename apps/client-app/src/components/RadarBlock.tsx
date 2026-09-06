@@ -5,8 +5,8 @@ import { Icon } from './Icon';
 /**
  * Radar animatsiya bloki — spetsifikatsiya 9.29-bandi (12-ekran).
  * 88px doira, 3 ta kengayuvchi `primary` halqa, markazda 32px ikona.
- * `static` varianti — "Operator ko'rib chiqmoqda" holati uchun:
- * animatsiya yo'q, 64px operator ikonasi.
+ * `static` varianti — "Operator koʻrib chiqmoqda" holati uchun:
+ * animatsiya yoʻq, 64px operator ikonasi.
  */
 export type RadarVariant = 'animated' | 'static';
 
@@ -32,7 +32,7 @@ export interface RadarBlockProps {
 
 /**
  * Blok dekorativ: holat matni ("Usta qidirilmoqda…") yonidagi `h2` orqali
- * o'qiladi, shuning uchun bu yerda `aria-hidden`.
+ * oʻqiladi, shuning uchun bu yerda `aria-hidden`.
  */
 export function RadarBlock({ variant = 'animated', icon, className }: RadarBlockProps) {
   const centerIcon = icon ?? DEFAULT_ICON[variant];
@@ -51,8 +51,8 @@ export function RadarBlock({ variant = 'animated', icon, className }: RadarBlock
             key={delay}
             // `backwards` — siljish (delay) davomida halqa birinchi kadr
             // qiymatlarini (scale 0.6, opacity 24%) ushlab turadi. Busiz halqa
-            // kutish paytida to'liq shaffofmas `primary` disk bo'lib ko'rinardi
-            // va 9.29-banddagi 24% → 0% oralig'i buzilardi.
+            // kutish paytida toʻliq shaffofmas `primary` disk boʻlib koʻrinardi
+            // va 9.29-banddagi 24% → 0% oraligʻi buzilardi.
             style={{ animationDelay: delay, animationFillMode: 'backwards' }}
             className="absolute inset-0 animate-radar-ping rounded-full bg-primary"
           />

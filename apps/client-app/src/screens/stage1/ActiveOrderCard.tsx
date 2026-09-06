@@ -9,16 +9,16 @@ import type { Order } from '@/mocks/types';
 /**
  * 06-ekran, 6-blok: aktiv buyurtma kartasi.
  *
- * Karta terminal bo'lmagan HAR BIR holat uchun bitta variantda chiziladi —
- * jami 6 variant. "Usta yetib keldi" bu ro'yxatda YO'Q: u holatda bosh sahifa
- * umuman ko'rsatilmaydi, 16-ekran majburan ochiladi (1-bo'lim, 4-qoida).
+ * Karta terminal boʻlmagan HAR BIR holat uchun bitta variantda chiziladi —
+ * jami 6 variant. "Usta yetib keldi" bu roʻyxatda YOʻQ: u holatda bosh sahifa
+ * umuman koʻrsatilmaydi, 16-ekran majburan ochiladi (1-boʻlim, 4-qoida).
  */
 export interface ActiveOrderCardProps {
   order: Order;
   className?: string;
 }
 
-/** Ikkinchi darajali qator — holatga qarab. `null` bo'lsa qator yashiriladi. */
+/** Ikkinchi darajali qator — holatga qarab. `null` boʻlsa qator yashiriladi. */
 function secondaryLine(order: Order): string | null {
   switch (order.status) {
     case ORDER_STATUS.SEARCHING:
@@ -27,7 +27,7 @@ function secondaryLine(order: Order): string | null {
       return order.queuePosition ? formatQueuePosition(order.queuePosition) : null;
     case ORDER_STATUS.ASSIGNED:
     case ORDER_STATUS.MASTER_EN_ROUTE:
-      // Taxminiy vaqt yo'q bo'lsa qator butunlay yashiriladi — "0 daqiqa" yozilmaydi.
+      // Taxminiy vaqt yoʻq boʻlsa qator butunlay yashiriladi — "0 daqiqa" yozilmaydi.
       return order.etaMinutes ? `Taxminiy vaqt: ${formatDuration(order.etaMinutes)}` : null;
     case ORDER_STATUS.IN_PROGRESS:
       return order.master?.fullName ?? null;

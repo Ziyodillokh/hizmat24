@@ -10,11 +10,11 @@ import { Toast } from '@/components/Toast';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 
 /**
- * 12-bo'lim · Universal holat naqshlari.
+ * 12-boʻlim · Universal holat naqshlari.
  *
- * Bu MAHSULOT ekrani emas — 12-bo'limdagi skeleton, bo'sh holat, xato va
- * banner naqshlarini bitta joyda ko'rsatadigan ma'lumotnoma. Shu sababli
- * ekranlar ro'yxatida alohida bosqichda turadi.
+ * Bu MAHSULOT ekrani emas — 12-boʻlimdagi skeleton, boʻsh holat, xato va
+ * banner naqshlarini bitta joyda koʻrsatadigan maʼlumotnoma. Shu sababli
+ * ekranlar roʻyxatida alohida bosqichda turadi.
  */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -41,31 +41,31 @@ export function StatePatternsScreen() {
         <SkeletonText lines={3} />
       </Section>
 
-      <Section title="12.2 · Bo'sh holatlar">
+      <Section title="12.2 · Boʻsh holatlar">
         <EmptyState
           icon={ClipboardList}
-          title="Hozircha buyurtmalaringiz yo'q"
+          title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
         />
-        {/* Tugmasiz variant: bildirishnomalar bo'sh bo'lganda CTA qo'yilmaydi. */}
+        {/* Tugmasiz variant: bildirishnomalar boʻsh boʻlganda CTA qoʻyilmaydi. */}
         <EmptyState
           icon={BellOff}
-          title="Bildirishnomalar yo'q"
-          description="Buyurtma bergach, holat o'zgarishlari shu yerda ko'rinadi"
+          title="Bildirishnomalar yoʻq"
+          description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
         />
         <EmptyState icon={SearchX} title="Hech narsa topilmadi" />
       </Section>
 
       <Section title="12.3 · Xato holatlari">
-        <Banner variant="danger">Kod noto&apos;g&apos;ri</Banner>
+        <Banner variant="danger">Kod notoʻgʻri</Banner>
         <Banner variant="warning">
-          SMS yuborishda xatolik. Kod kelmasa, taymer tugagach qayta so&apos;rang.
+          SMS yuborishda xatolik. Kod kelmasa, taymer tugagach qayta soʻrang.
         </Banner>
         <Banner variant="info">Usta ishni boshladi</Banner>
         <EmptyState
           icon={WifiOff}
-          title="Internetga ulanish yo'q"
+          title="Internetga ulanish yoʻq"
           action={{ label: 'Qayta urinish', onClick: () => undefined }}
         />
       </Section>
@@ -86,7 +86,7 @@ export function StatePatternsScreen() {
           )}
         </div>
         <Button variant="ghost" onClick={() => setToastVisible(true)}>
-          Toastni qayta ko&apos;rsatish
+          Toastni qayta koʻrsatish
         </Button>
       </Section>
 

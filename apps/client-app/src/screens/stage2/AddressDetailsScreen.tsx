@@ -10,8 +10,8 @@ import { ORDERS_BY_ID } from '@/mocks/orders';
 /**
  * 10 · Manzil tafsilotlari (2-qadam davomi).
  *
- * Manzil matni majburiy (1-bo'lim, 10-qoida): kamida 5, ko'pi bilan 300 belgi.
- * Kirish, qavat, xonadon va izoh ixtiyoriy — bo'sh qoldirilgani serverga bo'sh
+ * Manzil matni majburiy (1-boʻlim, 10-qoida): kamida 5, koʻpi bilan 300 belgi.
+ * Kirish, qavat, xonadon va izoh ixtiyoriy — boʻsh qoldirilgani serverga boʻsh
  * satr sifatida emas, umuman yuborilmaydi.
  */
 const ADDRESS_MIN = 5;
@@ -57,13 +57,13 @@ const INITIAL_DRAFT: Record<AddressDetailsVariant, AddressDraft> = {
 };
 
 /**
- * Mock xarita preview foni — haqiqiy xarita kutubxonasi ulanmagan, ko'cha to'ri
+ * Mock xarita preview foni — haqiqiy xarita kutubxonasi ulanmagan, koʻcha toʻri
  * mavjud tokenlar bilan chiziladi. Bu blok faqat shu ekranga tegishli.
  */
 export function AddressDetailsScreen({ variant = 'filled' }: AddressDetailsScreenProps) {
   const [draft, setDraft] = useState<AddressDraft>(INITIAL_DRAFT[variant]);
 
-  // Immutabl yangilanish: har bir o'zgarish yangi obyekt qaytaradi.
+  // Immutabl yangilanish: har bir oʻzgarish yangi obyekt qaytaradi.
   const update = (field: keyof AddressDraft, value: string): void =>
     setDraft((current) => ({ ...current, [field]: value }));
 

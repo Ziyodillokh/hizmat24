@@ -6,7 +6,7 @@ const STORAGE_KEY = 'hizmat24:theme';
 /**
  * Tema tanlovi.
  *
- * Boshlang'ich qiymat tizim sozlamasidan olinadi (`prefers-color-scheme`) —
+ * Boshlangʻich qiymat tizim sozlamasidan olinadi (`prefers-color-scheme`) —
  * haqiqiy ilovadagidek. Foydalanuvchi almashtirsa, tanlovi saqlanadi.
  */
 function readInitialTheme(): ThemeName {
@@ -14,7 +14,7 @@ function readInitialTheme(): ThemeName {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === 'dark' || saved === 'light') return saved;
   } catch {
-    // localStorage yopiq bo'lishi mumkin (private rejim) — tizim sozlamasiga qaytamiz.
+    // localStorage yopiq boʻlishi mumkin (private rejim) — tizim sozlamasiga qaytamiz.
   }
 
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -27,7 +27,7 @@ export function useThemePreference() {
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch {
-      // Saqlab bo'lmasa ham ilova ishlayveradi.
+      // Saqlab boʻlmasa ham ilova ishlayveradi.
     }
   }, [theme]);
 

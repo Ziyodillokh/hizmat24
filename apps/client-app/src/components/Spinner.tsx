@@ -1,9 +1,9 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Spinner FAQAT to'rt joyda ishlatiladi (12.1-band): tugma ichida,
+ * Spinner FAQAT toʻrt joyda ishlatiladi (12.1-band): tugma ichida,
  * 01-ekranda, 09-ekranda xarita yuklanishida va real-vaqt aloqa bannerida.
- * Ro'yxat va kontent yuklanishida faqat skeleton.
+ * Roʻyxat va kontent yuklanishida faqat skeleton.
  */
 export interface SpinnerProps {
   size?: 16 | 20 | 32;

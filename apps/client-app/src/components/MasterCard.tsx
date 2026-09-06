@@ -8,8 +8,8 @@ import { StarRating } from './StarRating';
 /**
  * Usta kartasi — spetsifikatsiya 9.7-bandi.
  * 64px avatar · ism `h3` · kasbi `body` `text-secondary` · "Yangi"/"Tajribali" badge ·
- * "Sertifikatli" chipi (agar mavjud bo'lsa) · yulduz + reyting · "142 ta buyurtma bajargan".
- * Kartada "Buyurtma berish" tugmasi YO'Q — usta tanlanmaydi (14.1-band, 3-punkt).
+ * "Sertifikatli" chipi (agar mavjud boʻlsa) · yulduz + reyting · "142 ta buyurtma bajargan".
+ * Kartada "Buyurtma berish" tugmasi YOʻQ — usta tanlanmaydi (14.1-band, 3-punkt).
  */
 export type MasterExperience = 'new' | 'experienced';
 
@@ -41,8 +41,8 @@ export function MasterCard({
 }: MasterCardProps) {
   const isInteractive = Boolean(onOpen);
 
-  // `role="button"` e'lon qilingan element klaviatura bilan ham ishlashi shart:
-  // haqiqiy <button> emas, shuning uchun Enter/Space ni o'zimiz ushlaymiz.
+  // `role="button"` eʼlon qilingan element klaviatura bilan ham ishlashi shart:
+  // haqiqiy <button> emas, shuning uchun Enter/Space ni oʻzimiz ushlaymiz.
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();

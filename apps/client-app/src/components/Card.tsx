@@ -20,10 +20,15 @@ export function Card({ state = 'default', interactive = false, className, childr
     <div
       className={cn(
         'rounded-lg bg-surface-elevated p-16 shadow-e1',
-        'border border-border',
+        // Chegara VA soya birga — generatsiya qilingan CSS ning eng tanish
+        // izi. Lightʼda endi ton farqi (#FFFFFF / #F2F7F7) va ikki qatlamli
+        // soya kartani belgilaydi; Darkʼda chiziq elevatsiya mexanizmining
+        // oʻzi boʻlgani uchun qoladi.
+        "border border-transparent [[data-theme='dark']_&]:border-border",
         state === 'selected' && 'border-2 border-primary',
         state === 'pressed' && 'scale-[0.99]',
-        interactive && 'transition-transform active:scale-[0.99]',
+        interactive &&
+          'transition-transform duration-press ease-std active:scale-[0.995] active:bg-surface-sunken',
         className,
       )}
       {...rest}

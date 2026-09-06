@@ -11,15 +11,15 @@ import type { CancelledBy } from '@/mocks/types';
 /**
  * 22 · Buyurtma bekor qilindi — TERMINAL.
  *
- * Stepper yo'q. Chek va baholash tugmasi ham yo'q (14.3-band, 19-punkt).
+ * Stepper yoʻq. Chek va baholash tugmasi ham yoʻq (14.3-band, 19-punkt).
  */
 export interface OrderCancelledScreenProps {
   cancelledBy?: CancelledBy;
 }
 
 /**
- * Kim bekor qilgani uch xil rangda ko'rsatiladi: usta bekor qilgani mijoz
- * uchun kutilmagan hodisa, shuning uchun u `warning` tusida (11-bo'lim, 22-ekran).
+ * Kim bekor qilgani uch xil rangda koʻrsatiladi: usta bekor qilgani mijoz
+ * uchun kutilmagan hodisa, shuning uchun u `warning` tusida (11-boʻlim, 22-ekran).
  */
 const CANCELLED_BY: Record<CancelledBy, { label: string; className: string }> = {
   CLIENT: { label: 'Siz bekor qildingiz', className: 'text-text-secondary' },

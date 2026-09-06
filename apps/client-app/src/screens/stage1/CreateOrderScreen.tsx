@@ -18,8 +18,8 @@ const DESCRIPTION_MAX = 2000;
 /**
  * 08 · Buyurtma berish (1-qadam: Muammo tavsifi).
  *
- * Surat biriktirish bloki ikki variantda: MVP'da butunlay yo'q, "kelajak"
- * variantida esa bloklangan holatda "Tez orada" yorlig'i bilan — fayl yuklash
+ * Surat biriktirish bloki ikki variantda: MVPʼda butunlay yoʻq, "kelajak"
+ * variantida esa bloklangan holatda "Tez orada" yorligʻi bilan — fayl yuklash
  * servisi hali ulanmagan.
  */
 export type CreateOrderVariant = 'empty' | 'too-short' | 'valid' | 'max' | 'with-attachments';
@@ -31,9 +31,9 @@ export interface CreateOrderScreenProps {
 const INITIAL_TEXT: Record<CreateOrderVariant, string> = {
   empty: '',
   'too-short': 'Kran',
-  valid: "Oshxonadagi kran oqmoqda, tagida suv to'planyapti.",
+  valid: "Oshxonadagi kran oqmoqda, tagida suv toʻplanyapti.",
   max: 'A'.repeat(DESCRIPTION_MAX),
-  'with-attachments': "Oshxonadagi kran oqmoqda, tagida suv to'planyapti.",
+  'with-attachments': "Oshxonadagi kran oqmoqda, tagida suv toʻplanyapti.",
 };
 
 /** Variant B — fayl yuklash servisi ulanmagan, blok bloklangan holatda. */
@@ -88,7 +88,7 @@ export function CreateOrderScreen({ variant = 'valid' }: CreateOrderScreenProps)
           </p>
         </div>
         <Button variant="ghost" size="small" fullWidth={false}>
-          O&apos;zgartirish
+          Oʻzgartirish
         </Button>
       </Card>
 

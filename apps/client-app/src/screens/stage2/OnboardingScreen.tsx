@@ -11,10 +11,10 @@ import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 /**
  * 02 · Kirish taklifi.
  *
- * Login majburiy, lekin xizmat turlari ro'yxati narxlari bilan login'siz ham
- * ko'rinadi (1-bo'lim, 14-qoida) — shuning uchun ro'yxat bu ekranda qisqartirilgan
- * shaklda chiziladi. Ro'yxatdagi istalgan element bosilsa ham telefon ekraniga
- * o'tiladi — bu yerdan to'g'ridan-to'g'ri buyurtma berib bo'lmaydi.
+ * Login majburiy, lekin xizmat turlari roʻyxati narxlari bilan loginʼsiz ham
+ * koʻrinadi (1-boʻlim, 14-qoida) — shuning uchun roʻyxat bu ekranda qisqartirilgan
+ * shaklda chiziladi. Roʻyxatdagi istalgan element bosilsa ham telefon ekraniga
+ * oʻtiladi — bu yerdan toʻgʻridan-toʻgʻri buyurtma berib boʻlmaydi.
  */
 export type OnboardingVariant = 'ready' | 'loading' | 'error';
 
@@ -22,11 +22,11 @@ export interface OnboardingScreenProps {
   variant?: OnboardingVariant;
 }
 
-/** Qisqartirilgan ko'rinish — birinchi 4 ta xizmat, server tartibida. */
+/** Qisqartirilgan koʻrinish — birinchi 4 ta xizmat, server tartibida. */
 const PREVIEW_COUNT = 4;
 const SKELETON_ROWS = 4;
 
-/** Ro'yxat yuklanishida faqat skeleton ishlatiladi, spinner emas (12.1-band). */
+/** Roʻyxat yuklanishida faqat skeleton ishlatiladi, spinner emas (12.1-band). */
 function ServiceListSkeleton() {
   return (
     <ul className="flex flex-col gap-12">
@@ -46,14 +46,14 @@ function ServiceListSkeleton() {
 export function OnboardingScreen({ variant = 'ready' }: OnboardingScreenProps) {
   const services = ALL_CATEGORIES.slice(0, PREVIEW_COUNT);
 
-  // Internet yo'q holatida ekranni to'liq offline bloki egallaydi (12.3-band, B):
+  // Internet yoʻq holatida ekranni toʻliq offline bloki egallaydi (12.3-band, B):
   // yagona amal "Qayta urinish", shuning uchun "Davom etish" sticky tugmasi ham chizilmaydi.
   if (variant === 'error') {
     return (
       <ScreenShell className="flex flex-col">
         <EmptyState
           icon={WifiOff}
-          title="Internetga ulanish yo'q"
+          title="Internetga ulanish yoʻq"
           action={{ label: 'Qayta urinish', onClick: () => undefined }}
         />
       </ScreenShell>

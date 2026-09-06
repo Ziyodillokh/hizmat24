@@ -9,10 +9,10 @@ import { ConfirmMasterScreen } from './ConfirmMasterScreen';
 const NOTE_MAX = 1000;
 
 /**
- * 17 · Xavfsizlik tasdig'i (modal).
+ * 17 · Xavfsizlik tasdigʻi (modal).
  *
- * 16-ekran ustida ochiladi, shuning uchun fon sifatida o'sha ekran chiziladi —
- * modal kontekstsiz ko'rinmasin.
+ * 16-ekran ustida ochiladi, shuning uchun fon sifatida oʻsha ekran chiziladi —
+ * modal kontekstsiz koʻrinmasin.
  */
 export type SafetyConfirmVariant = 'default' | 'submitting';
 
@@ -31,10 +31,10 @@ export function SafetyConfirmModal({ variant = 'default' }: SafetyConfirmModalPr
         <div className="flex flex-col items-center">
           <Icon icon={AlertTriangle} size={48} className="text-danger" />
           <h3 className="mt-16 text-center text-h3 text-text-primary">
-            Bu amalni bekor qilib bo&apos;lmaydi
+            Bu amalni bekor qilib boʻlmaydi
           </h3>
           <p className="mt-8 text-center text-body text-text-secondary">
-            Buyurtma to&apos;xtatiladi va operator siz bilan bog&apos;lanadi.
+            Buyurtma toʻxtatiladi va operator siz bilan bogʻlanadi.
           </p>
         </div>
 

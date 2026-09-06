@@ -12,12 +12,12 @@ import { ORDERS_BY_ID } from '@/mocks/orders';
 /**
  * 16 · Ustani tasdiqlang — BLOKLOVCHI EKRAN.
  *
- * Ataylab boshqa ekranlarga o'xshamaydi: stepper yo'q, banner-hero yo'q,
- * dekorativ rasm yo'q, butun fon neytral `surface`. Bu foydalanuvchiga
+ * Ataylab boshqa ekranlarga oʻxshamaydi: stepper yoʻq, banner-hero yoʻq,
+ * dekorativ rasm yoʻq, butun fon neytral `surface`. Bu foydalanuvchiga
  * "bu boshqa narsa, diqqat qiling" signalini beradi.
  *
- * Bu ekranda BEKOR QILISH TUGMASI YO'Q va orqaga qaytish yopilgan —
- * bu holatda bekor qilish tizim darajasida taqiqlangan (1-bo'lim, 4-qoida).
+ * Bu ekranda BEKOR QILISH TUGMASI YOʻQ va orqaga qaytish yopilgan —
+ * bu holatda bekor qilish tizim darajasida taqiqlangan (1-boʻlim, 4-qoida).
  */
 export type ConfirmMasterVariant = 'default' | 'confirming';
 
@@ -26,10 +26,10 @@ export interface ConfirmMasterScreenProps {
 }
 
 /**
- * Verifikatsiya chipi — 16-bandda AYNAN shu ko'rinishda ta'riflangan
+ * Verifikatsiya chipi — 16-bandda AYNAN shu koʻrinishda taʼriflangan
  * (success 12% fon, 14px check). 9.12-dagi `Badge` bu yerda mos kelmaydi:
  * u "Sertifikatli" ni `primary` tusida chizadi. Shuning uchun bu ekranga xos
- * kichik blok — kutubxonaga yangi komponent qo'shilmaydi (14.7-band, 58-punkt).
+ * kichik blok — kutubxonaga yangi komponent qoʻshilmaydi (14.7-band, 58-punkt).
  */
 function VerificationChip({ children }: { children: ReactNode }) {
   return (
@@ -71,15 +71,15 @@ export function ConfirmMasterScreen({ variant = 'default' }: ConfirmMasterScreen
         </div>
 
         <Banner variant="warning" icon={ShieldAlert} className="mt-24 w-full">
-          Kelgan odam suratdagi ustaga o&apos;xshamasa — «Yo&apos;q, bu boshqa odam» tugmasini
+          Kelgan odam suratdagi ustaga oʻxshamasa — «Yoʻq, bu boshqa odam» tugmasini
           bosing.
         </Banner>
       </main>
 
       {/*
-        Ikkala tugma VERTIKAL, bir xil o'lchamda (h=56) va bir xil vizual
-        og'irlikda. "Yo'q" hech qachon kichik, kulrang yoki matnli havola
-        ko'rinishida bo'lmaydi — dark pattern taqiqlanadi (14.3-band, 60-punkt).
+        Ikkala tugma VERTIKAL, bir xil oʻlchamda (h=56) va bir xil vizual
+        ogʻirlikda. "Yoʻq" hech qachon kichik, kulrang yoki matnli havola
+        koʻrinishida boʻlmaydi — dark pattern taqiqlanadi (14.3-band, 60-punkt).
       */}
       <div className="shrink-0 px-20 pb-12 pt-24">
         <div className="flex flex-col gap-12">
@@ -87,7 +87,7 @@ export function ConfirmMasterScreen({ variant = 'default' }: ConfirmMasterScreen
             Ha, shu usta
           </Button>
           <Button variant="destructive-outline" className="h-[56px]">
-            Yo&apos;q, bu boshqa odam
+            Yoʻq, bu boshqa odam
           </Button>
         </div>
       </div>

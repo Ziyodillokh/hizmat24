@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { registerBackButton } from './native';
 
-/** Ildiz ekranlar — bu yerda "orqaga" ilovadan chiqishni so'raydi. */
+/** Ildiz ekranlar — bu yerda "orqaga" ilovadan chiqishni soʻraydi. */
 const ROOT_ROUTES = new Set([
   '/app',
   '/app/home',
@@ -14,13 +14,13 @@ const ROOT_ROUTES = new Set([
 /**
  * Android apparat "orqaga" tugmasi.
  *
- * Standart holda u WebView'ni yopib ilovadan chiqaradi. Haqiqiy ilovada esa:
+ * Standart holda u WebViewʼni yopib ilovadan chiqaradi. Haqiqiy ilovada esa:
  *  - ichki ekranda — bir qadam orqaga;
  *  - tab ildizida — bosh sahifaga;
  *  - bosh sahifada — ilovadan chiqish.
  *
  * Bloklovchi ekranlarda (usta tasdiqlash, xavfsizlik natijasi) orqaga qaytish
- * TAQIQLANADI — bu spec talabi (1-bo'lim, 4-qoida).
+ * TAQIQLANADI — bu spec talabi (1-boʻlim, 4-qoida).
  */
 export function useBackButton(): void {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export function useBackButton(): void {
 
     return registerBackButton(() => {
       // Bloklovchi ekranlar: hodisa "hal qilindi" deb hisoblanadi, lekin
-      // hech qayerga o'tilmaydi — foydalanuvchi tanlov qilishi shart.
+      // hech qayerga oʻtilmaydi — foydalanuvchi tanlov qilishi shart.
       if (path.endsWith('/confirm-master') || path.endsWith('/safety')) {
         return true;
       }

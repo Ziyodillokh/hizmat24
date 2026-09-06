@@ -1,48 +1,73 @@
 import type { ButtonHTMLAttributes } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { Icon } from './Icon';
+import { Icon, type IconSize } from './Icon';
 
 /**
  * Grid elementi — spetsifikatsiya 9.5-bandi.
  * 72px doira (`category-circle`, e2) + ichida 28px outline ikona, ostida 8px,
  * yorliq `caption`, markazlashgan, MAKSIMUM 2 SATR.
  *
- * Nega bir qator emas: yorliqqa guruhning serverdan kelgan to'liq nomi beriladi
+ * Nega bir qator emas: yorliqqa guruhning serverdan kelgan toʻliq nomi beriladi
  * ("Elektrik xizmatlari"), 4 ustunli katakcha esa ~72px keng. Bir qatorga
- * majburlansa nom "Elektrik xi…" bo'lib kesiladi va foydalanuvchi xizmat turini
- * o'qiy olmaydi. 9.5-band ikki satrga ruxsat beradi, shuning uchun `line-clamp-2`.
- * Qat'iy balandlik qo'yilmaydi — qisqa nom bo'sh ikkinchi satrni band qilmaydi.
+ * majburlansa nom "Elektrik xi…" boʻlib kesiladi va foydalanuvchi xizmat turini
+ * oʻqiy olmaydi. 9.5-band ikki satrga ruxsat beradi, shuning uchun `line-clamp-2`.
+ * Qatʼiy balandlik qoʻyilmaydi — qisqa nom boʻsh ikkinchi satrni band qilmaydi.
  */
 
 /**
- * Doira ichidagi ikona rangi 6.4-bandda ikki temada ikki xil: Dark — oq,
- * Light — `primary`. Bitta token bunga mos kelmaydi (`on-primary-deep` ikkala
- * temada oq, `on-primary` esa Light'da ham to'q), shuning uchun asos `primary`,
- * Dark'da esa `data-theme` selektori orqali `on-primary-deep` ga almashadi —
- * temani `applyTheme()` aynan shu atribut bilan qo'yadi (src/lib/theme.ts).
- * Shu tariqa yangi rang kiritilmaydi (3.4-band) va struktura o'zgarmaydi (56-punkt).
+ * Doira ichidagi ikona rangi ikki temada ikki xil: Dark — oq, Light — toʻq
+ * turkuaz. `primary` (#10A3A0) och doira foni ustida atigi 2,68:1 berardi,
+ * yaʼni grafik elementlar uchun 3:1 chegarasidan past edi.
  */
-const CIRCLE_ICON_CLASSES = "text-primary [[data-theme='dark']_&]:text-on-primary-deep";
+/**
+ * `neutral` — "Barchasi" katakchasi uchun. U kategoriya EMAS, balki roʻyxatga
+ * oʻtish yoʻli; xuddi kategoriya kabi chizilsa foydalanuvchi uni toʻqqizinchi
+ * xizmat turi deb oʻylaydi.
+ *
+ * Klasslar toʻliq satr sifatida yozilgan — Tailwind manbani MATN sifatida
+ * skanerlaydi, shuning uchun klass nomini boʻlaklardan yigʻib boʻlmaydi.
+ */
+type TileTone = 'default' | 'neutral';
+
+const TILE_CIRCLE_CLASSES: Record<TileTone, string> = {
+  default: 'disc-lit shadow-e2',
+  neutral: 'bg-neutral-surface',
+};
+
+const TILE_ICON_CLASSES: Record<TileTone, string> = {
+  default: "text-primary-pressed [[data-theme='dark']_&]:text-on-primary-deep",
+  neutral: 'text-text-secondary',
+};
 
 export interface ServiceGroupTileProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+  tone?: TileTone;
+  /** Optik massani tenglashtirish uchun — `serviceIconSize()` dan keladi. */
+  iconSize?: IconSize;
   /**
-   * Katakcha yorlig'i — guruh nomi. Nom serverdan keladi, UI uni
-   * o'zgartirmaydi va qayta saralamaydi.
+   * Katakcha yorligʻi — guruh nomi. Nom serverdan keladi, UI uni
+   * oʻzgartirmaydi va qayta saralamaydi.
    */
   label: string;
-  /** Server bergan `iconKey` bo'yicha tanlangan vektor ikona — rasm URL emas (1-bo'lim, 16-punkt). */
+  /** Server bergan `iconKey` boʻyicha tanlangan vektor ikona — rasm URL emas (1-boʻlim, 16-punkt). */
   icon: LucideIcon;
 }
 
-export function ServiceGroupTile({ label, icon, className, ...rest }: ServiceGroupTileProps) {
+export function ServiceGroupTile({
+  label,
+  icon,
+  tone = 'default',
+  iconSize = 28,
+  className,
+  ...rest
+}: ServiceGroupTileProps) {
   return (
     <button
       type="button"
       className={cn(
         'flex w-full flex-col items-center gap-8 text-center',
-        'transition-transform active:scale-[0.98]',
+        'transition-transform duration-press ease-emphasized active:scale-[0.94]',
         className,
       )}
       {...rest}
@@ -50,23 +75,27 @@ export function ServiceGroupTile({ label, icon, className, ...rest }: ServiceGro
       <span
         className={cn(
           // 9.5-banddagi 72px. Tor ekranlarda (320–360px) doira ustun kengligiga
-          // qarab siqiladi, shuning uchun `max-w` — qat'iy `w` emas.
+          // qarab siqiladi, shuning uchun `max-w` — qatʼiy `w` emas.
           'flex aspect-square w-full max-w-[72px] items-center justify-center rounded-full',
           // Grid doiralari e2 darajasida (6.3-band): Light — oq doira va soya,
-          // Dark — to'ldirilgan teal va ingichka chegara. Ikkalasini ham
+          // Dark — toʻldirilgan teal va ingichka chegara. Ikkalasini ham
           // `category-circle` tokeni beradi.
-          'bg-category-circle shadow-e2',
-          // Light temada tus och bo'lgani uchun ingichka chegara shaklni
-          // aniqlashtiradi; Dark'da doira allaqachon to'ldirilgan.
-          "border border-border [[data-theme='dark']_&]:border-transparent",
+          // Jismoniy disk tepasida koʻproq yorugʻlik ushlaydi — `disc-lit`
+          // shuni beradi. Chegara olib tashlandi: Lightʼda `border` (L* 91,1)
+          // doira foni (94,3) dan TOʻQROQ edi, yaʼni katakcha sakkizta obyekt
+          // emas, sakkizta halqa boʻlib oʻqilardi.
+          TILE_CIRCLE_CLASSES[tone],
         )}
       >
-        <Icon icon={icon} size={28} className={CIRCLE_ICON_CLASSES} aria-hidden />
+        <Icon icon={icon} size={iconSize} className={TILE_ICON_CLASSES[tone]} aria-hidden />
       </span>
 
-      {/* Nomni yorliq o'zi aytadi, ikona dekorativ — shuning uchun u `aria-hidden`. */}
-      {/* Juda uzun nom bir satrda "…" bilan kesiladi — katakcha balandligi bir xil qoladi. */}
-      <span className="w-full truncate text-body-sm text-text-primary">{label}</span>
+      {/* Nomni yorliq oʻzi aytadi, ikona dekorativ — shuning uchun u `aria-hidden`. */}
+      {/* Ikki satrgacha oʻsadi: 72px katakchada "Elektrik xizmatlari" kabi
+          nom bir satrga sigʻmaydi va kesilsa xizmat turi oʻqilmay qoladi. */}
+      <span className="line-clamp-2 w-full text-balance text-body-sm text-text-primary">
+        {label}
+      </span>
     </button>
   );
 }

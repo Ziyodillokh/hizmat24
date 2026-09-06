@@ -18,13 +18,13 @@ import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
 import { MasterProfile, NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
 
-/** Login qilmagan foydalanuvchini kirish oqimiga qaytaradi (1-bo'lim, 14-qoida). */
+/** Login qilmagan foydalanuvchini kirish oqimiga qaytaradi (1-boʻlim, 14-qoida). */
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useApp();
   return isAuthenticated ? <>{children}</> : <Navigate to="/app" replace />;
 }
 
-/** Yangi ekranga o'tganda scroll tepaga qaytadi — haqiqiy ilovadagidek. */
+/** Yangi ekranga oʻtganda scroll tepaga qaytadi — haqiqiy ilovadagidek. */
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -199,18 +199,16 @@ function AppRoutes() {
 }
 
 /**
- * Ilova rejimi — haqiqiy mobil ilova ko'rinishi.
+ * Ilova rejimi — haqiqiy mobil ilova koʻrinishi.
  *
- * Preview galereyasidan farqi: maketa ramkasi yo'q, ekran to'liq viewport
- * bo'ylab chiziladi va tugmalar haqiqatan ishlaydi.
+ * Preview galereyasidan farqi: maketa ramkasi yoʻq, ekran toʻliq viewport
+ * boʻylab chiziladi va tugmalar haqiqatan ishlaydi.
  */
 export function AppRouter() {
   return (
     <ThemeProvider>
       <AppProvider>
-        <ToastHost>
-          <AppShell />
-        </ToastHost>
+        <AppShell />
       </AppProvider>
     </ThemeProvider>
   );
@@ -220,16 +218,24 @@ function AppShell() {
   const { theme } = useTheme();
 
   // Native status bar ilova temasiga ergashadi — aks holda ilova "web sahifa"
-  // bo'lib ko'rinadi.
+  // boʻlib koʻrinadi.
   useEffect(() => {
     void syncStatusBar(theme);
   }, [theme]);
 
+  /*
+   * `ToastHost` `DeviceView` ICHIDA turishi shart: tema CSS oʻzgaruvchilarini
+   * aynan `DeviceView` oʻsha divʼga yozadi (`applyTheme(theme, ref.current)`).
+   * Ilgari toast undan tashqarida edi va Dark temada Light qiymatlarini olib,
+   * toʻq sahifa ustida oq plastinka boʻlib chiqardi.
+   */
   return (
     <DeviceView theme={theme}>
-      <AppLaunch>
-        <AppRoutes />
-      </AppLaunch>
+      <ToastHost>
+        <AppLaunch>
+          <AppRoutes />
+        </AppLaunch>
+      </ToastHost>
     </DeviceView>
   );
 }

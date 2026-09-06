@@ -5,9 +5,9 @@ import { NotificationsScreen } from './NotificationsScreen';
 import { ProfileScreen } from './ProfileScreen';
 import { MasterProfileScreen } from './MasterProfileScreen';
 
-/** Bosqich 4 — tablar va tafsilot (13-bo'lim). */
+/** Bosqich 4 — tablar va tafsilot (13-boʻlim). */
 const STAGE_4: ScreenEntry[] = [
-  { id: '23', name: 'Buyurtma tafsiloti', stage: 4, variant: "Usta yo'lda",
+  { id: '23', name: 'Buyurtma tafsiloti', stage: 4, variant: "Usta yoʻlda",
     component: OrderDetailScreen },
   { id: '23', name: 'Buyurtma tafsiloti', stage: 4, variant: 'Yakunlangan',
     component: () => <OrderDetailScreen variant="rated" /> },
@@ -25,17 +25,17 @@ const STAGE_4: ScreenEntry[] = [
     component: () => <MyOrdersScreen initialFilter="active" /> },
   { id: '24', name: 'Buyurtmalarim', stage: 4, variant: 'Skeleton',
     component: () => <MyOrdersScreen variant="loading" /> },
-  { id: '24', name: 'Buyurtmalarim', stage: 4, variant: "Ko'proq yuklanmoqda",
+  { id: '24', name: 'Buyurtmalarim', stage: 4, variant: "Koʻproq yuklanmoqda",
     component: () => <MyOrdersScreen variant="loading-more" /> },
-  { id: '24', name: 'Buyurtmalarim', stage: 4, variant: "Bo'sh",
+  { id: '24', name: 'Buyurtmalarim', stage: 4, variant: "Boʻsh",
     component: () => <MyOrdersScreen variant="empty" /> },
   { id: '24', name: 'Buyurtmalarim', stage: 4, variant: 'Offline',
     component: () => <MyOrdersScreen variant="offline" /> },
 
   { id: '25', name: 'Bildirishnomalar', stage: 4, component: NotificationsScreen },
-  { id: '25', name: 'Bildirishnomalar', stage: 4, variant: "Hammasi o'qilgan",
+  { id: '25', name: 'Bildirishnomalar', stage: 4, variant: "Hammasi oʻqilgan",
     component: () => <NotificationsScreen variant="all-read" /> },
-  { id: '25', name: 'Bildirishnomalar', stage: 4, variant: "Bo'sh",
+  { id: '25', name: 'Bildirishnomalar', stage: 4, variant: "Boʻsh",
     component: () => <NotificationsScreen variant="empty" /> },
   { id: '25', name: 'Bildirishnomalar', stage: 4, variant: 'Skeleton',
     component: () => <NotificationsScreen variant="loading" /> },
@@ -43,7 +43,7 @@ const STAGE_4: ScreenEntry[] = [
   { id: '26', name: 'Profil', stage: 4, component: ProfileScreen },
   { id: '26', name: 'Profil', stage: 4, variant: 'Ismsiz',
     component: () => <ProfileScreen variant="without-name" /> },
-  { id: '26', name: 'Profil', stage: 4, variant: "Chiqish tasdig'i",
+  { id: '26', name: 'Profil', stage: 4, variant: "Chiqish tasdigʻi",
     component: () => <ProfileScreen variant="logout-confirm" /> },
 
   { id: '27', name: 'Usta profili', stage: 4, component: MasterProfileScreen },

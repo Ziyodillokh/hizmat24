@@ -12,7 +12,7 @@ import { USER } from '@/mocks/user';
 /**
  * 04 · Tasdiqlash kodi.
  *
- * Bu ekranda raqam TO'LIQ ko'rsatiladi (8.3-band istisnosi): foydalanuvchi
+ * Bu ekranda raqam TOʻLIQ koʻrsatiladi (8.3-band istisnosi): foydalanuvchi
  * kod qaysi raqamga ketganini tekshira olishi kerak, shuning uchun
  * `formatPhone()` ishlatiladi, `maskPhone()` emas.
  */
@@ -30,12 +30,12 @@ export interface OtpScreenProps {
   variant?: OtpVariant;
 }
 
-/** 8.2-band: "O'z xato matnlarimiz" ro'yxatidan, o'zgartirilmaydi. */
+/** 8.2-band: "Oʻz xato matnlarimiz" roʻyxatidan, oʻzgartirilmaydi. */
 const SMS_FAILED_TEXT =
-  "SMS yuborishda xatolik. Kod kelmasa, taymer tugagach qayta so'rang.";
-const TOO_MANY_ATTEMPTS_TEXT = "Juda ko'p urinish. 5 daqiqadan keyin qayta urinib ko'ring.";
+  "SMS yuborishda xatolik. Kod kelmasa, taymer tugagach qayta soʻrang.";
+const TOO_MANY_ATTEMPTS_TEXT = "Juda koʻp urinish. 5 daqiqadan keyin qayta urinib koʻring.";
 
-/** 11-bo'lim, 04-ekran: taymer 00:59 dan sanaydi. */
+/** 11-boʻlim, 04-ekran: taymer 00:59 dan sanaydi. */
 const RESEND_SECONDS = 59;
 
 const INITIAL_CODE: Record<OtpVariant, string> = {
@@ -52,11 +52,11 @@ const INITIAL_CODE: Record<OtpVariant, string> = {
 const OTP_STATE: Record<OtpVariant, OtpState> = {
   default: 'default',
   submitting: 'default',
-  // `error` + shake FAQAT noto'g'ri kod uchun (11-bo'lim, 04-ekran).
+  // `error` + shake FAQAT notoʻgʻri kod uchun (11-boʻlim, 04-ekran).
   invalid: 'error',
   // Muddati tugagan kod — kiritish xatosi emas, shuning uchun kataklar silkinmaydi.
   expired: 'default',
-  // Urinishlar tugagach kataklar tahrirlanmaydi (11-bo'lim, 04-ekran).
+  // Urinishlar tugagach kataklar tahrirlanmaydi (11-boʻlim, 04-ekran).
   'attempts-exhausted': 'disabled',
   'too-many-attempts': 'disabled',
   // SMS yuborilmadi: kod baribir kelishi mumkin, shuning uchun kataklar FAOL.
@@ -78,17 +78,17 @@ const RUNNING_TIMER: Record<OtpVariant, boolean> = {
 
 /**
  * Taymer matni maketda AYNAN 8.2-banddagi "Kodni qayta yuborish (00:59)"
- * ko'rinishida turishi kerak, shuning uchun sanoq jonli emas — qiymat
- * variantdan olinadi va o'zgarmaydi.
+ * koʻrinishida turishi kerak, shuning uchun sanoq jonli emas — qiymat
+ * variantdan olinadi va oʻzgarmaydi.
  */
 const pad = (value: number): string => value.toString().padStart(2, '0');
 const countdownLabel = (seconds: number): string =>
   `Kodni qayta yuborish (${pad(Math.floor(seconds / 60))}:${pad(seconds % 60)})`;
 
 /**
- * 12.3-A band: OTP xatolarida server matni ko'rsatiladi va o'zgartirilmaydi.
- * Maketda uning o'rni 2 satrgacha blok sifatida chiziladi — o'zimizdan matn
- * to'qib yozilmaydi (8.2-band qoidasi).
+ * 12.3-A band: OTP xatolarida server matni koʻrsatiladi va oʻzgartirilmaydi.
+ * Maketda uning oʻrni 2 satrgacha blok sifatida chiziladi — oʻzimizdan matn
+ * toʻqib yozilmaydi (8.2-band qoidasi).
  */
 function ServerMessagePlaceholder() {
   return (
@@ -106,7 +106,7 @@ export function OtpScreen({ variant = 'default' }: OtpScreenProps) {
   const isSubmitting = variant === 'submitting';
   const showsServerMessage =
     variant === 'invalid' || variant === 'expired' || variant === 'attempts-exhausted';
-  // Urinishlar tugagach faqat "Yangi kod so'rash" qoladi (11-bo'lim, 04-ekran).
+  // Urinishlar tugagach faqat "Yangi kod soʻrash" qoladi (11-boʻlim, 04-ekran).
   const showsResend = variant !== 'attempts-exhausted';
   const showsNewCodeRequest = variant === 'expired' || variant === 'attempts-exhausted';
 
@@ -116,11 +116,11 @@ export function OtpScreen({ variant = 'default' }: OtpScreenProps) {
       footer={
         <StickyFooter>
           <div className="flex flex-col gap-12">
-            {showsNewCodeRequest && <Button variant="secondary">Yangi kod so&apos;rash</Button>}
+            {showsNewCodeRequest && <Button variant="secondary">Yangi kod soʻrash</Button>}
             {showsResend && (
               // Kod 6-raqamda avtomatik yuboriladi — alohida "yuborish" tugmasi
-              // yo'q, shuning uchun yuklanish holatini shu yagona tugma
-              // ko'rsatadi (11-bo'lim, 04-ekran; spinner 12.1-band bo'yicha
+              // yoʻq, shuning uchun yuklanish holatini shu yagona tugma
+              // koʻrsatadi (11-boʻlim, 04-ekran; spinner 12.1-band boʻyicha
               // faqat tugma ichida ruxsat etilgan).
               <Button variant="ghost" loading={isSubmitting} disabled={isTimerRunning}>
                 {isTimerRunning ? countdownLabel(RESEND_SECONDS) : 'Kodni qayta yuborish'}
@@ -148,7 +148,7 @@ export function OtpScreen({ variant = 'default' }: OtpScreenProps) {
           {formatPhone(USER.phoneNumber)} raqamiga yuborildi
         </p>
         <Button variant="ghost" size="small" fullWidth={false}>
-          O&apos;zgartirish
+          Oʻzgartirish
         </Button>
       </div>
 

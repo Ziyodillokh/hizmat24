@@ -10,7 +10,7 @@ import { ReceiptScreen } from './ReceiptScreen';
 import { SafetyAlertScreen } from './SafetyAlertScreen';
 import { OrderCancelledScreen } from './OrderCancelledScreen';
 
-/** Bosqich 3 — buyurtma holatlari (13-bo'lim). */
+/** Bosqich 3 — buyurtma holatlari (13-boʻlim). */
 const STAGE_3: ScreenEntry[] = [
   { id: '12', name: 'Usta qidirilmoqda', stage: 3, component: SearchingScreen },
   { id: '12', name: 'Usta qidirilmoqda', stage: 3, variant: 'Operator',
@@ -26,18 +26,18 @@ const STAGE_3: ScreenEntry[] = [
   { id: '13', name: 'Siz navbatdasiz', stage: 3, variant: 'Offline',
     component: () => <QueuedScreen variant="offline" /> },
 
-  { id: '15', name: "Usta yo'lda", stage: 3, component: EnRouteScreen },
-  { id: '15', name: "Usta yo'lda", stage: 3, variant: 'Vaqtsiz',
+  { id: '15', name: "Usta yoʻlda", stage: 3, component: EnRouteScreen },
+  { id: '15', name: "Usta yoʻlda", stage: 3, variant: 'Vaqtsiz',
     component: () => <EnRouteScreen variant="no-eta" /> },
-  { id: '15', name: "Usta yo'lda", stage: 3, variant: 'Offline',
+  { id: '15', name: "Usta yoʻlda", stage: 3, variant: 'Offline',
     component: () => <EnRouteScreen variant="offline" /> },
 
   { id: '16', name: 'Ustani tasdiqlang', stage: 3, component: ConfirmMasterScreen },
   { id: '16', name: 'Ustani tasdiqlang', stage: 3, variant: 'Tasdiqlanmoqda',
     component: () => <ConfirmMasterScreen variant="confirming" /> },
 
-  { id: '17', name: "Xavfsizlik tasdig'i", stage: 3, component: SafetyConfirmModal },
-  { id: '17', name: "Xavfsizlik tasdig'i", stage: 3, variant: 'Yuborilmoqda',
+  { id: '17', name: "Xavfsizlik tasdigʻi", stage: 3, component: SafetyConfirmModal },
+  { id: '17', name: "Xavfsizlik tasdigʻi", stage: 3, variant: 'Yuborilmoqda',
     component: () => <SafetyConfirmModal variant="submitting" /> },
 
   { id: '18', name: 'Ish jarayonida', stage: 3, component: InProgressScreen },
@@ -53,7 +53,7 @@ const STAGE_3: ScreenEntry[] = [
     component: () => <RateWorkScreen variant="error" /> },
 
   { id: '20', name: 'Chek', stage: 3, component: ReceiptScreen },
-  { id: '20', name: 'Chek', stage: 3, variant: "Ma'lumot yetishmaydi",
+  { id: '20', name: 'Chek', stage: 3, variant: "Maʼlumot yetishmaydi",
     component: () => <ReceiptScreen variant="partial" /> },
   { id: '20', name: 'Chek', stage: 3, variant: 'Skeleton',
     component: () => <ReceiptScreen variant="loading" /> },

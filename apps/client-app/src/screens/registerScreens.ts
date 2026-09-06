@@ -1,6 +1,6 @@
 /**
- * Ekranlar reyestrini to'ldirish. Har bir bosqich o'z faylida ro'yxatdan o'tadi,
- * shunda 13-bo'limdagi tartib kodda ham ko'rinib turadi.
+ * Ekranlar reyestrini toʻldirish. Har bir bosqich oʻz faylida roʻyxatdan oʻtadi,
+ * shunda 13-boʻlimdagi tartib kodda ham koʻrinib turadi.
  */
 import { registerStage1 } from './stage1/index';
 import { registerStage2 } from './stage2/index';

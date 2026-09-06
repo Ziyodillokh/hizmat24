@@ -15,8 +15,8 @@ import { UNREAD_COUNT } from '@/mocks/notifications';
 /**
  * 26 · Profil — READ-ONLY.
  *
- * Profilni tahrirlash formasi, avatar yuklash, ism/telefon o'zgartirish,
- * "Manzillarim", to'lov usullari, til/tema tanlash CHIZILMAYDI
+ * Profilni tahrirlash formasi, avatar yuklash, ism/telefon oʻzgartirish,
+ * "Manzillarim", toʻlov usullari, til/tema tanlash CHIZILMAYDI
  * (14.4-band, 28–31-punkt).
  */
 export type ProfileVariant = 'with-name' | 'without-name' | 'logout-confirm';
@@ -35,7 +35,7 @@ interface MenuItem {
 const MENU: MenuItem[] = [
   { icon: ClipboardList, label: 'Buyurtmalar tarixi' },
   { icon: Bell, label: 'Bildirishnomalar', hint: 'Yoqilgan' },
-  { icon: Headset, label: "Qo'llab-quvvatlash xizmati" },
+  { icon: Headset, label: "Qoʻllab-quvvatlash xizmati" },
   { icon: Info, label: 'Ilova haqida', hint: '1.0.0' },
   { icon: LogOut, label: 'Chiqish', danger: true },
 ];
@@ -57,7 +57,7 @@ function MenuRow({ item }: { item: MenuItem }) {
         {item.label}
       </span>
       {item.hint && <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>}
-      {!item.danger && <Icon icon={ChevronRight} size={20} className="text-text-disabled" />}
+      {!item.danger && <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />}
     </button>
   );
 }
@@ -73,7 +73,7 @@ export function ProfileScreen({ variant = 'with-name' }: ProfileScreenProps) {
     >
       <div className="mt-4 flex flex-col items-center">
         <Avatar name={user.fullName} size={80} />
-        {/* Ism yo'q bo'lsa ikkinchi qator BUTUNLAY yashiriladi (8.3-band). */}
+        {/* Ism yoʻq boʻlsa ikkinchi qator BUTUNLAY yashiriladi (8.3-band). */}
         {hasName ? (
           <>
             <p className="mt-12 text-h2 text-text-primary">{user.fullName}</p>

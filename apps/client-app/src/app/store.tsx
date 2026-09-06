@@ -19,12 +19,12 @@ import { clearSession, loadSession, saveSession } from './persistence';
 /**
  * Prototip holati.
  *
- * Backend hali ulanmagan, shuning uchun server tomonidagi o'tishlar
- * (usta topildi → yo'lga chiqdi → yetib keldi) TAYMER bilan taqlid qilinadi.
- * Mijoz o'zi boshqaradigan o'tishlar esa haqiqiy tugmalar orqali bo'ladi.
+ * Backend hali ulanmagan, shuning uchun server tomonidagi oʻtishlar
+ * (usta topildi → yoʻlga chiqdi → yetib keldi) TAYMER bilan taqlid qilinadi.
+ * Mijoz oʻzi boshqaradigan oʻtishlar esa haqiqiy tugmalar orqali boʻladi.
  */
 
-/** Har bir avtomatik o'tish uchun kutish vaqti (ms) — demo tezligida. */
+/** Har bir avtomatik oʻtish uchun kutish vaqti (ms) — demo tezligida. */
 const SERVER_STEPS: Partial<Record<OrderStatus, { next: OrderStatus; delayMs: number }>> = {
   [ORDER_STATUS.SEARCHING]: { next: ORDER_STATUS.ASSIGNED, delayMs: 3500 },
   [ORDER_STATUS.SEARCHING_QUEUED]: { next: ORDER_STATUS.ASSIGNED, delayMs: 6000 },
@@ -54,7 +54,7 @@ interface AppActions {
   confirmMaster: (orderId: string) => void;
   rejectMaster: (orderId: string, note: string) => void;
   rateOrder: (orderId: string, stars: number, comment: string) => void;
-  /** Demo: keyingi server o'tishini kutmasdan darhol bajarish. */
+  /** Demo: keyingi server oʻtishini kutmasdan darhol bajarish. */
   advanceOrder: (orderId: string) => void;
   markNotificationsRead: () => void;
 }
@@ -81,12 +81,12 @@ const TERMINAL: readonly OrderStatus[] = [
   ORDER_STATUS.SAFETY_FLAGGED,
 ];
 
-/** Usta tayinlanganda telefon ko'rinadi; boshqa holatlarda `null` bo'ladi. */
+/** Usta tayinlanganda telefon koʻrinadi; boshqa holatlarda `null` boʻladi. */
 const assignMaster = () => ({ ...MASTERS.akmal });
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Boshlang'ich holat qurilmadan tiklanadi — ilova qayta ochilganda
-  // foydalanuvchi kirish ekraniga qaytmaydi va buyurtmasini yo'qotmaydi.
+  // Boshlangʻich holat qurilmadan tiklanadi — ilova qayta ochilganda
+  // foydalanuvchi kirish ekraniga qaytmaydi va buyurtmasini yoʻqotmaydi.
   const [state, setState] = useState<AppState>(() => {
     const restored = loadSession();
 
@@ -124,7 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  /** Server tomonidagi keyingi o'tishni qo'llaydi. */
+  /** Server tomonidagi keyingi oʻtishni qoʻllaydi. */
   const applyServerStep = useCallback(
     (orderId: string, status: OrderStatus) => {
       const step = SERVER_STEPS[status];
@@ -145,7 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [patchOrder],
   );
 
-  // Har bir aktiv buyurtma uchun keyingi avtomatik o'tishni rejalashtiramiz.
+  // Har bir aktiv buyurtma uchun keyingi avtomatik oʻtishni rejalashtiramiz.
   useEffect(() => {
     const active = state.orders.filter((order) => SERVER_STEPS[order.status]);
 
@@ -165,9 +165,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state.orders, applyServerStep]);
 
-  // Holat o'zgarganda qurilmaga yoziladi. Qoralama SAQLANMAYDI: u faqat
-  // buyurtma berish oqimi davomida yashaydi va yarim to'ldirilgan holda
-  // tiklanishi foydalanuvchini chalg'itardi.
+  // Holat oʻzgarganda qurilmaga yoziladi. Qoralama SAQLANMAYDI: u faqat
+  // buyurtma berish oqimi davomida yashaydi va yarim toʻldirilgan holda
+  // tiklanishi foydalanuvchini chalgʻitardi.
   useEffect(() => {
     saveSession({
       isAuthenticated: state.isAuthenticated,
@@ -179,7 +179,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, [state.isAuthenticated, state.phoneNumber, state.orders, state.notifications]);
 
-  // Komponent yo'q qilinganda barcha taymerlar tozalanadi.
+  // Komponent yoʻq qilinganda barcha taymerlar tozalanadi.
   useEffect(() => {
     const pending = timers.current;
     return () => {
@@ -237,8 +237,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             isUrgent: prev.draft.isUrgent,
             address: prev.draft.address,
             // Har uchinchi oddiy buyurtma navbatdan boshlanadi — haqiqiy
-            // tizimda ustalar band bo'lganda shunday bo'ladi. Shoshilinch
-            // buyurtma navbatni chetlab o'tadi (TZ 3.4).
+            // tizimda ustalar band boʻlganda shunday boʻladi. Shoshilinch
+            // buyurtma navbatni chetlab oʻtadi (TZ 3.4).
             status: shouldQueue ? ORDER_STATUS.SEARCHING_QUEUED : ORDER_STATUS.SEARCHING,
             master: null,
             etaMinutes: null,

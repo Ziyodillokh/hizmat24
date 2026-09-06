@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wrench } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
-import { Icon } from '@/components/Icon';
 import { Input } from '@/components/Input';
 import { OtpInput } from '@/components/OtpInput';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
@@ -38,14 +37,12 @@ export function WelcomeScreen() {
     >
       <div className="flex flex-col items-center py-32">
         {/*
-          Logotip lokapi: yolg'iz ikona ekran o'rtasida "to'ldirilmagan joy"
+          Logotip lokapi: yolgʻiz ikona ekran oʻrtasida "toʻldirilmagan joy"
           taassurotini berardi. Belgi + nom birga mahsulotning kirish ekrani
-          bo'lib o'qiladi.
+          boʻlib oʻqiladi.
         */}
-        <span className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary/[0.12]">
-          <Icon icon={Wrench} size={48} className="text-primary" />
-        </span>
-        <p className="mt-16 text-h2 text-text-primary">Hizmat24</p>
+        <BrandMark className="h-[88px] w-[88px]" />
+        <p className="mt-16 text-wordmark text-text-primary">Hizmat24</p>
 
         <h1 className="mt-24 text-center text-h1 text-text-primary">
           Ishonchli ustani 15 daqiqada toping
@@ -148,14 +145,14 @@ export function OtpScreen() {
         className="mt-24"
       />
 
-      {isWrong && <p className="mt-12 text-body-sm text-danger">Kod noto&apos;g&apos;ri</p>}
+      {isWrong && <p className="mt-12 text-body-sm text-danger">Kod notoʻgʻri</p>}
 
       <p className="mt-16 text-caption text-text-secondary">Kod 5 daqiqa amal qiladi</p>
 
       {/*
         Demo eslatmasi ataylab alohida blokda: backend ulanmagunicha SMS
         kelmaydi, shuning uchun kodni qayerdan olishni aytish kerak. Oddiy
-        matn qatori sifatida u tashlab ketilgan xatolik kabi ko'rinardi.
+        matn qatori sifatida u tashlab ketilgan xatolik kabi koʻrinardi.
       */}
       <div className="mt-16 rounded-md border border-border bg-surface-sunken px-16 py-12">
         <p className="text-body-sm text-text-secondary">

@@ -4,8 +4,8 @@ import { Toast, type ToastVariant } from '@/components/Toast';
 /**
  * Amal natijasi haqida qisqa javob.
  *
- * Haqiqiy ilovada tugma bosilgach nimadir "sodir bo'lgani" ko'rinishi kerak —
- * ekran jimgina o'zgarsa, foydalanuvchi amal ishlaganiga ishonchsiz qoladi.
+ * Haqiqiy ilovada tugma bosilgach nimadir "sodir boʻlgani" koʻrinishi kerak —
+ * ekran jimgina oʻzgarsa, foydalanuvchi amal ishlaganiga ishonchsiz qoladi.
  */
 interface ToastMessage {
   id: number;

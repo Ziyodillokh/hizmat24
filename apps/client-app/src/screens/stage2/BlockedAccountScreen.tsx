@@ -6,11 +6,11 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 /**
  * 05 · Hisob bloklangan.
  *
- * Terminal ekran: yagona amal — qo'llab-quvvatlash xizmati. "Qayta urinish"
- * tugmasi yo'q, chunki qayta urinish holatni o'zgartirmaydi (11-bo'lim, A qism).
- * Matn serverdan keladi va o'zgartirilmaydi (12.3-band, A).
+ * Terminal ekran: yagona amal — qoʻllab-quvvatlash xizmati. "Qayta urinish"
+ * tugmasi yoʻq, chunki qayta urinish holatni oʻzgartirmaydi (11-boʻlim, A qism).
+ * Matn serverdan keladi va oʻzgartirilmaydi (12.3-band, A).
  */
-const SERVER_MESSAGE = "Hisobingiz bloklangan, qo'llab-quvvatlash xizmatiga murojaat qiling";
+const SERVER_MESSAGE = "Hisobingiz bloklangan, qoʻllab-quvvatlash xizmatiga murojaat qiling";
 
 export function BlockedAccountScreen() {
   return (
@@ -18,7 +18,7 @@ export function BlockedAccountScreen() {
       className="flex flex-col items-center justify-center text-center"
       footer={
         <StickyFooter>
-          <Button variant="secondary">Qo&apos;llab-quvvatlashga murojaat</Button>
+          <Button variant="secondary">Qoʻllab-quvvatlashga murojaat</Button>
         </StickyFooter>
       }
     >

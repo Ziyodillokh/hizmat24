@@ -20,17 +20,17 @@ const VARIANT_LABELS: Record<BadgeVariant, string> = {
 /**
  * 9.12-band: fon — tokenning 14% shaffofligi.
  *
- * Shaffoflik Tailwind'ning standart `/[0.NN]` modifikatori orqali beriladi:
+ * Shaffoflik Tailwindʼning standart `/[0.NN]` modifikatori orqali beriladi:
  * rang tokenlari RGB kanallari sifatida saqlanadi va `rgb(var(--color-x) / <alpha>)`
  * shaklida ochiladi (tokens/colors.ts, tailwind.config.ts). Yangi rang kiritilmaydi (3.4-band).
  *
- * Klass nomlari to'liq yozilgan — Tailwind kontentni matn sifatida skanerlaydi,
- * shuning uchun bu satrlarni funksiya bilan yig'ish mumkin emas.
+ * Klass nomlari toʻliq yozilgan — Tailwind kontentni matn sifatida skanerlaydi,
+ * shuning uchun bu satrlarni funksiya bilan yigʻish mumkin emas.
  */
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   new: 'bg-border-strong text-text-secondary',
-  experienced: 'bg-success/[0.14] text-success',
-  certified: 'bg-primary/[0.14] text-primary',
+  experienced: 'bg-neutral-surface text-text-secondary',
+  certified: 'bg-primary-surface text-primary-pressed',
 };
 
 export interface BadgeProps {
@@ -42,10 +42,10 @@ export function Badge({ variant, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex h-[24px] items-center gap-8 rounded-full px-[10px]',
-        // Matn 11/14/600 — bu o'lcham/qalinlik shkalada faqat `overline` da bor,
+        'inline-flex h-[28px] items-center gap-8 rounded-full px-12',
+        // Matn 11/14/600 — bu oʻlcham/qalinlik shkalada faqat `overline` da bor,
         // lekin badge CAPS emas, shuning uchun tracking nolga qaytariladi (9.12-band).
-        'text-overline tracking-normal',
+        'text-badge',
         VARIANT_CLASSES[variant],
         className,
       )}

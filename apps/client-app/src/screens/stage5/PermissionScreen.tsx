@@ -6,10 +6,10 @@ import { StatusBar } from '@/preview/StatusBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
 
 /**
- * 31 · Ruxsat so'rash ekranlari.
+ * 31 · Ruxsat soʻrash ekranlari.
  *
  * Har biri uchun RAD ETILGAN varianti ham majburiy: unda nima ishlamasligi
- * tushuntiriladi va sozlamalarga yo'l ko'rsatiladi.
+ * tushuntiriladi va sozlamalarga yoʻl koʻrsatiladi.
  */
 export type PermissionKind = 'location' | 'notifications';
 
@@ -33,15 +33,15 @@ const COPY: Record<PermissionKind, PermissionCopy> = {
     description: 'Ustani sizga tez yuborishimiz uchun joylashuvingiz kerak',
     deniedTitle: 'Joylashuvga ruxsat berilmagan',
     deniedDescription:
-      "Ruxsatsiz manzilni xaritada avtomatik aniqlab bo'lmaydi — uni qo'lda kiritishingiz kerak bo'ladi",
+      "Ruxsatsiz manzilni xaritada avtomatik aniqlab boʻlmaydi — uni qoʻlda kiritishingiz kerak boʻladi",
   },
   notifications: {
     icon: BellRing,
     title: 'Bildirishnomalarni yoqing',
-    description: "Usta topilganda, yo'lga chiqqanda va yetib kelganda xabar beramiz",
-    deniedTitle: "Bildirishnomalar o'chirilgan",
+    description: "Usta topilganda, yoʻlga chiqqanda va yetib kelganda xabar beramiz",
+    deniedTitle: "Bildirishnomalar oʻchirilgan",
     deniedDescription:
-      "Usta yetib kelganini o'z vaqtida bilmaysiz — buyurtma holatini ilovadan tekshirib turishingiz kerak bo'ladi",
+      "Usta yetib kelganini oʻz vaqtida bilmaysiz — buyurtma holatini ilovadan tekshirib turishingiz kerak boʻladi",
   },
 };
 

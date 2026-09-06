@@ -4,7 +4,7 @@ import { Button, type ButtonVariant } from './Button';
 import { Icon } from './Icon';
 
 /**
- * Bo'sh holat — spetsifikatsiya 9.20 va 12.2-bandlari.
+ * Boʻsh holat — spetsifikatsiya 9.20 va 12.2-bandlari.
  * 96px outline ikona · 20px · `h3` sarlavha · 8px · `body-sm` tushuntirish
  * (maksimum 2 satr) · 24px · ixtiyoriy tugma.
  */
@@ -16,19 +16,19 @@ export interface EmptyStateAction {
 
 export interface EmptyStateProps {
   /**
-   * Blok sahifa oqimi ichida turibdi (ro'yxat ostida), to'liq ekranda emas.
-   * Bunda vertikal markazlashtirish va 25% siljish qo'llanmaydi.
+   * Blok sahifa oqimi ichida turibdi (roʻyxat ostida), toʻliq ekranda emas.
+   * Bunda vertikal markazlashtirish va 25% siljish qoʻllanmaydi.
    */
   inline?: boolean;
   /**
    * Ixcham variant: bosh sahifadagi kabi blok sahifaning kichik qismini
-   * egallashi kerak bo'lganda — ikona va bo'shliqlar kichrayadi.
+   * egallashi kerak boʻlganda — ikona va boʻshliqlar kichrayadi.
    */
   compact?: boolean;
   icon: LucideIcon;
   title: string;
   description?: string;
-  /** Berilmasa tugma bloki chizilmaydi VA matn ostidagi bo'shliq 0 bo'ladi. */
+  /** Berilmasa tugma bloki chizilmaydi VA matn ostidagi boʻshliq 0 boʻladi. */
   action?: EmptyStateAction;
   className?: string;
 }
@@ -46,7 +46,7 @@ export function EmptyState({
     <div
       className={cn(
         'flex w-full flex-col items-center px-20',
-        // To'liq ekran varianti markazda turadi va 25% yuqoriga siljiydi (12.2-band).
+        // Toʻliq ekran varianti markazda turadi va 25% yuqoriga siljiydi (12.2-band).
         // Sahifa ichida esa siljimaydi — aks holda blok yuqoridagi kontent
         // ustiga chiqib ketadi.
         inline ? (compact ? 'py-16' : 'py-32') : 'flex-1 justify-center',
@@ -56,16 +56,37 @@ export function EmptyState({
       {/*
        * Blok konteyner markazida turadi. Ilgari u 25% ga yuqoriga siljitilardi,
        * lekin ekran ostida tab bar borligi uchun optik markaz allaqachon
-       * o'rtadan yuqorida — qo'shimcha siljish blokni ekranning yuqori
-       * uchdan biriga chiqarib, ostida katta bo'sh maydon qoldirardi.
+       * oʻrtadan yuqorida — qoʻshimcha siljish blokni ekranning yuqori
+       * uchdan biriga chiqarib, ostida katta boʻsh maydon qoldirardi.
        */}
       <div className="flex w-full flex-col items-center text-center">
-        <Icon
-          icon={icon}
-          size={compact ? 48 : 96}
-          className="text-text-disabled"
-          aria-hidden
-        />
+        {/*
+          Ikkita ichma-ich tusli disk. Ilgari bu 24px lik interfeys glifini
+          96px gacha kattalashtirib, uni OʻCHIRILGAN rangda chizish edi —
+          shuning uchun boʻsh ekran "boʻsh" emas, "buzilgan" boʻlib oʻqilardi.
+          Alfa qiymatlari yuza ustiga kompozitsiya qilinadi, yaʼni ikkala
+          temada ham oʻzgarishsiz ishlaydi.
+        */}
+        <span
+          className={cn(
+            'flex items-center justify-center rounded-full bg-primary/[0.06]',
+            compact ? 'h-[72px] w-[72px]' : 'h-[112px] w-[112px]',
+          )}
+        >
+          <span
+            className={cn(
+              'flex items-center justify-center rounded-full bg-primary/[0.10]',
+              compact ? 'h-[48px] w-[48px]' : 'h-[76px] w-[76px]',
+            )}
+          >
+            <Icon
+              icon={icon}
+              size={compact ? 24 : 40}
+              className="text-primary/[0.55]"
+              aria-hidden
+            />
+          </span>
+        </span>
         <h3 className={cn(compact ? 'mt-12 text-body-lg' : 'mt-20 text-h3', 'text-text-primary')}>
           {title}
         </h3>

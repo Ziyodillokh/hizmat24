@@ -4,9 +4,9 @@ import type { ThemeName } from '@/tokens/colors';
 import { ViewportProvider } from './viewport';
 
 /**
- * Haqiqiy qurilmada ekranni to'liq viewport bo'ylab chizadi.
+ * Haqiqiy qurilmada ekranni toʻliq viewport boʻylab chizadi.
  *
- * `100dvh` ataylab: mobil brauzerlarda manzil paneli yig'ilib-ochilganda `100vh`
+ * `100dvh` ataylab: mobil brauzerlarda manzil paneli yigʻilib-ochilganda `100vh`
  * sakraydi va sticky pastki tugma ekran ostidan chiqib ketadi.
  */
 export interface DeviceViewProps {
@@ -24,7 +24,7 @@ export function DeviceView({ theme, children }: DeviceViewProps) {
   return (
     <ViewportProvider mode="device">
       {/*
-        Ildiz SCROLL QILMAYDI — scroll faqat ekranning kontent qismida bo'ladi
+        Ildiz SCROLL QILMAYDI — scroll faqat ekranning kontent qismida boʻladi
         (ScreenShell ichidagi `main`). Shunda header va pastki navigatsiya
         qimirlamay turadi, haqiqiy ilovadagidek.
       */}

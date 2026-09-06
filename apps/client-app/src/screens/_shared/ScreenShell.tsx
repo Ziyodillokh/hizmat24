@@ -10,18 +10,18 @@ import { useViewportMode } from '@/preview/viewport';
  * u shu yerda bir marta beriladi va ekranlarda takrorlanmaydi.
  */
 export interface ScreenShellProps {
-  /** Header, tab bar kabi to'liq kenglikdagi elementlar — padding'siz. */
+  /** Header, tab bar kabi toʻliq kenglikdagi elementlar — paddingʻsiz. */
   header?: ReactNode;
   /** Ekran ostidagi sticky blok (tugma yoki tab bar). */
   footer?: ReactNode;
-  /** Kontent gorizontal padding olmasin (masalan to'liq ekran xarita). */
+  /** Kontent gorizontal padding olmasin (masalan toʻliq ekran xarita). */
   bleed?: boolean;
   /**
-   * Kontentni vertikal markazga qo'yadi (kirish taklifi kabi qisqa ekranlar).
+   * Kontentni vertikal markazga qoʻyadi (kirish taklifi kabi qisqa ekranlar).
    *
-   * Busiz `main` oddiy blok konteyner bo'lib qoladi va ichkaridagi `flex-1`
-   * hech qanday ta'sir qilmaydi — kontent tepaga yopishib, ostida katta
-   * bo'sh maydon qolardi.
+   * Busiz `main` oddiy blok konteyner boʻlib qoladi va ichkaridagi `flex-1`
+   * hech qanday taʼsir qilmaydi — kontent tepaga yopishib, ostida katta
+   * boʻsh maydon qolardi.
    */
   center?: boolean;
   children: ReactNode;
@@ -64,11 +64,11 @@ export function ScreenShell({
 }
 
 /**
- * Ekran ostidagi bo'shliq.
+ * Ekran ostidagi boʻshliq.
  *
- * Maketa ramkasida u qat'iy 34px (6.1-banddagi home indicator zonasi).
- * Haqiqiy qurilmada esa balandlik modelga qarab har xil — iPhone'da 34px,
- * ko'p Android'da 0px — shuning uchun `env(safe-area-inset-bottom)` ishlatiladi.
+ * Maketa ramkasida u qatʼiy 34px (6.1-banddagi home indicator zonasi).
+ * Haqiqiy qurilmada esa balandlik modelga qarab har xil — iPhoneʼda 34px,
+ * koʻp Androidʼda 0px — shuning uchun `env(safe-area-inset-bottom)` ishlatiladi.
  */
 export function BottomInset() {
   const mode = useViewportMode();
@@ -85,8 +85,8 @@ export function BottomInset() {
  * Ekran ostidagi tugma bloki.
  *
  * `sticky` kerak emas: u scroll konteyneridan (ScreenShell ichidagi `main`)
- * TASHQARIDA turadi, ya'ni allaqachon qadalgan. Xavfsiz zona uchun ham
- * qo'shimcha padding kerak emas — `BottomInset` DOM'da undan keyin keladi.
+ * TASHQARIDA turadi, yaʼni allaqachon qadalgan. Xavfsiz zona uchun ham
+ * qoʻshimcha padding kerak emas — `BottomInset` DOMʼda undan keyin keladi.
  */
 export function StickyFooter({ children }: { children: ReactNode }) {
   return (

@@ -9,12 +9,12 @@ import { EnRouteScreen } from '@/screens/stage3/EnRouteScreen';
 const REASON_MIN = 3;
 const REASON_MAX = 500;
 
-/** 28-ekrandagi sabab chiplari — 8.2-bo'lim jadvalidan. */
+/** 28-ekrandagi sabab chiplari — 8.2-boʻlim jadvalidan. */
 const REASONS = [
   'Fikrimdan qaytdim',
   'Juda uzoq kutdim',
-  "Muammo o'zi hal bo'ldi",
-  "Narx to'g'ri kelmadi",
+  "Muammo oʻzi hal boʻldi",
+  "Narx toʻgʻri kelmadi",
   'Boshqa sabab',
 ] as const;
 
@@ -23,7 +23,7 @@ const OTHER_REASON = 'Boshqa sabab';
 /**
  * 28 · Bekor qilish sababi (bottom sheet).
  *
- * Sabab MAJBURIY (1-bo'lim, 5-qoida): tanlanmaguncha yoki erkin matn 3 belgiga
+ * Sabab MAJBURIY (1-boʻlim, 5-qoida): tanlanmaguncha yoki erkin matn 3 belgiga
  * yetmaguncha bekor qilish tugmasi ishlamaydi.
  */
 export type CancelReasonVariant = 'empty' | 'selected' | 'other-short' | 'submitting' | 'confirm';
@@ -92,11 +92,11 @@ export function CancelReasonSheet({ variant = 'selected' }: CancelReasonSheetPro
         </div>
       </Sheet>
 
-      {/* Tasdiqlash dialogi — bekor qilish qaytarib bo'lmaydigan amal. */}
+      {/* Tasdiqlash dialogi — bekor qilish qaytarib boʻlmaydigan amal. */}
       <Modal open={variant === 'confirm'} title="Buyurtmani rostdan bekor qilasizmi?">
         <div className="mt-20 flex flex-col gap-12">
           <Button variant="destructive">Ha, bekor qilish</Button>
-          <Button variant="ghost">Yo&apos;q</Button>
+          <Button variant="ghost">Yoʻq</Button>
         </div>
       </Modal>
     </div>

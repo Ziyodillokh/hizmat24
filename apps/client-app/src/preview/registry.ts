@@ -1,15 +1,15 @@
 import type { ComponentType } from 'react';
 
 /**
- * Ekranlar reyestri — preview navigatori shu ro'yxatdan quriladi.
- * Raqamlar spetsifikatsiyaning 11-bo'limidan olinadi va O'ZGARTIRILMAYDI (7-bo'lim).
+ * Ekranlar reyestri — preview navigatori shu roʻyxatdan quriladi.
+ * Raqamlar spetsifikatsiyaning 11-boʻlimidan olinadi va OʻZGARTIRILMAYDI (7-boʻlim).
  */
 export interface ScreenEntry {
-  /** Spec 11-bo'limidagi raqam: "06", "07a", "12" ... */
+  /** Spec 11-boʻlimidagi raqam: "06", "07a", "12" ... */
   id: string;
-  /** Frame nomi uchun o'zbekcha nom. */
+  /** Frame nomi uchun oʻzbekcha nom. */
   name: string;
-  /** Bosqich (13-bo'lim) — navigatorda guruhlash uchun. */
+  /** Bosqich (13-boʻlim) — navigatorda guruhlash uchun. */
   stage: 1 | 2 | 3 | 4 | 5;
   /** Ekranning holat varianti (masalan "Operator") — ixtiyoriy. */
   variant?: string;

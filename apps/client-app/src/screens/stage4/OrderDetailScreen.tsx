@@ -25,11 +25,11 @@ import type { Order } from '@/mocks/types';
 /**
  * 23 · Buyurtma tafsiloti — universal shablon.
  *
- * Tugmalar to'plami ekran ichida `if` bilan emas, `getDetailActions()` orqali
- * aniqlanadi: shunda bitta holat uchun noto'g'ri tugma chizilishi mumkin emas
+ * Tugmalar toʻplami ekran ichida `if` bilan emas, `getDetailActions()` orqali
+ * aniqlanadi: shunda bitta holat uchun notoʻgʻri tugma chizilishi mumkin emas
  * va qoida testlar bilan qoplangan.
  *
- * "Tahrirlash" tugmasi hech qachon qo'yilmaydi (14.3-band, 16-punkt).
+ * "Tahrirlash" tugmasi hech qachon qoʻyilmaydi (14.3-band, 16-punkt).
  */
 export type OrderDetailVariant = 'active' | 'rated' | 'cancelled' | 'flagged' | 'loading' | 'missing';
 
@@ -161,7 +161,7 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
       <Card className="mt-16">
         <MapPreview />
         <p className="mt-12 text-body text-text-primary">{order.address.label}</p>
-        {/* Ixtiyoriy maydonlar bo'lmasa qatorlar butunlay yashiriladi. */}
+        {/* Ixtiyoriy maydonlar boʻlmasa qatorlar butunlay yashiriladi. */}
         {hasAddressDetails && (
           <div className="mt-8 border-t border-border pt-8">
             {order.address.entrance && <DetailRow label="Kirish" value={order.address.entrance} />}
@@ -176,7 +176,7 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
       <Card className="mt-16">
         <DetailRow label="Yaratilgan" value={formatDateTime(order.createdAt, NOW)} />
 
-        {/* Sana MA'LUMOTdan olinadi, holatdan emas: `completedAt` — yagona manba. */}
+        {/* Sana MAʼLUMOTdan olinadi, holatdan emas: `completedAt` — yagona manba. */}
         {order.completedAt && (
           <DetailRow label="Yakunlangan" value={formatDateTime(order.completedAt, NOW)} />
         )}
@@ -185,8 +185,8 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
 
         {order.rating && (
           <div className="border-t border-border pt-12">
-            <p className="text-body-sm text-text-secondary">Qo&apos;ygan bahoingiz</p>
-            {/* Baho read-only — o'zgartirib bo'lmaydi (14.3-band, 20-punkt). */}
+            <p className="text-body-sm text-text-secondary">Qoʻygan bahoingiz</p>
+            {/* Baho read-only — oʻzgartirib boʻlmaydi (14.3-band, 20-punkt). */}
             <StarRating value={order.rating.stars} size="md" showValue className="mt-8" />
             {order.rating.comment && (
               <p className="mt-8 text-body text-text-primary">{order.rating.comment}</p>
@@ -197,7 +197,7 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
 
       {needsSafetyNotice(order.status) && (
         <Banner variant="danger" className="mt-16">
-          Buyurtma xavfsizlik tekshiruvida. Operatorimiz siz bilan bog&apos;lanadi.
+          Buyurtma xavfsizlik tekshiruvida. Operatorimiz siz bilan bogʻlanadi.
         </Banner>
       )}
 

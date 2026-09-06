@@ -6,7 +6,7 @@ import { Spinner } from './Spinner';
 
 /**
  * Suzuvchi aloqa banneri — spetsifikatsiya 9.26 va 12.4-bandlari.
- * h=36, to'liq kenglik, kontentni SURMAYDI — ustidan suzadi.
+ * h=36, toʻliq kenglik, kontentni SURMAYDI — ustidan suzadi.
  * Chapda 16px ikona yoki spinner, matn `body-sm`.
  */
 export type ConnectionBannerState = 'reconnecting' | 'stalled';
@@ -14,7 +14,7 @@ export type ConnectionBannerState = 'reconnecting' | 'stalled';
 /**
  * 9.26-band: `stalled` foni — `warning` tokenining 14% shaffofligi.
  *
- * Shaffoflik Tailwind'ning standart `/[0.NN]` modifikatori orqali beriladi:
+ * Shaffoflik Tailwindʼning standart `/[0.NN]` modifikatori orqali beriladi:
  * rang tokenlari RGB kanallari sifatida saqlanadi va `rgb(var(--color-x) / <alpha>)`
  * shaklida ochiladi (tokens/colors.ts, tailwind.config.ts). Yangi rang kiritilmaydi (3.4-band).
  */
@@ -59,7 +59,7 @@ export function ConnectionBanner({ state, onRefresh, className }: ConnectionBann
           size="small"
           fullWidth={false}
           onClick={onRefresh}
-          // Ghost tugma banner rangida bo'ladi; padding 0 — matn 20px chetga tekislanadi.
+          // Ghost tugma banner rangida boʻladi; padding 0 — matn 20px chetga tekislanadi.
           className="ml-auto px-0 text-warning"
         >
           Yangilash

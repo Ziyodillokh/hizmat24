@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn';
 /**
  * Toggle ("Shoshilinch") — spetsifikatsiya 9.10-bandi.
  * w=52 h=32 radius/full. Off = `border-strong` fon, On = `primary` fon,
- * knob 28px oq + soya. Default holati — o'chiq (08-ekran).
+ * knob 28px oq + soya. Default holati — oʻchiq (08-ekran).
  */
 export interface ToggleProps {
   /** Boshqariladigan qiymat. Default `false` — 9.10-band talabi. */
@@ -16,10 +16,10 @@ export interface ToggleProps {
 }
 
 // Knob soyasi `color/shadow` 20% — bu variant Tailwind elevatsiya tokenlarida
-// yo'q, shuning uchun token o'zgaruvchisi orqali beriladi (3.4-band).
+// yoʻq, shuning uchun token oʻzgaruvchisi orqali beriladi (3.4-band).
 // Dark temada soya faqat modal ostidagi overlay uchun ishlatiladi, elevatsiya
 // uchun emas (6.3-band; 14.7-band, 54-punkt) — `color/shadow` tokeni ham
-// "Dark'da ishlatilmaydi" deb belgilangan, shuning uchun u yerda o'chiriladi.
+// "Darkʼda ishlatilmaydi" deb belgilangan, shuning uchun u yerda oʻchiriladi.
 const KNOB_SHADOW_CLASSES =
   "shadow-[0_1px_2px_rgb(var(--color-shadow)/0.2)] [[data-theme='dark']_&]:shadow-none";
 
@@ -40,7 +40,7 @@ export function Toggle({
       onClick={() => onChange(!checked)}
       className={cn(
         'inline-flex h-32 w-[52px] shrink-0 items-center rounded-full p-2 transition-colors',
-        checked ? 'bg-primary' : 'bg-border-strong',
+        checked ? 'bg-primary' : 'bg-surface-sunken ring-1 ring-inset ring-border-strong',
         disabled && 'bg-border-strong/[0.38]',
         className,
       )}

@@ -9,11 +9,11 @@ import { useIsNarrowViewport } from './viewport';
 import type { ThemeName } from '@/tokens/colors';
 
 /**
- * Ekranni ko'rsatish.
+ * Ekranni koʻrsatish.
  *
- * Keng oynada — Dark va Light yonma-yon, maketa ramkalarida (7-bo'lim).
- * Tor oynada (telefon) — to'liq ekran qurilma rejimi: ramka telefon ekraniga
- * sig'maydi va gorizontal scroll paydo qilardi.
+ * Keng oynada — Dark va Light yonma-yon, maketa ramkalarida (7-boʻlim).
+ * Tor oynada (telefon) — toʻliq ekran qurilma rejimi: ramka telefon ekraniga
+ * sigʻmaydi va gorizontal scroll paydo qilardi.
  */
 export function ScreenPreview() {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +27,7 @@ export function ScreenPreview() {
       <div className="px-24 py-40">
         <p className="text-body text-text-primary">Ekran topilmadi.</p>
         <Link to="/" className="mt-12 inline-block text-body text-primary">
-          Ro&apos;yxatga qaytish
+          Roʻyxatga qaytish
         </Link>
       </div>
     );
@@ -42,7 +42,7 @@ export function ScreenPreview() {
           <Screen />
         </DeviceView>
 
-        {/* Telefonda ham ro'yxatga qaytish va tema almashtirish kerak. */}
+        {/* Telefonda ham roʻyxatga qaytish va tema almashtirish kerak. */}
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-safe-bottom">
           <div className="pointer-events-auto m-12 flex items-center gap-4 rounded-full bg-surface-modal px-4 py-4 shadow-e3">
             <Link

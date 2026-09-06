@@ -16,20 +16,20 @@ import {
   orEmpty,
 } from './formatters';
 
-/** Nazorat qilinadigan sana — `new Date()` ishlatilmaydi, natija barqaror bo'lsin. */
+/** Nazorat qilinadigan sana — `new Date()` ishlatilmaydi, natija barqaror boʻlsin. */
 const NOW = new Date(2026, 8, 5, 14, 30);
 
 describe('formatPrice (8.4-band)', () => {
-  it("mingliklarni probel bilan ajratadi va \"so'm\" qo'shadi", () => {
-    expect(formatPrice(150_000)).toBe("150 000 so'm");
+  it("mingliklarni probel bilan ajratadi va \"soʻm\" qoʻshadi", () => {
+    expect(formatPrice(150_000)).toBe("150 000 soʻm");
   });
 
   it('kasr qismini yaxlitlaydi — tiyin ishlatilmaydi', () => {
-    expect(formatPrice(99_999.6)).toBe("100 000 so'm");
+    expect(formatPrice(99_999.6)).toBe("100 000 soʻm");
   });
 
   it('millionni ham to\'g\'ri ajratadi', () => {
-    expect(formatPrice(1_500_000)).toBe("1 500 000 so'm");
+    expect(formatPrice(1_500_000)).toBe("1 500 000 soʻm");
   });
 
   it.each([
@@ -43,12 +43,12 @@ describe('formatPrice (8.4-band)', () => {
   });
 
   it('bosh sahifada aniq summa emas, taxminiy shakl ishlatiladi', () => {
-    expect(formatApproxPrice(150_000)).toBe("taxminan 150 000 so'm");
+    expect(formatApproxPrice(150_000)).toBe("taxminan 150 000 soʻm");
   });
 });
 
 describe('formatRating (8.5-band)', () => {
-  it("o'nlik ajratkich sifatida VERGUL ishlatadi", () => {
+  it("oʻnlik ajratkich sifatida VERGUL ishlatadi", () => {
     expect(formatRating(4.8)).toBe('4,8');
   });
 
@@ -107,7 +107,7 @@ describe('formatDuration (8.5-band)', () => {
 
   it('`~` faqat taxminiy vaqt va navbat uchun', () => {
     expect(formatApproxDuration(15)).toBe('~15 daqiqa');
-    expect(formatQueuePosition(3)).toBe("~3-o'rin");
+    expect(formatQueuePosition(3)).toBe("~3-oʻrin");
     expect(formatPrice(150_000)).not.toContain('~');
   });
 });

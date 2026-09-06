@@ -6,17 +6,19 @@ export interface ServiceCategory {
   description: string | null;
   groupId: string;
   basePrice: number;
+  /** Xizmatning OʻZ ikonasi. Berilmasa guruhnikini meros qiladi. */
+  iconKey?: string;
 }
 
 export interface ServiceGroup {
   id: string;
   /**
    * Guruh nomi — bosh sahifa gridida, guruh ekrani sarlavhasida va qidiruv
-   * natijalarida bir xil shu nom ko'rsatiladi. Server bitta nom yuboradi;
-   * UI unga qisqartirilgan ikkinchi shakl o'ylab topmaydi (8.1-band, yagona atama).
+   * natijalarida bir xil shu nom koʻrsatiladi. Server bitta nom yuboradi;
+   * UI unga qisqartirilgan ikkinchi shakl oʻylab topmaydi (8.1-band, yagona atama).
    */
   name: string;
-  /** Ilova ikonani shu kalit bo'yicha tanlaydi — rasm URL emas (1-bo'lim, 16-qoida). */
+  /** Ilova ikonani shu kalit boʻyicha tanlaydi — rasm URL emas (1-boʻlim, 16-qoida). */
   iconKey: string;
   categories: ServiceCategory[];
 }
@@ -31,7 +33,7 @@ export interface Master {
   hasGovCertificate: boolean;
   ratingAvg: number;
   completedOrdersCount: number;
-  /** Faqat 4 holatda to'ldiriladi (1-bo'lim, 3-qoida). */
+  /** Faqat 4 holatda toʻldiriladi (1-boʻlim, 3-qoida). */
   phoneNumber: string | null;
 }
 
@@ -58,7 +60,7 @@ export interface Order {
   master: Master | null;
   etaMinutes: number | null;
   queuePosition: number | null;
-  /** Operator qo'lda ko'rib chiqmoqda (12/13-ekranlarning alohida holati). */
+  /** Operator qoʻlda koʻrib chiqmoqda (12/13-ekranlarning alohida holati). */
   isEscalated: boolean;
   createdAt: Date;
   completedAt: Date | null;
@@ -81,7 +83,7 @@ export type NotificationKind =
 export interface AppNotification {
   id: string;
   kind: NotificationKind;
-  /** Sarlavha va matn serverdan tayyor keladi — UI o'z matnini to'qimaydi (25-ekran). */
+  /** Sarlavha va matn serverdan tayyor keladi — UI oʻz matnini toʻqimaydi (25-ekran). */
   title: string;
   body: string;
   orderId: string | null;

@@ -18,7 +18,7 @@ import { USER } from '@/mocks/user';
 import { HomeBanner } from './HomeBanner';
 import { ActiveOrderCard } from './ActiveOrderCard';
 
-/** Grid'da birinchi 7 ta guruh + doimiy "Barchasi" katakchasi (06-ekran). */
+/** Gridʼda birinchi 7 ta guruh + doimiy "Barchasi" katakchasi (06-ekran). */
 const VISIBLE_GROUPS = 7;
 
 export type HomeVariant =
@@ -73,8 +73,8 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
     <div className="flex h-full min-h-full flex-col bg-surface">
       {/*
         Light temadagi dekorativ turkuaz blok: status bar, header va qidiruv
-        panelining orqasidan o'tadi (2.1-band, 3-punkt). Dark temada blok yo'q —
-        fon oddiy `surface` ga qaytadi, ya'ni ko'zga ko'rinmaydi.
+        panelining orqasidan oʻtadi (2.1-band, 3-punkt). Dark temada blok yoʻq —
+        fon oddiy `surface` ga qaytadi, yaʼni koʻzga koʻrinmaydi.
       */}
       <div className="bg-surface-hero [[data-theme='dark']_&]:bg-surface">
         <StatusBar />
@@ -125,9 +125,9 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
             {variant === 'no-active-order' && (
               <section className="mt-16">
                 <div className="flex items-center justify-between gap-12">
-                  <h2 className="text-h2 text-text-primary">So&apos;nggi buyurtmalaringiz</h2>
+                  <h2 className="text-h2 text-text-primary">Soʻnggi buyurtmalaringiz</h2>
                   <Button variant="ghost" size="small" fullWidth={false}>
-                    Barchasini ko&apos;rish
+                    Barchasini koʻrish
                   </Button>
                 </div>
                 <ul className="mt-12 grid grid-cols-2 gap-12">
@@ -149,7 +149,7 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
             {variant === 'no-orders' && (
               <EmptyState
                 icon={ClipboardList}
-                title="Hozircha buyurtmalaringiz yo'q"
+                title="Hozircha buyurtmalaringiz yoʻq"
                 description="Birinchi buyurtmangizni bering"
                 action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
                 inline

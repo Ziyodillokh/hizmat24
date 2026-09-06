@@ -12,7 +12,7 @@ import { StatusChip } from '@/components/StatusChip';
 import { StatusBar } from '@/preview/StatusBar';
 import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
-import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
+import { MORE_ICON, serviceIcon, serviceIconSize } from '@/lib/serviceIcons';
 import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
@@ -52,9 +52,10 @@ export function HomeTab() {
   return (
     <div className="flex h-full flex-col bg-surface">
       {/* Yuqori blok qadalgan — scroll faqat undan pastda. */}
-      {/* Pastki burchaklar yumaloqlangan: ilgari turkuaz blok ekranni kesib
-          o'tuvchi to'g'ri chiziq bilan tugardi va tugallanmagandek ko'rinardi. */}
-      <div className="shrink-0 rounded-b-lg bg-surface-hero [[data-theme='dark']_&]:rounded-none [[data-theme='dark']_&]:bg-surface">
+      {/* Hero maydoni endi IKKALA temada ham bir xil material. Ilgari Lightʼda
+          yorqin tsian plastinka turar, Darkʼda esa blok butunlay oʻchirilardi —
+          ikki tema ikki xil mahsulot boʻlib koʻrinardi. */}
+      <div className="hero-field shrink-0 rounded-b-xl">
         <StatusBar />
         <Header
           variant="home"
@@ -83,12 +84,15 @@ export function HomeTab() {
               key={group.id}
               label={group.name}
               icon={serviceIcon(group.iconKey)}
+              iconSize={serviceIconSize(group.iconKey)}
               onClick={() => navigate(`/app/groups/${group.id}`)}
             />
           ))}
           <ServiceGroupTile
             label="Barchasi"
             icon={MORE_ICON}
+            iconSize={serviceIconSize('more')}
+            tone="neutral"
             onClick={() => navigate('/app/services')}
           />
         </div>
@@ -119,14 +123,14 @@ export function HomeTab() {
         ) : recent.length > 0 ? (
           <section className="mt-16">
             <div className="flex items-center justify-between gap-12">
-              <h2 className="text-h3 text-text-primary">So&apos;nggi buyurtmalaringiz</h2>
+              <h2 className="text-h3 text-text-primary">Soʻnggi buyurtmalaringiz</h2>
               <Button
                 variant="ghost"
                 size="small"
                 fullWidth={false}
                 onClick={() => navigate('/app/orders')}
               >
-                Barchasini ko&apos;rish
+                Barchasini koʻrish
               </Button>
             </div>
             {/* Referensdagi ikki ustunli naqsh — lekin kartada usta emas, buyurtma. */}
@@ -148,17 +152,17 @@ export function HomeTab() {
           </section>
         ) : (
           /*
-            Ilgari bu yerda ekran o'rtasida suzib turgan ikona va matn bor edi —
-            u sahifaning qolgan qismi bilan bog'lanmagandek ko'rinardi. Karta
-            ichidagi taklif esa tugallangan blok bo'lib o'qiladi.
+            Ilgari bu yerda ekran oʻrtasida suzib turgan ikona va matn bor edi —
+            u sahifaning qolgan qismi bilan bogʻlanmagandek koʻrinardi. Karta
+            ichidagi taklif esa tugallangan blok boʻlib oʻqiladi.
           */
           <Card className="mt-20 flex items-center gap-16">
             <span className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-md bg-surface-sunken">
               <Icon icon={ClipboardList} size={24} className="text-text-secondary" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-body-lg font-semibold text-text-primary">
-                Hozircha buyurtmangiz yo&apos;q
+              <p className="text-title text-text-primary">
+                Hozircha buyurtmangiz yoʻq
               </p>
               <p className="mt-2 text-body-sm text-text-secondary">
                 Kerakli xizmatni tanlang — ustani biz topamiz
