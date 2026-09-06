@@ -30,6 +30,7 @@ export const MASTERS = {
     ratingAvg: 4.9,
     completedOrdersCount: 210,
     photoUrl: male1,
+    isPremium: true,
     phoneNumber: '+998901112237',
   },
   feruza: {
@@ -41,6 +42,7 @@ export const MASTERS = {
     ratingAvg: 4.9,
     completedOrdersCount: 178,
     photoUrl: female1,
+    isPremium: true,
     phoneNumber: '+998901112241',
   },
   akmal: {
@@ -52,6 +54,7 @@ export const MASTERS = {
     ratingAvg: 4.8,
     completedOrdersCount: 142,
     photoUrl: male2,
+    isPremium: true,
     phoneNumber: '+998901112233',
   },
   jahongir: {
@@ -63,6 +66,7 @@ export const MASTERS = {
     ratingAvg: 4.7,
     completedOrdersCount: 96,
     photoUrl: male1,
+    isPremium: true,
     phoneNumber: '+998901112238',
   },
   dilshod: {
@@ -74,6 +78,7 @@ export const MASTERS = {
     ratingAvg: 4.6,
     completedOrdersCount: 87,
     photoUrl: male2,
+    isPremium: true,
     phoneNumber: '+998901112235',
   },
   rustam: {
@@ -85,6 +90,7 @@ export const MASTERS = {
     ratingAvg: 4.5,
     completedOrdersCount: 134,
     photoUrl: male1,
+    isPremium: true,
     phoneNumber: '+998901112240',
   },
   nilufar: {

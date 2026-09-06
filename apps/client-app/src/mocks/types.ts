@@ -38,6 +38,11 @@ export interface Master {
    * Yoʻq boʻlsa `Avatar` ism bosh harfiga tushadi — roʻyxat buzilmaydi.
    */
   photoUrl?: string;
+  /**
+   * Premium tarif sotib olgan usta. Faqat shundaylar bosh sahifaning
+   * yuqorisidagi qatorda koʻrsatiladi — bu tarifning asosiy imtiyozi.
+   */
+  isPremium?: boolean;
   /** Faqat 4 holatda toʻldiriladi (1-boʻlim, 3-qoida). */
   phoneNumber: string | null;
 }

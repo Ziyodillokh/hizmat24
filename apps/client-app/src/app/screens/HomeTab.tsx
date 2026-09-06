@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { MasterSuggestionCard } from '@/components/MasterSuggestionCard';
-import { SearchField } from '@/components/SearchField';
+import { PremiumMastersRail } from '@/components/PremiumMastersRail';
 import { ServiceGroupTile } from '@/components/ServiceGroupTile';
 import { StatusChip } from '@/components/StatusChip';
 import { StatusBar } from '@/preview/StatusBar';
@@ -14,13 +13,19 @@ import { MORE_ICON, serviceIcon, serviceIconSize } from '@/lib/serviceIcons';
 import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
-import { MASTERS } from '@/mocks/masters';
+import { MASTER_LIST, MASTERS } from '@/mocks/masters';
 import { USER } from '@/mocks/user';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import { useApp } from '../store';
 import type { LiveOrder } from '../types';
 
 const VISIBLE_GROUPS = 7;
+
+/**
+ * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
+ * faqat shular koʻrinadi. Tartib `MASTER_LIST` dan meros: reyting boʻyicha.
+ */
+const PREMIUM_MASTERS = MASTER_LIST.filter((master) => master.isPremium);
 
 /** Tavsiya blokida ikkita usta — referens maketdagi ikki ustunli qator. */
 const SUGGESTED_MASTERS = Object.values(MASTERS).slice(0, 2);
@@ -47,7 +52,6 @@ function secondaryLine(order: LiveOrder): string | null {
 export function HomeTab() {
   const navigate = useNavigate();
   const { activeOrder, phoneNumber, unreadCount } = useApp();
-  const [query, setQuery] = useState('');
 
   const groups = SERVICE_GROUPS.slice(0, VISIBLE_GROUPS);
 
@@ -75,12 +79,16 @@ export function HomeTab() {
             onNotificationsClick={() => navigate('/app/notifications')}
           />
 
+          {/*
+            Qidiruv maydoni oʻrniga premium ustalar qatori. Qidiruv "Barcha
+            xizmatlar" ekranida qoladi — u yerda roʻyxat uzun va qidiruv
+            haqiqatan kerak; bosh sahifada esa kategoriya katakchalari
+            allaqachon toʻgʻridan-toʻgʻri yoʻl beradi.
+          */}
           <div className="px-20 pt-4">
-            <SearchField
-              floating
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Xizmatlarni qidirish"
+            <PremiumMastersRail
+              masters={PREMIUM_MASTERS}
+              onSelect={(id) => navigate(`/app/master/${id}`)}
             />
           </div>
 
@@ -117,7 +125,7 @@ export function HomeTab() {
         )}
 
         <h2 className="pt-16 text-h3 text-text-primary">Mashhur xizmatlar</h2>
-        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12">
+        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-8">
           {groups.map((group) => (
             <ServiceGroupTile
               key={group.id}
