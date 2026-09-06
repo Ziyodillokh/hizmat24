@@ -474,7 +474,7 @@ export function MasterProfile() {
       <div className="mt-16 flex flex-col items-center">
         {/* 120px avatar ekranning uchdan birini egallardi — 80px hero blokni
             ixchamlashtiradi va ostidagi maʼlumotga joy ochadi. */}
-        <Avatar name={master.fullName} size={80} />
+        <Avatar name={master.fullName} src={master.photoUrl} size={80} shape="square" />
         <h1 className="mt-12 text-center text-h2 text-text-primary">{master.fullName}</h1>
         <p className="mt-2 text-body text-text-secondary">{master.profession}</p>
 

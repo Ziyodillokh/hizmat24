@@ -21,6 +21,8 @@ export interface MasterCardProps {
   completedOrders: number;
   experience?: MasterExperience;
   isCertified?: boolean;
+  /** Ilova ichiga joylangan rasm; boʻlmasa ism bosh harfi chiziladi. */
+  photoUrl?: string;
   /** 19-ekran uchun ixcham variant: 44px avatar, bajarilgan buyurtmalar qatorisiz. */
   compact?: boolean;
   /** Kartani bosish usta profilini ochadi (14 va 15-ekranlar). */
@@ -34,6 +36,7 @@ export function MasterCard({
   rating,
   completedOrders,
   experience = 'new',
+  photoUrl,
   isCertified = false,
   compact = false,
   onOpen,
@@ -58,7 +61,7 @@ export function MasterCard({
       onKeyDown={isInteractive ? handleKeyDown : undefined}
       className={cn('flex items-start gap-12', className)}
     >
-      <Avatar name={name} size={compact ? 44 : 64} />
+      <Avatar name={name} src={photoUrl} size={compact ? 44 : 64} shape="square" />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-h3 text-text-primary">{name}</p>

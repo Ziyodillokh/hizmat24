@@ -168,6 +168,7 @@ export function OrderTracking() {
               profession={order.master.profession}
               rating={order.master.ratingAvg}
               completedOrders={order.master.completedOrdersCount}
+              photoUrl={order.master.photoUrl}
               experience={order.master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
               isCertified={order.master.hasGovCertificate}
               onOpen={() => navigate(`/app/master/${order.master?.id}`)}
@@ -194,6 +195,7 @@ export function OrderTracking() {
             profession={order.master.profession}
             rating={order.master.ratingAvg}
             completedOrders={order.master.completedOrdersCount}
+              photoUrl={order.master.photoUrl}
             experience={order.master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
             isCertified={order.master.hasGovCertificate}
             className="mt-20"
