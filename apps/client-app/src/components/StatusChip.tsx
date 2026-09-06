@@ -14,14 +14,40 @@ const TONE_CLASSES: Record<ChipTone, { wrap: string; dot: string }> = {
   neutral: { wrap: 'bg-neutral-surface text-text-secondary', dot: 'bg-text-secondary' },
 };
 
+/** Faqat matn rangi — `inline` variantida fon chizilmaydi. */
+const TONE_TEXT: Record<ChipTone, string> = {
+  primary: 'text-primary-pressed',
+  warning: 'text-warning',
+  success: 'text-success',
+  danger: 'text-danger',
+  neutral: 'text-text-secondary',
+};
+
 export interface StatusChipProps {
   status: OrderStatus;
+  /**
+   * `inline` — fonsiz variant: nuqta + rangli matn.
+   *
+   * Roʻyxat qatorlarida toʻldirilgan tabletka nomdan koʻra baland kontrast
+   * beradi va eʼtiborni oʻgʻirlaydi; har bir qatorda takrorlanganda esa
+   * roʻyxat rang-barang boʻlib ketadi.
+   */
+  inline?: boolean;
   className?: string;
 }
 
-export function StatusChip({ status, className }: StatusChipProps) {
+export function StatusChip({ status, inline = false, className }: StatusChipProps) {
   const { label, tone } = STATUS_CHIPS[status];
   const classes = TONE_CLASSES[tone];
+
+  if (inline) {
+    return (
+      <span className={cn('inline-flex items-center gap-4 text-caption', TONE_TEXT[tone], className)}>
+        <span className={cn('h-[6px] w-[6px] shrink-0 rounded-full', classes.dot)} aria-hidden />
+        {label}
+      </span>
+    );
+  }
 
   return (
     <span

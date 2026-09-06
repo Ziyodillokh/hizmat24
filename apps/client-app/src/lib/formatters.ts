@@ -24,6 +24,28 @@ export const formatPriceFrom = (amount: number): string => `${formatPrice(amount
 export const formatPriceRange = (min: number, max: number): string =>
   `${Math.round(min).toString().replace(/\B(?=(\d{3})+(?!\d))/g, NBSP)}${NBSP}–${NBSP}${formatPrice(max)}`;
 
+/**
+ * Buyurtmalar roʻyxatidagi guruh sarlavhasi: "Bugun" · "Kecha" · "Sentabr" ·
+ * "2025-yil dekabr".
+ *
+ * Uzun roʻyxat sanaga qarab boʻlinganda koʻz bilan skanerlash osonlashadi —
+ * aks holda oʻttizta bir xil karta uzluksiz oqim boʻlib koʻrinadi.
+ */
+export function orderDateGroup(date: Date, now: Date): string {
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return 'Bugun';
+  if (isSameDay(date, yesterday)) return 'Kecha';
+
+  const month = MONTHS[date.getMonth()];
+  const capitalised = month.charAt(0).toUpperCase() + month.slice(1);
+
+  return date.getFullYear() === now.getFullYear()
+    ? capitalised
+    : `${date.getFullYear()}-yil ${month}`;
+}
+
 /** 8.5-band: bitta kasr xona, oʻnlik ajratkich — VERGUL. Server 4.75 bersa ham 4,8. */
 export const formatRating = (value: number): string => value.toFixed(1).replace('.', ',');
 

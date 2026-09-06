@@ -28,7 +28,7 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
 import { serviceIcon } from '@/lib/serviceIcons';
-import { formatPhone } from '@/lib/formatters';
+import { formatPhone, formatTime, orderDateGroup } from '@/lib/formatters';
 import {
   HISTORY_FILTER_LABELS,
   isMasterPhoneVisible,
@@ -50,10 +50,31 @@ export function OrdersTab() {
   const { orders } = useApp();
   const [filter, setFilter] = useState<HistoryFilter>('all');
 
-  const visible = useMemo(
-    () => orders.filter((order) => matchesHistoryFilter(order.status, filter)),
-    [orders, filter],
-  );
+  const now = new Date();
+
+  /*
+   * Buyurtmalar sana boʻyicha guruhlanadi ("Bugun" · "Kecha" · "Sentabr").
+   * Roʻyxat allaqachon yangidan eskiga tartiblangan holda keladi, shuning
+   * uchun guruhlar ham shu tartibda hosil boʻladi — qayta saralash shart emas.
+   */
+  const groups = useMemo(() => {
+    const visible = orders.filter((order) => matchesHistoryFilter(order.status, filter));
+    const result: { title: string; orders: typeof visible }[] = [];
+
+    for (const order of visible) {
+      const title = orderDateGroup(order.createdAt, now);
+      const last = result[result.length - 1];
+      if (last && last.title === title) last.orders.push(order);
+      else result.push({ title, orders: [order] });
+    }
+
+    return result;
+    // `now` har renderda yangilanadi, lekin guruh sarlavhasi kun aniqligida
+    // hisoblanadi — uni bogʻliqlikka qoʻshish keraksiz qayta hisoblash beradi.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orders, filter]);
+
+  const isEmpty = groups.length === 0;
 
   return (
     <ScreenShell
@@ -74,26 +95,42 @@ export function OrdersTab() {
           action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
           inline
         />
-      ) : visible.length === 0 ? (
-        <EmptyState icon={SearchX} title="Hech narsa topilmadi" className="mt-24"
+      ) : isEmpty ? (
+        <EmptyState
+          icon={SearchX}
+          title="Bu boʻlimda buyurtma yoʻq"
+          description="Boshqa filtrni tanlab koʻring"
+          className="mt-24"
           inline
         />
       ) : (
-        <ul className="mt-16 flex flex-col gap-12">
-          {visible.map((order) => (
-            <li key={order.id}>
-              <OrderCard
-                serviceIcon={serviceIcon(order.categoryIconKey)}
-                serviceName={order.categoryName}
-                status={order.status}
-                createdAt={order.createdAt}
-                now={new Date()}
-                price={order.price}
-                onSelect={() => navigate(`/app/order/${order.id}`)}
-              />
-            </li>
-          ))}
-        </ul>
+        groups.map((group) => (
+          <section key={group.title} className="mt-20 first:mt-16">
+            <h2 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h2>
+            <ul className="mt-8 flex flex-col gap-8">
+              {group.orders.map((order) => (
+                <li key={order.id}>
+                  <OrderCard
+                    serviceIcon={serviceIcon(order.categoryIconKey)}
+                    serviceName={order.categoryName}
+                    status={order.status}
+                    createdAt={order.createdAt}
+                    now={now}
+                    // "Bugun"/"Kecha" guruhida sarlavha kunni allaqachon
+                    // aytgan — kartada faqat vaqt qoladi.
+                    dateLabel={
+                      group.title === 'Bugun' || group.title === 'Kecha'
+                        ? formatTime(order.createdAt)
+                        : undefined
+                    }
+                    price={order.price}
+                    onSelect={() => navigate(`/app/order/${order.id}`)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
       )}
 
       <div className="h-bottom-reserve" aria-hidden />
@@ -101,7 +138,6 @@ export function OrdersTab() {
   );
 }
 
-/** 25 · Bildirishnomalar. */
 export function NotificationsTab() {
   const navigate = useNavigate();
   const { notifications, unreadCount, markNotificationsRead } = useApp();
