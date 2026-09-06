@@ -48,7 +48,7 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
           key={master.id}
           type="button"
           onClick={() => onSelect(master.id)}
-          className="flex w-[64px] shrink-0 flex-col items-center gap-4 transition-transform duration-press ease-emphasized active:scale-[0.94]"
+          className="flex w-[60px] shrink-0 flex-col items-center gap-2 transition-transform duration-press ease-emphasized active:scale-[0.94]"
         >
           {/*
             Ikki qatlamli halqa: tashqarida oltin gradient, ichkarida hero
@@ -57,7 +57,7 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
           */}
           <span className="rounded-full bg-gradient-to-br from-star to-illus-hi-vis p-[2px]">
             <span className="block rounded-full border-2 border-surface-hero">
-              <Avatar name={master.fullName} src={master.photoUrl} size={48} />
+              <Avatar name={master.fullName} src={master.photoUrl} size={44} />
             </span>
           </span>
 

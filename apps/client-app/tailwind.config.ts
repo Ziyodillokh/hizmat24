@@ -89,8 +89,10 @@ export default {
          * bogʻliq va CSS uni oʻzi hisoblay olmaydi.
          */
         marquee: {
-          '0%, 14%': { transform: 'translateX(0)' },
-          '48%, 62%': { transform: 'translateX(calc(-1 * var(--marquee-distance)))' },
+          // Boshida uzoqroq turadi: ekran ochilganda foydalanuvchi avval
+          // toʻliq ismni oʻqiydi, keyin matn suriladi.
+          '0%, 24%': { transform: 'translateX(0)' },
+          '54%, 70%': { transform: 'translateX(calc(-1 * var(--marquee-distance)))' },
           '96%, 100%': { transform: 'translateX(0)' },
         },
         shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },

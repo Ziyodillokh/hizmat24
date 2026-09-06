@@ -74,7 +74,17 @@ export function MarqueeText({ text, className }: MarqueeTextProps) {
       // `title` — matn kesilgan holatda ham toʻliq nom qurilma
       // yordamchi texnologiyalariga yetib borsin.
       title={text}
-      className={cn('block overflow-hidden whitespace-nowrap', className)}
+      className={cn(
+        'block overflow-hidden whitespace-nowrap',
+        /*
+         * Surilish paytida matn chekkada KESKIN kesilardi va bu buzuq
+         * renderdek koʻrinardi ("Sardor" -> "ardor"). Maska chekkalarni
+         * yumshoq soʻndiradi, shunda harakat ataylab qilinganini bildiradi.
+         */
+        isScrolling &&
+          '[mask-image:linear-gradient(to_right,transparent,black_10px,black_calc(100%-10px),transparent)]',
+        className,
+      )}
     >
       <span
         ref={innerRef}

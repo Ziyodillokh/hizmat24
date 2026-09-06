@@ -124,8 +124,8 @@ export function HomeTab() {
           </section>
         )}
 
-        <h2 className="pt-16 text-h3 text-text-primary">Mashhur xizmatlar</h2>
-        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-8">
+        <h2 className="pt-12 text-h3 text-text-primary">Mashhur xizmatlar</h2>
+        <div className="mt-8 grid grid-cols-4 gap-8 gap-y-8">
           {groups.map((group) => (
             <ServiceGroupTile
               key={group.id}
@@ -144,7 +144,7 @@ export function HomeTab() {
           />
         </div>
 
-        <h2 className="pt-12 text-h3 text-text-primary">Sizga tavsiya etiladiganlar</h2>
+        <h2 className="pt-8 text-h3 text-text-primary">Sizga tavsiya etiladiganlar</h2>
         <ul className="mt-8 grid grid-cols-2 items-stretch gap-12">
           {SUGGESTED_MASTERS.map((master) => (
             <li key={master.id} className="min-w-0">
@@ -161,7 +161,6 @@ export function HomeTab() {
           ))}
         </ul>
 
-        <div className="h-4" aria-hidden />
       </main>
 
       <AppTabBar active="home" />

@@ -52,7 +52,7 @@ export function MasterSuggestionCard({
         className="flex min-w-0 items-center gap-8 text-left"
         aria-label={`${name} — ${profession}`}
       >
-        <Avatar name={name} src={photoUrl} size={48} shape="square" className="shrink-0" />
+        <Avatar name={name} src={photoUrl} size={44} shape="square" className="shrink-0" />
 
         <span className="min-w-0 flex-1">
           <MarqueeText
@@ -60,7 +60,7 @@ export function MasterSuggestionCard({
             className="text-body-sm font-semibold leading-tight text-text-primary"
           />
           <span className="mt-2 block truncate text-caption text-text-secondary">{profession}</span>
-          <span className="mt-4 flex items-center gap-4">
+          <span className="mt-2 flex items-center gap-4">
             <Icon icon={Star} size={14} weight="fill" className="text-star" aria-hidden />
             <span className="tabular text-caption text-text-primary">{formatRating(rating)}</span>
           </span>
@@ -68,13 +68,13 @@ export function MasterSuggestionCard({
       </button>
 
       {/* `OrderCard` va `ServiceCard` dagi kabi ajratuvchi chiziq. */}
-      <span className="-mx-12 mb-8 mt-12 block h-px bg-border" aria-hidden />
+      <span className="-mx-12 mb-8 mt-8 block h-px bg-border" aria-hidden />
 
       <button
         type="button"
         onClick={onAction}
         className={cn(
-          'mt-auto flex min-h-[38px] w-full items-center justify-center rounded-md px-8',
+          'mt-auto flex min-h-[36px] w-full items-center justify-center rounded-md px-8',
           'bg-primary text-button-sm text-on-primary shadow-primary-lift',
           'transition-[transform,background-color,box-shadow] duration-press ease-emphasized',
           'active:scale-[0.97] active:bg-primary-pressed active:text-on-primary-deep active:shadow-e1',
