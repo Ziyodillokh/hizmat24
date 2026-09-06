@@ -1,5 +1,5 @@
+import { Check, ShieldWarning } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import { Check, ShieldAlert } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
@@ -70,7 +70,7 @@ export function ConfirmMasterScreen({ variant = 'default' }: ConfirmMasterScreen
           </span>
         </div>
 
-        <Banner variant="warning" icon={ShieldAlert} className="mt-24 w-full">
+        <Banner variant="warning" icon={ShieldWarning} className="mt-24 w-full">
           Kelgan odam suratdagi ustaga oʻxshamasa — «Yoʻq, bu boshqa odam» tugmasini
           bosing.
         </Banner>

@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
-import { Bell, ChevronRight, ClipboardList, Headset, Info, LogOut } from 'lucide-react';
+import { Bell, CaretRight, ClipboardText, Headset, Info, SignOut } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Avatar } from '@/components/Avatar';
 import { BottomNav } from '@/components/BottomNav';
 import { Header } from '@/components/Header';
@@ -10,7 +10,6 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { maskPhone } from '@/lib/formatters';
 import { USER, USER_WITHOUT_NAME } from '@/mocks/user';
-import { UNREAD_COUNT } from '@/mocks/notifications';
 
 /**
  * 26 · Profil — READ-ONLY.
@@ -26,18 +25,18 @@ export interface ProfileScreenProps {
 }
 
 interface MenuItem {
-  icon: LucideIcon;
+  icon: IconGlyph;
   label: string;
   hint?: string;
   danger?: boolean;
 }
 
 const MENU: MenuItem[] = [
-  { icon: ClipboardList, label: 'Buyurtmalar tarixi' },
+  { icon: ClipboardText, label: 'Buyurtmalar tarixi' },
   { icon: Bell, label: 'Bildirishnomalar', hint: 'Yoqilgan' },
   { icon: Headset, label: "Qoʻllab-quvvatlash xizmati" },
   { icon: Info, label: 'Ilova haqida', hint: '1.0.0' },
-  { icon: LogOut, label: 'Chiqish', danger: true },
+  { icon: SignOut, label: 'Chiqish', danger: true },
 ];
 
 function MenuRow({ item }: { item: MenuItem }) {
@@ -57,7 +56,7 @@ function MenuRow({ item }: { item: MenuItem }) {
         {item.label}
       </span>
       {item.hint && <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>}
-      {!item.danger && <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />}
+      {!item.danger && <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />}
     </button>
   );
 }
@@ -69,7 +68,7 @@ export function ProfileScreen({ variant = 'with-name' }: ProfileScreenProps) {
   return (
     <ScreenShell
       header={<Header variant="inner" title="Profil" />}
-      footer={<BottomNav active="profile" unreadCount={UNREAD_COUNT} onSelect={() => undefined} />}
+      footer={<BottomNav active="profile" onSelect={() => undefined} />}
     >
       <div className="mt-4 flex flex-col items-center">
         <Avatar name={user.fullName} size={80} />

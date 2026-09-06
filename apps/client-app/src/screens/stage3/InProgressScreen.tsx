@@ -1,4 +1,4 @@
-import { Wrench } from 'lucide-react';
+import { Wrench } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { ConnectionBanner } from '@/components/ConnectionBanner';

@@ -1,15 +1,5 @@
-import {
-  BellRing,
-  CheckCircle2,
-  Headset,
-  ListOrdered,
-  Navigation,
-  ShieldAlert,
-  UserCheck,
-  Wrench,
-  XCircle,
-  type LucideIcon,
-} from 'lucide-react';
+import { BellRinging, CheckCircle, Headset, ListNumbers, NavigationArrow, ShieldWarning, UserCheck, Wrench, XCircle } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { formatDateTime } from '@/lib/formatters';
 import { Icon } from './Icon';
@@ -35,20 +25,20 @@ export type NotificationType =
 export type NotificationTone = 'primary' | 'warning' | 'success' | 'danger' | 'secondary';
 
 export interface NotificationVisual {
-  icon: LucideIcon;
+  icon: IconGlyph;
   tone: NotificationTone;
 }
 
 /** 25-ekran: "9 ta tur uchun ikona va rang xaritasi" — aynan shu jadval. */
 export const NOTIFICATION_ICONS: Record<NotificationType, NotificationVisual> = {
   MASTER_ASSIGNED: { icon: UserCheck, tone: 'primary' },
-  MASTER_EN_ROUTE: { icon: Navigation, tone: 'primary' },
-  MASTER_ARRIVED: { icon: BellRing, tone: 'warning' },
-  QUEUED: { icon: ListOrdered, tone: 'warning' },
+  MASTER_EN_ROUTE: { icon: NavigationArrow, tone: 'primary' },
+  MASTER_ARRIVED: { icon: BellRinging, tone: 'warning' },
+  QUEUED: { icon: ListNumbers, tone: 'warning' },
   WORK_STARTED: { icon: Wrench, tone: 'primary' },
-  WORK_COMPLETED: { icon: CheckCircle2, tone: 'success' },
+  WORK_COMPLETED: { icon: CheckCircle, tone: 'success' },
   ORDER_CANCELLED: { icon: XCircle, tone: 'secondary' },
-  SAFETY_FLAGGED: { icon: ShieldAlert, tone: 'danger' },
+  SAFETY_FLAGGED: { icon: ShieldWarning, tone: 'danger' },
   OPERATOR_SEARCHING: { icon: Headset, tone: 'warning' },
 };
 
@@ -108,7 +98,7 @@ export function NotificationRow({
         )}
         aria-hidden
       >
-        <Icon icon={icon} size={20} />
+        <Icon icon={icon} size={20} weight="duotone" />
       </span>
 
       <span className="min-w-0 flex-1">

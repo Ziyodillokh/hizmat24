@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
-import { BellRing, MapPin } from 'lucide-react';
+import { BellRinging, MapPin } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { StatusBar } from '@/preview/StatusBar';
@@ -19,7 +19,7 @@ export interface PermissionScreenProps {
 }
 
 interface PermissionCopy {
-  icon: LucideIcon;
+  icon: IconGlyph;
   title: string;
   description: string;
   deniedTitle: string;
@@ -36,7 +36,7 @@ const COPY: Record<PermissionKind, PermissionCopy> = {
       "Ruxsatsiz manzilni xaritada avtomatik aniqlab boʻlmaydi — uni qoʻlda kiritishingiz kerak boʻladi",
   },
   notifications: {
-    icon: BellRing,
+    icon: BellRinging,
     title: 'Bildirishnomalarni yoqing',
     description: "Usta topilganda, yoʻlga chiqqanda va yetib kelganda xabar beramiz",
     deniedTitle: "Bildirishnomalar oʻchirilgan",

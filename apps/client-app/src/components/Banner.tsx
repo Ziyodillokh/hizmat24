@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
@@ -33,7 +33,7 @@ const VARIANT_CLASSES: Record<BannerVariant, { wrap: string; icon: string }> = {
 export interface BannerProps {
   variant?: BannerVariant;
   /** Chapdagi 20px ikona — ixtiyoriy, rangi variantdan olinadi. */
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   className?: string;
   children: ReactNode;
 }

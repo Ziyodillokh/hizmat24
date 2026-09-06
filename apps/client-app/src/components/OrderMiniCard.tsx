@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/formatters';
 import type { OrderStatus } from '@/lib/orderStateMachine';
@@ -43,7 +43,7 @@ function splitFormattedPrice(amount: number): { value: string; currency: string 
 
 export interface OrderMiniCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */
-  serviceIcon: LucideIcon;
+  serviceIcon: IconGlyph;
   /** Xizmat nomi serverdan keladi, UI oʻz matnini toʻqimaydi. */
   serviceName: string;
   status: OrderStatus;

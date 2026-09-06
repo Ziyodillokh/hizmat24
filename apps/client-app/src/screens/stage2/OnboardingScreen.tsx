@@ -1,4 +1,4 @@
-import { Wrench, WifiOff } from 'lucide-react';
+import { WifiSlash, Wrench } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Icon } from '@/components/Icon';
@@ -52,7 +52,7 @@ export function OnboardingScreen({ variant = 'ready' }: OnboardingScreenProps) {
     return (
       <ScreenShell className="flex flex-col">
         <EmptyState
-          icon={WifiOff}
+          icon={WifiSlash}
           title="Internetga ulanish yoʻq"
           action={{ label: 'Qayta urinish', onClick: () => undefined }}
         />

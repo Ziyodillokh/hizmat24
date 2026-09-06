@@ -1,4 +1,4 @@
-import { XCircle } from 'lucide-react';
+import { XCircle } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { StatusBar } from '@/preview/StatusBar';

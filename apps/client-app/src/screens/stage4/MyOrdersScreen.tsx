@@ -1,5 +1,5 @@
+import { ClipboardText, FileMagnifyingGlass } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { ClipboardList, SearchX } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { EmptyState } from '@/components/EmptyState';
@@ -16,7 +16,6 @@ import {
   type HistoryFilter,
 } from '@/lib/orderStateMachine';
 import { ORDER_HISTORY, NOW } from '@/mocks/orders';
-import { UNREAD_COUNT } from '@/mocks/notifications';
 
 /**
  * 24 · Buyurtmalarim.
@@ -66,7 +65,7 @@ export function MyOrdersScreen({ variant = 'ready', initialFilter = 'all' }: MyO
   return (
     <ScreenShell
       header={<Header variant="inner" title="Buyurtmalarim" />}
-      footer={<BottomNav active="orders" unreadCount={UNREAD_COUNT} onSelect={() => undefined} />}
+      footer={<BottomNav active="orders" onSelect={() => undefined} />}
     >
       {variant === 'offline' && <ConnectionBanner state="reconnecting" />}
 
@@ -80,13 +79,13 @@ export function MyOrdersScreen({ variant = 'ready', initialFilter = 'all' }: MyO
         <OrdersSkeleton />
       ) : variant === 'empty' ? (
         <EmptyState
-          icon={ClipboardList}
+          icon={ClipboardText}
           title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
         />
       ) : isFilterEmpty ? (
-        <EmptyState icon={SearchX} title="Hech narsa topilmadi" className="mt-24"
+        <EmptyState icon={FileMagnifyingGlass} title="Hech narsa topilmadi" className="mt-24"
           inline
         />
       ) : (

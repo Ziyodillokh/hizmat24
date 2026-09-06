@@ -1,4 +1,4 @@
-import { Headset } from 'lucide-react';
+import { Headset } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { ConnectionBanner } from '@/components/ConnectionBanner';

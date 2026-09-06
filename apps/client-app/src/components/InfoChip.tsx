@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
@@ -19,7 +19,7 @@ const TONE_CLASSES: Record<InfoChipTone, string> = {
 };
 
 export interface InfoChipProps {
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   tone?: InfoChipTone;
   /** Matn 8.2/8.5-bandlar boʻyicha formatlangan holda uzatiladi. */
   children: ReactNode;

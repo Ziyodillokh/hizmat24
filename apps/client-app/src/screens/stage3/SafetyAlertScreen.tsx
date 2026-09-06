@@ -1,4 +1,4 @@
-import { ShieldAlert } from 'lucide-react';
+import { ShieldWarning } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { StatusBar } from '@/preview/StatusBar';
@@ -20,7 +20,7 @@ export function SafetyAlertScreen() {
       <StatusBar />
 
       <main className="flex flex-1 flex-col items-center justify-center px-20">
-        <Icon icon={ShieldAlert} size={72} className="text-danger" />
+        <Icon icon={ShieldWarning} size={72} className="text-danger" />
 
         <h1 className="mt-24 text-center text-h1 text-text-primary">
           Signalingiz qabul qilindi

@@ -1,6 +1,6 @@
+import { FileMagnifyingGlass } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { SearchField } from '@/components/SearchField';
@@ -71,7 +71,7 @@ export function AllServicesTab() {
 
       {results.length === 0 ? (
         <EmptyState
-          icon={SearchX}
+          icon={FileMagnifyingGlass}
           title="Hech narsa topilmadi"
           action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => setQuery('') }}
           inline

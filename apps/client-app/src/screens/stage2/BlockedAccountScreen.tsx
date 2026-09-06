@@ -1,4 +1,4 @@
-import { ShieldAlert } from 'lucide-react';
+import { ShieldWarning } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
@@ -22,7 +22,7 @@ export function BlockedAccountScreen() {
         </StickyFooter>
       }
     >
-      <Icon icon={ShieldAlert} size={64} className="text-danger" aria-hidden />
+      <Icon icon={ShieldWarning} size={64} className="text-danger" aria-hidden />
       <h1 className="mt-20 text-h1 text-text-primary">Hisobingiz bloklangan</h1>
       {/* Server matni 2 satrgacha blok sifatida joylashadi (12.3-band, A). */}
       <p className="mt-12 text-body text-text-secondary">{SERVER_MESSAGE}</p>

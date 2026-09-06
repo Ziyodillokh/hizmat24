@@ -1,5 +1,5 @@
+import { Warning } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
@@ -29,7 +29,7 @@ export function SafetyConfirmModal({ variant = 'default' }: SafetyConfirmModalPr
 
       <Modal open>
         <div className="flex flex-col items-center">
-          <Icon icon={AlertTriangle} size={48} className="text-danger" />
+          <Icon icon={Warning} size={48} className="text-danger" />
           <h3 className="mt-16 text-center text-h3 text-text-primary">
             Bu amalni bekor qilib boʻlmaydi
           </h3>

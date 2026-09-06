@@ -1,4 +1,4 @@
-import { BellOff } from 'lucide-react';
+import { BellSlash } from '@phosphor-icons/react';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/Button';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
@@ -29,7 +29,7 @@ export function NotificationsScreen({ variant = 'ready' }: NotificationsScreenPr
   return (
     <ScreenShell
       header={<Header variant="inner" title="Bildirishnomalar" />}
-      footer={<BottomNav active="notifications" unreadCount={unread} onSelect={() => undefined} />}
+      footer={<BottomNav active="home" onSelect={() => undefined} />}
     >
       {variant === 'offline' && <ConnectionBanner state="reconnecting" />}
 
@@ -57,7 +57,7 @@ export function NotificationsScreen({ variant = 'ready' }: NotificationsScreenPr
         </ul>
       ) : items.length === 0 ? (
         <EmptyState
-          icon={BellOff}
+          icon={BellSlash}
           title="Bildirishnomalar yoʻq"
           description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
           inline

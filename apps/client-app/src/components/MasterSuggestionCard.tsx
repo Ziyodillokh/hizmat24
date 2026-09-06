@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react';
+import { Star } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
 import { Avatar } from './Avatar';
@@ -62,7 +62,7 @@ export function MasterSuggestionCard({
       <div className="flex items-center gap-4">
         {/* Bitta toʻldirilgan yulduz + raqam: beshta yulduz tor katakchada
             reytingning oʻzidan koʻproq joy egallardi. */}
-        <Icon icon={Star} size={16} className="fill-star text-star" aria-hidden />
+        <Icon icon={Star} size={16} weight="fill" className="text-star" aria-hidden />
         <span className="tabular text-numeric-sm text-text-primary">{formatRating(rating)}</span>
       </div>
 

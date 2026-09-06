@@ -1,6 +1,6 @@
+import { Clock, Drop, Lightning, MagnifyingGlass, Plug, Tray } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Droplet, Inbox, Plug, Search, Zap } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { Banner } from '@/components/Banner';
@@ -91,7 +91,7 @@ function Gallery() {
       <GallerySection title="9.5 / 9.6 · Grid elementi va xizmat kartasi">
         <div className="flex w-[300px] gap-12">
           <ServiceGroupTile label="Elektrik xizmatlari" icon={Plug} />
-          <ServiceGroupTile label="Santexnika" icon={Droplet} />
+          <ServiceGroupTile label="Santexnika" icon={Drop} />
         </div>
         <div className="w-[340px]">
           <ServiceCard name="Rozetka oʻrnatish" description="Bitta nuqta" price={80_000} icon={Plug} onSelect={() => undefined} />
@@ -129,7 +129,7 @@ function Gallery() {
 
       <GallerySection title="9.8 / 9.13 · Buyurtma va bildirishnoma qatorlari">
         <div className="w-[340px]">
-          <OrderCard serviceIcon={Droplet} serviceName="Kran taʼmirlash" status={ORDER_STATUS.CLOSED} createdAt={NOW} now={NOW} price={100_000} onSelect={() => undefined} />
+          <OrderCard serviceIcon={Drop} serviceName="Kran taʼmirlash" status={ORDER_STATUS.CLOSED} createdAt={NOW} now={NOW} price={100_000} onSelect={() => undefined} />
         </div>
         <div className="w-[340px]">
           <NotificationRow type="MASTER_ARRIVED" title="Usta yetib keldi" body="Iltimos, kelgan ustani tasdiqlang" createdAt={NOW} now={NOW} isUnread />
@@ -152,7 +152,7 @@ function Gallery() {
         </GalleryRow>
         <GalleryRow label="InfoChip">
           <InfoChip icon={Clock} tone="primary">Taxminiy vaqt: 15 daqiqa</InfoChip>
-          <InfoChip icon={Zap} tone="warning">Shoshilinch</InfoChip>
+          <InfoChip icon={Lightning} tone="warning">Shoshilinch</InfoChip>
           <InfoChip>~3-oʻrin</InfoChip>
         </GalleryRow>
         <GalleryRow label="SegmentControl">
@@ -208,10 +208,10 @@ function Gallery() {
         </GalleryRow>
         <GalleryRow label="Boʻsh holat">
           <div className="w-[340px]">
-            <EmptyState icon={Inbox} title="Bildirishnomalar yoʻq" description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi" />
+            <EmptyState icon={Tray} title="Bildirishnomalar yoʻq" description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi" />
           </div>
           <div className="w-[340px]">
-            <EmptyState icon={Search} title="Hech narsa topilmadi" action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => undefined }} />
+            <EmptyState icon={MagnifyingGlass} title="Hech narsa topilmadi" action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => undefined }} />
           </div>
         </GalleryRow>
         <GalleryRow label="Radar">
@@ -221,9 +221,9 @@ function Gallery() {
       </GallerySection>
 
       <GallerySection title="9.14 / 9.15 · Header va pastki navigatsiya">
-        <div className="w-full"><Header variant="home" name="Jasur" phone="+998901234567" now={NOW} unreadCount={3} /></div>
+        <div className="w-full"><Header variant="home" name="Jasur" phone="+998901234567" now={NOW} /></div>
         <div className="w-full"><Header variant="inner" title="Barcha xizmatlar" /></div>
-        <div className="w-full"><BottomNav active="home" unreadCount={3} onSelect={() => undefined} /></div>
+        <div className="w-full"><BottomNav active="home" onSelect={() => undefined} /></div>
       </GallerySection>
 
       <GallerySection title="Spinner">

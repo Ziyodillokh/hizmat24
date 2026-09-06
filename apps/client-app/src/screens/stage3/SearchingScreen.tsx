@@ -1,4 +1,4 @@
-import { Headset, Search } from 'lucide-react';
+import { Headset, MagnifyingGlass } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -50,7 +50,7 @@ export function SearchingScreen({ variant = 'searching' }: SearchingScreenProps)
         {/* Operator holatida radar TOʻXTAYDI — statik operator ikonasi qoladi. */}
         <RadarBlock
           variant={isOperator ? 'static' : 'animated'}
-          icon={isOperator ? Headset : Search}
+          icon={isOperator ? Headset : MagnifyingGlass}
         />
 
         <h2 className="mt-24 text-center text-h2 text-text-primary">{HEADING[variant]}</h2>

@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 import { Spinner } from './Spinner';
@@ -38,7 +38,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   loading?: boolean;
   loadingLabel?: string;
   fullWidth?: boolean;
-  leadingIcon?: LucideIcon;
+  leadingIcon?: IconGlyph;
   children: ReactNode;
 }
 

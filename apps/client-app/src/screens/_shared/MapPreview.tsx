@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react';
+import { MapPin } from '@phosphor-icons/react';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/lib/cn';
 

@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import type { InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
@@ -50,7 +50,7 @@ export function SearchField({
         {...rest}
       />
       <Icon
-        icon={Search}
+        icon={MagnifyingGlass}
         size={20}
         aria-hidden
         className={cn(

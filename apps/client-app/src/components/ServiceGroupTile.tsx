@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ButtonHTMLAttributes } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon, type IconSize } from './Icon';
 
@@ -51,7 +51,7 @@ export interface ServiceGroupTileProps
    */
   label: string;
   /** Server bergan `iconKey` boʻyicha tanlangan vektor ikona — rasm URL emas (1-boʻlim, 16-punkt). */
-  icon: LucideIcon;
+  icon: IconGlyph;
 }
 
 export function ServiceGroupTile({
@@ -87,7 +87,7 @@ export function ServiceGroupTile({
           TILE_CIRCLE_CLASSES[tone],
         )}
       >
-        <Icon icon={icon} size={iconSize} className={TILE_ICON_CLASSES[tone]} aria-hidden />
+        <Icon icon={icon} size={iconSize} weight="duotone" className={TILE_ICON_CLASSES[tone]} aria-hidden />
       </span>
 
       {/* Nomni yorliq oʻzi aytadi, ikona dekorativ — shuning uchun u `aria-hidden`. */}

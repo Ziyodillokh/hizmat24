@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
-import { ChevronRight, Clock, Phone, Send } from 'lucide-react';
+import { CaretRight, Clock, PaperPlaneTilt, Phone } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
@@ -18,14 +18,14 @@ export interface SupportScreenProps {
 }
 
 interface ChannelItem {
-  icon: LucideIcon;
+  icon: IconGlyph;
   label: string;
   value: string;
 }
 
 const CHANNELS: ChannelItem[] = [
   { icon: Phone, label: "Telefon orqali bogʻlanish", value: '+998 71 200 24 24' },
-  { icon: Send, label: 'Telegram orqali yozish', value: '@hizmat24_support' },
+  { icon: PaperPlaneTilt, label: 'Telegram orqali yozish', value: '@hizmat24_support' },
 ];
 
 export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
@@ -51,7 +51,7 @@ export function SupportScreen({ variant = 'default' }: SupportScreenProps) {
               <span className="block text-body-lg text-text-primary">{channel.label}</span>
               <span className="block text-body-sm text-text-secondary">{channel.value}</span>
             </span>
-            <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
+            <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />
           </button>
         ))}
       </nav>

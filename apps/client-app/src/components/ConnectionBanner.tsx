@@ -1,4 +1,4 @@
-import { TriangleAlert } from 'lucide-react';
+import { Warning } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -50,7 +50,7 @@ export function ConnectionBanner({ state, onRefresh, className }: ConnectionBann
       {state === 'reconnecting' ? (
         <Spinner size={16} className="text-current" />
       ) : (
-        <Icon icon={TriangleAlert} size={16} />
+        <Icon icon={Warning} size={16} />
       )}
       <span className="truncate text-body-sm">{STATE_MESSAGES[state]}</span>
       {state === 'stalled' && (

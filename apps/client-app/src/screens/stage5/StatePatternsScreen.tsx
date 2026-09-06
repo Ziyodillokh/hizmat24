@@ -1,5 +1,5 @@
+import { BellSlash, ClipboardText, FileMagnifyingGlass, WifiSlash } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { BellOff, ClipboardList, SearchX, WifiOff } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
@@ -43,18 +43,18 @@ export function StatePatternsScreen() {
 
       <Section title="12.2 · Boʻsh holatlar">
         <EmptyState
-          icon={ClipboardList}
+          icon={ClipboardText}
           title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
         />
         {/* Tugmasiz variant: bildirishnomalar boʻsh boʻlganda CTA qoʻyilmaydi. */}
         <EmptyState
-          icon={BellOff}
+          icon={BellSlash}
           title="Bildirishnomalar yoʻq"
           description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
         />
-        <EmptyState icon={SearchX} title="Hech narsa topilmadi" />
+        <EmptyState icon={FileMagnifyingGlass} title="Hech narsa topilmadi" />
       </Section>
 
       <Section title="12.3 · Xato holatlari">
@@ -64,7 +64,7 @@ export function StatePatternsScreen() {
         </Banner>
         <Banner variant="info">Usta ishni boshladi</Banner>
         <EmptyState
-          icon={WifiOff}
+          icon={WifiSlash}
           title="Internetga ulanish yoʻq"
           action={{ label: 'Qayta urinish', onClick: () => undefined }}
         />

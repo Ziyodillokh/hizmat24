@@ -1,6 +1,6 @@
+import { CaretRight } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { KeyboardEvent } from 'react';
-import { ChevronRight } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/formatters';
 import { Card } from './Card';
@@ -28,7 +28,7 @@ export interface ServiceCardProps {
   /** Soʻmdagi butun summa. */
   price: number;
   /** Xizmat turi ikonasi — outline, bitta oila (6.4-band). */
-  icon: LucideIcon;
+  icon: IconGlyph;
   onSelect?: () => void;
   className?: string;
 }
@@ -69,7 +69,7 @@ export function ServiceCard({
           className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-primary-surface"
           aria-hidden
         >
-          <Icon icon={icon} size={24} className="text-primary-pressed" />
+          <Icon icon={icon} size={24} weight="duotone" className="text-primary-pressed" />
         </span>
 
         <div className="min-w-0 flex-1">
@@ -81,7 +81,7 @@ export function ServiceCard({
         </div>
 
         {isInteractive && (
-          <Icon icon={ChevronRight} size={16} className="mt-4 shrink-0 text-text-secondary" />
+          <Icon icon={CaretRight} size={16} className="mt-4 shrink-0 text-text-secondary" />
         )}
       </div>
 

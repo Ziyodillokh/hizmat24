@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Button, type ButtonVariant } from './Button';
 import { Icon } from './Icon';
@@ -25,7 +25,7 @@ export interface EmptyStateProps {
    * egallashi kerak boʻlganda — ikona va boʻshliqlar kichrayadi.
    */
   compact?: boolean;
-  icon: LucideIcon;
+  icon: IconGlyph;
   title: string;
   description?: string;
   /** Berilmasa tugma bloki chizilmaydi VA matn ostidagi boʻshliq 0 boʻladi. */
@@ -82,6 +82,7 @@ export function EmptyState({
             <Icon
               icon={icon}
               size={compact ? 24 : 40}
+              weight="duotone"
               className="text-primary/[0.55]"
               aria-hidden
             />

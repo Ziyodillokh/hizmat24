@@ -1,4 +1,4 @@
-import { User } from 'lucide-react';
+import { User } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon, type IconSize } from './Icon';
 

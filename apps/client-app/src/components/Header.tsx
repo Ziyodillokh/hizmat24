@@ -1,5 +1,5 @@
+import { ArrowLeft, Bell } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import { ArrowLeft, Bell } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatPhone, greeting } from '@/lib/formatters';
 import { Avatar } from './Avatar';

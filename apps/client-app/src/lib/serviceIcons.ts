@@ -1,29 +1,5 @@
-import {
-  AirVent,
-  Armchair,
-  Cable,
-  CookingPot,
-  DoorOpen,
-  Droplet,
-  Flame,
-  Hammer,
-  Heater,
-  LayoutGrid,
-  Lightbulb,
-  PaintRoller,
-  Paintbrush,
-  Plug,
-  ShowerHead,
-  SprayCan,
-  Thermometer,
-  Toilet,
-  ToggleLeft,
-  WashingMachine,
-  Waves,
-  Wrench,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { Armchair, CookingPot, Door, Drop, Fan, Fire, Hammer, Lightbulb, Lightning, PaintBrush, PaintRoller, Plug, Plugs, Shower, SprayBottle, SquaresFour, Thermometer, ThermometerHot, ToggleLeft, Toilet, WashingMachine, Waves, Wrench } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { IconSize } from '@/components/Icon';
 
 /**
@@ -36,40 +12,40 @@ import type { IconSize } from '@/components/Icon';
  * xizmat bitta bir xil glif bilan chizilardi — hech bir haqiqiy ilova
  * vertikal roʻyxatda bitta gliftni toʻrt marta takrorlamaydi.
  */
-const ICONS: Record<string, LucideIcon> = {
+const ICONS: Record<string, IconGlyph> = {
   // Guruhlar
-  // `Plug` katakchadagi eng yengil glif edi; `Zap` xizmat turini aniqroq beradi.
-  electrician: Zap,
-  plumber: Droplet,
-  gas: Flame,
+  // `Plug` katakchadagi eng yengil glif edi; `Lightning` xizmat turini aniqroq beradi.
+  electrician: Lightning,
+  plumber: Drop,
+  gas: Fire,
   // `Blocks` ilova vidjetiga oʻxshardi, "Texnika" ga emas.
   appliance: WashingMachine,
   carpenter: Hammer,
   painter: PaintRoller,
   // `Sparkles` — sunʼiy intellekt mahsulotlarining eng tanish belgisi.
-  cleaning: SprayCan,
+  cleaning: SprayBottle,
 
   // Xizmatlar
   socket: Plug,
   lamp: Lightbulb,
   breaker: ToggleLeft,
-  rewire: Cable,
-  tap: ShowerHead,
+  rewire: Plugs,
+  tap: Shower,
   toilet: Toilet,
   drain: Waves,
   heating: Thermometer,
   stove: CookingPot,
-  boiler: Heater,
+  boiler: ThermometerHot,
   washer: WashingMachine,
-  ac: AirVent,
-  door: DoorOpen,
+  ac: Fan,
+  door: Door,
   furniture: Armchair,
-  wall: Paintbrush,
-  general: SprayCan,
+  wall: PaintBrush,
+  general: SprayBottle,
 };
 
 /** Nomaʼlum kalit kelsa ham layout buzilmasin — neytral zaxira ikona. */
-export const serviceIcon = (iconKey: string): LucideIcon => ICONS[iconKey] ?? Wrench;
+export const serviceIcon = (iconKey: string): IconGlyph => ICONS[iconKey] ?? Wrench;
 
 /**
  * Optik massani tenglashtirish: ixcham gliflar kattaroq, keng va zich
@@ -90,4 +66,4 @@ const ICON_SIZES: Record<string, IconSize> = {
 export const serviceIconSize = (iconKey: string): IconSize => ICON_SIZES[iconKey] ?? 28;
 
 /** Gridʼning oxirgi katakchasi — "Barchasi" (06-ekran). */
-export const MORE_ICON = LayoutGrid;
+export const MORE_ICON = SquaresFour;

@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react';
+import { Shield } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 

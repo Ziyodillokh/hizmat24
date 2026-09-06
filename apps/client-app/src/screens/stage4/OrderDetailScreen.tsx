@@ -1,4 +1,4 @@
-import { FileQuestion, Zap } from 'lucide-react';
+import { FileMagnifyingGlass, Lightning } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button, type ButtonVariant } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -81,7 +81,7 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
     return (
       <ScreenShell header={<Header variant="inner" title="Buyurtma tafsiloti" />}>
         <EmptyState
-          icon={FileQuestion}
+          icon={FileMagnifyingGlass}
           title="Buyurtma topilmadi"
           action={{ label: 'Buyurtmalarimga qaytish', onClick: () => undefined }}
         />
@@ -152,7 +152,7 @@ export function OrderDetailScreen({ variant = 'active' }: OrderDetailScreenProps
         </div>
         <p className="mt-12 text-body text-text-primary">{order.description}</p>
         {order.isUrgent && (
-          <InfoChip icon={Zap} tone="warning" className="mt-12">
+          <InfoChip icon={Lightning} tone="warning" className="mt-12">
             Shoshilinch
           </InfoChip>
         )}

@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react';
+import { Star } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
 import { Icon, type IconSize } from './Icon';
@@ -45,8 +45,11 @@ export function StarRating({ value, size = 'sm', showValue = false, onChange, cl
       key={star}
       icon={Star}
       size={icon}
-      // `fill-current` — 9.11-band talabi: boʻsh yulduz ham toʻldirilgan, faqat rangi boshqa.
-      className={cn('fill-current', box, star <= filledCount ? 'text-star' : 'text-star-empty')}
+      // Boʻsh yulduz ham TOʻLDIRILGAN, faqat rangi boshqa (9.11-band).
+      // Phosphor'da toʻldirish `fill-current` utilitasi bilan emas, ogʻirlik
+      // orqali beriladi — aks holda glif ikki qatlam boʻlib chiziladi.
+      weight="fill"
+      className={cn(box, star <= filledCount ? 'text-star' : 'text-star-empty')}
     />
   );
 

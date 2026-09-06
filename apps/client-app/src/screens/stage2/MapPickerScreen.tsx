@@ -1,4 +1,4 @@
-import { LocateFixed, TriangleAlert } from 'lucide-react';
+import { Crosshair, Warning } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -67,7 +67,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
 
       {variant === 'no-permission' && (
         <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 px-20">
-          <Banner variant="warning" icon={TriangleAlert}>
+          <Banner variant="warning" icon={Warning}>
             Joylashuvga ruxsat berilmagan
           </Banner>
           <div className="mt-16 flex flex-col gap-12">
@@ -79,7 +79,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
 
       {variant === 'error' && (
         <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 px-20">
-          <Banner variant="danger" icon={TriangleAlert}>
+          <Banner variant="danger" icon={Warning}>
             Xatolik yuz berdi. Birozdan soʻng qayta urinib koʻring.
           </Banner>
           <Button variant="secondary" className="mt-16">
@@ -99,7 +99,7 @@ export function MapPickerScreen({ variant = 'default' }: MapPickerScreenProps) {
               aria-label="Mening joylashuvim"
               className="flex h-48 w-48 items-center justify-center rounded-full border border-border bg-surface-raised shadow-e2 transition-transform active:scale-[0.98]"
             >
-              <Icon icon={LocateFixed} size={24} className="text-primary" />
+              <Icon icon={Crosshair} size={24} className="text-primary" />
             </button>
           </div>
 

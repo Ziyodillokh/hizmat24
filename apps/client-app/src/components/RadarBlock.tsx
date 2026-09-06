@@ -1,9 +1,10 @@
-import { Headset, Radar, type LucideIcon } from 'lucide-react';
+import { Broadcast, Headset } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
 /**
- * Radar animatsiya bloki — spetsifikatsiya 9.29-bandi (12-ekran).
+ * Broadcast animatsiya bloki — spetsifikatsiya 9.29-bandi (12-ekran).
  * 88px doira, 3 ta kengayuvchi `primary` halqa, markazda 32px ikona.
  * `static` varianti — "Operator koʻrib chiqmoqda" holati uchun:
  * animatsiya yoʻq, 64px operator ikonasi.
@@ -18,15 +19,15 @@ const ICON_SIZE: Record<RadarVariant, 32 | 64> = {
   static: 64,
 };
 
-const DEFAULT_ICON: Record<RadarVariant, LucideIcon> = {
-  animated: Radar,
+const DEFAULT_ICON: Record<RadarVariant, IconGlyph> = {
+  animated: Broadcast,
   static: Headset,
 };
 
 export interface RadarBlockProps {
   variant?: RadarVariant;
   /** Markaziy ikona; berilmasa variantga mos standart ikona olinadi. */
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   className?: string;
 }
 

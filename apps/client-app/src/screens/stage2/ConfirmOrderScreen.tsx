@@ -1,4 +1,4 @@
-import { CircleAlert, Clock, TriangleAlert, Zap } from 'lucide-react';
+import { Clock, Lightning, Warning, WarningCircle } from '@phosphor-icons/react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -77,7 +77,7 @@ function AddressDetailRow({ label, value }: { label: string; value?: string }) {
 function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
   if (variant === 'server-error') {
     return (
-      <Banner variant="danger" icon={CircleAlert} className="mt-16">
+      <Banner variant="danger" icon={WarningCircle} className="mt-16">
         {SERVER_ERROR_TEXT}
       </Banner>
     );
@@ -85,7 +85,7 @@ function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
 
   if (variant === 'rate-limited') {
     return (
-      <Banner variant="danger" icon={CircleAlert} className="mt-16">
+      <Banner variant="danger" icon={WarningCircle} className="mt-16">
         <p>Juda koʻp urinish. Bir oz kuting va qayta urinib koʻring.</p>
         <InfoChip icon={Clock} className="mt-12">
           {RETRY_COUNTDOWN}
@@ -96,7 +96,7 @@ function SubmitError({ variant }: { variant: ConfirmOrderVariant }) {
 
   if (variant === 'timeout') {
     return (
-      <Banner variant="danger" icon={CircleAlert} className="mt-16">
+      <Banner variant="danger" icon={WarningCircle} className="mt-16">
         <p>Server javob bermadi. Qayta urinib koʻring.</p>
         <Button variant="secondary" size="small" fullWidth={false} className="mt-12">
           Qayta urinish
@@ -175,12 +175,12 @@ export function ConfirmOrderScreen({
 
       {/* 4-blok: "Shoshilinch" faqat yoqilgan boʻlsa koʻrinadi. */}
       {isUrgent && (
-        <InfoChip icon={Zap} tone="warning" className="mt-12">
+        <InfoChip icon={Lightning} tone="warning" className="mt-12">
           Shoshilinch
         </InfoChip>
       )}
 
-      <Banner variant="warning" icon={TriangleAlert} className="mt-24">
+      <Banner variant="warning" icon={Warning} className="mt-24">
         Buyurtma berilgandan keyin uni tahrirlab boʻlmaydi.
       </Banner>
 

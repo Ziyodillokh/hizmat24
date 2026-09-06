@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '@phosphor-icons/react';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/lib/cn';
 import workerPhoto from '@/assets/worker.webp';

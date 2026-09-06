@@ -1,6 +1,6 @@
+import { Check, ShieldWarning, Warning } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { AlertTriangle, Check, ShieldAlert } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
@@ -71,7 +71,7 @@ export function ConfirmMasterFlow() {
           </span>
         </div>
 
-        <Banner variant="warning" icon={ShieldAlert} className="mt-24 w-full">
+        <Banner variant="warning" icon={ShieldWarning} className="mt-24 w-full">
           Kelgan odam suratdagi ustaga oʻxshamasa — «Yoʻq, bu boshqa odam» tugmasini
           bosing.
         </Banner>
@@ -105,7 +105,7 @@ export function ConfirmMasterFlow() {
 
       <Modal open={rejectOpen} onClose={() => setRejectOpen(false)}>
         <div className="flex flex-col items-center">
-          <Icon icon={AlertTriangle} size={48} className="text-danger" />
+          <Icon icon={Warning} size={48} className="text-danger" />
           <h3 className="mt-16 text-center text-h3 text-text-primary">
             Bu amalni bekor qilib boʻlmaydi
           </h3>
@@ -156,7 +156,7 @@ export function SafetyAlertResult() {
       <StatusBar />
 
       <main className="flex flex-1 flex-col items-center justify-center px-20">
-        <Icon icon={ShieldAlert} size={72} className="text-danger" />
+        <Icon icon={ShieldWarning} size={72} className="text-danger" />
         <h1 className="mt-24 text-center text-h1 text-text-primary">Signalingiz qabul qilindi</h1>
         <p className="mt-8 text-center text-body text-text-secondary">
           Operatorimiz hoziroq siz bilan bogʻlanadi

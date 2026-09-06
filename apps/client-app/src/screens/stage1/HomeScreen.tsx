@@ -1,5 +1,5 @@
+import { ClipboardText } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { ClipboardList } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { BottomNav } from '@/components/BottomNav';
 import { EmptyState } from '@/components/EmptyState';
@@ -13,7 +13,6 @@ import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
 import { ORDERS, ORDER_HISTORY, NOW } from '@/mocks/orders';
-import { NOTIFICATIONS, UNREAD_COUNT } from '@/mocks/notifications';
 import { USER } from '@/mocks/user';
 import { HomeBanner } from './HomeBanner';
 import { ActiveOrderCard } from './ActiveOrderCard';
@@ -84,7 +83,6 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
           name={USER.fullName}
           phone={USER.phoneNumber}
           now={NOW}
-          unreadCount={UNREAD_COUNT}
         />
         <div className="px-20 pb-12 pt-4">
           <SearchField
@@ -148,7 +146,7 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
 
             {variant === 'no-orders' && (
               <EmptyState
-                icon={ClipboardList}
+                icon={ClipboardText}
                 title="Hozircha buyurtmalaringiz yoʻq"
                 description="Birinchi buyurtmangizni bering"
                 action={{ label: 'Ustani chaqirish', onClick: () => undefined }}
@@ -164,7 +162,6 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
 
       <BottomNav
         active="home"
-        unreadCount={NOTIFICATIONS.filter((n) => n.readAt === null).length}
         onSelect={() => undefined}
       />
       <div className="h-home-indicator shrink-0" aria-hidden />

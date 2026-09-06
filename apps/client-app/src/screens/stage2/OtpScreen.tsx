@@ -1,5 +1,5 @@
+import { Warning } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -136,7 +136,7 @@ export function OtpScreen({ variant = 'default' }: OtpScreenProps) {
         yangi xato beradi (12.3-B band).
       */}
       {variant === 'sms-failed' && (
-        <Banner variant="warning" icon={AlertTriangle} className="mt-16">
+        <Banner variant="warning" icon={Warning} className="mt-16">
           {SMS_FAILED_TEXT}
         </Banner>
       )}

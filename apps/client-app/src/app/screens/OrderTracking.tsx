@@ -1,6 +1,6 @@
+import { MagnifyingGlass, Timer, Wrench, XCircle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { Search, Timer, Wrench, XCircle } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -142,7 +142,7 @@ export function OrderTracking() {
 
       {order.status === ORDER_STATUS.SEARCHING && (
         <div className="mt-32 flex flex-col items-center">
-          <RadarBlock icon={Search} />
+          <RadarBlock icon={MagnifyingGlass} />
           <h2 className="mt-24 text-h2 text-text-primary">Usta qidirilmoqda…</h2>
           <DemoAction label="ustani darhol topish" onClick={() => advanceOrder(order.id)} />
         </div>

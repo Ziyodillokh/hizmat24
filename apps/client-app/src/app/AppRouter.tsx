@@ -16,6 +16,7 @@ import { OrderTracking } from './screens/OrderTracking';
 import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
 import { MasterProfile, NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
+import { MastersTab } from './screens/MastersTab';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
 
 /** Login qilmagan foydalanuvchini kirish oqimiga qaytaradi (1-boʻlim, 14-qoida). */
@@ -155,6 +156,14 @@ function AppRoutes() {
             element={
               <RequireAuth>
                 <OrdersTab />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="masters"
+            element={
+              <RequireAuth>
+                <MastersTab />
               </RequireAuth>
             }
           />

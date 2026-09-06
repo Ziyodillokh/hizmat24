@@ -1,4 +1,5 @@
-import { Bell, ClipboardList, House, User, type LucideIcon } from 'lucide-react';
+import { ClipboardText, House, User, UsersThree } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
@@ -7,19 +8,19 @@ import { Icon } from './Icon';
  * h=56 + 34px home indicator zonasi. AYNAN 4 element (8.2-band);
  * "Xabarlar"/"Chat" tabi yoʻq (14.2-band, 9-punkt).
  */
-export type TabKey = 'home' | 'orders' | 'notifications' | 'profile';
+export type TabKey = 'home' | 'orders' | 'masters' | 'profile';
 
 interface TabDefinition {
   key: TabKey;
   label: string;
-  icon: LucideIcon;
+  icon: IconGlyph;
 }
 
 /** Tartib ham, yorliqlar ham 8.2-banddagi jadvaldan — oʻzgartirilmaydi. */
 const TABS: readonly TabDefinition[] = [
   { key: 'home', label: 'Bosh sahifa', icon: House },
-  { key: 'orders', label: 'Buyurtmalar', icon: ClipboardList },
-  { key: 'notifications', label: 'Bildirishnomalar', icon: Bell },
+  { key: 'orders', label: 'Buyurtmalar', icon: ClipboardText },
+  { key: 'masters', label: 'Mutaxassislar', icon: UsersThree },
   { key: 'profile', label: 'Profil', icon: User },
 ];
 
@@ -31,10 +32,10 @@ type TabState = 'active' | 'inactive';
  * turkuaz boʻlgani uchun — eng sezilmas koʻrsatkich.
  */
 const ICON_CLASSES: Record<TabState, string> = {
-  // To'liq to'ldirish `ClipboardList` va `Bell` ning ichki chiziqlarini
-  // yo'q qilib, ularni bitta bo'lakka aylantirardi. Past alfali to'ldirish
-  // shaklni "og'irlashtiradi", lekin detalni saqlaydi.
-  active: 'fill-primary/[0.22] text-primary [stroke-width:2]',
+  // Toʻldirish endi Phosphor ogʻirligi orqali beriladi (`weight="fill"`) —
+  // u glifning ichki detalini saqlagan holda shaklni toʻldiradi. Lucide'da
+  // bu mumkin emasdi: `fill-*` utilitasi konturni bitta boʻlakka aylantirardi.
+  active: 'text-primary',
   inactive: 'text-text-secondary',
 };
 
@@ -83,13 +84,11 @@ export function UnreadBadge({ count, className }: UnreadBadgeProps) {
 
 export interface BottomNavProps {
   active: TabKey;
-  /** Bildirishnomalar tabidagi badge uchun (9.14-band). */
-  unreadCount?: number;
   onSelect: (tab: TabKey) => void;
   className?: string;
 }
 
-export function BottomNav({ active, unreadCount = 0, onSelect, className }: BottomNavProps) {
+export function BottomNav({ active, onSelect, className }: BottomNavProps) {
   return (
     <nav className={cn('w-full border-t border-border bg-surface', className)}>
       <ul className="flex h-tab-bar items-stretch">
@@ -107,13 +106,12 @@ export function BottomNav({ active, unreadCount = 0, onSelect, className }: Bott
                 className="flex h-full w-full flex-col items-center justify-center gap-4 px-4"
               >
                 <span className="relative flex h-[28px] w-[44px] items-center justify-center">
-                  <Icon icon={tab.icon} size={24} className={ICON_CLASSES[state]} />
-                  {tab.key === 'notifications' && (
-                    <UnreadBadge
-                      count={unreadCount}
-                      className="absolute -right-4 -top-4 ring-surface"
-                    />
-                  )}
+                  <Icon
+                    icon={tab.icon}
+                    size={24}
+                    weight={state === 'active' ? 'fill' : 'regular'}
+                    className={ICON_CLASSES[state]}
+                  />
                 </span>
                 <span className={cn('max-w-full truncate text-tab-label', LABEL_CLASSES[state])}>
                   {tab.label}

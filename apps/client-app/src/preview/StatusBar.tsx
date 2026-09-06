@@ -1,4 +1,4 @@
-import { BatteryFull, Signal, Wifi } from 'lucide-react';
+import { BatteryFull, CellSignalHigh, WifiHigh } from '@phosphor-icons/react';
 import { Icon } from '@/components/Icon';
 import { useViewportMode } from './viewport';
 
@@ -24,8 +24,8 @@ export function StatusBar() {
     <div className="flex h-status-bar shrink-0 items-end justify-between px-20 pb-8 text-text-primary">
       <span className="text-title tabular">9:41</span>
       <div className="flex items-center gap-4">
-        <Icon icon={Signal} size={16} />
-        <Icon icon={Wifi} size={16} />
+        <Icon icon={CellSignalHigh} size={16} />
+        <Icon icon={WifiHigh} size={16} />
         <Icon icon={BatteryFull} size={24} />
       </div>
     </div>

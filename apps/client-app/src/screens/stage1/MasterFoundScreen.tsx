@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+import { Clock } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { InfoChip } from '@/components/InfoChip';

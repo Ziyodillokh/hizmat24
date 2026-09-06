@@ -1,19 +1,7 @@
+import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, ShieldCheck, SignOut, Sun } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
-import {
-  Bell,
-  BellOff,
-  ChevronRight,
-  ClipboardList,
-  Headset,
-  Info,
-  LogOut,
-  Moon,
-  SearchX,
-  ShieldCheck,
-  Sun,
-} from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
@@ -92,7 +80,7 @@ export function OrdersTab() {
 
       {orders.length === 0 ? (
         <EmptyState
-          icon={ClipboardList}
+          icon={ClipboardText}
           title="Hozircha buyurtmalaringiz yoʻq"
           description="Birinchi buyurtmangizni bering"
           action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
@@ -100,7 +88,7 @@ export function OrdersTab() {
         />
       ) : isEmpty ? (
         <EmptyState
-          icon={SearchX}
+          icon={FileMagnifyingGlass}
           title="Bu boʻlimda buyurtma yoʻq"
           description="Boshqa filtrni tanlab koʻring"
           className="mt-24"
@@ -145,54 +133,81 @@ export function NotificationsTab() {
   const navigate = useNavigate();
   const { notifications, unreadCount, markNotificationsRead } = useApp();
 
+  const now = new Date();
+
+  /*
+   * Buyurtmalar roʻyxatidagi kabi sana boʻyicha guruhlash. Bildirishnomalar
+   * oqimi tez oʻsadi va guruhsiz u tugamaydigan bir xil kartalar tasmasiga
+   * aylanadi — foydalanuvchi qaysi biri bugungi ekanini ajrata olmaydi.
+   */
+  const groups = useMemo(() => {
+    const result: { title: string; items: typeof notifications }[] = [];
+
+    for (const item of notifications) {
+      const title = orderDateGroup(item.sentAt, now);
+      const last = result[result.length - 1];
+      if (last && last.title === title) last.items.push(item);
+      else result.push({ title, items: [item] });
+    }
+
+    return result;
+    // Guruh sarlavhasi kun aniqligida hisoblanadi — `now` ni bogʻliqlikka
+    // qoʻshish har renderda keraksiz qayta hisoblash beradi.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
+
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Bildirishnomalar" />}
-      footer={<AppTabBar active="notifications" />}
+      header={
+        <Header variant="inner" title="Bildirishnomalar" onBack={() => navigate('/app/home')} />
+      }
     >
-      {unreadCount > 0 && (
-        <div className="flex items-center justify-between gap-12 pt-4">
-          <p className="shrink-0 text-caption text-text-secondary">
-            {unreadCount} ta oʻqilmagan
-          </p>
-          {/*
-            Oddiy matnli amal: `Button` `button` shkalasida (16px/600) chiqib,
-            sahifa sarlavhasidan ham baland koʻrinardi va yon yorliqni ikki
-            satrga surib yuborardi.
-          */}
-          <button
-            type="button"
-            onClick={markNotificationsRead}
-            className="shrink-0 text-caption text-primary"
-          >
-            Barchasini oʻqildi
-          </button>
-        </div>
-      )}
-
       {notifications.length === 0 ? (
         <EmptyState
-          icon={BellOff}
+          icon={BellSlash}
           title="Bildirishnomalar yoʻq"
           description="Buyurtma bergach, holat oʻzgarishlari shu yerda koʻrinadi"
           inline
         />
       ) : (
-        <ul className="mt-12 flex flex-col gap-4">
-          {notifications.map((item) => (
-            <li key={item.id}>
-              <NotificationRow
-                type={notificationUiType(item.kind)}
-                title={item.title}
-                body={item.body}
-                createdAt={item.sentAt}
-                now={new Date()}
-                isUnread={item.readAt === null}
-                onSelect={() => navigate('/app/orders')}
-              />
-            </li>
+        <>
+          {/* Xulosa qatori: nechta oʻqilmagan va ularni bir bosishda yopish. */}
+          <div className="flex items-center justify-between gap-12 pt-8">
+            <p className="shrink-0 text-body-sm text-text-secondary">
+              {unreadCount > 0 ? `${unreadCount} ta oʻqilmagan` : 'Barchasi oʻqilgan'}
+            </p>
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                onClick={markNotificationsRead}
+                className="shrink-0 rounded-full bg-primary-surface px-12 py-4 text-caption text-primary-pressed"
+              >
+                Barchasini oʻqildi
+              </button>
+            )}
+          </div>
+
+          {groups.map((group) => (
+            <section key={group.title} className="mt-16 first:mt-12">
+              <h2 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h2>
+              <ul className="mt-8 flex flex-col gap-8">
+                {group.items.map((item) => (
+                  <li key={item.id}>
+                    <NotificationRow
+                      type={notificationUiType(item.kind)}
+                      title={item.title}
+                      body={item.body}
+                      createdAt={item.sentAt}
+                      now={now}
+                      isUnread={item.readAt === null}
+                      onSelect={() => navigate('/app/orders')}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </>
       )}
 
       <div className="h-bottom-reserve" aria-hidden />
@@ -201,7 +216,7 @@ export function NotificationsTab() {
 }
 
 interface MenuItem {
-  icon: LucideIcon;
+  icon: IconGlyph;
   label: string;
   hint?: string;
   onSelect?: () => void;
@@ -257,7 +272,7 @@ function MenuGroup({ section }: { section: MenuSection }) {
                 )}
                 aria-hidden
               >
-                <Icon icon={item.icon} size={20} />
+                <Icon icon={item.icon} size={20} weight="duotone" />
               </span>
 
               <span
@@ -274,7 +289,7 @@ function MenuGroup({ section }: { section: MenuSection }) {
               )}
               {item.control ??
                 (isInteractive && !item.danger && (
-                  <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
+                  <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />
                 ))}
             </Row>
           );
@@ -313,7 +328,7 @@ export function ProfileTab() {
       title: 'Hisob',
       items: [
         {
-          icon: ClipboardList,
+          icon: ClipboardText,
           label: 'Buyurtmalar tarixi',
           onSelect: () => navigate('/app/orders'),
         },
@@ -345,7 +360,7 @@ export function ProfileTab() {
     },
     {
       title: 'Sessiya',
-      items: [{ icon: LogOut, label: 'Chiqish', danger: true, onSelect: () => setLogoutOpen(true) }],
+      items: [{ icon: SignOut, label: 'Chiqish', danger: true, onSelect: () => setLogoutOpen(true) }],
     },
   ];
 

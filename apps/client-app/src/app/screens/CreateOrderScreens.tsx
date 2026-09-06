@@ -1,6 +1,6 @@
+import { Crosshair, Timer } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LocateFixed, Timer } from 'lucide-react';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -132,7 +132,7 @@ export function MapStep() {
           aria-label="Mening joylashuvim"
           className="absolute bottom-16 right-16 flex h-[48px] w-[48px] items-center justify-center rounded-full bg-surface-raised shadow-e2"
         >
-          <Icon icon={LocateFixed} size={24} className="text-primary" />
+          <Icon icon={Crosshair} size={24} className="text-primary" />
         </button>
       </div>
 

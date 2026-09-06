@@ -1,5 +1,6 @@
+import { CaretRight } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { KeyboardEvent } from 'react';
-import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatDateTime, formatPrice } from '@/lib/formatters';
 import { STATUS_CHIPS, type ChipTone, type OrderStatus } from '@/lib/orderStateMachine';
@@ -44,7 +45,7 @@ function splitFormattedPrice(amount: number): { value: string; currency: string 
 
 export interface OrderCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */
-  serviceIcon: LucideIcon;
+  serviceIcon: IconGlyph;
   /** Xizmat nomi serverdan keladi, UI oʻz matnini toʻqimaydi. */
   serviceName: string;
   status: OrderStatus;
@@ -103,7 +104,7 @@ export function OrderCard({
           )}
           aria-hidden
         >
-          <Icon icon={serviceIcon} size={24} />
+          <Icon icon={serviceIcon} size={24} weight="duotone" />
         </span>
 
         <div className="min-w-0 flex-1">
@@ -112,7 +113,7 @@ export function OrderCard({
         </div>
 
         {isInteractive && (
-          <Icon icon={ChevronRight} size={16} className="mt-4 shrink-0 text-text-secondary" />
+          <Icon icon={CaretRight} size={16} className="mt-4 shrink-0 text-text-secondary" />
         )}
       </div>
 

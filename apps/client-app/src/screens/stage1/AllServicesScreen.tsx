@@ -1,5 +1,5 @@
+import { FileMagnifyingGlass } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { SearchX } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { SearchField } from '@/components/SearchField';
 import { ServiceCard } from '@/components/ServiceCard';
@@ -57,7 +57,7 @@ export function AllServicesScreen({ initialState = 'ready' }: AllServicesScreenP
         <ServicesSkeleton />
       ) : results.length === 0 ? (
         <EmptyState
-          icon={SearchX}
+          icon={FileMagnifyingGlass}
           title="Hech narsa topilmadi"
           action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => setQuery('') }}
           inline

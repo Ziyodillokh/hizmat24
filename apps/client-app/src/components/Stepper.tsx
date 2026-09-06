@@ -1,5 +1,5 @@
+import { Check } from '@phosphor-icons/react';
 import { Fragment } from 'react';
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 import { STEPPER_LABELS, getStepperState, type OrderStatus } from '@/lib/orderStateMachine';

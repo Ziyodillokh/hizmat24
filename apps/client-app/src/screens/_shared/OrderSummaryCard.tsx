@@ -1,6 +1,6 @@
+import { Lightning } from '@phosphor-icons/react';
 import { Card } from '@/components/Card';
 import { InfoChip } from '@/components/InfoChip';
-import { Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/formatters';
 import type { Order } from '@/mocks/types';
@@ -23,7 +23,7 @@ export function OrderSummaryCard({ order, className }: OrderSummaryCardProps) {
       <p className="text-body-sm text-text-secondary">{order.address.label}</p>
 
       {order.isUrgent && (
-        <InfoChip icon={Zap} tone="warning" className="mt-4 self-start">
+        <InfoChip icon={Lightning} tone="warning" className="mt-4 self-start">
           Shoshilinch
         </InfoChip>
       )}

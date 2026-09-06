@@ -1,5 +1,5 @@
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useEffect } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
@@ -30,7 +30,7 @@ export interface ToastProps {
   message: string;
   variant?: ToastVariant;
   /** Chapdagi 20px ikona — ixtiyoriy. */
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   /** Berilsa, `durationMs` tugagach chaqiriladi. */
   onDismiss?: () => void;
   durationMs?: number;

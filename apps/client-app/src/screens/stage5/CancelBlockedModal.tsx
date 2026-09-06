@@ -1,4 +1,4 @@
-import { TriangleAlert } from 'lucide-react';
+import { Warning } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
@@ -21,7 +21,7 @@ export function CancelBlockedModal() {
 
       <Modal open>
         <div className="flex flex-col items-center">
-          <Icon icon={TriangleAlert} size={48} className="text-warning" />
+          <Icon icon={Warning} size={48} className="text-warning" />
           <h3 className="mt-16 text-center text-h3 text-text-primary">
             Bekor qilib boʻlmaydi
           </h3>

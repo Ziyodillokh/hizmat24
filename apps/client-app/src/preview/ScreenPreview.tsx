@@ -1,6 +1,6 @@
+import { ArrowLeft, Moon, Sun } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun } from 'lucide-react';
 import { Icon } from '@/components/Icon';
 import { PhoneFrame } from './PhoneFrame';
 import { DeviceView } from './DeviceView';
