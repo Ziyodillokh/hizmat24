@@ -106,6 +106,7 @@ export function MastersTab() {
                   profession={master.profession}
                   rating={master.ratingAvg}
                   completedOrders={master.completedOrdersCount}
+                  photoUrl={master.photoUrl}
                   isCertified={master.hasGovCertificate}
                   isNew={master.experienceLevel === 'NEW'}
                   onOpen={() => navigate(`/app/master/${master.id}`)}

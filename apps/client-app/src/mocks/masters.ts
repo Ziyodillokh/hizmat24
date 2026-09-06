@@ -1,3 +1,4 @@
+import akmalPhoto from '@/assets/masters/akmal.webp';
 import type { Master } from './types';
 
 /**
@@ -16,6 +17,7 @@ export const MASTERS: Record<string, Master> = {
     hasGovCertificate: true,
     ratingAvg: 4.8,
     completedOrdersCount: 142,
+    photoUrl: akmalPhoto,
     phoneNumber: '+998901112233',
   },
   dilshod: {

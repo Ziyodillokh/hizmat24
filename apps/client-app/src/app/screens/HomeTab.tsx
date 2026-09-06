@@ -144,6 +144,7 @@ export function HomeTab() {
                 name={master.fullName}
                 profession={master.profession}
                 rating={master.ratingAvg}
+                photoUrl={master.photoUrl}
                 actionLabel="Buyurtma berish"
                 onAction={() => navigate('/app/services')}
                 onOpen={() => navigate(`/app/master/${master.id}`)}

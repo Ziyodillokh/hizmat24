@@ -3,18 +3,25 @@ import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
 import { Avatar } from './Avatar';
 import { Icon } from './Icon';
+import { MarqueeText } from './MarqueeText';
 
 /**
  * Bosh sahifadagi "Sizga tavsiya etiladiganlar" kartasi.
  *
- * Ikki ustunli tor katakcha: avatar, ism, kasbi, reyting va amal tugmasi.
- * Ism va kasb `truncate` bilan — 390px ekranda ustun kengligi ~160px, uzun
- * ism qatorni buzmasligi kerak.
+ * Tuzilma referens maketdan: chapda yumaloqlangan KVADRAT foto, oʻngda ism,
+ * kasb va reyting; ostida ajratuvchi chiziq va butun enlik amal tugmasi.
+ *
+ * Ism va familiya BITTA qatorda turadi. Katakcha ~160px keng, shuning uchun
+ * uzun nom sigʻmasligi mumkin — bunda `MarqueeText` uni sekin surib
+ * koʻrsatadi. Uch nuqta bilan kesish bu yerda yaramaydi: familiya aynan
+ * ustani ajratib turadigan qism.
  */
 export interface MasterSuggestionCardProps {
   name: string;
   profession: string;
   rating: number;
+  /** Ilova ichiga joylangan rasm; boʻlmasa ism bosh harfi chiziladi. */
+  photoUrl?: string;
   actionLabel: string;
   onAction: () => void;
   onOpen?: () => void;
@@ -25,6 +32,7 @@ export function MasterSuggestionCard({
   name,
   profession,
   rating,
+  photoUrl,
   actionLabel,
   onAction,
   onOpen,
@@ -41,36 +49,32 @@ export function MasterSuggestionCard({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 items-start gap-8 text-left"
+        className="flex min-w-0 items-center gap-8 text-left"
         aria-label={`${name} — ${profession}`}
       >
-        <Avatar name={name} size={36} className="shrink-0" />
+        <Avatar name={name} src={photoUrl} size={48} shape="square" className="shrink-0" />
+
         <span className="min-w-0 flex-1">
-          {/* Ikki satrgacha: "Akmal Rahimov" 160px lik katakchada bir satrga
-              sigʻmaydi va kesilsa ustaning kim ekani oʻqilmay qoladi. */}
-          <span className="line-clamp-2 block text-body-sm font-semibold leading-tight text-text-primary">
-            {name}
-          </span>
+          <MarqueeText
+            text={name}
+            className="text-body-sm font-semibold leading-tight text-text-primary"
+          />
           <span className="mt-2 block truncate text-caption text-text-secondary">{profession}</span>
+          <span className="mt-4 flex items-center gap-4">
+            <Icon icon={Star} size={14} weight="fill" className="text-star" aria-hidden />
+            <span className="tabular text-caption text-text-primary">{formatRating(rating)}</span>
+          </span>
         </span>
       </button>
 
-      {/* `OrderCard` va `ServiceCard` dagi kabi ajratuvchi chiziq — uchala
-          karta ham bitta tuzilmada oʻqiladi. */}
-      <span className="-mx-12 mb-8 mt-auto block h-px bg-border" aria-hidden />
-
-      <div className="flex items-center gap-4">
-        {/* Bitta toʻldirilgan yulduz + raqam: beshta yulduz tor katakchada
-            reytingning oʻzidan koʻproq joy egallardi. */}
-        <Icon icon={Star} size={16} weight="fill" className="text-star" aria-hidden />
-        <span className="tabular text-numeric-sm text-text-primary">{formatRating(rating)}</span>
-      </div>
+      {/* `OrderCard` va `ServiceCard` dagi kabi ajratuvchi chiziq. */}
+      <span className="-mx-12 mb-8 mt-12 block h-px bg-border" aria-hidden />
 
       <button
         type="button"
         onClick={onAction}
         className={cn(
-          'mt-8 flex min-h-[38px] w-full items-center justify-center rounded-md px-8',
+          'mt-auto flex min-h-[38px] w-full items-center justify-center rounded-md px-8',
           'bg-primary text-button-sm text-on-primary shadow-primary-lift',
           'transition-[transform,background-color,box-shadow] duration-press ease-emphasized',
           'active:scale-[0.97] active:bg-primary-pressed active:text-on-primary-deep active:shadow-e1',

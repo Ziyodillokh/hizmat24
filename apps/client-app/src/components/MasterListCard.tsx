@@ -3,6 +3,7 @@ import { CaretRight, SealCheck, Star } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { formatRating } from '@/lib/formatters';
 import { Avatar } from './Avatar';
+import { MarqueeText } from './MarqueeText';
 import { Card } from './Card';
 import { Icon } from './Icon';
 
@@ -21,6 +22,8 @@ export interface MasterListCardProps {
   profession: string;
   rating: number;
   completedOrders: number;
+  /** Ilova ichiga joylangan rasm; boʻlmasa ism bosh harfi chiziladi. */
+  photoUrl?: string;
   /** Davlat sertifikati bor ustada ism yonida tasdiq belgisi chiziladi. */
   isCertified?: boolean;
   /** Yangi usta — kam ish bajargan; roʻyxatda ochiq belgilanadi. */
@@ -34,6 +37,7 @@ export function MasterListCard({
   profession,
   rating,
   completedOrders,
+  photoUrl,
   isCertified = false,
   isNew = false,
   onOpen,
@@ -57,21 +61,11 @@ export function MasterListCard({
       className={cn('p-12', className)}
     >
       <div className="flex items-start gap-12">
-        <Avatar name={name} size={44} className="shrink-0" />
+        <Avatar name={name} src={photoUrl} size={48} shape="square" className="shrink-0" />
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-4">
-            <p className="min-w-0 truncate text-title text-text-primary">{name}</p>
-            {isCertified && (
-              <Icon
-                icon={SealCheck}
-                size={16}
-                weight="fill"
-                className="shrink-0 text-primary"
-                aria-label="Sertifikatli"
-              />
-            )}
-          </div>
+          {/* Ism va familiya bitta qatorda; sigʻmasa sekin suriladi. */}
+          <MarqueeText text={name} className="text-title text-text-primary" />
           <p className="mt-2 truncate text-body-sm text-text-secondary">{profession}</p>
         </div>
 
@@ -91,11 +85,21 @@ export function MasterListCard({
           </span>
         </span>
 
-        {isNew && (
+        {/*
+          Sertifikat belgisi pastki qatorda: ism yonida tursa, `MarqueeText`
+          butun bo'sh joyni egallagani uchun u ismdan uzoqlashib, qator
+          chetiga yopishib qolardi.
+        */}
+        {isCertified ? (
+          <span className="flex shrink-0 items-center gap-4 rounded-full bg-primary-surface px-8 py-2 text-badge text-primary-pressed">
+            <Icon icon={SealCheck} size={14} weight="fill" aria-hidden />
+            Sertifikatli
+          </span>
+        ) : isNew ? (
           <span className="shrink-0 rounded-full bg-neutral-surface px-8 py-2 text-badge text-text-secondary">
             Yangi
           </span>
-        )}
+        ) : null}
       </div>
     </Card>
   );

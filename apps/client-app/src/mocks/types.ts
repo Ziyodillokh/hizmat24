@@ -33,6 +33,11 @@ export interface Master {
   hasGovCertificate: boolean;
   ratingAvg: number;
   completedOrdersCount: number;
+  /**
+   * Usta rasmi. Backend ulanmagunicha ilova ichidagi fayldan keladi.
+   * Yoʻq boʻlsa `Avatar` ism bosh harfiga tushadi — roʻyxat buzilmaydi.
+   */
+  photoUrl?: string;
   /** Faqat 4 holatda toʻldiriladi (1-boʻlim, 3-qoida). */
   phoneNumber: string | null;
 }

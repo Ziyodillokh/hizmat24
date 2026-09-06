@@ -82,6 +82,17 @@ export default {
       },
       transitionDuration: { press: '110ms', state: '180ms', enter: '260ms' },
       keyframes: {
+        /*
+         * Sigʻmagan matnni chapga surish. Ikkala chekkada toʻxtab turadi —
+         * uzluksiz harakat oʻqishga xalaqit beradi. Masofa komponentdan
+         * `--marquee-distance` orqali keladi, chunki u matn kengligiga
+         * bogʻliq va CSS uni oʻzi hisoblay olmaydi.
+         */
+        marquee: {
+          '0%, 14%': { transform: 'translateX(0)' },
+          '48%, 62%': { transform: 'translateX(calc(-1 * var(--marquee-distance)))' },
+          '96%, 100%': { transform: 'translateX(0)' },
+        },
         shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
         'radar-ping': {
           '0%': { transform: 'scale(0.6)', opacity: '0.24' },
@@ -102,6 +113,7 @@ export default {
         },
       },
       animation: {
+        marquee: 'marquee var(--marquee-duration, 6s) ease-in-out infinite',
         shimmer: 'shimmer 1.2s linear infinite',
         'radar-ping': 'radar-ping 2s ease-out infinite',
         'step-pulse': 'step-pulse 2s ease-in-out infinite',
