@@ -131,7 +131,12 @@ export function Header({
         />
       )}
       <div className="min-w-0 flex-1">
-        <p className={cn('truncate text-body-sm', GREETING_CLASSES[tone])}>
+        {/*
+          Salomlashuv — kichik, katta harflarda va kengaytirilgan harf
+          oraligʻi bilan: u ismni TANITIB beruvchi yorliq, ismning oʻzi bilan
+          bir xil ogʻirlikda raqobatlashmasligi kerak.
+        */}
+        <p className={cn('truncate text-overline uppercase', GREETING_CLASSES[tone])}>
           {greeting(now ?? new Date())}
         </p>
         {/*
@@ -139,7 +144,7 @@ export function Header({
           holda bosh sahifadagi eng katta matnga aylanib, eʼtiborni xizmatlardan
           oʻgʻirlab olardi. Salomlashuv bilan birga u ikkilamchi maʼlumot.
         */}
-        <p className={cn('truncate text-h3', TITLE_CLASSES[tone])}>{identity}</p>
+        <p className={cn('mt-2 truncate text-h2', TITLE_CLASSES[tone])}>{identity}</p>
       </div>
       <button
         type="button"

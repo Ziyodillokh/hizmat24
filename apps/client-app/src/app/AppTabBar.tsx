@@ -4,6 +4,7 @@ import { BottomNav, type TabKey } from '@/components/BottomNav';
 const ROUTES: Record<TabKey, string> = {
   home: '/app/home',
   orders: '/app/orders',
+  market: '/app/market',
   masters: '/app/masters',
   profile: '/app/profile',
 };

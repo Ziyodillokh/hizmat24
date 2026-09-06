@@ -1,14 +1,16 @@
-import { ClipboardText, House, User, UsersThree } from '@phosphor-icons/react';
+import { ClipboardText, House, Storefront, User, UsersThree } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
 /**
- * Pastki navigatsiya — spetsifikatsiya 9.14-bandi.
- * h=56 + 34px home indicator zonasi. AYNAN 4 element (8.2-band);
- * "Xabarlar"/"Chat" tabi yoʻq (14.2-band, 9-punkt).
+ * Pastki navigatsiya — beshta boʻlim.
+ *
+ * Yorliqlar QISQA: 360px ekranda beshta tabga 72px dan tushadi va
+ * "Mutaxassislar" yoki "Bosh sahifa" kabi uzun soʻz kesilib qolardi.
+ * Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
  */
-export type TabKey = 'home' | 'orders' | 'masters' | 'profile';
+export type TabKey = 'home' | 'orders' | 'market' | 'masters' | 'profile';
 
 interface TabDefinition {
   key: TabKey;
@@ -16,11 +18,11 @@ interface TabDefinition {
   icon: IconGlyph;
 }
 
-/** Tartib ham, yorliqlar ham 8.2-banddagi jadvaldan — oʻzgartirilmaydi. */
 const TABS: readonly TabDefinition[] = [
-  { key: 'home', label: 'Bosh sahifa', icon: House },
-  { key: 'orders', label: 'Buyurtmalar', icon: ClipboardText },
-  { key: 'masters', label: 'Mutaxassislar', icon: UsersThree },
+  { key: 'home', label: 'Asosiy', icon: House },
+  { key: 'orders', label: 'Buyurtma', icon: ClipboardText },
+  { key: 'market', label: 'Market', icon: Storefront },
+  { key: 'masters', label: 'Ustalar', icon: UsersThree },
   { key: 'profile', label: 'Profil', icon: User },
 ];
 
@@ -103,9 +105,24 @@ export function BottomNav({ active, onSelect, className }: BottomNavProps) {
                 aria-current={state === 'active' ? 'page' : undefined}
                 // 8px oraliq 56px lik panel ichida ikona va yorliqni ikkita
                 // bogʻlanmagan obyekt qilib koʻrsatardi.
-                className="flex h-full w-full flex-col items-center justify-center gap-4 px-4"
+                className="relative flex h-full w-full flex-col items-center justify-center gap-2 px-2"
               >
-                <span className="relative flex h-[28px] w-[44px] items-center justify-center">
+                {/*
+                  Aktiv boʻlim tepasidagi qisqa chiziq — uchinchi signal
+                  (rang va toʻldirishdan tashqari). Beshta tab boʻlganda
+                  faqat rang bilan ajratish yetarli emas: yorliqlar kichrayadi
+                  va koʻz qaysi boʻlimda turganini darhol topa olmaydi.
+                */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    'absolute inset-x-0 top-0 mx-auto h-[3px] w-[24px] rounded-b-full',
+                    'transition-colors duration-state ease-std',
+                    state === 'active' ? 'bg-primary' : 'bg-transparent',
+                  )}
+                />
+
+                <span className="relative flex h-[26px] w-[40px] items-center justify-center">
                   <Icon
                     icon={tab.icon}
                     size={24}

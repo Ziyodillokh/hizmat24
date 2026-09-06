@@ -58,7 +58,12 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
             rangdagi ikkinchi halqa boʻlib koʻrinardi. Shaffof tirqishda
             fonning oʻzi koʻrinadi va halqa qayerda tursa ham toʻgʻri chiqadi.
           */}
-          <span className="rounded-full border-[2.5px] border-illus-hi-vis p-[3px]">
+          {/*
+            `flex` shart: `block` boʻlganda ichkaridagi inline avatar qator
+            qutisini hosil qilib, oʻramning balandligini kengligidan katta
+            qilardi (58x65) va halqa DOIRA emas, ellips boʻlib chizilardi.
+          */}
+          <span className="flex rounded-full border-[2.5px] border-illus-hi-vis p-[3px]">
             <Avatar name={master.fullName} src={master.photoUrl} size={48} />
           </span>
 

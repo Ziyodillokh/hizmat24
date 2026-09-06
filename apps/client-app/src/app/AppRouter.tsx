@@ -16,6 +16,9 @@ import { OrderTracking } from './screens/OrderTracking';
 import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
 import { MasterProfile, NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
+import { MarketTab } from './screens/MarketTab';
+import { ProductDetail } from './screens/ProductDetail';
+import { ShopDetail } from './screens/ShopDetail';
 import { MastersTab } from './screens/MastersTab';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
 
@@ -156,6 +159,30 @@ function AppRoutes() {
             element={
               <RequireAuth>
                 <OrdersTab />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="market"
+            element={
+              <RequireAuth>
+                <MarketTab />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="market/:shopId"
+            element={
+              <RequireAuth>
+                <ShopDetail />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="market/:shopId/:productId"
+            element={
+              <RequireAuth>
+                <ProductDetail />
               </RequireAuth>
             }
           />

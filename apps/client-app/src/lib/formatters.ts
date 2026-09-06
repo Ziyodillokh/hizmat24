@@ -114,9 +114,15 @@ export const EMPTY_VALUE = '—';
 export const orEmpty = (value: string | null | undefined): string => value ?? EMPTY_VALUE;
 
 /** 8.3-band: vaqtga qarab salomlashuv. */
+/**
+ * Salomlashuv — vergulsiz. Vergul ilgari matnning oʻziga qoʻshib
+ * yozilgandi, lekin u sarlavha uslubiga (katta harflar, kengaytirilgan
+ * harf oraligʻi) mos kelmaydi va tinish belgisi tipografiyaning ishi
+ * emas — komponentning ishi.
+ */
 export function greeting(now: Date): string {
   const hour = now.getHours();
-  if (hour >= 5 && hour < 12) return 'Xayrli tong,';
-  if (hour >= 12 && hour < 18) return 'Xayrli kun,';
-  return 'Xayrli kech,';
+  if (hour >= 5 && hour < 12) return 'Xayrli tong';
+  if (hour >= 12 && hour < 18) return 'Xayrli kun';
+  return 'Xayrli kech';
 }
