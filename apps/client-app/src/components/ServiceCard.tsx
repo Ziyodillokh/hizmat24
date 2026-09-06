@@ -9,22 +9,23 @@ import { Icon } from './Icon';
 /**
  * Xizmat turi kartasi — spetsifikatsiya 9.6-bandi.
  *
- * Nomi ALOHIDA qatorda turadi. Ilgari nom va narx bitta qatorni boʻlishardi,
- * narx bloki esa qisqarmasdi ("taxminan 1 500 000 soʻm" ≈ 200px) — natijada
- * 390px ekranda nomga ~90px qolib, u "Rozetka…" boʻlib kesilardi va
- * foydalanuvchi xizmatni umuman oʻqiy olmasdi.
+ * `OrderCard` bilan bir xil tuzilma: tepada mazmun (ikona, nom, tavsif),
+ * pastda meta qatori (narx), orasida karta chetigacha choʻzilgan chiziq.
+ * Ikkala roʻyxat ham bitta "karta tili" da gapiradi.
  *
- * Endi: 1-qator — nom (kerak boʻlsa 2 satr), 2-qator — tavsif va narx.
- * Shu tuzilishda uzun nom ham, katta summa ham toʻliq koʻrinadi.
+ * Narx oʻz qatorida turgani uchun u hech qachon nomni siqmaydi — ilgari
+ * ular bitta qatorni boʻlishardi va nom "Rozetka…" boʻlib kesilardi.
+ * "Taxminiy narx" yozuvi 14.6-band talabini bajaradi: roʻyxatdagi summa
+ * yakuniy emas va buni har bir kartada aytish kerak.
  */
-const CURRENCY_LABEL = "soʻm";
+const CURRENCY_LABEL = 'soʻm';
 
 export interface ServiceCardProps {
   /** Xizmat nomi — serverdan keladi. */
   name: string;
   /** Tavsif kelmasligi mumkin: bunda qator umuman chizilmaydi, layout buzilmaydi (9.6-band). */
   description?: string | null;
-  /** Soʻmdagi butun summa. Roʻyxatda narx taxminiy — buni roʻyxat sarlavhasi aytadi. */
+  /** Soʻmdagi butun summa. */
   price: number;
   /** Xizmat turi ikonasi — outline, bitta oila (6.4-band). */
   icon: LucideIcon;
@@ -61,29 +62,37 @@ export function ServiceCard({
       tabIndex={isInteractive ? 0 : undefined}
       onClick={onSelect}
       onKeyDown={isInteractive ? handleKeyDown : undefined}
-      className={cn('flex items-center gap-12 p-12', className)}
+      className={cn('p-12', className)}
     >
-      {/* Ichki blok yuzasi `surface-sunken` (3.1-band) — karta ustida ikkala temada ham ajralib turadi. */}
-      <span className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-surface-sunken">
-        <Icon icon={icon} size={24} className="text-primary" />
-      </span>
-
-      <span className="flex min-w-0 flex-1 flex-col gap-2">
-        <span className="line-clamp-2 text-title text-text-primary">{name}</span>
-
-        <span className="flex min-w-0 items-baseline gap-8">
-          <span className="tabular shrink-0 text-numeric-sm text-primary">{amount}</span>
-          <span className="shrink-0 text-caption text-text-secondary">{CURRENCY_LABEL}</span>
-          {/* Tavsif ixtiyoriy: yoʻq boʻlsa qator narx bilan cheklanadi. */}
-          {description ? (
-            <span className="truncate text-body-sm text-text-secondary">· {description}</span>
-          ) : null}
+      <div className="flex items-start gap-12">
+        <span
+          className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-primary-surface"
+          aria-hidden
+        >
+          <Icon icon={icon} size={24} className="text-primary-pressed" />
         </span>
-      </span>
 
-      {isInteractive && (
-        <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
-      )}
+        <div className="min-w-0 flex-1">
+          <p className="text-title text-text-primary">{name}</p>
+          {/* Tavsif ixtiyoriy: yoʻq boʻlsa qator umuman chizilmaydi. */}
+          {description ? (
+            <p className="mt-2 line-clamp-1 text-body-sm text-text-secondary">{description}</p>
+          ) : null}
+        </div>
+
+        {isInteractive && (
+          <Icon icon={ChevronRight} size={16} className="mt-4 shrink-0 text-text-secondary" />
+        )}
+      </div>
+
+      <span className="-mx-12 my-12 block h-px bg-border" aria-hidden />
+
+      <div className="flex items-baseline justify-between gap-8">
+        <span className="text-caption text-text-secondary">Taxminiy narx</span>
+        <span className="tabular shrink-0 text-price text-text-primary">
+          {amount} <span className="text-currency text-text-secondary">{CURRENCY_LABEL}</span>
+        </span>
+      </div>
     </Card>
   );
 }

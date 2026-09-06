@@ -41,23 +41,27 @@ export function MasterSuggestionCard({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 items-center gap-8 text-left"
+        className="flex min-w-0 items-start gap-8 text-left"
         aria-label={`${name} — ${profession}`}
       >
         <Avatar name={name} size={36} className="shrink-0" />
         <span className="min-w-0 flex-1">
           {/* Ikki satrgacha: "Akmal Rahimov" 160px lik katakchada bir satrga
               sigʻmaydi va kesilsa ustaning kim ekani oʻqilmay qoladi. */}
-          <span className="block line-clamp-2 text-body-sm font-semibold leading-tight text-text-primary">
+          <span className="line-clamp-2 block text-body-sm font-semibold leading-tight text-text-primary">
             {name}
           </span>
-          <span className="block truncate text-caption text-text-secondary">{profession}</span>
+          <span className="mt-2 block truncate text-caption text-text-secondary">{profession}</span>
         </span>
       </button>
 
-      <div className="mt-auto flex items-center gap-4 pt-8">
-        {/* Bitta to'ldirilgan yulduz + raqam: beshta yulduz tor katakchada
-            reytingning o'zidan ko'proq joy egallardi. */}
+      {/* `OrderCard` va `ServiceCard` dagi kabi ajratuvchi chiziq — uchala
+          karta ham bitta tuzilmada oʻqiladi. */}
+      <span className="-mx-12 mb-8 mt-auto block h-px bg-border" aria-hidden />
+
+      <div className="flex items-center gap-4">
+        {/* Bitta toʻldirilgan yulduz + raqam: beshta yulduz tor katakchada
+            reytingning oʻzidan koʻproq joy egallardi. */}
         <Icon icon={Star} size={16} className="fill-star text-star" aria-hidden />
         <span className="tabular text-numeric-sm text-text-primary">{formatRating(rating)}</span>
       </div>

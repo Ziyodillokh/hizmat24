@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Headset,
   Info,
+  LogOut,
   Moon,
   SearchX,
   ShieldCheck,
@@ -31,6 +32,8 @@ import { serviceIcon } from '@/lib/serviceIcons';
 import { formatPhone, formatTime, orderDateGroup } from '@/lib/formatters';
 import {
   HISTORY_FILTER_LABELS,
+  ORDER_STATUS,
+  isTerminal,
   isMasterPhoneVisible,
   matchesHistoryFilter,
   type HistoryFilter,
@@ -204,6 +207,8 @@ interface MenuItem {
   onSelect?: () => void;
   /** Chevron oʻrniga chiziladigan boshqaruv (masalan tema almashtirgichi). */
   control?: ReactNode;
+  /** Buzuvchi amal (chiqish) — qizil tusda chiziladi. */
+  danger?: boolean;
 }
 
 interface MenuSection {
@@ -214,13 +219,22 @@ interface MenuSection {
 /**
  * Sozlama qatorlari bitta kartaga yigʻiladi — alohida suzuvchi qatorlar
  * oʻrniga guruhlangan roʻyxat mobil ilovalarda tanish va tartibli koʻrinadi.
+ *
+ * Ikonalar tusli plitkada: ilovadagi barcha kartalar shu tilda gapiradi
+ * (`OrderCard`, `ServiceCard`), yalangʻoch glif esa sozlamalar roʻyxatini
+ * qolgan ekranlardan uzib qoʻyardi.
  */
 function MenuGroup({ section }: { section: MenuSection }) {
   return (
-    <section className="mt-24">
+    <section className="mt-20">
       <h2 className="px-4 text-overline uppercase text-text-secondary">{section.title}</h2>
 
-      <div className="mt-8 overflow-hidden rounded-lg border border-border bg-surface-elevated">
+      <div
+        className={cn(
+          'mt-8 overflow-hidden rounded-lg border border-transparent bg-surface-elevated shadow-e1',
+          "[[data-theme='dark']_&]:border-border",
+        )}
+      >
         {section.items.map((item, index) => {
           const isInteractive = Boolean(item.onSelect);
           const Row = isInteractive ? 'button' : 'div';
@@ -230,19 +244,36 @@ function MenuGroup({ section }: { section: MenuSection }) {
               key={item.label}
               {...(isInteractive ? { type: 'button' as const, onClick: item.onSelect } : {})}
               className={cn(
-                'flex min-h-touch w-full items-center gap-12 px-16 py-12 text-left',
+                'flex min-h-touch w-full items-center gap-12 px-12 py-8 text-left',
+                'transition-colors duration-press ease-std',
+                isInteractive && 'active:bg-surface-sunken',
                 index > 0 && 'border-t border-border',
               )}
             >
-              <Icon icon={item.icon} size={20} className="shrink-0 text-text-secondary" />
-              <span className="min-w-0 flex-1 truncate text-body-lg text-text-primary">
+              <span
+                className={cn(
+                  'flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm',
+                  item.danger ? 'bg-danger-surface text-danger' : 'bg-neutral-surface text-text-secondary',
+                )}
+                aria-hidden
+              >
+                <Icon icon={item.icon} size={20} />
+              </span>
+
+              <span
+                className={cn(
+                  'min-w-0 flex-1 truncate text-body-lg',
+                  item.danger ? 'text-danger' : 'text-text-primary',
+                )}
+              >
                 {item.label}
               </span>
+
               {item.hint && (
                 <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>
               )}
               {item.control ??
-                (isInteractive && (
+                (isInteractive && !item.danger && (
                   <Icon icon={ChevronRight} size={16} className="shrink-0 text-text-secondary" />
                 ))}
             </Row>
@@ -256,9 +287,26 @@ function MenuGroup({ section }: { section: MenuSection }) {
 /** 26 · Profil — read-only. */
 export function ProfileTab() {
   const navigate = useNavigate();
-  const { phoneNumber, signOut } = useApp();
+  const { phoneNumber, orders, signOut } = useApp();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
+
+  /*
+   * Koʻrsatkichlar haqiqiy holatdan hisoblanadi — toʻqilgan raqam emas.
+   * Buyurtma yoʻq boʻlsa blok umuman chizilmaydi: uchta nol foydalanuvchiga
+   * hech narsa aytmaydi va sahifani boʻsh koʻrsatadi.
+   */
+  const stats = useMemo(() => {
+    const done = orders.filter((order) => order.status === ORDER_STATUS.CLOSED).length;
+    const active = orders.filter(
+      (order) => !isTerminal(order.status) && order.status !== ORDER_STATUS.CANCELLED,
+    ).length;
+    return [
+      { value: orders.length, label: 'Buyurtma' },
+      { value: done, label: 'Yakunlangan' },
+      { value: active, label: 'Faol' },
+    ];
+  }, [orders]);
 
   const sections: MenuSection[] = [
     {
@@ -295,6 +343,10 @@ export function ProfileTab() {
         { icon: Info, label: 'Ilova haqida', hint: '1.0.0' },
       ],
     },
+    {
+      title: 'Sessiya',
+      items: [{ icon: LogOut, label: 'Chiqish', danger: true, onSelect: () => setLogoutOpen(true) }],
+    },
   ];
 
   return (
@@ -302,15 +354,15 @@ export function ProfileTab() {
       header={<Header variant="inner" title="Profil" />}
       footer={<AppTabBar active="profile" />}
     >
-      {/*
-        Foydalanuvchi bloki chapga tekislangan: markazlashgan katta avatar
-        ekranning yarmini boʻsh qoldirardi. Raqam maskalanmaydi — bu
-        foydalanuvchining OʻZ profili, oʻz raqamini yashirishning maʼnosi yoʻq.
-      */}
-      <div className="mt-8 flex items-center gap-16">
+      {/* Foydalanuvchi kartasi — ilovadagi boshqa kartalar bilan bir tilda. */}
+      <div
+        className={cn(
+          'mt-8 flex items-center gap-12 rounded-lg border border-transparent bg-surface-elevated p-12 shadow-e1',
+          "[[data-theme='dark']_&]:border-border",
+        )}
+      >
         <Avatar name={USER.fullName} size={64} />
         <div className="min-w-0 flex-1">
-          {/* Bosh sahifa bilan bir xil: ism birinchi, raqam ikkinchi qatorda. */}
           <p className="truncate text-h3 text-text-primary">{USER.fullName}</p>
           <p className="mt-2 truncate text-body-sm text-text-secondary">
             {formatPhone(phoneNumber)}
@@ -318,15 +370,26 @@ export function ProfileTab() {
         </div>
       </div>
 
+      {orders.length > 0 && (
+        <div className="mt-12 grid grid-cols-3 gap-8">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className={cn(
+                'rounded-lg border border-transparent bg-surface-elevated px-8 py-12 text-center shadow-e1',
+                "[[data-theme='dark']_&]:border-border",
+              )}
+            >
+              <p className="tabular text-h3 text-text-primary">{stat.value}</p>
+              <p className="mt-2 truncate text-caption text-text-secondary">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {sections.map((section) => (
         <MenuGroup key={section.title} section={section} />
       ))}
-
-      <div className="mt-24">
-        <Button variant="ghost" onClick={() => setLogoutOpen(true)}>
-          Chiqish
-        </Button>
-      </div>
 
       <Modal
         open={logoutOpen}
@@ -354,7 +417,6 @@ export function ProfileTab() {
   );
 }
 
-/** 27 · Usta profili — read-only. */
 export function MasterProfile() {
   const navigate = useNavigate();
   const { masterId } = useParams<{ masterId: string }>();

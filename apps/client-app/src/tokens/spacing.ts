@@ -3,6 +3,12 @@
  */
 
 /** 6.1-band: 4px asos. Bu roʻyxatdan tashqari qiymat yoʻq (13, 15, 18, 22px taqiqlanadi). */
+/**
+ * DIQQAT: bu roʻyxatda YOʻQ raqam jimgina Tailwind standart shkalasiga
+ * tushadi va butunlay boshqa qiymat beradi — `py-10` 10px emas, 40px
+ * (10 x 0.25rem) chiziladi va hech qanday xato bermaydi. Shuning uchun
+ * padding/margin/gap uchun faqat shu qiymatlar ishlatiladi.
+ */
 export const SPACING = [2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64] as const;
 
 /** 6.1-band: qatʼiy belgilangan tuzilma oʻlchamlari. */
