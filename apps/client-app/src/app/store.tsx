@@ -13,7 +13,7 @@ import { MASTERS } from '@/mocks/masters';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, OrderAddress } from '@/mocks/types';
-import { EMPTY_DRAFT, type LiveOrder, type OrderDraft } from './types';
+import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
 import { clearSession, loadSession, saveSession } from './persistence';
 
 /**
@@ -36,6 +36,9 @@ const SERVER_STEPS: Partial<Record<OrderStatus, { next: OrderStatus; delayMs: nu
 interface AppState {
   isAuthenticated: boolean;
   phoneNumber: string;
+  /** Tanishtiruv oqimi tugatilganmi. */
+  hasOnboarded: boolean;
+  role: UserRole | null;
   draft: OrderDraft;
   orders: LiveOrder[];
   notifications: AppNotification[];
@@ -43,6 +46,8 @@ interface AppState {
 
 interface AppActions {
   signIn: (phone: string) => void;
+  /** Tanishtiruv yakunlandi va rol tanlandi. */
+  completeOnboarding: (role: UserRole) => void;
   signOut: () => void;
   setDraftCategory: (categoryId: string) => void;
   setDraftDetails: (description: string, isUrgent: boolean) => void;
@@ -94,6 +99,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return {
         isAuthenticated: false,
         phoneNumber: '',
+        hasOnboarded: false,
+        role: null,
         draft: EMPTY_DRAFT,
         orders: [],
         notifications: NOTIFICATIONS,
@@ -105,6 +112,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       isAuthenticated: restored.isAuthenticated,
       phoneNumber: restored.phoneNumber,
+      hasOnboarded: restored.hasOnboarded,
+      role: restored.role,
       draft: EMPTY_DRAFT,
       orders: restored.orders,
       notifications: NOTIFICATIONS.map((item) =>
@@ -172,12 +181,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveSession({
       isAuthenticated: state.isAuthenticated,
       phoneNumber: state.phoneNumber,
+      hasOnboarded: state.hasOnboarded,
+      role: state.role,
       orders: state.orders,
       readNotificationIds: state.notifications
         .filter((item) => item.readAt !== null)
         .map((item) => item.id),
     });
-  }, [state.isAuthenticated, state.phoneNumber, state.orders, state.notifications]);
+  }, [
+    state.isAuthenticated,
+    state.phoneNumber,
+    state.hasOnboarded,
+    state.role,
+    state.orders,
+    state.notifications,
+  ]);
 
   // Komponent yoʻq qilinganda barcha taymerlar tozalanadi.
   useEffect(() => {
@@ -192,6 +210,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     () => ({
       signIn: (phone) =>
         setState((prev) => ({ ...prev, isAuthenticated: true, phoneNumber: phone })),
+      completeOnboarding: (role) =>
+        setState((prev) => ({ ...prev, hasOnboarded: true, role })),
 
       signOut: () => {
         clearSession();
@@ -199,6 +219,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           ...prev,
           isAuthenticated: false,
           phoneNumber: '',
+          hasOnboarded: false,
+          role: null,
           draft: EMPTY_DRAFT,
           orders: [],
         }));

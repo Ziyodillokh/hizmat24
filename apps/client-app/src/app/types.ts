@@ -9,6 +9,12 @@ export interface OrderDraft {
   address: OrderAddress | null;
 }
 
+/**
+ * Foydalanuvchi roli. Usta ilovasi alohida oqim boʻladi; hozircha tanlov
+ * saqlanadi va mijoz oqimi ochiladi.
+ */
+export type UserRole = 'client' | 'master';
+
 export interface LiveOrder {
   id: string;
   shortId: string;

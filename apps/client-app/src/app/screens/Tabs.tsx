@@ -1,4 +1,4 @@
-import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, ShieldCheck, SignOut, Sun } from '@phosphor-icons/react';
+import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
@@ -31,6 +31,7 @@ import { MASTERS } from '@/mocks/masters';
 import { USER } from '@/mocks/user';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
+import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
 
 const FILTERS: HistoryFilter[] = ['all', 'active', 'done', 'cancelled'];
@@ -302,7 +303,8 @@ function MenuGroup({ section }: { section: MenuSection }) {
 /** 26 · Profil — read-only. */
 export function ProfileTab() {
   const navigate = useNavigate();
-  const { phoneNumber, orders, signOut } = useApp();
+  const { phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
+  const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -333,6 +335,25 @@ export function ProfileTab() {
           onSelect: () => navigate('/app/orders'),
         },
         { icon: Bell, label: 'Bildirishnomalar', hint: 'Yoqilgan' },
+        {
+          /*
+           * Tanishtiruvda "keyinchalik profil orqali almashtira olasiz" deb
+           * va'da berilgan — bu qator oʻsha va'dani bajaradi. Usiz ilova
+           * bajarilmaydigan va'da bergan boʻlardi.
+           */
+          icon: role === 'master' ? Wrench : UserCircle,
+          label: 'Rol',
+          hint: role === 'master' ? 'Usta' : 'Mijoz',
+          onSelect: () => {
+            const next = role === 'master' ? 'client' : 'master';
+            completeOnboarding(next);
+            showToast(
+              next === 'master'
+                ? 'Usta ilovasi tayyorlanmoqda — hozircha mijoz rejimi'
+                : 'Mijoz rejimiga oʻtdingiz',
+            );
+          },
+        },
         {
           icon: theme === 'dark' ? Moon : Sun,
           label: 'Tungi rejim',

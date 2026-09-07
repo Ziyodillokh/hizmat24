@@ -8,7 +8,9 @@ import { useBackButton } from './useBackButton';
 import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
-import { OtpScreen, PhoneScreen, WelcomeScreen } from './screens/AuthScreens';
+import { LoginScreen } from './screens/LoginScreen';
+import { OnboardingScreen } from './screens/OnboardingScreen';
+import { OtpScreen } from './screens/OtpScreen';
 import { HomeTab } from './screens/HomeTab';
 import { AllServicesTab, GroupServicesTab } from './screens/CatalogScreens';
 import { AddressStep, ConfirmStep, MapStep, OrderDetailsStep } from './screens/CreateOrderScreens';
@@ -49,7 +51,7 @@ function ScrollToTop() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useApp();
+  const { isAuthenticated, hasOnboarded } = useApp();
   useBackButton();
 
   return (
@@ -57,12 +59,31 @@ function AppRoutes() {
       <ScrollToTop />
       <PageTransition>
         <Routes>
+          {/*
+            Kirmagan foydalanuvchi — kirish ekrani. Kirgan, lekin tanishtiruvni
+            koʻrmagan boʻlsa — tanishtiruv; aks holda bosh sahifa.
+          */}
           <Route
             index
-            element={isAuthenticated ? <Navigate to="/app/home" replace /> : <WelcomeScreen />}
+            element={
+              !isAuthenticated ? (
+                <LoginScreen />
+              ) : hasOnboarded ? (
+                <Navigate to="/app/home" replace />
+              ) : (
+                <Navigate to="/app/onboarding" replace />
+              )
+            }
           />
-          <Route path="auth/phone" element={<PhoneScreen />} />
           <Route path="auth/otp" element={<OtpScreen />} />
+          <Route
+            path="onboarding"
+            element={
+              <RequireAuth>
+                <OnboardingScreen />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path="home"

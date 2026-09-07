@@ -39,6 +39,12 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   loadingLabel?: string;
   fullWidth?: boolean;
   leadingIcon?: IconGlyph;
+  /**
+   * Yorliqdan keyingi ikona. Ikonani `children` ichiga qoʻyib boʻlmaydi:
+   * yorliq matni oʻralishi mumkin boʻlgan `span` ichida turadi va ikona
+   * matndan ajralib, alohida qatorga tushib ketardi.
+   */
+  trailingIcon?: IconGlyph;
   children: ReactNode;
 }
 
@@ -49,6 +55,7 @@ export function Button({
   loadingLabel = 'Yuborilmoqda…',
   fullWidth = true,
   leadingIcon,
+  trailingIcon,
   disabled,
   className,
   children,
@@ -92,6 +99,7 @@ export function Button({
           {/* `truncate` EMAS: uzun oʻzbekcha chaqiriq ("Qoʻllab-quvvatlashga
               murojaat") 360px ekranda uch nuqta bilan kesilardi. */}
           <span className="text-center leading-tight">{children}</span>
+          {trailingIcon && <Icon icon={trailingIcon} size={20} />}
         </>
       )}
     </button>

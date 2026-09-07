@@ -1,5 +1,5 @@
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
-import type { LiveOrder } from './types';
+import type { LiveOrder, UserRole } from './types';
 
 /**
  * Ilova holatini qurilmada saqlash.
@@ -19,6 +19,10 @@ interface StoredOrder extends Omit<LiveOrder, 'createdAt' | 'completedAt'> {
 interface StoredSession {
   isAuthenticated: boolean;
   phoneNumber: string;
+  /** Tanishtiruv oqimi bir marta koʻrsatiladi. */
+  hasOnboarded: boolean;
+  /** Tanlangan rol; hali tanlanmagan boʻlsa `null`. */
+  role: UserRole | null;
   orders: StoredOrder[];
   readNotificationIds: string[];
 }
@@ -26,6 +30,8 @@ interface StoredSession {
 export interface RestoredSession {
   isAuthenticated: boolean;
   phoneNumber: string;
+  hasOnboarded: boolean;
+  role: UserRole | null;
   orders: LiveOrder[];
   readNotificationIds: string[];
 }
@@ -65,6 +71,9 @@ export function loadSession(): RestoredSession | null {
     return {
       isAuthenticated: parsed.isAuthenticated === true,
       phoneNumber: typeof parsed.phoneNumber === 'string' ? parsed.phoneNumber : '',
+      hasOnboarded: parsed.hasOnboarded === true,
+      // Notoʻgʻri qiymat saqlangan boʻlsa rol tanlanmagan deb qaraladi.
+      role: parsed.role === 'client' || parsed.role === 'master' ? parsed.role : null,
       orders: Array.isArray(parsed.orders)
         ? parsed.orders.map(reviveOrder).filter((order): order is LiveOrder => order !== null)
         : [],
@@ -83,6 +92,8 @@ export function saveSession(session: RestoredSession): void {
     const payload: StoredSession = {
       isAuthenticated: session.isAuthenticated,
       phoneNumber: session.phoneNumber,
+      hasOnboarded: session.hasOnboarded,
+      role: session.role,
       orders: session.orders.map((order) => ({
         ...order,
         createdAt: order.createdAt.toISOString(),
