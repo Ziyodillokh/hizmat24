@@ -132,3 +132,13 @@ export const MASTERS = {
 export const MASTER_LIST: Master[] = Object.values(MASTERS).sort(
   (a, b) => b.ratingAvg - a.ratingAvg || b.completedOrdersCount - a.completedOrdersCount,
 );
+
+/**
+ * Ustani `id` boʻyicha topadi.
+ *
+ * Kalit (`MASTERS.akmal`) va `id` (`'m-akmal'`) bir xil emas, shuning uchun
+ * qidiruv qiymatlar boʻylab yuradi. Marshrutdan kelgan `id` mavjud boʻlmasligi
+ * mumkin — shuning uchun `undefined` qaytadi va chaqiruvchi buni tekshiradi.
+ */
+export const masterById = (id: string | undefined): Master | undefined =>
+  id ? MASTER_LIST.find((master) => master.id === id) : undefined;

@@ -1,10 +1,11 @@
-import { MagnifyingGlass, Timer, Wrench, XCircle } from '@phosphor-icons/react';
+import { ChatCircleDots, MagnifyingGlass, Phone, Timer, Wrench, XCircle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
+import { Icon } from '@/components/Icon';
 import { InfoChip } from '@/components/InfoChip';
 import { MasterCard } from '@/components/MasterCard';
 import { Modal } from '@/components/Modal';
@@ -18,6 +19,7 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { canCancel, isMasterPhoneVisible, ORDER_STATUS } from '@/lib/orderStateMachine';
 import { formatDuration, formatPrice } from '@/lib/formatters';
 import { useApp } from '../store';
+import { useChat } from '../chat-store';
 import { useToast } from '../ToastHost';
 import { warnFeedback } from '../native';
 import type { LiveOrder } from '../types';
@@ -75,6 +77,7 @@ export function OrderTracking() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const { findOrder, cancelOrder, advanceOrder } = useApp();
+  const { openThread } = useChat();
   const showToast = useToast();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -116,13 +119,34 @@ export function OrderTracking() {
       footer={
         <StickyFooter>
           <div className="flex flex-col gap-12">
-            {isMasterPhoneVisible(order.status) && order.master?.phoneNumber && (
-              <a
-                href={`tel:${order.master.phoneNumber}`}
-                className="flex h-[52px] w-full items-center justify-center rounded-md bg-primary px-20 text-button text-on-primary"
-              >
-                Qoʻngʻiroq qilish
-              </a>
+            {/*
+              Usta tayinlangach bogʻlanishning IKKI yoʻli ochiladi. Ular bir
+              qatorda: ikkitasini ustma-ust qoʻyish past ekranlarda bekor
+              qilish tugmasini pastga surib yuborardi.
+            */}
+            {order.master && (
+              <div className="flex gap-12">
+                {isMasterPhoneVisible(order.status) && order.master.phoneNumber && (
+                  <a
+                    href={`tel:${order.master.phoneNumber}`}
+                    className="flex h-[52px] flex-1 items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
+                  >
+                    <Icon icon={Phone} size={20} weight="fill" />
+                    Qoʻngʻiroq
+                  </a>
+                )}
+                <Button
+                  variant="secondary"
+                  leadingIcon={ChatCircleDots}
+                  className="flex-1"
+                  onClick={() =>
+                    order.master &&
+                    navigate(`/app/chat/${openThread(order.master.id, order.categoryName)}`)
+                  }
+                >
+                  Yozish
+                </Button>
+              </div>
             )}
             {canCancel(order.status) && (
               <Button variant="secondary" onClick={() => setSheetOpen(true)}>

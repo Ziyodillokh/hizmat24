@@ -1,4 +1,5 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { KeyboardResize } from '@capacitor/keyboard';
 
 /**
  * Android paketlash sozlamalari.
@@ -30,6 +31,15 @@ const config: CapacitorConfig = {
       backgroundColor: '#0E2B2C',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
+    },
+    /*
+     * Chat kompozitori klaviatura ostida qolib ketmasligi uchun WebView
+     * QAYTA OʻLCHANADI. Buning uchun AndroidManifestʻda ham
+     * `windowSoftInputMode="adjustResize"` turibdi — biri boʻlmasa
+     * ikkinchisi ishlamaydi.
+     */
+    Keyboard: {
+      resize: KeyboardResize.Native,
     },
     StatusBar: {
       overlaysWebView: false,

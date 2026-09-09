@@ -8,6 +8,7 @@ import { useBackButton } from './useBackButton';
 import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
+import { ChatProvider } from './chat-store';
 import { LoginScreen } from './screens/LoginScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { OtpScreen } from './screens/OtpScreen';
@@ -22,6 +23,9 @@ import { MarketTab } from './screens/MarketTab';
 import { ProductDetail } from './screens/ProductDetail';
 import { ShopDetail } from './screens/ShopDetail';
 import { MastersTab } from './screens/MastersTab';
+import { AiAssistantScreen } from './screens/AiAssistant';
+import { ChatListScreen } from './screens/ChatList';
+import { ChatThreadScreen } from './screens/ChatThread';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
 
 /**
@@ -225,6 +229,32 @@ function AppRoutes() {
             }
           />
           <Route
+            path="chat"
+            element={
+              <RequireAuth>
+                <ChatListScreen />
+              </RequireAuth>
+            }
+          />
+          {/* `ai` statik segment `:threadId` dan ustun — Router aniqroq
+              marshrutni oʻzi tanlaydi, tartibga bogʻliq emas. */}
+          <Route
+            path="chat/ai"
+            element={
+              <RequireAuth>
+                <AiAssistantScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="chat/:threadId"
+            element={
+              <RequireAuth>
+                <ChatThreadScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="notifications"
             element={
               <RequireAuth>
@@ -274,7 +304,9 @@ export function AppRouter() {
   return (
     <ThemeProvider>
       <AppProvider>
-        <AppShell />
+        <ChatProvider>
+          <AppShell />
+        </ChatProvider>
       </AppProvider>
     </ThemeProvider>
   );

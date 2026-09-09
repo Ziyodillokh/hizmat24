@@ -1,4 +1,4 @@
-import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
+import { Bell, BellSlash, CaretRight, ChatCircleDots, ChatsCircle, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
@@ -31,6 +31,7 @@ import { MASTERS } from '@/mocks/masters';
 import { USER } from '@/mocks/user';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
+import { useChat } from '../chat-store';
 import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
 
@@ -304,6 +305,7 @@ function MenuGroup({ section }: { section: MenuSection }) {
 export function ProfileTab() {
   const navigate = useNavigate();
   const { phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
+  const { unreadTotal } = useChat();
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -333,6 +335,12 @@ export function ProfileTab() {
           icon: ClipboardText,
           label: 'Buyurtmalar tarixi',
           onSelect: () => navigate('/app/orders'),
+        },
+        {
+          icon: ChatsCircle,
+          label: 'Xabarlar',
+          hint: unreadTotal > 0 ? `${unreadTotal} ta yangi` : undefined,
+          onSelect: () => navigate('/app/chat'),
         },
         { icon: Bell, label: 'Bildirishnomalar', hint: 'Yoqilgan' },
         {
@@ -457,6 +465,7 @@ export function MasterProfile() {
   const navigate = useNavigate();
   const { masterId } = useParams<{ masterId: string }>();
   const { activeOrder } = useApp();
+  const { openThread } = useChat();
 
   const master = Object.values(MASTERS).find((item) => item.id === masterId);
   if (!master) return <Navigate to="/app/home" replace />;
@@ -471,24 +480,52 @@ export function MasterProfile() {
       header={<Header variant="inner" title="Usta profili" onBack={() => navigate(-1)} />}
       footer={
         <StickyFooter>
-          {canCall ? (
-            <a
-              href={`tel:${master.phoneNumber}`}
-              className="flex h-[52px] w-full items-center justify-center rounded-md bg-primary px-20 text-button text-on-primary"
-            >
-              Qoʻngʻiroq qilish
-            </a>
-          ) : (
-            <div className="flex flex-col gap-12">
-              <p className="text-center text-body-sm text-text-secondary">
-                Ish yakunlangan — savol boʻlsa qoʻllab-quvvatlash xizmatiga murojaat
-                qiling
-              </p>
-              <Button variant="ghost" onClick={() => navigate('/app/support')}>
-                Qoʻllab-quvvatlashga murojaat
+          <div className="flex flex-col gap-12">
+            {/*
+              Yozish HAR DOIM ochiq, qoʻngʻiroq esa faqat buyurtma aktiv
+              paytda: usta raqami ish tugagach yopiladi. Ilgari bu holatda
+              ekranda faqat "qoʻllab-quvvatlashga yozing" degan matn qolardi.
+            */}
+            <div className="flex gap-12">
+              {canCall && (
+                <a
+                  href={`tel:${master.phoneNumber}`}
+                  className="flex h-[52px] flex-1 items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
+                >
+                  <Icon icon={Phone} size={20} weight="fill" />
+                  Qoʻngʻiroq
+                </a>
+              )}
+              <Button
+                variant={canCall ? 'secondary' : 'primary'}
+                leadingIcon={ChatCircleDots}
+                className="flex-1"
+                onClick={() =>
+                  navigate(
+                    `/app/chat/${openThread(
+                      master.id,
+                      activeOrder?.master?.id === master.id
+                        ? activeOrder.categoryName
+                        : 'Savol-javob',
+                    )}`,
+                  )
+                }
+              >
+                Yozish
               </Button>
             </div>
-          )}
+
+            {!canCall && (
+              <>
+                <p className="text-center text-body-sm text-text-secondary">
+                  Ish yakunlangan — usta raqami yopiq
+                </p>
+                <Button variant="ghost" onClick={() => navigate('/app/support')}>
+                  Qoʻllab-quvvatlashga murojaat
+                </Button>
+              </>
+            )}
+          </div>
         </StickyFooter>
       }
     >

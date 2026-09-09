@@ -62,18 +62,45 @@ const MONTHS = [
 const isSameDay = (a: Date, b: Date): boolean =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
-/** 8.5-band: "Bugun, 14:30" · "Kecha, 09:15" · "5-sentabr, 14:30" · "2025-yil 5-sentabr, 14:30". */
-export function formatDateTime(date: Date, now: Date): string {
+/**
+ * Kun yorligʻi: "Bugun" · "Kecha" · "5-sentabr" · "2025-yil 5-sentabr".
+ *
+ * `orderDateGroup` dan farqi — u eski sanani OY aniqligida ("Sentabr")
+ * beradi, chunki buyurtmalar roʻyxati oylar boʻyicha boʻlinadi. Chatda esa
+ * ajratkich aynan KUNni bildirishi kerak: bir oy ichidagi uch xil suhbat
+ * kuni bitta "Sentabr" ostiga tushib qolmasligi kerak.
+ */
+export function formatDayLabel(date: Date, now: Date): string {
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
 
-  if (isSameDay(date, now)) return `Bugun, ${formatTime(date)}`;
-  if (isSameDay(date, yesterday)) return `Kecha, ${formatTime(date)}`;
+  if (isSameDay(date, now)) return 'Bugun';
+  if (isSameDay(date, yesterday)) return 'Kecha';
 
   const day = `${date.getDate()}-${MONTHS[date.getMonth()]}`;
-  return date.getFullYear() === now.getFullYear()
-    ? `${day}, ${formatTime(date)}`
-    : `${date.getFullYear()}-yil ${day}, ${formatTime(date)}`;
+  return date.getFullYear() === now.getFullYear() ? day : `${date.getFullYear()}-yil ${day}`;
+}
+
+/** 8.5-band: "Bugun, 14:30" · "Kecha, 09:15" · "5-sentabr, 14:30" · "2025-yil 5-sentabr, 14:30". */
+export const formatDateTime = (date: Date, now: Date): string =>
+  `${formatDayLabel(date, now)}, ${formatTime(date)}`;
+
+/**
+ * Suhbatlar roʻyxatidagi vaqt — bitta qatorga sigʻadigan eng qisqa shakl.
+ *
+ * Bugungi xabar uchun soat, kechagisi uchun "Kecha", undan eskisi uchun
+ * "05.09". Toʻliq sana yozilsa qator ismni siqib qoʻyardi.
+ */
+export function formatChatTime(date: Date, now: Date): string {
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return formatTime(date);
+  if (isSameDay(date, yesterday)) return 'Kecha';
+  if (date.getFullYear() === now.getFullYear())
+    return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}`;
+
+  return formatShortDate(date);
 }
 
 /** Roʻyxatlar uchun qisqa shakl. */

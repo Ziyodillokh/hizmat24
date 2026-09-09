@@ -3,7 +3,9 @@ import {
   EMPTY_VALUE,
   formatApproxDuration,
   formatApproxPrice,
+  formatChatTime,
   formatDateTime,
+  formatDayLabel,
   formatDuration,
   formatPhone,
   formatPrice,
@@ -145,5 +147,40 @@ describe('orEmpty (8.5-band)', () => {
     expect(orEmpty(null)).toBe(EMPTY_VALUE);
     expect(EMPTY_VALUE).toBe('—');
     expect(orEmpty('Akmal')).toBe('Akmal');
+  });
+});
+
+describe('formatDayLabel (chat kun ajratkichi)', () => {
+  it('bugun va kechani soʻz bilan aytadi', () => {
+    expect(formatDayLabel(new Date(2026, 8, 5, 3, 0), NOW)).toBe('Bugun');
+    expect(formatDayLabel(new Date(2026, 8, 4, 23, 59), NOW)).toBe('Kecha');
+  });
+
+  it("eski sanani KUN aniqligida beradi — oy nomi bilan cheklanmaydi", () => {
+    // `orderDateGroup` shu sanaga "Sentabr" berardi; chatda bu bir oydagi
+    // barcha suhbat kunlarini bitta guruhga qoʻshib yuborardi.
+    expect(formatDayLabel(new Date(2026, 8, 1, 10, 0), NOW)).toBe('1-sentabr');
+  });
+
+  it('boshqa yildagi sanada yil yoziladi', () => {
+    expect(formatDayLabel(new Date(2025, 11, 31, 10, 0), NOW)).toBe('2025-yil 31-dekabr');
+  });
+});
+
+describe('formatChatTime (suhbatlar roʻyxati)', () => {
+  it('bugungi xabar uchun soat koʻrsatadi', () => {
+    expect(formatChatTime(new Date(2026, 8, 5, 9, 5), NOW)).toBe('09:05');
+  });
+
+  it('kechagi xabar uchun "Kecha"', () => {
+    expect(formatChatTime(new Date(2026, 8, 4, 9, 5), NOW)).toBe('Kecha');
+  });
+
+  it('shu yildagi eski xabar uchun kun.oy', () => {
+    expect(formatChatTime(new Date(2026, 8, 1, 9, 5), NOW)).toBe('01.09');
+  });
+
+  it('boshqa yildagi xabar uchun toʻliq sana', () => {
+    expect(formatChatTime(new Date(2025, 11, 31, 9, 5), NOW)).toBe('31.12.2025');
   });
 });

@@ -113,6 +113,11 @@ export default {
           '0%': { left: '-30%' },
           '100%': { left: '100%' },
         },
+        /* AI javob yozayotganini bildiruvchi uchta nuqta. */
+        'typing-dot': {
+          '0%, 60%, 100%': { opacity: '0.3', transform: 'translateY(0)' },
+          '30%': { opacity: '1', transform: 'translateY(-2px)' },
+        },
       },
       animation: {
         marquee: 'marquee var(--marquee-duration, 6s) ease-in-out infinite',
@@ -121,6 +126,7 @@ export default {
         'step-pulse': 'step-pulse 2s ease-in-out infinite',
         shake: 'shake 0.3s ease-in-out',
         indeterminate: 'indeterminate 1.4s ease-in-out infinite',
+        'typing-dot': 'typing-dot 1.2s ease-in-out infinite',
       },
     },
   },
