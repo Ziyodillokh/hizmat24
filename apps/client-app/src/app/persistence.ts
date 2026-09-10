@@ -1,5 +1,14 @@
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
-import type { LiveOrder, UserRole } from './types';
+import { buildInvoice, type OrderInvoice } from '@/lib/pricing';
+import type { LiveOrder, PaymentMethod, UserRole } from './types';
+
+/**
+ * 3-bosqichdan OLDIN saqlangan buyurtmalarda toʻlov usuli yozilmagan.
+ * 2-bosqich ularni "Kafolatli" deb koʻrsatgan edi — tarix qayta yozilmaydi.
+ *
+ * Yagona isteʼmolchisi shu fayl: `wallet.ts` endi usulni TAXMIN QILMAYDI.
+ */
+const LEGACY_PAYMENT_METHOD: PaymentMethod = 'escrow';
 
 /**
  * Ilova holatini qurilmada saqlash.
@@ -11,10 +20,27 @@ import type { LiveOrder, UserRole } from './types';
 const STORAGE_KEY = 'hizmat24:session:v1';
 
 /** Saqlanadigan shakl — `Date` JSONʼda satrga aylanadi, qayta oʻqishda tiklanadi. */
-interface StoredOrder extends Omit<LiveOrder, 'createdAt' | 'completedAt'> {
+interface StoredOrder extends Omit<LiveOrder, 'createdAt' | 'completedAt' | 'scheduledAt'> {
   createdAt: string;
   completedAt: string | null;
+  scheduledAt: string | null;
 }
+
+/** 3-bosqichdan oldingi yozuvda hisob-faktura oʻrniga shu maydon turardi. */
+interface LegacyOrderFields {
+  price?: number;
+}
+
+const isPaymentMethod = (value: unknown): value is PaymentMethod =>
+  value === 'escrow' || value === 'cash' || value === 'card';
+
+const isInvoice = (value: unknown): value is OrderInvoice => {
+  if (typeof value !== 'object' || value === null) return false;
+  const invoice = value as Record<string, unknown>;
+  return (['base', 'urgentFee', 'discountPercent', 'discount', 'total'] as const).every((key) =>
+    Number.isFinite(invoice[key]),
+  );
+};
 
 interface StoredSession {
   isAuthenticated: boolean;
@@ -54,10 +80,27 @@ function reviveOrder(raw: unknown): LiveOrder | null {
   const createdAt = new Date(order.createdAt);
   if (Number.isNaN(createdAt.getTime())) return null;
 
+  const legacyPrice = (order as LegacyOrderFields).price;
+
   return {
     ...(order as StoredOrder),
     createdAt,
     completedAt: order.completedAt ? new Date(order.completedAt) : null,
+    // `scheduledAt` spread orqali SATR boʻlib oʻtardi, tipi esa `Date` deb
+    // turardi — birinchi formatlashda ilova qulardi.
+    scheduledAt: order.scheduledAt ? new Date(order.scheduledAt) : null,
+    paymentMethod: isPaymentMethod(order.paymentMethod)
+      ? order.paymentMethod
+      : LEGACY_PAYMENT_METHOD,
+    // Eski buyurtmada chegirma HAQIQATAN boʻlmagan, demak yakuniy summa
+    // aynan eski `price` ga teng — bu toʻqima emas.
+    invoice: isInvoice(order.invoice)
+      ? order.invoice
+      : buildInvoice({
+          base: typeof legacyPrice === 'number' ? legacyPrice : 0,
+          isUrgent: false,
+          discountPercent: 0,
+        }),
   };
 }
 
@@ -98,6 +141,7 @@ export function saveSession(session: RestoredSession): void {
         ...order,
         createdAt: order.createdAt.toISOString(),
         completedAt: order.completedAt ? order.completedAt.toISOString() : null,
+        scheduledAt: order.scheduledAt ? order.scheduledAt.toISOString() : null,
       })),
       readNotificationIds: session.readNotificationIds,
     };

@@ -31,7 +31,7 @@ const SLIDES: Slide[] = [
     icon: ShieldCheck,
     title: 'Xohlasangiz — pulingiz xavfsiz',
     description:
-      'Toʻlov paytida ixtiyoriy kafolatni tanlasangiz, pulingiz ish tugaguncha saqlanadi. Usta kelmasa — toʻliq qaytariladi.',
+      'Toʻlov paytida ixtiyoriy kafolat Click va Payme ulangach ochiladi: pulingiz ish tugaguncha saqlanadi, usta kelmasa toʻliq qaytariladi.',
   },
   {
     icon: SealCheck,

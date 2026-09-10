@@ -1,4 +1,4 @@
-import { ChatCircleDots, MagnifyingGlass, Phone, Timer, Wrench, XCircle } from '@phosphor-icons/react';
+import { CalendarCheck, ChatCircleDots, MagnifyingGlass, Phone, Timer, Wrench, XCircle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
@@ -17,7 +17,9 @@ import { Stepper } from '@/components/Stepper';
 import { Textarea } from '@/components/Textarea';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { canCancel, isMasterPhoneVisible, ORDER_STATUS } from '@/lib/orderStateMachine';
-import { formatDuration, formatPrice } from '@/lib/formatters';
+import { formatDateTime, formatDuration, formatPrice } from '@/lib/formatters';
+import { useMinuteClock } from '@/lib/useMinuteClock';
+import { METHOD_SHORT_LABELS } from '@/lib/wallet';
 import { useApp } from '../store';
 import { useChat } from '../chat-store';
 import { useToast } from '../ToastHost';
@@ -41,9 +43,12 @@ function Summary({ order }: { order: LiveOrder }) {
     <Card className="mt-16 flex flex-col gap-8">
       <div className="flex items-start justify-between gap-12">
         <p className="min-w-0 flex-1 text-h3 text-text-primary">{order.categoryName}</p>
-        <p className="shrink-0 text-price text-text-primary tabular">{formatPrice(order.price)}</p>
+        <p className="shrink-0 text-price text-text-primary tabular">{formatPrice(order.invoice.total)}</p>
       </div>
       <p className="text-body-sm text-text-secondary">{order.address.label}</p>
+      <p className="text-caption text-text-secondary">
+        {METHOD_SHORT_LABELS[order.paymentMethod]}
+      </p>
       {order.isUrgent && (
         <InfoChip icon={Timer} tone="warning" className="mt-4 self-start">
           Shoshilinch
@@ -78,6 +83,7 @@ export function OrderTracking() {
   const { orderId } = useParams<{ orderId: string }>();
   const { findOrder, cancelOrder, advanceOrder } = useApp();
   const { openThread } = useChat();
+  const now = useMinuteClock();
   const showToast = useToast();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -248,7 +254,27 @@ export function OrderTracking() {
         </Banner>
       )}
 
+      {/* Rejalashtirilgan buyurtma kunlab qidiruvda turadi — sabab
+          aytilmasa ilova qotib qolgandek koʻrinadi. */}
+      {order.scheduledAt &&
+        (order.status === ORDER_STATUS.SEARCHING ||
+          order.status === ORDER_STATUS.SEARCHING_QUEUED) && (
+          <Banner variant="info" icon={CalendarCheck} className="mt-16">
+            Buyurtma {formatDateTime(order.scheduledAt, now)} ga rejalashtirilgan. Usta qidiruvi
+            oʻsha vaqtda boshlanadi.
+          </Banner>
+        )}
+
       <Summary order={order} />
+
+      <button
+        type="button"
+        onClick={() => navigate(`/app/order/${order.id}/payment-receipt`)}
+        className="mt-12 px-4 text-caption text-primary-pressed"
+      >
+        Toʻlov chekini koʻrish
+      </button>
+
       <div className="h-bottom-reserve" aria-hidden />
 
       <Sheet open={sheetOpen} title="Bekor qilish sababi" onClose={() => setSheetOpen(false)}>
@@ -293,6 +319,9 @@ export function OrderTracking() {
         onClose={() => setConfirmOpen(false)}
       >
         <div className="mt-20 flex flex-col gap-12">
+          <p className="text-center text-body-sm text-text-secondary">
+            Hech qanday pul yechilmagan.
+          </p>
           <Button variant="destructive" onClick={submitCancel}>
             Ha, bekor qilish
           </Button>

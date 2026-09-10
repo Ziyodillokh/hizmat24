@@ -44,6 +44,14 @@ export function useBackButton(): void {
         return true;
       }
 
+      // Toʻlov chekiga tasdiqlashdan `replace` bilan kelinadi, demak tarixda
+      // boʻshatilgan qoralama qolgan. Bir qadam orqaga qaytish oʻsha yerga
+      // tushirardi — buyurtmaning oʻziga oʻtamiz.
+      if (path.endsWith('/payment-receipt')) {
+        navigate(path.replace('/payment-receipt', ''), { replace: true });
+        return true;
+      }
+
       if (path === '/app/home' || path === '/app') {
         return false; // ilovadan chiqish
       }

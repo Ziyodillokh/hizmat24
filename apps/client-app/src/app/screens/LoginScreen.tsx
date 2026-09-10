@@ -30,7 +30,7 @@ interface Benefit {
 const BENEFITS: Benefit[] = [
   {
     icon: ShieldCheck,
-    title: 'Ixtiyoriy kafolat',
+    title: 'Ixtiyoriy kafolat — tez orada',
     description: 'Xohlasangiz, pulingiz ish tugaguncha xavfsiz saqlanadi',
   },
   {

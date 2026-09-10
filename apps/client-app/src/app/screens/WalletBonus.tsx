@@ -5,6 +5,7 @@ import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { InfoChip } from '@/components/InfoChip';
+import { SummaryRow } from '@/components/SummaryRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { formatPercent, formatPrice } from '@/lib/formatters';
@@ -38,31 +39,6 @@ const LEVEL_RANGES: Record<LevelKey, string> = {
   silver: '10–29 ta buyurtma',
   gold: '30 ta buyurtmadan boshlab',
 };
-
-/** Chek uslubidagi qator: chapda yorliq, oʻngda qiymat. */
-function SummaryRow({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: 'success';
-}) {
-  return (
-    <div className="flex items-start justify-between gap-16 py-12">
-      <p className="shrink-0 text-body-sm text-text-secondary">{label}</p>
-      <p
-        className={cn(
-          'tabular min-w-0 text-right text-body-lg',
-          tone === 'success' ? 'text-success' : 'text-text-primary',
-        )}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
 
 export function WalletBonus() {
   const navigate = useNavigate();
@@ -141,7 +117,7 @@ export function WalletBonus() {
 
       <h2 className="mt-20 px-4 text-overline uppercase text-text-secondary">Daraja tizimi</h2>
       <p className="mt-8 px-4 text-body-sm text-text-secondary">
-        Chegirma platforma komissiyasidan beriladi — ustaning ish haqiga taʼsir qilmaydi.
+        Chegirma toʻlanadigan summadan ayiriladi. Uni platforma oʻz komissiyasidan qoplaydi — ustaning ish haqi kamaymaydi, sizdan esa komissiya olinmaydi.
       </p>
 
       <div
@@ -194,7 +170,7 @@ export function WalletBonus() {
       </div>
 
       <p className="mt-8 px-4 text-caption text-text-secondary">
-        Chegirma toʻlov sahifasida qoʻllanadi. Toʻlov sahifasi hozircha tayyorlanmoqda.
+        Chegirma har bir buyurtmaning toʻlov sahifasida avtomatik qoʻllanadi — hech narsa yoqish shart emas.
       </p>
 
       <h2 className="mt-20 px-4 text-overline uppercase text-text-secondary">Keshbek</h2>

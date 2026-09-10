@@ -112,11 +112,34 @@ const MONTHS = [
   'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr',
 ];
 
+/**
+ * Hafta kunlari — 8.5-band roʻyxati, DUSHANBADAN boshlab.
+ *
+ * `getDay()` da 0 = yakshanba, shuning uchun indeks `(getDay() + 6) % 7`
+ * orqali olinadi. Jadvalga `getDay()` toʻgʻridan-toʻgʻri berilsa, yakshanba
+ * "dushanba" boʻlib chiqadi.
+ */
+const WEEKDAYS = [
+  'dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba', 'yakshanba',
+];
+
+/** Sana tasmasidagi qisqa yorliq: "Du" · "Se" · "Cho". */
+const WEEKDAYS_SHORT = ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha', 'Yak'];
+
+const weekdayIndex = (date: Date): number => (date.getDay() + 6) % 7;
+
+export const formatWeekday = (date: Date): string => WEEKDAYS[weekdayIndex(date)];
+
+export const formatWeekdayShort = (date: Date): string => WEEKDAYS_SHORT[weekdayIndex(date)];
+
+/** Sana tasmasidagi kun raqami: "5" · "28". Ekranda `getDate()` yozilmaydi. */
+export const formatDayNumber = (date: Date): string => String(date.getDate());
+
 const isSameDay = (a: Date, b: Date): boolean =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 /**
- * Kun yorligʻi: "Bugun" · "Kecha" · "5-sentabr" · "2025-yil 5-sentabr".
+ * Kun yorligʻi: "Bugun" · "Ertaga" · "Kecha" · "5-sentabr" · "2025-yil 5-sentabr".
  *
  * `orderDateGroup` dan farqi — u eski sanani OY aniqligida ("Sentabr")
  * beradi, chunki buyurtmalar roʻyxati oylar boʻyicha boʻlinadi. Chatda esa
@@ -126,9 +149,14 @@ const isSameDay = (a: Date, b: Date): boolean =>
 export function formatDayLabel(date: Date, now: Date): string {
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
 
   if (isSameDay(date, now)) return 'Bugun';
   if (isSameDay(date, yesterday)) return 'Kecha';
+  // "Ertaga" — rejalashtirilgan buyurtma uchun: ilgari sanalar faqat
+  // oʻtmishda edi, endi kelajakka ham yoziladi.
+  if (isSameDay(date, tomorrow)) return 'Ertaga';
 
   const day = `${date.getDate()}-${MONTHS[date.getMonth()]}`;
   return date.getFullYear() === now.getFullYear() ? day : `${date.getFullYear()}-yil ${day}`;

@@ -223,3 +223,19 @@ export function matchesHistoryFilter(status: OrderStatus, filter: HistoryFilter)
  */
 export const needsSafetyNotice = (status: OrderStatus): boolean =>
   status === ORDER_STATUS.SAFETY_FLAGGED;
+
+/**
+ * Toʻlov chekidagi holat.
+ *
+ * `paid` FAQAT `CLOSED` dan chiqadi: pul haqiqatan koʻchgani mijoz ishni
+ * tasdiqlaganda maʼlum boʻladi. Undan oldin "toʻlanmagan" deb yozilmaydi —
+ * naqd toʻlovda pul allaqachon ustaning qoʻlida boʻlishi mumkin.
+ */
+export type PaymentStateKey = 'pending' | 'confirm' | 'paid' | 'none';
+
+export function paymentStateFor(status: OrderStatus): PaymentStateKey {
+  if (status === ORDER_STATUS.CLOSED) return 'paid';
+  if (status === ORDER_STATUS.COMPLETED_BY_MASTER) return 'confirm';
+  if (status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.SAFETY_FLAGGED) return 'none';
+  return 'pending';
+}

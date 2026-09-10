@@ -1,15 +1,19 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Qadam indikatori (3 nuqta) — spetsifikatsiya 9.24-bandi, 08–11 ekranlar uchun.
+ * Qadam indikatori — spetsifikatsiya 9.24-bandi, buyurtma berish oqimi uchun.
  * Bu 9.16 stepperdan ALOHIDA komponent, aralashtirilmaydi.
+ *
+ * Qadamlar soni uchtadan beshtaga oʻsdi: oqimga vaqt tanlash va toʻlov
+ * qoʻshildi. Kenglik xavfsiz — 4x8 + 20 + 4x8 = 84px, 360px ekranda ham joy
+ * bor.
  */
-export const STEP_DOT_LABELS = ['Tavsif', 'Manzil', 'Tasdiqlash'] as const;
+export const STEP_DOT_LABELS = ['Tavsif', 'Manzil', 'Vaqt', 'Toʻlov', 'Tasdiqlash'] as const;
 
-export type StepDotIndex = 0 | 1 | 2;
+export type StepDotIndex = 0 | 1 | 2 | 3 | 4;
 
 export interface StepDotsProps {
-  /** 0-indeksli joriy qadam: Tavsif · Manzil · Tasdiqlash. */
+  /** 0-indeksli joriy qadam. */
   currentStep: StepDotIndex;
   className?: string;
 }

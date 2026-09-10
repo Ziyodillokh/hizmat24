@@ -4,11 +4,15 @@ import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { MasterCard } from '@/components/MasterCard';
 import { StarRating } from '@/components/StarRating';
+import { SummaryRow } from '@/components/SummaryRow';
 import { Stepper } from '@/components/Stepper';
 import { Textarea } from '@/components/Textarea';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { formatDateTime, formatPrice, orEmpty } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
+import { useMinuteClock } from '@/lib/useMinuteClock';
+import { METHOD_LABELS } from '@/lib/wallet';
+import { cn } from '@/lib/cn';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
 import { tapFeedback } from '../native';
@@ -85,20 +89,12 @@ export function RateOrderScreen() {
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-16 py-12">
-      <span className="shrink-0 text-body-sm text-text-secondary">{label}</span>
-      <span className="min-w-0 text-right text-body-lg text-text-primary">{children}</span>
-    </div>
-  );
-}
-
 /** 20 · Chek. */
 export function ReceiptScreen() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const { findOrder } = useApp();
+  const now = useMinuteClock();
 
   const order = orderId ? findOrder(orderId) : undefined;
   if (!order) return <Navigate to="/app/home" replace />;
@@ -114,30 +110,44 @@ export function ReceiptScreen() {
         </StickyFooter>
       }
     >
-      <div className="mt-4 rounded-lg border border-border bg-surface-elevated p-16">
-        <Row label="Buyurtma raqami">
-          <span className="tabular tracking-[0.4px]">{order.shortId}</span>
-        </Row>
+      <div
+        className={cn(
+          'mt-4 rounded-lg border border-transparent bg-surface-elevated p-16 shadow-e1',
+          "[[data-theme='dark']_&]:border-border",
+        )}
+      >
+        <SummaryRow label="Buyurtma raqami" value={order.shortId} mono />
         <div className="border-t border-dashed border-border" />
-        <Row label="Xizmat">{order.categoryName}</Row>
-        <Row label="Usta">{orEmpty(order.master?.fullName)}</Row>
-        <Row label="Baho">
-          {order.rating ? (
-            <StarRating value={order.rating.stars} size="sm" showValue />
-          ) : (
-            orEmpty(null)
-          )}
-        </Row>
-        <Row label="Yakunlangan sana">
-          {order.completedAt ? formatDateTime(order.completedAt, new Date()) : orEmpty(null)}
-        </Row>
+        <SummaryRow label="Xizmat" value={order.categoryName} />
+        <SummaryRow label="Usta" value={orEmpty(order.master?.fullName)} />
+        <SummaryRow
+          label="Baho"
+          value={
+            order.rating ? <StarRating value={order.rating.stars} size="sm" showValue /> : orEmpty(null)
+          }
+        />
+        <SummaryRow
+          label="Yakunlangan sana"
+          value={order.completedAt ? formatDateTime(order.completedAt, now) : orEmpty(null)}
+        />
+        <SummaryRow label="Toʻlov usuli" value={METHOD_LABELS[order.paymentMethod]} />
 
         <div className="border-t border-dashed border-border pt-16" />
         <div className="flex items-baseline justify-between gap-16">
           <span className="text-body-lg text-text-secondary">Jami</span>
-          <span className="text-display text-text-primary tabular">{formatPrice(order.price)}</span>
+          <span className="text-display text-text-primary tabular">{formatPrice(order.invoice.total)}</span>
         </div>
       </div>
+
+      {/* Ikki hujjat bir-birini takrorlamaydi, bir-biriga ulanadi: bu chek
+          nima qilinganini, toʻlov cheki esa nima toʻlanganini aytadi. */}
+      <button
+        type="button"
+        onClick={() => navigate(`/app/order/${order.id}/payment-receipt`)}
+        className="mt-12 px-4 text-caption text-primary-pressed"
+      >
+        Toʻlov chekini koʻrish
+      </button>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

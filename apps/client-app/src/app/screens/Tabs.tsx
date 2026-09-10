@@ -117,7 +117,7 @@ export function OrdersTab() {
                         ? formatTime(order.createdAt)
                         : undefined
                     }
-                    price={order.price}
+                    price={order.invoice.total}
                     onSelect={() => navigate(`/app/order/${order.id}`)}
                   />
                 </li>

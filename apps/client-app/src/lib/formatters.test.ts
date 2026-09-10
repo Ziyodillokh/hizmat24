@@ -14,6 +14,8 @@ import {
   formatQueuePosition,
   formatRating,
   formatShortDate,
+  formatWeekday,
+  formatWeekdayShort,
   formatTime,
   greeting,
   maskPhone,
@@ -153,9 +155,11 @@ describe('orEmpty (8.5-band)', () => {
 });
 
 describe('formatDayLabel (chat kun ajratkichi)', () => {
-  it('bugun va kechani soʻz bilan aytadi', () => {
+  it('bugun, ertaga va kechani soʻz bilan aytadi', () => {
     expect(formatDayLabel(new Date(2026, 8, 5, 3, 0), NOW)).toBe('Bugun');
     expect(formatDayLabel(new Date(2026, 8, 4, 23, 59), NOW)).toBe('Kecha');
+    // Rejalashtirilgan buyurtma kelajakka yoziladi.
+    expect(formatDayLabel(new Date(2026, 8, 6, 9, 0), NOW)).toBe('Ertaga');
   });
 
   it("eski sanani KUN aniqligida beradi — oy nomi bilan cheklanmaydi", () => {
@@ -202,5 +206,24 @@ describe('formatPercent', () => {
     expect(formatPercent(0)).toBe('0%');
     expect(formatPercent(12)).toBe('12%');
     expect(formatPercent(12.5)).toBe('13%');
+  });
+});
+
+describe('formatWeekday (hafta dushanbadan boshlanadi)', () => {
+  it('yakshanbani yakshanba deb ataydi — getDay() 0 tuzogʻi', () => {
+    // 2026-09-13 — yakshanba.
+    expect(formatWeekday(new Date(2026, 8, 13))).toBe('yakshanba');
+    expect(formatWeekdayShort(new Date(2026, 8, 13))).toBe('Yak');
+  });
+
+  it('dushanba jadvalning birinchi elementi', () => {
+    expect(formatWeekday(new Date(2026, 8, 7))).toBe('dushanba');
+    expect(formatWeekdayShort(new Date(2026, 8, 7))).toBe('Du');
+  });
+
+  it('shanba — yakshanbadan oldingi kun, siljib ketmaydi', () => {
+    // NOW = 2026-09-05, shanba.
+    expect(formatWeekday(NOW)).toBe('shanba');
+    expect(formatWeekdayShort(NOW)).toBe('Sha');
   });
 });

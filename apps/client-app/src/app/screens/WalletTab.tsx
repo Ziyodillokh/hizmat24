@@ -134,7 +134,7 @@ export function WalletTab() {
     title: 'Toʻlov va himoya',
     items: [
       { icon: SealPercent, label: 'Sizdan komissiya', hint: formatPercent(CLIENT_COMMISSION_PERCENT) },
-      { icon: ShieldCheck, label: 'Kafolatli toʻlov', hint: 'Yoqilgan' },
+      { icon: ShieldCheck, label: 'Kafolatli toʻlov', hint: 'Tez orada' },
       { icon: Wallet, label: 'Hisob balansi', hint: 'Tez orada' },
     ],
   };

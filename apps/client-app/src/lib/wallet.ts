@@ -1,5 +1,6 @@
 import { ALL_CATEGORIES, findGroup } from '@/mocks/serviceGroups';
 import { ORDER_STATUS } from './orderStateMachine';
+import { MONEY_STEP } from './pricing';
 import type { LiveOrder, PaymentMethod, WalletTransaction } from '@/app/types';
 
 /**
@@ -43,14 +44,6 @@ export const CASHBACK_BLOCK = 10;
 export const CASHBACK_PERCENT = 1;
 
 /**
- * Cashback eng yaqin 100 soʻmga yaxlitlanadi.
- *
- * Demodagi qoida: 410 000 soʻmning 1% i = 4 100 soʻm. Tiyin darajasidagi
- * aniqlik bu yerda maʼnosiz — soʻmda eng kichik amaliy birlik 100.
- */
-const CASHBACK_ROUNDING = 100;
-
-/**
  * Toʻlov usuli nomlari.
  *
  * `escrow` — "Kafolatli toʻlov": ilova boshqa hamma joyda aynan shu soʻzni
@@ -70,16 +63,6 @@ export const METHOD_SHORT_LABELS: Record<PaymentMethod, string> = {
   card: 'Karta',
 };
 
-/**
- * 2-bosqichda toʻlov ekrani yoʻq, demak jonli buyurtmaning usuli nomaʼlum.
- * Platformaning asosiy usuli — kafolatli toʻlov, shuning uchun vaqtincha shu
- * qiymat qoʻyiladi.
- *
- * 3-BOSQICH: toʻlov ekrani qoʻshilganda aynan shu konstanta oʻrniga
- * `order.paymentMethod` keladi.
- */
-export const DEFAULT_PAYMENT_METHOD: PaymentMethod = 'escrow';
-
 /** Nolga boʻlish HAMMA joyda shu yerda toʻxtaydi. */
 export const percentOf = (part: number, total: number): number =>
   total > 0 ? (part * 100) / total : 0;
@@ -96,8 +79,9 @@ const isSameMonth = (a: Date, b: Date): boolean =>
  * Faqat `CLOSED`: `COMPLETED_BY_MASTER` da mijoz hali baholamagan va escrow
  * ochilmagan, `CANCELLED`/`SAFETY_FLAGGED` da esa pul umuman toʻlanmagan.
  *
- * DIQQAT: `order.price` — katalogdagi asosiy narx. Haqiqiy hisob-faktura
- * 3-bosqichdagi toʻlov ekrani bilan keladi va oʻshanda shu qator oʻzgaradi.
+ * Summa — buyurtma yaratilganda MUZLATILGAN hisob-fakturadan olinadi.
+ * Daraja keyin koʻtarilsa ham oʻtmishdagi chek, oylik statistika va
+ * yigʻilgan keshbek oʻzgarmaydi.
  */
 export function orderToTransaction(order: LiveOrder): WalletTransaction | null {
   if (order.status !== ORDER_STATUS.CLOSED) return null;
@@ -115,8 +99,8 @@ export function orderToTransaction(order: LiveOrder): WalletTransaction | null {
     groupId: category?.groupId ?? 'g-other',
     groupName: category?.groupName ?? 'Boshqa',
     masterName: order.master?.fullName ?? null,
-    amount: Math.max(0, Math.round(order.price)),
-    method: DEFAULT_PAYMENT_METHOD,
+    amount: Math.max(0, Math.round(order.invoice.total)),
+    method: order.paymentMethod,
     paidAt: order.completedAt ?? order.createdAt,
   };
 }
@@ -305,7 +289,7 @@ export function cashbackFor(transactions: readonly WalletTransaction[]): Cashbac
 }
 
 const roundCashback = (amount: number): number =>
-  Math.round((amount * CASHBACK_PERCENT) / 100 / CASHBACK_ROUNDING) * CASHBACK_ROUNDING;
+  Math.round((amount * CASHBACK_PERCENT) / 100 / MONEY_STEP) * MONEY_STEP;
 
 export interface MonthBar {
   /** Oyning 1-sanasi — sarlavha va aria-label shu sanadan yasaladi. */

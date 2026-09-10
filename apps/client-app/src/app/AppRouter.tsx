@@ -15,6 +15,9 @@ import { OtpScreen } from './screens/OtpScreen';
 import { HomeTab } from './screens/HomeTab';
 import { AllServicesTab, GroupServicesTab } from './screens/CatalogScreens';
 import { AddressStep, ConfirmStep, MapStep, OrderDetailsStep } from './screens/CreateOrderScreens';
+import { ScheduleStep } from './screens/ScheduleStep';
+import { PaymentStep } from './screens/PaymentStep';
+import { PaymentReceipt } from './screens/PaymentReceipt';
 import { OrderTracking } from './screens/OrderTracking';
 import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
@@ -142,6 +145,22 @@ function AppRoutes() {
             }
           />
           <Route
+            path="new/schedule"
+            element={
+              <RequireAuth>
+                <ScheduleStep />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="new/payment"
+            element={
+              <RequireAuth>
+                <PaymentStep />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="new/confirm"
             element={
               <RequireAuth>
@@ -187,6 +206,14 @@ function AppRoutes() {
             element={
               <RequireAuth>
                 <ReceiptScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="order/:orderId/payment-receipt"
+            element={
+              <RequireAuth>
+                <PaymentReceipt />
               </RequireAuth>
             }
           />

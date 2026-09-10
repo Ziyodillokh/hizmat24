@@ -13,6 +13,8 @@ import { MASTERS } from '@/mocks/masters';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, OrderAddress } from '@/mocks/types';
+import { buildInvoice } from '@/lib/pricing';
+import type { PaymentMethod } from './types';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
 import { clearSession, loadSession, saveSession } from './persistence';
 
@@ -50,11 +52,21 @@ interface AppActions {
   completeOnboarding: (role: UserRole) => void;
   signOut: () => void;
   setDraftCategory: (categoryId: string) => void;
-  setDraftDetails: (description: string, isUrgent: boolean) => void;
+  setDraftDetails: (description: string) => void;
   setDraftAddress: (address: OrderAddress) => void;
+  /** Vaqt tanlash: `scheduledAt === null` — imkon qadar tez. */
+  setDraftSchedule: (scheduledAt: Date | null, isUrgent: boolean) => void;
+  setDraftPayment: (method: PaymentMethod) => void;
   resetDraft: () => void;
-  /** Qoralamadan buyurtma yaratadi va uning id sini qaytaradi. */
-  createOrder: () => string | null;
+  /**
+   * Qoralamadan buyurtma yaratadi va uning id sini qaytaradi.
+   *
+   * Chegirma foizi TASHQARIDAN keladi: daraja mock toʻlovlar va jonli
+   * buyurtmalar birgalikda hisoblanadi, store esa faqat jonli buyurtmalarni
+   * koʻradi. Foiz shu yerda hisoblansa, Bonuslar sahifasi "Kumush · 4%" deb
+   * turganda chekda "Bronza · 2%" chiqardi.
+   */
+  createOrder: (discountPercent: number) => string | null;
   cancelOrder: (orderId: string, reason: string) => void;
   confirmMaster: (orderId: string) => void;
   rejectMaster: (orderId: string, note: string) => void;
@@ -100,6 +112,24 @@ const TERMINAL: readonly OrderStatus[] = [
   ORDER_STATUS.CANCELLED,
   ORDER_STATUS.SAFETY_FLAGGED,
 ];
+
+/**
+ * Keyingi avtomatik oʻtishgacha kutish vaqti.
+ *
+ * Rejalashtirilgan buyurtmada usta qidiruvi belgilangan vaqtda boshlanadi.
+ * Busiz kelasi haftaga yozilgan buyurtmada ham 3,5 soniyadan keyin "Usta
+ * topildi" chiqardi — bu ekranda koʻrinadigan yolgʻon. Faqat BIRINCHI qadam
+ * suriladi, keyingilari odatdagi tezlikda ketadi.
+ *
+ * 7 kun = 604 800 000 ms; `setTimeout` chegarasi 2 147 483 647 ms.
+ */
+function waitMsFor(order: LiveOrder, delayMs: number): number {
+  const isSearching =
+    order.status === ORDER_STATUS.SEARCHING || order.status === ORDER_STATUS.SEARCHING_QUEUED;
+  if (!isSearching || !order.scheduledAt) return delayMs;
+
+  return Math.max(0, order.scheduledAt.getTime() - Date.now()) + delayMs;
+}
 
 /** Usta tayinlanganda telefon koʻrinadi; boshqa holatlarda `null` boʻladi. */
 const assignMaster = () => ({ ...MASTERS.akmal });
@@ -185,7 +215,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const handle = window.setTimeout(() => {
         timers.current.delete(key);
         applyServerStep(order.id, order.status);
-      }, step.delayMs);
+      }, waitMsFor(order, step.delayMs));
 
       timers.current.set(key, handle);
     }
@@ -246,24 +276,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setDraftCategory: (categoryId) =>
         setState((prev) => ({ ...prev, draft: { ...prev.draft, categoryId } })),
 
-      setDraftDetails: (description, isUrgent) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, description, isUrgent } })),
+      setDraftDetails: (description) =>
+        setState((prev) => ({ ...prev, draft: { ...prev.draft, description } })),
+
+      setDraftSchedule: (scheduledAt, isUrgent) =>
+        setState((prev) => ({
+          ...prev,
+          // Invariant SHU YERDA saqlanadi: rejalashtirilgan buyurtma
+          // shoshilinch boʻlmaydi.
+          draft: { ...prev.draft, scheduledAt, isUrgent: scheduledAt === null && isUrgent },
+        })),
+
+      setDraftPayment: (paymentMethod) =>
+        setState((prev) => ({ ...prev, draft: { ...prev.draft, paymentMethod } })),
 
       setDraftAddress: (address) =>
         setState((prev) => ({ ...prev, draft: { ...prev.draft, address } })),
 
       resetDraft: () => setState((prev) => ({ ...prev, draft: EMPTY_DRAFT })),
 
-      createOrder: () => {
+      createOrder: (discountPercent) => {
         let createdId: string | null = null;
 
         setState((prev) => {
           const category = ALL_CATEGORIES.find((item) => item.id === prev.draft.categoryId);
-          if (!category || !prev.draft.address) return prev;
+          // Toʻlov usuli ham majburiy: usulsiz buyurtma hamyonda yorliqsiz
+          // qator berardi.
+          if (!category || !prev.draft.address || !prev.draft.paymentMethod) return prev;
 
           orderCounter += 1;
           createdId = `live-${orderCounter}`;
-          const shouldQueue = !prev.draft.isUrgent && orderCounter % 3 === 0;
+          // Rejalashtirilgan buyurtmada navbat maʼnosiz — navbat "hozir"
+          // tushunchasi.
+          const shouldQueue =
+            !prev.draft.isUrgent && prev.draft.scheduledAt === null && orderCounter % 3 === 0;
 
           const order: LiveOrder = {
             id: createdId,
@@ -272,7 +318,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             categoryName: category.name,
             categoryIconKey: category.iconKey,
             description: prev.draft.description,
-            price: category.basePrice,
+            invoice: buildInvoice({
+              base: category.basePrice,
+              isUrgent: prev.draft.isUrgent,
+              discountPercent,
+            }),
+            paymentMethod: prev.draft.paymentMethod,
+            scheduledAt: prev.draft.scheduledAt,
             isUrgent: prev.draft.isUrgent,
             address: prev.draft.address,
             // Har uchinchi oddiy buyurtma navbatdan boshlanadi — haqiqiy

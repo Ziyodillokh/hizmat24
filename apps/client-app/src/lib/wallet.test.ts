@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ORDER_STATUS } from './orderStateMachine';
+import { buildInvoice } from './pricing';
 import {
   buildWalletView,
   byGroup,
@@ -51,7 +52,9 @@ function order(status: LiveOrder['status'], options: Partial<LiveOrder> = {}): L
     categoryName: "Kran taʼmirlash",
     categoryIconKey: 'tap',
     description: '',
-    price: 100_000,
+    invoice: buildInvoice({ base: 100_000, isUrgent: false, discountPercent: 0 }),
+    paymentMethod: 'escrow' as PaymentMethod,
+    scheduledAt: null,
     isUrgent: false,
     address: { label: 'Chilonzor' },
     status,
@@ -193,8 +196,40 @@ describe('orderToTransaction', () => {
   });
 
   it('manfiy narx nolga tushadi', () => {
-    const result = orderToTransaction(order(ORDER_STATUS.CLOSED, { price: -5_000 }));
+    const invoice = buildInvoice({ base: -5_000, isUrgent: false, discountPercent: 0 });
+    const result = orderToTransaction(order(ORDER_STATUS.CLOSED, { invoice }));
+
     expect(result?.amount).toBe(0);
+  });
+
+  it('toʻlov usuli buyurtmadan olinadi — taxmin qilinmaydi', () => {
+    const result = orderToTransaction(
+      order(ORDER_STATUS.CLOSED, { paymentMethod: 'cash' as PaymentMethod }),
+    );
+
+    expect(result?.method).toBe('cash');
+  });
+
+  it('chegirma ayirilgan summa yoziladi', () => {
+    const invoice = buildInvoice({ base: 100_000, isUrgent: false, discountPercent: 4 });
+    const result = orderToTransaction(order(ORDER_STATUS.CLOSED, { invoice }));
+
+    expect(result?.amount).toBe(96_000);
+  });
+
+  it('shoshilinch qoʻshimchasi summaga kiradi', () => {
+    const invoice = buildInvoice({ base: 100_000, isUrgent: true, discountPercent: 4 });
+    const result = orderToTransaction(order(ORDER_STATUS.CLOSED, { invoice }));
+
+    expect(result?.amount).toBe(116_000);
+  });
+
+  it('hisob-faktura muzlatilgan — daraja koʻtarilsa ham summa oʻzgarmaydi', () => {
+    const invoice = buildInvoice({ base: 100_000, isUrgent: false, discountPercent: 2 });
+    const yozilgan = order(ORDER_STATUS.CLOSED, { invoice });
+
+    expect(orderToTransaction(yozilgan)?.amount).toBe(orderToTransaction(yozilgan)?.amount);
+    expect(orderToTransaction(yozilgan)?.amount).toBe(98_000);
   });
 });
 

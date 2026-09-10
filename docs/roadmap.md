@@ -96,15 +96,46 @@ Qo'shimcha qarorlar:
 **3-bosqichga ko'chirildi:** escrow'da muzlatilgan summa, chegirmani to'lovda
 qo'llash, keshbekni sarflash, to'lov cheki, Click/Payme integratsiyasi.
 
-### 3-bosqich — Bron va to'lov
+### 3-bosqich — Bron va to'lov ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
 | Sana va vaqt tanlash | `/app/new/schedule` |
-| To'lov (escrow, sug'urta, Click/Payme) | `/app/new/payment` |
+| To'lov usuli va hisob | `/app/new/payment` |
 | To'lov cheki | `/app/order/:id/payment-receipt` |
 
-Hozir buyurtma zanjiri uzilgan: vaqt tanlash ham, to'lov ham yo'q.
+Buyurtma zanjiri to'liq: xizmat → tavsif → xarita → manzil → **vaqt** →
+**to'lov** → tasdiqlash → **to'lov cheki** → kuzatuv. StepDots 5 qadam.
+
+Qo'shimcha qarorlar:
+- **Yakuniy summa** = asosiy narx + shoshilinch qo'shimchasi (20 000 so'm,
+  qat'iy) − daraja chegirmasi. Chegirma faqat asosiy narxdan olinadi.
+- Shoshilinch qo'shimchasi vaqt tanlash ekranida, tugma yonida aytiladi —
+  to'lov ekranida birinchi marta ko'rinsa, u yashirin to'lov bo'lardi.
+- **Faqat naqd ishlaydi.** Kafolatli to'lov va bank kartasi ro'yxatda
+  ko'rinadi, lekin `disabled` — Click va Payme ulangach ochiladi. Ekranda
+  buni aytadigan banner turadi.
+- Hisob-faktura buyurtma yaratilganda **muzlatiladi**: daraja keyin
+  ko'tarilsa ham o'tmishdagi chek va statistika o'zgarmaydi.
+- `LiveOrder.price` o'chirildi, o'rniga `invoice` — kompilyator har bir
+  o'quvchini ko'rsatishi uchun.
+- Rejalashtirilgan buyurtmada usta qidiruvi belgilangan vaqtda boshlanadi.
+- Ikkita chek bir-birini takrorlamaydi: `/receipt` — nima qilindi va kim
+  qildi, `/payment-receipt` — nima to'lanadi va qaysi qatorlardan.
+- Sug'urta va bosqichli escrow qoidasi **kiritilmadi**: shartnoma yo'q,
+  demak bajarib bo'lmaydigan va'da bo'lardi.
+
+**Yopilgan ochiq uchlar:** `DEFAULT_PAYMENT_METHOD` taxmini o'chdi, daraja
+chegirmasi haqiqatan qo'llanadi, kafolat va'dalari "tez orada" deb
+aniqlashtirildi.
+
+**Ochiq uchlar (keyingi bosqichlarga):** qoralama saqlanmaydi (oqim
+yarmida ilova yopilsa yo'qoladi); `MapStep` dagi "Mening joylashuvim"
+tugmasi hech narsa qilmaydi (`@capacitor/geolocation` o'rnatilmagan);
+rejalashtirilgan buyurtma uchun alohida `OrderStatus` yo'q; keshbekni
+sarflash balans bilan birga keladi; platforma komissiyasi ish narxining
+6% idan kam bo'lmasligi shart — aks holda Oltin darajadagi chegirma
+platformani zararga soladi.
 
 ### 4-bosqich — Ish jarayoni
 

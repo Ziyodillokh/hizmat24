@@ -129,7 +129,7 @@ export function ConfirmOrderScreen({
         </StickyFooter>
       }
     >
-      <StepDots currentStep={2} />
+      <StepDots currentStep={4} />
 
       <h1 className="mt-20 text-h1 text-text-primary">Buyurtmani tasdiqlang</h1>
 

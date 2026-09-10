@@ -24,7 +24,7 @@ export const AI_TOPICS: AiTopic[] = [
     chip: 'Kafolat?',
     question: 'Kafolat qanday ishlaydi?',
     answer:
-      'Toʻlov paytida ixtiyoriy kafolatni tanlasangiz, pulingiz ish tugaguncha platformada saqlanadi. Usta ishni yakunlagach va siz tasdiqlagach — pul ustaga oʻtadi. Usta kelmasa yoki ish bajarilmasa, pul toʻliq qaytariladi.',
+      'Toʻlov paytida ixtiyoriy kafolatni tanlasangiz, pulingiz ish tugaguncha platformada saqlanadi. Usta ishni yakunlagach va siz tasdiqlagach — pul ustaga oʻtadi. Usta kelmasa yoki ish bajarilmasa, pul toʻliq qaytariladi. Kafolatli toʻlov Click va Payme ulangach ishga tushadi; hozircha buyurtma naqd toʻlanadi.',
   },
   {
     id: 'find-master',
@@ -38,7 +38,7 @@ export const AI_TOPICS: AiTopic[] = [
     chip: 'Pul qaytishi',
     question: 'Pulim qanday qaytariladi?',
     answer:
-      'Kafolat tanlangan boʻlsa, pul kartangizga 1-3 ish kunida qaytariladi. Kafolatsiz toʻlovda esa usta bilan kelishuv yoki nizo ochish orqali hal qilinadi.',
+      'Kafolat ishga tushgach, pul kartangizga 1-3 ish kunida qaytariladi. Hozircha naqd toʻlovda pul ilovada saqlanmaydi — masala usta bilan kelishuv yoki nizo ochish orqali hal qilinadi.',
   },
   {
     id: 'price',
@@ -52,7 +52,7 @@ export const AI_TOPICS: AiTopic[] = [
     chip: 'Kechikish?',
     question: 'Usta kechiksa nima boʻladi?',
     answer:
-      'Usta belgilangan vaqtdan 15 daqiqa kechiksa, sizga xabar keladi va buyurtmani bepul bekor qilish tugmasi ochiladi. Kafolat tanlangan boʻlsa pul darhol qaytariladi.',
+      'Usta belgilangan vaqtdan 15 daqiqa kechiksa, sizga xabar keladi va buyurtmani bepul bekor qilish tugmasi ochiladi. Kafolat ishga tushgach pul darhol qaytariladi.',
   },
   {
     id: 'rating',

@@ -3,16 +3,17 @@ import {
   ACTIVE_ORDER_STATUSES,
   canCancel,
   canRate,
+  DETAIL_ACTION_LABELS,
+  getDetailActions,
   getStepperState,
   hasReceipt,
   isBlockingConfirmation,
   isMasterPhoneVisible,
   isTerminal,
-  DETAIL_ACTION_LABELS,
-  getDetailActions,
   matchesHistoryFilter,
   needsSafetyNotice,
   ORDER_STATUS,
+  paymentStateFor,
   STATUS_CHIPS,
   STEPPER_LABELS,
   type HistoryFilter,
@@ -244,5 +245,38 @@ describe('matchesHistoryFilter (24-ekran)', () => {
 describe('needsSafetyNotice (23-ekran)', () => {
   it('faqat xavfsizlik tekshiruvidagi buyurtmada ogohlantirish chiqadi', () => {
     expect(ALL.filter(needsSafetyNotice)).toEqual([ORDER_STATUS.SAFETY_FLAGGED]);
+  });
+});
+
+describe('paymentStateFor (toʻlov chekidagi holat)', () => {
+  it('faqat yopilgan buyurtma "toʻlandi" deb belgilanadi', () => {
+    expect(paymentStateFor(ORDER_STATUS.CLOSED)).toBe('paid');
+
+    const paid = Object.values(ORDER_STATUS).filter(
+      (status) => paymentStateFor(status) === 'paid',
+    );
+    expect(paid).toEqual([ORDER_STATUS.CLOSED]);
+  });
+
+  it('usta ishni tugatgach mijozdan tasdiq soʻraladi', () => {
+    expect(paymentStateFor(ORDER_STATUS.COMPLETED_BY_MASTER)).toBe('confirm');
+  });
+
+  it('bekor qilingan buyurtmada toʻlov boʻlmaydi', () => {
+    expect(paymentStateFor(ORDER_STATUS.CANCELLED)).toBe('none');
+    expect(paymentStateFor(ORDER_STATUS.SAFETY_FLAGGED)).toBe('none');
+  });
+
+  it('qolgan holatlarda toʻlov kutiladi', () => {
+    for (const status of [
+      ORDER_STATUS.SEARCHING,
+      ORDER_STATUS.SEARCHING_QUEUED,
+      ORDER_STATUS.ASSIGNED,
+      ORDER_STATUS.MASTER_EN_ROUTE,
+      ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION,
+      ORDER_STATUS.IN_PROGRESS,
+    ]) {
+      expect(paymentStateFor(status)).toBe('pending');
+    }
   });
 });

@@ -1,12 +1,23 @@
 import type { OrderStatus } from '@/lib/orderStateMachine';
+import type { OrderInvoice } from '@/lib/pricing';
 import type { Master, OrderAddress } from '@/mocks/types';
 
-/** Buyurtma qoralamasi — 08→09→10→11 oqimi davomida toʻldiriladi. */
+/** Buyurtma qoralamasi — tavsif → manzil → vaqt → toʻlov oqimi davomida toʻldiriladi. */
 export interface OrderDraft {
   categoryId: string | null;
   description: string;
+  /**
+   * `scheduledAt !== null` boʻlganda HAR DOIM `false`.
+   *
+   * Invariantni `store.setDraftSchedule` normallashtiradi — u shu ikki
+   * maydonni yozadigan yagona joy, shuning uchun ikkinchi qorovul kerak emas.
+   */
   isUrgent: boolean;
   address: OrderAddress | null;
+  /** `null` — "imkon qadar tez". Aks holda tanlangan sana va soat. */
+  scheduledAt: Date | null;
+  /** Toʻlov ekrani yozadi; tanlanmaguncha `null`. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /**
@@ -22,7 +33,16 @@ export interface LiveOrder {
   categoryName: string;
   categoryIconKey: string;
   description: string;
-  price: number;
+  /**
+   * MUZLATILGAN hisob-faktura: buyurtma yaratilganda bir marta hisoblanadi
+   * va qayta hisoblanmaydi. Aks holda foydalanuvchi Kumush darajaga
+   * koʻtarilgan kuni oʻtmishdagi barcha summalar, oylik statistika va
+   * yigʻilgan keshbek jimgina oʻzgarib ketardi.
+   */
+  invoice: OrderInvoice;
+  paymentMethod: PaymentMethod;
+  /** `null` — buyurtma darhol yuborilgan. */
+  scheduledAt: Date | null;
   isUrgent: boolean;
   address: OrderAddress;
   status: OrderStatus;
@@ -41,6 +61,8 @@ export const EMPTY_DRAFT: OrderDraft = {
   description: '',
   isUrgent: false,
   address: null,
+  scheduledAt: null,
+  paymentMethod: null,
 };
 
 /**

@@ -46,7 +46,7 @@ const SUGGESTED_MASTERS = Object.values(MASTERS).slice(0, 2);
 function secondaryLine(order: LiveOrder): string | null {
   switch (order.status) {
     case ORDER_STATUS.SEARCHING:
-      return 'Usta qidirilmoqda…';
+      return order.scheduledAt ? 'Belgilangan vaqtga rejalashtirilgan' : 'Usta qidirilmoqda…';
     case ORDER_STATUS.SEARCHING_QUEUED:
       return order.queuePosition ? formatQueuePosition(order.queuePosition) : null;
     case ORDER_STATUS.ASSIGNED:
@@ -121,7 +121,7 @@ export function HomeTab() {
                   {activeOrder.categoryName}
                 </p>
                 <p className="tabular shrink-0 text-price text-text-primary">
-                  {formatPrice(activeOrder.price)}
+                  {formatPrice(activeOrder.invoice.total)}
                 </p>
               </div>
               {secondaryLine(activeOrder) && (

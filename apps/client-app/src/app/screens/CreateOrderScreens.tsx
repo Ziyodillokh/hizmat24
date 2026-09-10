@@ -9,14 +9,19 @@ import { Icon } from '@/components/Icon';
 import { InfoChip } from '@/components/InfoChip';
 import { Input } from '@/components/Input';
 import { StepDots } from '@/components/StepDots';
+import { SummaryRow } from '@/components/SummaryRow';
 import { Textarea } from '@/components/Textarea';
-import { Toggle } from '@/components/Toggle';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { MapPreview } from '@/screens/_shared/MapPreview';
 import { serviceIcon } from '@/lib/serviceIcons';
-import { formatApproxPrice, formatPrice } from '@/lib/formatters';
+import { formatApproxPrice, formatPercent, formatPrice } from '@/lib/formatters';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
+import { buildInvoice } from '@/lib/pricing';
+import { timingLabel } from '@/lib/schedule';
+import { useMinuteClock } from '@/lib/useMinuteClock';
+import { METHOD_LABELS } from '@/lib/wallet';
 import { useApp } from '../store';
+import { useWallet } from '../useWallet';
 import { useToast } from '../ToastHost';
 import { tapFeedback } from '../native';
 
@@ -31,14 +36,13 @@ export function OrderDetailsStep() {
   const { draft, setDraftDetails } = useApp();
 
   const [description, setDescription] = useState(draft.description);
-  const [isUrgent, setIsUrgent] = useState(draft.isUrgent);
 
   const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
   const isTooShort = description.trim().length > 0 && description.trim().length < DESCRIPTION_MIN;
   const canContinue = description.trim().length >= DESCRIPTION_MIN;
 
   const next = () => {
-    setDraftDetails(description, isUrgent);
+    setDraftDetails(description);
     navigate('/app/new/map');
   };
 
@@ -101,16 +105,6 @@ export function OrderDetailsStep() {
         className="mt-12"
       />
 
-      <div className="mt-24 flex items-start justify-between gap-16">
-        <div className="min-w-0 flex-1">
-          <p className="text-body-lg text-text-primary">Shoshilinch</p>
-          <p className="mt-2 text-body-sm text-text-secondary">
-            Usta navbatdan tashqari yuboriladi
-          </p>
-        </div>
-        <Toggle checked={isUrgent} onChange={setIsUrgent} label="Shoshilinch" />
-      </div>
-
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>
   );
@@ -165,7 +159,7 @@ export function AddressStep() {
       floor: floor.trim() || undefined,
       apartment: apartment.trim() || undefined,
     });
-    navigate('/app/new/confirm');
+    navigate('/app/new/schedule');
   };
 
   return (
@@ -174,12 +168,14 @@ export function AddressStep() {
       footer={
         <StickyFooter>
           <Button variant="primary" disabled={!isValid} onClick={save}>
-            Saqlash
+            Davom etish
           </Button>
         </StickyFooter>
       }
     >
-      <MapPreview className="mt-4" />
+      <StepDots currentStep={1} />
+
+      <MapPreview className="mt-16" />
 
       <Input
         value={label}
@@ -220,6 +216,8 @@ export function AddressStep() {
 export function ConfirmStep() {
   const navigate = useNavigate();
   const { draft, createOrder } = useApp();
+  const { level } = useWallet();
+  const now = useMinuteClock();
   const showToast = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -227,25 +225,47 @@ export function ConfirmStep() {
 
   const submit = () => {
     setIsSubmitting(true);
-    const orderId = createOrder();
+    const orderId = createOrder(level.discountPercent);
     if (orderId) {
       void tapFeedback();
       showToast('Buyurtma qabul qilindi', 'success');
-      navigate(`/app/order/${orderId}`, { replace: true });
+      navigate(`/app/order/${orderId}/payment-receipt`, { replace: true });
     } else {
+      // Jimgina muvaffaqiyatsizlik qolmaydi: sabab aytiladi.
       setIsSubmitting(false);
+      showToast('Buyurtma yaratilmadi — maʼlumotlar toʻliq emas', 'danger');
     }
   };
 
-  if (!category || !draft.address) {
+  if (!category || !draft.address || !draft.paymentMethod) {
+    // Boshi berk koʻcha qolmaydi: yetishmayotgan qadamga yoʻl beriladi.
+    const target = !category
+      ? '/app/services'
+      : !draft.address
+        ? '/app/new/map'
+        : '/app/new/payment';
+
     return (
       <ScreenShell header={<Header variant="inner" title="Buyurtmani tasdiqlash" onBack={() => navigate('/app/home')} />}>
         <Banner variant="warning" className="mt-16">
           Buyurtma maʼlumotlari toʻliq emas
         </Banner>
+        <Button variant="secondary" className="mt-16" onClick={() => navigate(target)}>
+          Toʻldirish
+        </Button>
       </ScreenShell>
     );
   }
+
+  /*
+   * Tasdiqlash ekranidagi summa chekdagi bilan AYNAN bir xil boʻlishi shart,
+   * shuning uchun ikkalasi ham `buildInvoice` dan chiqadi.
+   */
+  const invoice = buildInvoice({
+    base: category.basePrice,
+    isUrgent: draft.isUrgent,
+    discountPercent: level.discountPercent,
+  });
 
   const { address } = draft;
   const hasDetails = Boolean(address.entrance || address.floor || address.apartment);
@@ -261,16 +281,32 @@ export function ConfirmStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={2} />
+      <StepDots currentStep={4} />
       <h1 className="mt-20 text-h1 text-text-primary">Buyurtmani tasdiqlang</h1>
 
       <Card className="mt-16">
         <div className="flex items-start justify-between gap-12">
           <p className="min-w-0 flex-1 text-h3 text-text-primary">{category.name}</p>
-          <p className="shrink-0 text-price text-text-primary tabular">
-            {formatPrice(category.basePrice)}
+          <p className="tabular shrink-0 text-price text-text-primary">
+            {formatPrice(invoice.total)}
           </p>
         </div>
+
+        <span className="-mx-16 my-16 block h-px bg-border" aria-hidden />
+
+        <SummaryRow label="Xizmat narxi" value={formatPrice(invoice.base)} />
+        {invoice.urgentFee > 0 && (
+          <SummaryRow label="Shoshilinch yuborish" value={formatPrice(invoice.urgentFee)} />
+        )}
+        {invoice.discount > 0 && (
+          <SummaryRow
+            label={`Daraja chegirmasi (${formatPercent(invoice.discountPercent)})`}
+            value={formatPrice(-invoice.discount)}
+            tone="success"
+          />
+        )}
+        <SummaryRow label="Vaqt" value={timingLabel(draft, now)} />
+        <SummaryRow label="Toʻlov usuli" value={METHOD_LABELS[draft.paymentMethod]} />
       </Card>
 
       <Card className="mt-12">
