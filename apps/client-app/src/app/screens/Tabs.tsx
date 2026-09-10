@@ -1,6 +1,5 @@
-import { Bell, BellSlash, CaretRight, ChatCircleDots, ChatsCircle, ClipboardText, FileMagnifyingGlass, Headset, Info, Moon, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
-import type { Icon as IconGlyph } from '@phosphor-icons/react';
-import { useMemo, useState, type ReactNode } from 'react';
+import { Bell, BellSlash, ChatCircleDots, ClipboardText, FileMagnifyingGlass, Headset, Info, Medal, Moon, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
@@ -9,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
+import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { NotificationRow } from '@/components/NotificationRow';
 import { OrderCard } from '@/components/OrderCard';
 import { SegmentControl } from '@/components/SegmentControl';
@@ -32,6 +32,7 @@ import { USER } from '@/mocks/user';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
 import { useChat } from '../chat-store';
+import { useWallet } from '../useWallet';
 import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
 
@@ -217,95 +218,11 @@ export function NotificationsTab() {
   );
 }
 
-interface MenuItem {
-  icon: IconGlyph;
-  label: string;
-  hint?: string;
-  onSelect?: () => void;
-  /** Chevron oʻrniga chiziladigan boshqaruv (masalan tema almashtirgichi). */
-  control?: ReactNode;
-  /** Buzuvchi amal (chiqish) — qizil tusda chiziladi. */
-  danger?: boolean;
-}
-
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
-
-/**
- * Sozlama qatorlari bitta kartaga yigʻiladi — alohida suzuvchi qatorlar
- * oʻrniga guruhlangan roʻyxat mobil ilovalarda tanish va tartibli koʻrinadi.
- *
- * Ikonalar tusli plitkada: ilovadagi barcha kartalar shu tilda gapiradi
- * (`OrderCard`, `ServiceCard`), yalangʻoch glif esa sozlamalar roʻyxatini
- * qolgan ekranlardan uzib qoʻyardi.
- */
-function MenuGroup({ section }: { section: MenuSection }) {
-  return (
-    <section className="mt-20">
-      <h2 className="px-4 text-overline uppercase text-text-secondary">{section.title}</h2>
-
-      <div
-        className={cn(
-          'mt-8 overflow-hidden rounded-lg border border-transparent bg-surface-elevated shadow-e1',
-          "[[data-theme='dark']_&]:border-border",
-        )}
-      >
-        {section.items.map((item, index) => {
-          const isInteractive = Boolean(item.onSelect);
-          const Row = isInteractive ? 'button' : 'div';
-
-          return (
-            <Row
-              key={item.label}
-              {...(isInteractive ? { type: 'button' as const, onClick: item.onSelect } : {})}
-              className={cn(
-                'flex min-h-touch w-full items-center gap-12 px-12 py-8 text-left',
-                'transition-colors duration-press ease-std',
-                isInteractive && 'active:bg-surface-sunken',
-                index > 0 && 'border-t border-border',
-              )}
-            >
-              <span
-                className={cn(
-                  'flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm',
-                  item.danger ? 'bg-danger-surface text-danger' : 'bg-neutral-surface text-text-secondary',
-                )}
-                aria-hidden
-              >
-                <Icon icon={item.icon} size={20} weight="duotone" />
-              </span>
-
-              <span
-                className={cn(
-                  'min-w-0 flex-1 truncate text-body-lg',
-                  item.danger ? 'text-danger' : 'text-text-primary',
-                )}
-              >
-                {item.label}
-              </span>
-
-              {item.hint && (
-                <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>
-              )}
-              {item.control ??
-                (isInteractive && !item.danger && (
-                  <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />
-                ))}
-            </Row>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 /** 26 · Profil — read-only. */
 export function ProfileTab() {
   const navigate = useNavigate();
   const { phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
-  const { unreadTotal } = useChat();
+  const { level } = useWallet();
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -337,10 +254,11 @@ export function ProfileTab() {
           onSelect: () => navigate('/app/orders'),
         },
         {
-          icon: ChatsCircle,
-          label: 'Xabarlar',
-          hint: unreadTotal > 0 ? `${unreadTotal} ta yangi` : undefined,
-          onSelect: () => navigate('/app/chat'),
+          // Chat endi tab bar'da — menyudagi takroriy qator oʻrniga bonus.
+          icon: Medal,
+          label: 'Bonuslar',
+          hint: level.label,
+          onSelect: () => navigate('/app/wallet/bonus'),
         },
         { icon: Bell, label: 'Bildirishnomalar', hint: 'Yoqilgan' },
         {

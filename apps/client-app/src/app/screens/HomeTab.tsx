@@ -1,3 +1,4 @@
+import { Storefront, UsersThree } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -19,7 +20,18 @@ import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import { useApp } from '../store';
 import type { LiveOrder } from '../types';
 
-const VISIBLE_GROUPS = 7;
+/**
+ * Panjarada 4x2 = 8 oʻrin bor va uchtasi navigatsiyaga ketadi (Market,
+ * Ustalar, Barchasi). Qolgan beshtasi eng katta xizmat guruhlariga beriladi;
+ * tushib qolgan ikkitasi ("Boʻyoqchilik", "Tozalash" — har birida bittadan
+ * xizmat) "Barchasi" orqali bitta bosishda topiladi.
+ *
+ * Nega aynan panjara: Market va Mutaxassislar tab bardan chiqdi va ularga
+ * bosh sahifadan yoʻl kerak, lekin sahifa toʻrtta oʻlchamda SCROLLSIZ
+ * sigʻishi shart. 390x844 da zaxira ~23px — yangi qator qoʻshib boʻlmaydi,
+ * shuning uchun mavjud panjaradagi ikkita oʻrin almashtirildi (+0px).
+ */
+const VISIBLE_GROUPS = 5;
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
@@ -137,6 +149,23 @@ export function HomeTab() {
               onClick={() => navigate(`/app/groups/${group.id}`)}
             />
           ))}
+          {/*
+            Uchta neytral katakcha yonma-yon turadi va koʻz ularni bitta
+            guruh — "boshqa boʻlimlar" — sifatida oʻqiydi. `tone="neutral"`
+            majburiy: ular xizmat turi emas, roʻyxatga oʻtish yoʻli.
+          */}
+          <ServiceGroupTile
+            label="Market"
+            icon={Storefront}
+            tone="neutral"
+            onClick={() => navigate('/app/market')}
+          />
+          <ServiceGroupTile
+            label="Ustalar"
+            icon={UsersThree}
+            tone="neutral"
+            onClick={() => navigate('/app/masters')}
+          />
           <ServiceGroupTile
             label="Barchasi"
             icon={MORE_ICON}

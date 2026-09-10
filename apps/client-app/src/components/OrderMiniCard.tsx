@@ -1,7 +1,7 @@
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
-import { formatPrice } from '@/lib/formatters';
+import { splitFormattedPrice } from '@/lib/formatters';
 import type { OrderStatus } from '@/lib/orderStateMachine';
 import { Button } from './Button';
 import { Card } from './Card';
@@ -24,22 +24,6 @@ import { StatusChip } from './StatusChip';
  * gridan chiqarib yuboradi.
  */
 const INFO_CLASSES = 'flex min-w-0 flex-col items-start gap-8 text-left';
-
-/**
- * 8.4-band: narx raqami `price` (tabular figures) bilan, yonidagi "soʻm" esa
- * `currency` `text-secondary` bilan chiziladi. Matnning oʻzi formatPrice() dan
- * keladi — bu yerda faqat tipografiya uchun boʻlaklarga ajratiladi, qoʻlda
- * formatlash yoʻq.
- */
-const CURRENCY_LABEL = "soʻm";
-
-function splitFormattedPrice(amount: number): { value: string; currency: string } {
-  const formatted = formatPrice(amount);
-  const currencyAt = formatted.lastIndexOf(CURRENCY_LABEL);
-  // Yorliq topilmasa butun satr raqam sifatida chiziladi — kesilgan matn chiqmaydi.
-  const value = currencyAt === -1 ? formatted.trim() : formatted.slice(0, currencyAt).trim();
-  return { value, currency: CURRENCY_LABEL };
-}
 
 export interface OrderMiniCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */

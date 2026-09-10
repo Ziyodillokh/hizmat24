@@ -9,7 +9,6 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { SHOP_LIST, type ShopCategory } from '@/mocks/shops';
 import { isOpenNow } from '@/lib/shopHours';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
 
 /**
@@ -56,7 +55,9 @@ export function MarketTab() {
   }, [query, category]);
 
   return (
-    <ScreenShell header={<Header variant="inner" title="Market" />} footer={<AppTabBar active="market" />}>
+    <ScreenShell
+      header={<Header variant="inner" title="Market" onBack={() => navigate('/app/home')} />}
+    >
       <SearchField
         value={query}
         onChange={(event) => setQuery(event.target.value)}

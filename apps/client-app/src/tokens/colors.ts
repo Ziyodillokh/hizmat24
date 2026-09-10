@@ -129,7 +129,7 @@ export const LIGHT: Palette = {
   // turkuaz bo'lib qoladi.
   'surface-hero-top': '#22CFCC',
   'surface-hero': '#14AEAB',
-  // Banner tepа blokdan to'qroq — referensdagi kabi.
+  // Banner tepa blokdan to'qroq — referensdagi kabi.
   'surface-hero-deep': '#0B7E7C',
   // Light temada bu doira OQ edi — oq sahifa ustida u umuman koʻrinmasdi
   // (soya 4% boʻlgani uchun chegara ham sezilmasdi). Endi yengil turkuaz tus:

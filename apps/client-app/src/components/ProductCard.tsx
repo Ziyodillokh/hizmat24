@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react';
 import { cn } from '@/lib/cn';
-import { formatPrice } from '@/lib/formatters';
+import { splitFormattedPrice } from '@/lib/formatters';
 import { Card } from './Card';
 
 /**
@@ -14,8 +14,6 @@ import { Card } from './Card';
  * boshi ("Mis kabel VVG…") uni tanib olish uchun yetarli, narx esa hech
  * qachon kesilmaydi: u qaror qabul qilinadigan raqam.
  */
-const CURRENCY_LABEL = 'soʻm';
-
 export interface ProductCardProps {
   name: string;
   price: number;
@@ -29,8 +27,7 @@ export interface ProductCardProps {
 export function ProductCard({ name, price, unit, imageUrl, onSelect, className }: ProductCardProps) {
   const isInteractive = Boolean(onSelect);
 
-  const formatted = formatPrice(price);
-  const amount = formatted.slice(0, formatted.lastIndexOf(CURRENCY_LABEL)).trim();
+  const { value: amount, currency } = splitFormattedPrice(price);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!onSelect || (event.key !== 'Enter' && event.key !== ' ')) return;
@@ -63,7 +60,7 @@ export function ProductCard({ name, price, unit, imageUrl, onSelect, className }
         */}
         <p className="mt-auto whitespace-nowrap pt-8">
           <span className="tabular text-price text-text-primary">{amount}</span>{' '}
-          <span className="text-currency text-text-secondary">{CURRENCY_LABEL}</span>
+          <span className="text-currency text-text-secondary">{currency}</span>
         </p>
         <p className="text-caption text-text-secondary">{unit} uchun</p>
       </div>

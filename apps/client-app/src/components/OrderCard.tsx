@@ -1,13 +1,3 @@
-import { CaretRight } from '@phosphor-icons/react';
-import type { Icon as IconGlyph } from '@phosphor-icons/react';
-import type { KeyboardEvent } from 'react';
-import { cn } from '@/lib/cn';
-import { formatDateTime, formatPrice } from '@/lib/formatters';
-import { STATUS_CHIPS, type ChipTone, type OrderStatus } from '@/lib/orderStateMachine';
-import { Card } from './Card';
-import { Icon } from './Icon';
-import { StatusChip } from './StatusChip';
-
 /**
  * Buyurtma kartasi (roʻyxat elementi).
  *
@@ -24,7 +14,15 @@ import { StatusChip } from './StatusChip';
  * ikki marta — rangda va matnda — takrorlanadi, shuning uchun qidirilayotgan
  * buyurtma matnni oʻqimasdan ham topiladi.
  */
-const CURRENCY_LABEL = 'soʻm';
+import { CaretRight } from '@phosphor-icons/react';
+import type { Icon as IconGlyph } from '@phosphor-icons/react';
+import type { KeyboardEvent } from 'react';
+import { cn } from '@/lib/cn';
+import { formatDateTime, splitFormattedPrice } from '@/lib/formatters';
+import { STATUS_CHIPS, type ChipTone, type OrderStatus } from '@/lib/orderStateMachine';
+import { Card } from './Card';
+import { Icon } from './Icon';
+import { StatusChip } from './StatusChip';
 
 /** Ikona plitkasi uchun holat tusi. `StatusChip` bilan bitta manbadan. */
 const TILE_CLASSES: Record<ChipTone, string> = {
@@ -34,14 +32,6 @@ const TILE_CLASSES: Record<ChipTone, string> = {
   danger: 'bg-danger-surface text-danger',
   neutral: 'bg-neutral-surface text-text-secondary',
 };
-
-function splitFormattedPrice(amount: number): { value: string; currency: string } {
-  const formatted = formatPrice(amount);
-  const at = formatted.lastIndexOf(CURRENCY_LABEL);
-  // Yorliq topilmasa butun satr raqam sifatida chiziladi — kesilgan matn chiqmaydi.
-  const value = at === -1 ? formatted.trim() : formatted.slice(0, at).trim();
-  return { value, currency: CURRENCY_LABEL };
-}
 
 export interface OrderCardProps {
   /** Xizmat turi ikonasi — lucide glifi (6.4-band). */

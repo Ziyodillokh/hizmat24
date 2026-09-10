@@ -46,7 +46,7 @@ export const EMPTY_DRAFT: OrderDraft = {
 /**
  * Chat — ish vaqtidagi shakl.
  *
- * Mockʻda vaqt "necha daqiqa oldin" sifatida saqlanadi (`src/mocks/chats.ts`),
+ * Mockʼda vaqt "necha daqiqa oldin" sifatida saqlanadi (`src/mocks/chats.ts`),
  * bu yerda esa allaqachon ANIQ sana: ekran vaqtni formatlaydi va har renderda
  * qayta hisoblanadigan nisbiy qiymat xabarlarni sekin "surib" yuborardi.
  */
@@ -77,4 +77,39 @@ export interface AiMessage {
   from: 'client' | 'assistant';
   text: string;
   sentAt: Date;
+}
+
+/**
+ * Toʻlov usuli.
+ *
+ * `escrow` — pul ish tugaguncha platformada saqlanadi (ixtiyoriy kafolat),
+ * `cash` — ustaga qoʻlma-qoʻl, `card` — bank kartasi orqali.
+ */
+export type PaymentMethod = 'escrow' | 'cash' | 'card';
+
+/**
+ * Toʻlangan pul yozuvi — "Karta" boʻlimining yagona maʼlumot birligi.
+ *
+ * Faqat HAQIQATDA toʻlangan pul yoziladi: bekor qilingan buyurtma
+ * tranzaksiyaga aylanmaydi. Aks holda buyurtma berib darhol bekor qilish
+ * orqali daraja va cashback koʻtarilib ketardi.
+ */
+export interface WalletTransaction {
+  id: string;
+  /** Haqiqiy buyurtmadan kelgan boʻlsa uning `id` si; mockʼda `null`. */
+  orderId: string | null;
+  /** "HZ-104312" — chekdagi bilan bir xil raqam. */
+  shortId: string;
+  categoryName: string;
+  /** `serviceIcon()` kaliti — rasm manzili emas. */
+  categoryIconKey: string;
+  /** Soha boʻyicha taqsimot shu boʻyicha hisoblanadi. */
+  groupId: string;
+  groupName: string;
+  /** Usta topilmagan boʻlsa `null` — UI da EMPTY_VALUE chiziladi. */
+  masterName: string | null;
+  amount: number;
+  method: PaymentMethod;
+  /** Pul haqiqatan koʻchgan payt: buyurtma yaratilgan emas, YAKUNLANGAN vaqt. */
+  paidAt: Date;
 }

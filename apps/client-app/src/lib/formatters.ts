@@ -16,6 +16,26 @@ export function formatPrice(amount: number): string {
   return `${digits}${NBSP}soʻm`;
 }
 
+/** Valyuta yorligʻi — raqamdan ajratib chizadigan uchta karta shuni ishlatadi. */
+export const CURRENCY_LABEL = 'soʻm';
+
+/**
+ * Narxni raqam va valyutaga ajratadi.
+ *
+ * Kartalarda summa `price` uslubida, "soʻm" esa kichikroq va oʻchgan rangda
+ * chiziladi. Ilgari bu funksiya `OrderCard`, `OrderMiniCard` va `ProductCard`
+ * da uch marta takrorlangan edi.
+ */
+export function splitFormattedPrice(amount: number): { value: string; currency: string } {
+  const formatted = formatPrice(amount);
+  const at = formatted.lastIndexOf(CURRENCY_LABEL);
+  // Yorliq topilmasa butun satr raqam sifatida chiziladi — kesilgan matn chiqmaydi.
+  return {
+    value: at === -1 ? formatted.trim() : formatted.slice(0, at).trim(),
+    currency: CURRENCY_LABEL,
+  };
+}
+
 /** Bosh sahifa va xizmatlar roʻyxatida — aniq summa emas (14.6-band, 45-punkt). */
 export const formatApproxPrice = (amount: number): string => `taxminan ${formatPrice(amount)}`;
 
@@ -38,6 +58,19 @@ export function orderDateGroup(date: Date, now: Date): string {
   if (isSameDay(date, now)) return 'Bugun';
   if (isSameDay(date, yesterday)) return 'Kecha';
 
+  return formatMonth(date, now);
+}
+
+/**
+ * Oy sarlavhasi: "Sentabr" (joriy yil) · "2025-yil dekabr" (boshqa yil).
+ *
+ * "Sentabr 2026" YOZILMAYDI — bu inglizcha tartib. Oʻzbekchada yil oldinda
+ * keladi va u faqat boshqa yil boʻlganda koʻrsatiladi.
+ *
+ * `orderDateGroup` shu funksiyani chaqiradi — oy nomlari jadvali bitta
+ * qoladi va ikki joyda ikki xil yozilib ketmaydi.
+ */
+export function formatMonth(date: Date, now: Date): string {
   const month = MONTHS[date.getMonth()];
   const capitalised = month.charAt(0).toUpperCase() + month.slice(1);
 
@@ -45,6 +78,26 @@ export function orderDateGroup(date: Date, now: Date): string {
     ? capitalised
     : `${date.getFullYear()}-yil ${month}`;
 }
+
+/**
+ * Yil koʻrsatmaydigan qisqa oy nomi: "Sentabr" · "Dekabr".
+ *
+ * "Oxirgi 6 oy" bloki uchun: u ketma-ket olti oyni koʻrsatadi, tartibning
+ * oʻzi kontekst beradi, tor qatorga esa "2025-yil dekabr" sigʻmaydi.
+ */
+export function formatMonthShort(date: Date): string {
+  const month = MONTHS[date.getMonth()];
+  return month.charAt(0).toUpperCase() + month.slice(1);
+}
+
+/**
+ * Foiz: "0%" · "12%". Kasr xonasi YOʻQ.
+ *
+ * 8.5-band oʻnlik ajratkich sifatida vergulni talab qiladi, yaʼni "12.5%"
+ * darhol xato boʻlardi. "12,5%" esa bir necha buyurtmalik namunada soxta
+ * aniqlik beradi — shuning uchun foiz butun songa yaxlitlanadi.
+ */
+export const formatPercent = (value: number): string => `${Math.round(value)}%`;
 
 /** 8.5-band: bitta kasr xona, oʻnlik ajratkich — VERGUL. Server 4.75 bersa ham 4,8. */
 export const formatRating = (value: number): string => value.toFixed(1).replace('.', ',');

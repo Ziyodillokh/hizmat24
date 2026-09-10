@@ -7,7 +7,6 @@ import { MasterListCard } from '@/components/MasterListCard';
 import { SearchField } from '@/components/SearchField';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { MASTER_LIST } from '@/mocks/masters';
-import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
 
 /**
@@ -48,8 +47,9 @@ export function MastersTab() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Mutaxassislar" />}
-      footer={<AppTabBar active="masters" />}
+      header={
+        <Header variant="inner" title="Mutaxassislar" onBack={() => navigate('/app/home')} />
+      }
     >
       <SearchField
         value={query}

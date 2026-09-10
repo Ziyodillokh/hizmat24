@@ -33,8 +33,8 @@ Tab bar demodagi kabi **5 ta bo'lim** bo'ladi:
 | Tab | Ichida nima bor |
 |---|---|
 | **Bosh** | Premium ustalar tasmasi, qidiruv, banner, kategoriyalar, tavsiya etilgan ustalar. **Market** va **Mutaxassislar** shu yerdan ochiladi |
-| **Karta** | Balans, daromad/xarajat, escrow'dagi pul, bonuslar |
-| **Zakazlar** | Buyurtmalar ro'yxati va kuzatuv |
+| **Karta** | Shu oyda sarflangan pul, soha va to'lov usuli bo'yicha taqsimot, oxirgi 6 oy, daraja va keshbek |
+| **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
 | **Chat** | Suhbatlar ro'yxati, usta bilan yozishma, AI yordamchi |
 | **Profil** | Manzillar, sevimlilar, rol, sozlamalar, yordam |
 
@@ -69,16 +69,32 @@ Qo'shimcha qarorlar:
 - Suhbati yo'q usta bilan yozishmoqchi bo'lsa — bo'sh suhbat ochiladi.
 - Klaviatura kompozitorni yopmasligi uchun `windowSoftInputMode=adjustResize`.
 
-### 2-bosqich — Karta va pul
+### 2-bosqich — Karta va pul ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
-| Hamyon (balans, daromad/xarajat) | `/app/wallet` |
-| Bonuslar (Bronze / Silver / Gold) | `/app/wallet/bonus` |
+| Karta va moliya (sarflangan pul, statistika) | `/app/wallet` |
+| Bonuslar (Bronza / Kumush / Oltin, keshbek) | `/app/wallet/bonus` |
 | Tranzaksiyalar tarixi | `/app/wallet/history` |
 
-**Shu bosqich oxirida tab bar 5 ta demo tabiga almashadi.** Market va
-Mutaxassislar Bosh sahifaga ko'chadi.
+**Tab bar almashdi:** Bosh · Karta · Buyurtma · Chat · Profil. Market va
+Mutaxassislar Bosh sahifadagi katakchalarga ko'chdi (qo'shilgan balandlik 0px).
+
+Qo'shimcha qarorlar:
+- Bu bo'lim **hamyon emas**: hisob balansi va uni to'ldirish Click hamda
+  Payme ulangach ishga tushadi. Hozircha faqat sarflangan pul ko'rsatiladi
+  va sahifa buni ochiq aytadi.
+- Daraja pul emas, **yakunlangan buyurtma soniga** bog'liq: 0–9 Bronza (2%),
+  10–29 Kumush (4%), 30+ Oltin (6%). Bekor qilingan buyurtma sanalmaydi.
+- Keshbek alohida mexanika: har 10 ta buyurtmada 1%, eng yaqin 100 so'mga
+  yaxlitlanadi.
+- Tab yorlig'i demodagi "Zakazlar" emas, "Buyurtma" — ilovada birorta joyda
+  "zakaz" so'zi yo'q.
+- Statistika mock to'lovlar (16 ta) va haqiqiy yakunlangan buyurtmalardan
+  birgalikda hisoblanadi; bir buyurtma ikki marta sanalmaydi.
+
+**3-bosqichga ko'chirildi:** escrow'da muzlatilgan summa, chegirmani to'lovda
+qo'llash, keshbekni sarflash, to'lov cheki, Click/Payme integratsiyasi.
 
 ### 3-bosqich — Bron va to'lov
 
@@ -147,8 +163,9 @@ Hozir buyurtma zanjiri uzilgan: vaqt tanlash ham, to'lov ham yo'q.
 Bu savollar arxitekturaga ta'sir qiladi va bosqich boshlanishidan oldin
 javob kerak:
 
-1. **Balans qayerdan to'ladi?** Click/Payme integratsiyasi rejadami yoki
-   2-bosqichda mock qoladimi.
+1. ~~**Balans qayerdan to'ladi?**~~ Javob berildi: Click va Payme kelajakda
+   ulanadi va hisob to'ldiriladi. 2-bosqichda balans chizilmadi — u to'lov
+   integratsiyasi bilan birga 3-bosqichda keladi.
 2. **Usta tomoni qayerda?** Shu ilova ichida rejim almashtirish bilanmi
    (demodagi kabi: bitta hisob, ikki rejim) yoki alohida APK.
 3. **Backend qachon ulanadi?** Hozir barcha ekran mock'da ishlaydi.

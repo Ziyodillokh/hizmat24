@@ -9,6 +9,7 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { formatChatTime } from '@/lib/formatters';
 import { masterById } from '@/mocks/masters';
 import { useChat } from '../chat-store';
+import { AppTabBar } from '../AppTabBar';
 
 /** AI qatoridagi avatar — foto emas, shuning uchun tusli plitka. */
 function AssistantAvatar() {
@@ -37,7 +38,10 @@ export function ChatListScreen() {
   const lastAi = aiMessages[aiMessages.length - 1];
 
   return (
-    <ScreenShell header={<Header variant="inner" title="Chat" onBack={() => navigate('/app/home')} />}>
+    <ScreenShell
+      header={<Header variant="inner" title="Chat" />}
+      footer={<AppTabBar active="chat" />}
+    >
       <section className="mt-8">
         <h2 className="px-4 text-overline uppercase text-text-secondary">Yordamchi</h2>
         <ChatListRow

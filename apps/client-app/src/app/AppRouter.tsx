@@ -23,6 +23,9 @@ import { MarketTab } from './screens/MarketTab';
 import { ProductDetail } from './screens/ProductDetail';
 import { ShopDetail } from './screens/ShopDetail';
 import { MastersTab } from './screens/MastersTab';
+import { WalletTab } from './screens/WalletTab';
+import { WalletBonus } from './screens/WalletBonus';
+import { WalletHistory } from './screens/WalletHistory';
 import { AiAssistantScreen } from './screens/AiAssistant';
 import { ChatListScreen } from './screens/ChatList';
 import { ChatThreadScreen } from './screens/ChatThread';
@@ -193,6 +196,30 @@ function AppRoutes() {
             element={
               <RequireAuth>
                 <OrdersTab />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="wallet"
+            element={
+              <RequireAuth>
+                <WalletTab />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="wallet/bonus"
+            element={
+              <RequireAuth>
+                <WalletBonus />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="wallet/history"
+            element={
+              <RequireAuth>
+                <WalletHistory />
               </RequireAuth>
             }
           />

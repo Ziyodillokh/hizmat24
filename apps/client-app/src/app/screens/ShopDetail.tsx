@@ -31,7 +31,7 @@ export function ShopDetail() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title={shop.name} onBack={() => navigate('/app/market')} />}
+      header={<Header variant="inner" title={shop.name} onBack={() => navigate(-1)} />}
     >
       <img
         src={shopCover(shop.category)}

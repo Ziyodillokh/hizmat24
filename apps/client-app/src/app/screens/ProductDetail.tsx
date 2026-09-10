@@ -41,7 +41,7 @@ export function ProductDetail() {
   return (
     <ScreenShell
       header={
-        <Header variant="inner" title="Mahsulot" onBack={() => navigate(`/app/market/${shop.id}`)} />
+        <Header variant="inner" title="Mahsulot" onBack={() => navigate(-1)} />
       }
       footer={
         <StickyFooter>

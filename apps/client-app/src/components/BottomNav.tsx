@@ -1,4 +1,4 @@
-import { ClipboardText, House, Storefront, User, UsersThree } from '@phosphor-icons/react';
+import { ChatsCircle, ClipboardText, CreditCard, House, User } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
@@ -11,11 +11,13 @@ import { Icon } from './Icon';
  * ikki marta zahiralanardi va bu bosh sahifani past ekranlarda scrollga
  * majbur qilardi.
  *
- * Yorliqlar QISQA: 360px ekranda beshta tabga 72px dan tushadi va
- * "Mutaxassislar" yoki "Bosh sahifa" kabi uzun soʻz kesilib qolardi.
- * Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
+ * Yorliqlar QISQA: 360px ekranda beshta tabga 72px dan tushadi va uzun soʻz
+ * kesilib qolardi. Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
+ *
+ * Market va Mutaxassislar bu yerdan CHIQARILDI: beshta oʻringa asosiy oqim
+ * sigʻishi kerak, ular esa bosh sahifadagi katakchalardan ochiladi.
  */
-export type TabKey = 'home' | 'orders' | 'market' | 'masters' | 'profile';
+export type TabKey = 'home' | 'wallet' | 'orders' | 'chat' | 'profile';
 
 interface TabDefinition {
   key: TabKey;
@@ -24,10 +26,10 @@ interface TabDefinition {
 }
 
 const TABS: readonly TabDefinition[] = [
-  { key: 'home', label: 'Asosiy', icon: House },
+  { key: 'home', label: 'Bosh', icon: House },
+  { key: 'wallet', label: 'Karta', icon: CreditCard },
   { key: 'orders', label: 'Buyurtma', icon: ClipboardText },
-  { key: 'market', label: 'Market', icon: Storefront },
-  { key: 'masters', label: 'Ustalar', icon: UsersThree },
+  { key: 'chat', label: 'Chat', icon: ChatsCircle },
   { key: 'profile', label: 'Profil', icon: User },
 ];
 
@@ -92,10 +94,12 @@ export function UnreadBadge({ count, className }: UnreadBadgeProps) {
 export interface BottomNavProps {
   active: TabKey;
   onSelect: (tab: TabKey) => void;
+  /** Tab ustidagi oʻqilmagan soni; 0 yoki berilmagan boʻlsa chizilmaydi. */
+  badges?: Partial<Record<TabKey, number>>;
   className?: string;
 }
 
-export function BottomNav({ active, onSelect, className }: BottomNavProps) {
+export function BottomNav({ active, onSelect, badges, className }: BottomNavProps) {
   return (
     <nav className={cn('w-full border-t border-border bg-surface', className)}>
       <ul className="flex h-tab-bar items-stretch">
@@ -133,6 +137,11 @@ export function BottomNav({ active, onSelect, className }: BottomNavProps) {
                     size={24}
                     weight={state === 'active' ? 'fill' : 'regular'}
                     className={ICON_CLASSES[state]}
+                  />
+                  {/* Halqa tab bar foniga mos: badge ikonani "kesib" oʻtadi. */}
+                  <UnreadBadge
+                    count={badges?.[tab.key] ?? 0}
+                    className="absolute -top-2 right-2 ring-surface"
                   />
                 </span>
                 <span className={cn('max-w-full truncate text-tab-label', LABEL_CLASSES[state])}>

@@ -80,6 +80,21 @@ export function useApp(): AppContextValue {
 
 let orderCounter = 104_900;
 
+/**
+ * Hisoblagichni saqlangan buyurtmalardan tiklaydi.
+ *
+ * Usiz ilova har qayta ochilganda 104_900 dan boshlanardi, tiklangan
+ * buyurtmalar esa eski raqamlarini saqlab qolardi — natijada IKKI xil
+ * buyurtma bir xil `id` oladi. Keyin `patchOrder` ikkalasini birdan
+ * oʻzgartiradi, hamyon esa bitta toʻlovni ikki marta sanaydi.
+ */
+function restoreCounter(orders: readonly LiveOrder[]): void {
+  for (const order of orders) {
+    const digits = Number.parseInt(order.shortId.replace(/\D/g, ''), 10);
+    if (Number.isFinite(digits) && digits > orderCounter) orderCounter = digits;
+  }
+}
+
 const TERMINAL: readonly OrderStatus[] = [
   ORDER_STATUS.CLOSED,
   ORDER_STATUS.CANCELLED,
@@ -106,6 +121,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         notifications: NOTIFICATIONS,
       };
     }
+
+    restoreCounter(restored.orders);
 
     const readIds = new Set(restored.readNotificationIds);
 

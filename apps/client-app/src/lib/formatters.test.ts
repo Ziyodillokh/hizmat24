@@ -6,6 +6,8 @@ import {
   formatChatTime,
   formatDateTime,
   formatDayLabel,
+  formatMonth,
+  formatPercent,
   formatDuration,
   formatPhone,
   formatPrice,
@@ -182,5 +184,23 @@ describe('formatChatTime (suhbatlar roʻyxati)', () => {
 
   it('boshqa yildagi xabar uchun toʻliq sana', () => {
     expect(formatChatTime(new Date(2025, 11, 31, 9, 5), NOW)).toBe('31.12.2025');
+  });
+});
+
+describe('formatMonth (oy sarlavhasi)', () => {
+  it('joriy yilda faqat oy nomi, bosh harf bilan', () => {
+    expect(formatMonth(new Date(2026, 8, 1), NOW)).toBe('Sentabr');
+  });
+
+  it("boshqa yilda yil OLDINDA keladi — \"Sentabr 2026\" emas", () => {
+    expect(formatMonth(new Date(2025, 11, 15), NOW)).toBe('2025-yil dekabr');
+  });
+});
+
+describe('formatPercent', () => {
+  it('butun songa yaxlitlaydi va kasr yozmaydi', () => {
+    expect(formatPercent(0)).toBe('0%');
+    expect(formatPercent(12)).toBe('12%');
+    expect(formatPercent(12.5)).toBe('13%');
   });
 });

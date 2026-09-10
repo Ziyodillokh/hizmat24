@@ -2,13 +2,18 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { registerBackButton } from './native';
 
-/** Ildiz ekranlar — bu yerda "orqaga" ilovadan chiqishni soʻraydi. */
-const ROOT_ROUTES = new Set([
+/**
+ * Ildiz ekranlar — bu yerda "orqaga" bosh sahifaga qaytaradi.
+ *
+ * Market va Mutaxassislar bu roʻyxatdan CHIQARILDI: ular endi tab emas,
+ * ichki ekran. Ularda "orqaga" bir qadam orqaga qaytishi kerak, aks holda
+ * Mahsulot → Doʻkon → Market zanjiri oʻrniga darhol bosh sahifaga sakrardi.
+ */
+export const ROOT_ROUTES = new Set([
   '/app',
   '/app/home',
+  '/app/wallet',
   '/app/orders',
-  '/app/market',
-  '/app/masters',
   '/app/chat',
   '/app/notifications',
   '/app/profile',
