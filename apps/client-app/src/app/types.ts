@@ -1,5 +1,6 @@
 import type { OrderStatus } from '@/lib/orderStateMachine';
 import type { OrderInvoice } from '@/lib/pricing';
+import type { OrderRating } from '@/lib/rating';
 import type { Master, OrderAddress } from '@/mocks/types';
 
 /** Buyurtma qoralamasi — tavsif → manzil → vaqt → toʻlov oqimi davomida toʻldiriladi. */
@@ -53,7 +54,7 @@ export interface LiveOrder {
   completedAt: Date | null;
   cancelReason: string | null;
   cancelledBy: 'CLIENT' | 'MASTER' | 'SYSTEM' | null;
-  rating: { stars: number; comment: string | null } | null;
+  rating: OrderRating | null;
 }
 
 export const EMPTY_DRAFT: OrderDraft = {
@@ -134,4 +135,11 @@ export interface WalletTransaction {
   method: PaymentMethod;
   /** Pul haqiqatan koʻchgan payt: buyurtma yaratilgan emas, YAKUNLANGAN vaqt. */
   paidAt: Date;
+}
+
+/** Baholash ekrani yuboradigan shakl — `OrderRating` dan farqi: izoh doim satr. */
+export interface RatingInput {
+  stars: number;
+  comment: string;
+  tags: readonly string[];
 }

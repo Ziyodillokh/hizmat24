@@ -1,5 +1,6 @@
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import { buildInvoice, type OrderInvoice } from '@/lib/pricing';
+import { normalizeRating } from '@/lib/rating';
 import type { LiveOrder, PaymentMethod, UserRole } from './types';
 
 /**
@@ -89,6 +90,8 @@ function reviveOrder(raw: unknown): LiveOrder | null {
     // `scheduledAt` spread orqali SATR boʻlib oʻtardi, tipi esa `Date` deb
     // turardi — birinchi formatlashda ilova qulardi.
     scheduledAt: order.scheduledAt ? new Date(order.scheduledAt) : null,
+    // Eski yozuvda `tags` yoʻq edi — `tags.join()` darhol qulardi.
+    rating: normalizeRating(order.rating),
     paymentMethod: isPaymentMethod(order.paymentMethod)
       ? order.paymentMethod
       : LEGACY_PAYMENT_METHOD,

@@ -14,6 +14,7 @@ import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, OrderAddress } from '@/mocks/types';
 import { buildInvoice } from '@/lib/pricing';
+import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
 import { clearSession, loadSession, saveSession } from './persistence';
@@ -70,7 +71,11 @@ interface AppActions {
   cancelOrder: (orderId: string, reason: string) => void;
   confirmMaster: (orderId: string) => void;
   rejectMaster: (orderId: string, note: string) => void;
-  rateOrder: (orderId: string, stars: number, comment: string) => void;
+  /**
+   * Baho obyekt sifatida uzatiladi: pozitsion argumentlarda `comment` va
+   * `tags` ni almashtirib yuborish oson boʻlardi.
+   */
+  rateOrder: (orderId: string, rating: RatingInput) => void;
   /** Demo: keyingi server oʻtishini kutmasdan darhol bajarish. */
   advanceOrder: (orderId: string) => void;
   markNotificationsRead: () => void;
@@ -364,10 +369,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
           etaMinutes: null,
         }),
 
-      rateOrder: (orderId, stars, comment) =>
+      rateOrder: (orderId, rating) =>
         patchOrder(orderId, {
           status: ORDER_STATUS.CLOSED,
-          rating: { stars, comment: comment || null },
+          rating: {
+            stars: rating.stars,
+            comment: rating.comment.trim() || null,
+            tags: [...rating.tags],
+          },
         }),
 
       advanceOrder: (orderId) =>

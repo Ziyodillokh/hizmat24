@@ -239,3 +239,13 @@ export function paymentStateFor(status: OrderStatus): PaymentStateKey {
   if (status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.SAFETY_FLAGGED) return 'none';
   return 'pending';
 }
+
+/**
+ * 4-bosqich: "Usta yoʻlda" sahifasi faqat usta yoʻlga chiqqanda ochiladi.
+ *
+ * `ASSIGNED` ataylab KIRMAYDI: usta hali yoʻlga chiqmagan va sahifa
+ * sarlavhasi holat chipi bilan aynan bir xil ("Usta yoʻlda") — boshqa
+ * holatda u yolgʻon boʻlardi.
+ */
+export const canOpenEnRoute = (status: OrderStatus): boolean =>
+  status === ORDER_STATUS.MASTER_EN_ROUTE;

@@ -18,6 +18,8 @@ import { AddressStep, ConfirmStep, MapStep, OrderDetailsStep } from './screens/C
 import { ScheduleStep } from './screens/ScheduleStep';
 import { PaymentStep } from './screens/PaymentStep';
 import { PaymentReceipt } from './screens/PaymentReceipt';
+import { MasterEnRouteScreen } from './screens/MasterEnRoute';
+import { WorkProofScreen } from './screens/WorkProof';
 import { OrderTracking } from './screens/OrderTracking';
 import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
@@ -214,6 +216,22 @@ function AppRoutes() {
             element={
               <RequireAuth>
                 <PaymentReceipt />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="order/:orderId/map"
+            element={
+              <RequireAuth>
+                <MasterEnRouteScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="order/:orderId/proof"
+            element={
+              <RequireAuth>
+                <WorkProofScreen />
               </RequireAuth>
             }
           />

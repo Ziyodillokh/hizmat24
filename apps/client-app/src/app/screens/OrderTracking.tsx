@@ -1,11 +1,11 @@
-import { CalendarCheck, ChatCircleDots, MagnifyingGlass, Phone, Timer, Wrench, XCircle } from '@phosphor-icons/react';
+import { CalendarCheck, MagnifyingGlass, Timer, Wrench, XCircle } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { useNavigate, useParams, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
-import { Icon } from '@/components/Icon';
 import { InfoChip } from '@/components/InfoChip';
 import { MasterCard } from '@/components/MasterCard';
 import { Modal } from '@/components/Modal';
@@ -16,12 +16,12 @@ import { Sheet } from '@/components/Sheet';
 import { Stepper } from '@/components/Stepper';
 import { Textarea } from '@/components/Textarea';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
-import { canCancel, isMasterPhoneVisible, ORDER_STATUS } from '@/lib/orderStateMachine';
-import { formatDateTime, formatDuration, formatPrice } from '@/lib/formatters';
+import { canCancel, canOpenEnRoute, ORDER_STATUS } from '@/lib/orderStateMachine';
+import { formatApproxDuration, formatDateTime, formatPrice } from '@/lib/formatters';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_SHORT_LABELS } from '@/lib/wallet';
 import { useApp } from '../store';
-import { useChat } from '../chat-store';
+import { MasterContactRow } from './MasterContactRow';
 import { useToast } from '../ToastHost';
 import { warnFeedback } from '../native';
 import type { LiveOrder } from '../types';
@@ -35,6 +35,9 @@ const REASONS = [
 ] as const;
 
 const OTHER = 'Boshqa sabab';
+
+/** Navbatdagi kutish — demo qiymati, manbai yoʻq. */
+const DEMO_QUEUE_WAIT_MINUTES = 20;
 const REASON_MIN = 3;
 
 /** Buyurtma xulosasi — barcha kuzatuv holatlarida bir xil. */
@@ -81,8 +84,8 @@ function DemoAction({ label, onClick }: { label: string; onClick: () => void }) 
 export function OrderTracking() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
+  const location = useLocation();
   const { findOrder, cancelOrder, advanceOrder } = useApp();
-  const { openThread } = useChat();
   const now = useMinuteClock();
   const showToast = useToast();
 
@@ -92,6 +95,20 @@ export function OrderTracking() {
   const [note, setNote] = useState('');
 
   const order = orderId ? findOrder(orderId) : undefined;
+
+  /*
+   * "Usta yoʻlda" sahifasidagi "Buyurtmani bekor qilish" havolasi shu yerga
+   * qaytaradi va varaqni ochadi — bekor qilish oqimining (besh sabab,
+   * izoh maydoni va tasdiqlash oynasi) ikkinchi nusxasi yasalmaydi.
+   */
+  useEffect(() => {
+    const state = location.state as { openCancel?: boolean } | null;
+    if (!state?.openCancel) return;
+    if (order && canCancel(order.status)) setSheetOpen(true);
+    // Bir martalik: sahifa yangilanganda varaq qayta ochilmaydi.
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location, navigate, order]);
+
   if (!order) return <Navigate to="/app/home" replace />;
 
   // Usta yetib kelgan boʻlsa — bloklovchi ekran majburan ochiladi.
@@ -116,7 +133,11 @@ export function OrderTracking() {
     showToast('Buyurtma bekor qilindi');
   };
 
-  const isTerminal =
+  /*
+   * Kutubxonadagi `isTerminal()` dan FARQ qiladi: u `CLOSED` ni ham
+   * qamraydi, bu esa qamramaydi. Nomi ataylab boshqacha.
+   */
+  const isCancelledOrFlagged =
     order.status === ORDER_STATUS.CANCELLED || order.status === ORDER_STATUS.SAFETY_FLAGGED;
 
   return (
@@ -130,36 +151,13 @@ export function OrderTracking() {
               qatorda: ikkitasini ustma-ust qoʻyish past ekranlarda bekor
               qilish tugmasini pastga surib yuborardi.
             */}
-            {order.master && (
-              <div className="flex gap-12">
-                {isMasterPhoneVisible(order.status) && order.master.phoneNumber && (
-                  <a
-                    href={`tel:${order.master.phoneNumber}`}
-                    className="flex h-[52px] flex-1 items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
-                  >
-                    <Icon icon={Phone} size={20} weight="fill" />
-                    Qoʻngʻiroq
-                  </a>
-                )}
-                <Button
-                  variant="secondary"
-                  leadingIcon={ChatCircleDots}
-                  className="flex-1"
-                  onClick={() =>
-                    order.master &&
-                    navigate(`/app/chat/${openThread(order.master.id, order.categoryName)}`)
-                  }
-                >
-                  Yozish
-                </Button>
-              </div>
-            )}
+            <MasterContactRow order={order} />
             {canCancel(order.status) && (
               <Button variant="secondary" onClick={() => setSheetOpen(true)}>
                 Bekor qilish
               </Button>
             )}
-            {isTerminal && (
+            {isCancelledOrFlagged && (
               <Button variant="primary" onClick={() => navigate('/app/services')}>
                 Qayta buyurtma berish
               </Button>
@@ -183,7 +181,10 @@ export function OrderTracking() {
           <p className="text-display text-text-primary tabular">~{order.queuePosition}</p>
           <p className="mt-8 text-body text-text-primary">Navbatdagi oʻrningiz</p>
           <p className="mt-4 text-body-sm text-text-secondary">
-            Taxminiy kutish: {formatDuration(20)}
+            Taxminiy kutish: {formatApproxDuration(DEMO_QUEUE_WAIT_MINUTES)}
+          </p>
+          <p className="mt-4 text-caption text-text-secondary">
+            Navbat va kutish vaqti — demo maʼlumot.
           </p>
           <DemoAction label="navbatdan chiqarish" onClick={() => advanceOrder(order.id)} />
         </div>
@@ -207,12 +208,19 @@ export function OrderTracking() {
             {order.etaMinutes !== null && (
               <div className="mt-16">
                 <p className="text-h3 text-text-primary">
-                  {formatDuration(order.etaMinutes)}da yetib keladi
+                  {formatApproxDuration(order.etaMinutes)}da yetib keladi
                 </p>
-                {order.status === ORDER_STATUS.MASTER_EN_ROUTE && (
-                  <ProgressBar value={72} className="mt-12" />
-                )}
+                {canOpenEnRoute(order.status) && <ProgressBar indeterminate className="mt-12" />}
               </div>
+            )}
+            {canOpenEnRoute(order.status) && (
+              <button
+                type="button"
+                onClick={() => navigate(`/app/order/${order.id}/map`)}
+                className="mt-12 px-4 text-caption text-primary-pressed"
+              >
+                Manzil va aloqa
+              </button>
             )}
             <DemoAction label="keyingi bosqich" onClick={() => advanceOrder(order.id)} />
           </>
@@ -234,6 +242,9 @@ export function OrderTracking() {
             Usta ishni boshladi
           </Banner>
           <DemoAction label="ishni yakunlash" onClick={() => advanceOrder(order.id)} />
+          <p className="mt-8 text-caption text-text-secondary">
+            Ish yakunlangach usta isbot yuboradi va baholash ochiladi.
+          </p>
         </>
       )}
 

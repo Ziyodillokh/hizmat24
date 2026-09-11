@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ACTIVE_ORDER_STATUSES,
   canCancel,
+  canOpenEnRoute,
   canRate,
   DETAIL_ACTION_LABELS,
   getDetailActions,
@@ -277,6 +278,31 @@ describe('paymentStateFor (toʻlov chekidagi holat)', () => {
       ORDER_STATUS.IN_PROGRESS,
     ]) {
       expect(paymentStateFor(status)).toBe('pending');
+    }
+  });
+});
+
+describe('canOpenEnRoute (4-bosqich)', () => {
+  it('faqat usta yoʻlga chiqqanda ochiladi', () => {
+    expect(canOpenEnRoute(ORDER_STATUS.MASTER_EN_ROUTE)).toBe(true);
+
+    const open = Object.values(ORDER_STATUS).filter(canOpenEnRoute);
+    expect(open).toEqual([ORDER_STATUS.MASTER_EN_ROUTE]);
+  });
+
+  it('bloklovchi ekran chetlab oʻtilmaydi', () => {
+    expect(canOpenEnRoute(ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION)).toBe(false);
+  });
+
+  it('sahifa ochiq boʻlganda qoʻngʻiroq va bekor qilish ham ochiq', () => {
+    // Footerʼdagi tugmalar hech qachon oʻlik boʻlmaydi.
+    expect(isMasterPhoneVisible(ORDER_STATUS.MASTER_EN_ROUTE)).toBe(true);
+    expect(canCancel(ORDER_STATUS.MASTER_EN_ROUTE)).toBe(true);
+  });
+
+  it('bitta buyurtma bir vaqtda ikki ekranga tegishli boʻlmaydi', () => {
+    for (const status of Object.values(ORDER_STATUS)) {
+      expect(canOpenEnRoute(status) && hasReceipt(status)).toBe(false);
     }
   });
 });

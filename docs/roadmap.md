@@ -137,13 +137,41 @@ sarflash balans bilan birga keladi; platforma komissiyasi ish narxining
 6% idan kam bo'lmasligi shart — aks holda Oltin darajadagi chegirma
 platformani zararga soladi.
 
-### 4-bosqich — Ish jarayoni
+### 4-bosqich — Ish jarayoni ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
-| Jonli xarita (usta yo'lda) | `/app/order/:id/map` |
-| Ish yakunlash isboti (foto + GPS) | `/app/order/:id/proof` |
+| Usta yo'lda (manzil va aloqa) | `/app/order/:id/map` |
+| Ish isboti | `/app/order/:id/proof` |
 | Baholash (qayta ishlangan) | `/app/order/:id/rate` |
+
+**Jonli xarita BAJARILMADI va bu ataylab.** Ma'lumot modelida birorta
+koordinata yo'q (`OrderAddress` ham, `Master` ham), xarita kutubxonasi va
+plitka serveri yo'q, ilova internetsiz ishlaydi. Har qanday xarita to'liq
+ixtiro bo'lardi — foydalanuvchi eng xavotirli bo'lgan daqiqada aytilgan
+yolg'on. Ekran o'rniga to'rt savolga javob beradi: kim keladi, taxminan
+qachon, qanday bog'lanaman, kechiksa nima qilaman.
+
+Qo'shimcha qarorlar:
+- `@capacitor/camera` va `@capacitor/geolocation` **o'rnatilmadi.** Isbot
+  fotosini usta oladi (mijozga kamera kerak emas), geolokatsiya esa
+  mijozning koordinatasini beradi, ustanikini emas.
+- Isbot sahifasida soxta foto **yo'q**: o'rindosh ochiq "hali yuklanmagan"
+  deydi. "GPS tasdiqlandi" belgichasi ham chizilmaydi — tekshirilmagan
+  xavfsizlik da'vosi oddiy soxta ma'lumotdan og'irroq.
+- Isbot sahifasi baholashni **bloklamaydi**: hech qachon kelmaydigan
+  ma'lumotga qo'yilgan darvoza buyurtmani muzlatib qo'yardi.
+- Baholashda past baho uchun **sabab tegi majburiy** (uzun izoh emas):
+  bir marta bosish bir xil signalni beradi, eng asabiy daqiqada esa
+  20 belgilik izoh eng katta to'siq bo'lardi.
+- Yulduz shkalasi monoton qilindi: ilgari 2-yulduz "Qoniqarli" edi —
+  salbiy bahoga ijobiy yorliq.
+- `ProgressBar value={72}` o'chirildi: 72% to'qilgan raqam edi, endi
+  `indeterminate`.
+
+**Ochiq uchlar:** jonli xarita, ish fotosi va GPS tasdig'i — backend va
+usta ilovasi kelgach; nizo ochish — 5-bosqich; `MapStep` dagi "Mening
+joylashuvim" tugmasi hamon hech narsa qilmaydi.
 
 ### 5-bosqich — Nizo va kafolat
 

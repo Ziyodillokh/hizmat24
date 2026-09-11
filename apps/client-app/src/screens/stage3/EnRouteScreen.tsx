@@ -69,7 +69,7 @@ export function EnRouteScreen({ variant = 'default' }: EnRouteScreenProps) {
               {formatDuration(etaMinutes)}da yetib keladi
             </p>
             {/* Progress hech qachon 100% koʻrsatmaydi — maksimum 92%. */}
-            <ProgressBar value={72} className="mt-12" />
+            <ProgressBar indeterminate className="mt-12" />
           </>
         )}
         <p className="mt-8 text-caption text-text-secondary">{order.address.label}</p>

@@ -52,6 +52,21 @@ export function useBackButton(): void {
         return true;
       }
 
+      /*
+       * Baholash bloklovchi ekran emas, lekin bir qadam orqaga qaytish
+       * buyurtma ekraniga tushadi va u yakunlangan buyurtmani darhol shu
+       * yerga qaytaradi — apparat tugmasi umuman ishlamayotgandek
+       * koʻrinardi. Buyurtma yoʻqolmaydi: u aktiv roʻyxatda qoladi va bosh
+       * sahifadagi karta orqali ochiladi.
+       *
+       * Naqsh ANIQ yoziladi: `endsWith('/map')` kabi qoida buyurtma berish
+       * oqimidagi `/app/new/map` ni ham ushlab olardi.
+       */
+      if (/^\/app\/order\/[^/]+\/rate$/.test(path)) {
+        navigate('/app/home', { replace: true });
+        return true;
+      }
+
       if (path === '/app/home' || path === '/app') {
         return false; // ilovadan chiqish
       }
