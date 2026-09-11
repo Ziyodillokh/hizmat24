@@ -28,7 +28,9 @@ const config: CapacitorConfig = {
        */
       launchAutoHide: true,
       launchShowDuration: 3000,
-      backgroundColor: '#0E2B2C',
+      // Splash rasmi turkuaz gradient — ramka rangi ham shunga mos boʻlsin,
+      // aks holda rasm chetida toʻq yoʻl koʻrinardi.
+      backgroundColor: '#0B7E7C',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
     },
