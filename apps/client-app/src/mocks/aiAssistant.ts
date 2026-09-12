@@ -24,35 +24,35 @@ export const AI_TOPICS: AiTopic[] = [
     chip: 'Kafolat?',
     question: 'Kafolat qanday ishlaydi?',
     answer:
-      'Toʻlov paytida ixtiyoriy kafolatni tanlasangiz, pulingiz ish tugaguncha platformada saqlanadi. Usta ishni yakunlagach va siz tasdiqlagach — pul ustaga oʻtadi. Usta kelmasa yoki ish bajarilmasa, pul toʻliq qaytariladi. Kafolatli toʻlov Click va Payme ulangach ishga tushadi; hozircha buyurtma naqd toʻlanadi.',
+      'Kafolatli toʻlov — pul ish tugaguncha platformada saqlanadigan usul — Click va Payme ulangach ishga tushadi. Bugun buyurtma naqd toʻlanadi va pul ilova orqali oʻtmaydi: ishni koʻrib, ustaga oʻzingiz toʻlaysiz. Bugun nima ishlashini «Kafolat va himoya» sahifasida toʻliq oʻqishingiz mumkin.',
   },
   {
     id: 'find-master',
     chip: 'Usta kerak',
     question: 'Menga usta kerak, qanday buyurtma beraman?',
     answer:
-      'Bosh sahifadan kerakli xizmatni tanlang, muammoni qisqacha yozing va manzilni koʻrsating. Ustani tizim oʻzi tayinlaydi — eng yaqin va boʻsh mutaxassisni topadi. Odatda bu 3 daqiqagacha vaqt oladi.',
+      'Bosh sahifadan kerakli xizmatni tanlang, muammoni qisqacha yozing va manzilni koʻrsating. Ustani tizim oʻzi tayinlaydi. Hozir ilova demo rejimida ishlayapti, shuning uchun usta bir necha soniyada tayinlanadi; haqiqiy vaqt backend ulangach maʼlum boʻladi.',
   },
   {
     id: 'refund',
     chip: 'Pul qaytishi',
     question: 'Pulim qanday qaytariladi?',
     answer:
-      'Kafolat ishga tushgach, pul kartangizga 1-3 ish kunida qaytariladi. Hozircha naqd toʻlovda pul ilovada saqlanmaydi — masala usta bilan kelishuv yoki nizo ochish orqali hal qilinadi.',
+      'Naqd toʻlovda pul ilova orqali oʻtmaydi, shuning uchun platforma uni qaytara olmaydi. Buyurtma bekor qilinsa ham hech qanday pul yechilmaydi — chunki olinmagan ham. Ish sifatsiz boʻlsa, buyurtma sahifasidagi «Muammo haqida xabar» tugmasi murojaat matnini tayyorlaydi va uni qoʻllab-quvvatlashga yuborishingizga yordam beradi.',
   },
   {
     id: 'price',
     chip: 'Narxlar?',
     question: 'Narxlar qanday belgilanadi?',
     answer:
-      'Roʻyxatdagi narx — taxminiy. Usta kelib ishni koʻrgach yakuniy narxni aytadi. Agar u taxminiy narxdan 20% dan koʻp farq qilsa, siz buyurtmani bekor qilishingiz mumkin va hech narsa toʻlamaysiz.',
+      'Roʻyxatdagi narx — taxminiy. Buyurtma berilganda summa bir marta hisoblanadi va keyin oʻzgarmaydi: chekdagi raqam siz koʻrgan raqam bilan bir xil boʻladi. Ilovada narxni qayta hisoblash oqimi hali yoʻq — usta joyida boshqa summa soʻrasa, toʻlashdan oldin qoʻllab-quvvatlash xizmatiga bogʻlaning.',
   },
   {
     id: 'late',
     chip: 'Kechikish?',
     question: 'Usta kechiksa nima boʻladi?',
     answer:
-      'Usta belgilangan vaqtdan 15 daqiqa kechiksa, sizga xabar keladi va buyurtmani bepul bekor qilish tugmasi ochiladi. Kafolat ishga tushgach pul darhol qaytariladi.',
+      'Usta yetib kelgunicha buyurtmani bepul bekor qilishingiz mumkin — jarima yoʻq va hech qanday pul yechilmaydi. Kechikish haqida avtomatik xabar yuborish hali ishlamaydi, shuning uchun holatni buyurtma sahifasidan kuzatasiz. Buyurtma aktiv boʻlganda ustaning raqami ochiq — qoʻngʻiroq qilib soʻrashingiz mumkin.',
   },
   {
     id: 'rating',
@@ -75,7 +75,7 @@ export function answerFor(text: string): string {
   const needle = text.toLowerCase();
   const keywords: Record<string, string[]> = {
     guarantee: ['kafolat', 'escrow', 'xavfsiz'],
-    refund: ['qaytar', 'pul qayt', 'refund'],
+    refund: ['qaytar', 'pul qayt', 'refund', 'nizo', 'shikoyat', 'murojaat'],
     price: ['narx', 'qancha', 'toʻlov', 'tolov'],
     late: ['kechik', 'kelmadi', 'vaqt'],
     rating: ['reyting', 'baho', 'yulduz'],
@@ -89,5 +89,5 @@ export function answerFor(text: string): string {
     }
   }
 
-  return 'Bu savolga hozircha javob bera olmayman — yordamchi demo rejimida ishlayapti. Qoʻllab-quvvatlash xizmatiga yozsangiz, operator javob beradi.';
+  return 'Bu savolga hozircha javob bera olmayman — yordamchi demo rejimida ishlayapti. Qoʻllab-quvvatlash xizmatiga telefon yoki Telegram orqali yozsangiz, odam javob beradi.';
 }

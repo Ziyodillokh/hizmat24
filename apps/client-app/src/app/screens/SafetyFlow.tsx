@@ -110,7 +110,9 @@ export function ConfirmMasterFlow() {
             Bu amalni bekor qilib boʻlmaydi
           </h3>
           <p className="mt-8 text-center text-body text-text-secondary">
-            Buyurtma toʻxtatiladi va operator siz bilan bogʻlanadi.
+            Buyurtma darhol toʻxtatiladi va ish boshlanmaydi. Keyin qoʻllab-quvvatlash
+            xizmatiga oʻzingiz bogʻlanasiz — telefon va Telegram keyingi ekranda
+            koʻrsatiladi.
           </p>
         </div>
 
@@ -157,13 +159,16 @@ export function SafetyAlertResult() {
 
       <main className="flex flex-1 flex-col items-center justify-center px-20">
         <Icon icon={ShieldWarning} size={72} className="text-danger" />
-        <h1 className="mt-24 text-center text-h1 text-text-primary">Signalingiz qabul qilindi</h1>
+        {/* "Signal raqami" mavjud boʻlmagan hujjatni nazarda tutardi —
+            blok aslida buyurtma raqamini koʻrsatadi. */}
+        <h1 className="mt-24 text-center text-h1 text-text-primary">Buyurtma toʻxtatildi</h1>
         <p className="mt-8 text-center text-body text-text-secondary">
-          Operatorimiz hoziroq siz bilan bogʻlanadi
+          Usta tasdiqlanmadi, ish boshlanmaydi va hech qanday pul yechilmaydi. Endi
+          qoʻllab-quvvatlash xizmatiga oʻzingiz bogʻlaning — buyurtma raqami quyida.
         </p>
 
         <div className="mt-24 w-full rounded-sm bg-surface-sunken p-16 text-center">
-          <p className="text-caption text-text-secondary">Signal raqami</p>
+          <p className="text-caption text-text-secondary">Buyurtma raqami</p>
           <p className="mt-4 text-body-lg text-text-primary tabular tracking-[0.4px]">
             {order.shortId}
           </p>
@@ -172,8 +177,14 @@ export function SafetyAlertResult() {
 
       <div className="shrink-0 px-20 pb-12 pt-24">
         <div className="flex flex-col gap-12">
-          <Button variant="primary" onClick={() => navigate('/app/support')}>
-            Qoʻllab-quvvatlashga murojaat
+          <Button variant="primary" onClick={() => navigate(`/app/support?order=${order.id}`)}>
+            Qoʻllab-quvvatlash xizmati
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/app/order/${order.id}/dispute`)}
+          >
+            Muammo haqida xabar
           </Button>
           <Button variant="ghost" onClick={() => navigate('/app/home')}>
             Bosh sahifaga

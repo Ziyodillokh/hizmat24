@@ -27,21 +27,28 @@ interface Benefit {
   description: string;
 }
 
+/*
+ * Uchala vaʼda ham bugun ISHLAYDIGAN narsani aytadi.
+ *
+ * "Passport va ID tekshiruvidan oʻtgan" olib tashlandi: `Master` tipida
+ * bunday maydon umuman yoʻq. "24/7 AI" ham — javoblar tayyor matnlardan
+ * keladi (`aiAssistant.ts` izohi buni allaqachon tan oladi).
+ */
 const BENEFITS: Benefit[] = [
   {
     icon: ShieldCheck,
-    title: 'Ixtiyoriy kafolat — tez orada',
-    description: 'Xohlasangiz, pulingiz ish tugaguncha xavfsiz saqlanadi',
+    title: 'Naqd toʻlov — pul sizda',
+    description: 'Ishni koʻrmaguningizcha toʻlamaysiz, bekor qilish bepul',
   },
   {
     icon: SealCheck,
-    title: 'Tasdiqlangan ustalar',
-    description: 'Passport va ID tekshiruvidan oʻtgan',
+    title: 'Usta haqida maʼlumot ochiq',
+    description: 'Sertifikat, reyting va bajarilgan ishlar soni koʻrinadi',
   },
   {
     icon: Robot,
     title: 'AI yordamchi',
-    description: '24/7 savol-javob va usta tavsiyasi',
+    description: 'Narx, jadval va kafolat boʻyicha tayyor javoblar',
   },
 ];
 

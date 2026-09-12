@@ -193,13 +193,22 @@ export function RateOrderScreen() {
           {/* "Pulni qaytarish" tugmasi YOʻQ: naqd toʻlovda platforma pulni
               qaytara olmaydi va bunday vaʼda berilmaydi. */}
           <Banner variant="warning" icon={Warning} className="mt-16">
-            Past baho ustaning reytingiga taʼsir qiladi. Pulni qaytarish va nizo ochish
-            keyingi bosqichda ochiladi.
+            Past baho ustaning reytingiga taʼsir qiladi. Pulni qaytarish yoʻq — naqd toʻlovda
+            platforma pulni qaytara olmaydi.
           </Banner>
+          {/* Ikkala havola ham bahoni yuborishni BLOKLAMAYDI: ular qoʻshimcha
+              yoʻl, darvoza emas. */}
           <button
             type="button"
-            onClick={() => navigate('/app/support')}
+            onClick={() => navigate(`/app/order/${order.id}/dispute`)}
             className="mt-12 px-4 text-caption text-primary-pressed"
+          >
+            Muammo haqida xabar berish
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`/app/support?order=${order.id}`)}
+            className="mt-8 block px-4 text-caption text-primary-pressed"
           >
             Qoʻllab-quvvatlashga yozish
           </button>
@@ -291,6 +300,16 @@ export function ReceiptScreen() {
         className="mt-8 block px-4 text-caption text-primary-pressed"
       >
         Ish isbotini koʻrish
+      </button>
+
+      {/* Buyurtma yopilgach ham yoʻl ochiq qoladi: aks holda bahoni yuborish
+          yagona eshikni yopib qoʻyardi. */}
+      <button
+        type="button"
+        onClick={() => navigate(`/app/order/${order.id}/dispute`)}
+        className="mt-8 block px-4 text-caption text-primary-pressed"
+      >
+        Muammo haqida xabar berish
       </button>
 
       <div className="h-bottom-reserve" aria-hidden />

@@ -151,6 +151,7 @@ export const isBlockingConfirmation = (status: OrderStatus): boolean =>
 export type DetailAction =
   | 'call'
   | 'cancel'
+  | 'dispute'
   | 'confirm-master'
   | 'reject-master'
   | 'support'
@@ -167,6 +168,7 @@ export const DETAIL_ACTION_LABELS: Record<DetailAction, string> = {
   rate: 'Ishni baholash',
   receipt: "Chekni koʻrish",
   reorder: 'Qayta buyurtma berish',
+  dispute: 'Muammo haqida xabar',
 };
 
 const DETAIL_ACTIONS: Record<OrderStatus, readonly DetailAction[]> = {
@@ -175,11 +177,11 @@ const DETAIL_ACTIONS: Record<OrderStatus, readonly DetailAction[]> = {
   ASSIGNED: ['call', 'cancel'],
   MASTER_EN_ROUTE: ['call', 'cancel'],
   ARRIVED_PENDING_CONFIRMATION: ['confirm-master', 'reject-master'],
-  IN_PROGRESS: ['call', 'support'],
-  COMPLETED_BY_MASTER: ['rate', 'receipt'],
-  CLOSED: ['receipt', 'reorder'],
-  CANCELLED: ['reorder'],
-  SAFETY_FLAGGED: ['support'],
+  IN_PROGRESS: ['call', 'support', 'dispute'],
+  COMPLETED_BY_MASTER: ['rate', 'receipt', 'dispute'],
+  CLOSED: ['receipt', 'reorder', 'dispute'],
+  CANCELLED: ['reorder', 'dispute'],
+  SAFETY_FLAGGED: ['support', 'dispute'],
 };
 
 export const getDetailActions = (status: OrderStatus): readonly DetailAction[] =>
@@ -249,3 +251,20 @@ export function paymentStateFor(status: OrderStatus): PaymentStateKey {
  */
 export const canOpenEnRoute = (status: OrderStatus): boolean =>
   status === ORDER_STATUS.MASTER_EN_ROUTE;
+
+/**
+ * 5-bosqich: murojaat qaysi holatda ochiladi.
+ *
+ * Qidiruv, tayinlash va yoʻldagi holatlarda `false`: u yerda BEPUL BEKOR
+ * QILISH ishlaydi va u kuchliroq vosita — murojaat tugmasi faqat
+ * chalgʻitardi. Bloklovchi tasdiqlash ekraniga ham hech narsa qoʻshilmaydi.
+ */
+const DISPUTABLE: readonly OrderStatus[] = [
+  ORDER_STATUS.IN_PROGRESS,
+  ORDER_STATUS.COMPLETED_BY_MASTER,
+  ORDER_STATUS.CLOSED,
+  ORDER_STATUS.CANCELLED,
+  ORDER_STATUS.SAFETY_FLAGGED,
+];
+
+export const canOpenDispute = (status: OrderStatus): boolean => DISPUTABLE.includes(status);

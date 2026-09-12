@@ -11,7 +11,12 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { addressDetailsLine } from '@/lib/address';
 import { cn } from '@/lib/cn';
 import { formatDateTime, formatPrice, orEmpty } from '@/lib/formatters';
-import { canRate, DETAIL_ACTION_LABELS, hasReceipt } from '@/lib/orderStateMachine';
+import {
+  canOpenDispute,
+  canRate,
+  DETAIL_ACTION_LABELS,
+  hasReceipt,
+} from '@/lib/orderStateMachine';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_LABELS } from '@/lib/wallet';
 import { useApp } from '../store';
@@ -70,12 +75,21 @@ export function WorkProofScreen() {
             >
               {isAwaitingRating ? DETAIL_ACTION_LABELS.rate : DETAIL_ACTION_LABELS.receipt}
             </Button>
-            <Button variant="ghost" onClick={() => navigate('/app/support')}>
-              Muammo bormi?
-            </Button>
+            {/* Ish notoʻgʻri bajarilgani AYNAN shu ekranda koʻrinadi — xabar
+                berish yoʻli ham shu yerdan boshlanadi. */}
+            {canOpenDispute(order.status) && (
+              <Button
+                variant="ghost"
+                onClick={() => navigate(`/app/order/${order.id}/dispute`)}
+              >
+                {DETAIL_ACTION_LABELS.dispute}
+              </Button>
+            )}
+            {/* Vaʼda ikkiga ajratiladi: matn tayyorlash ISHLAYDI, pul
+                qaytarish esa yoʻq — va nega yoʻqligi aytiladi. */}
             <p className="text-center text-caption text-text-secondary">
-              Nizo ochish va pulni qaytarish hali tayyor emas — hozircha
-              qoʻllab-quvvatlash xizmati yordam beradi.
+              Ilova murojaat matnini buyurtma maʼlumoti bilan tayyorlaydi. Pulni qaytarish
+              esa yoʻq: naqd toʻlovda platformada saqlanadigan pul boʻlmaydi.
             </p>
           </div>
         </StickyFooter>

@@ -309,10 +309,19 @@ export function PaymentStep() {
         {Math.min(cashback.filled + 1, CASHBACK_BLOCK)}/{CASHBACK_BLOCK}
       </p>
 
+      {/* `canCancel` `MASTER_EN_ROUTE` da HAM ruxsat beradi — matn
+          foydalanuvchining haqiqiy huquqini kam koʻrsatmasligi kerak. */}
       <Banner variant="warning" className="mt-16">
-        Usta yoʻlga chiqmagunicha bekor qilish bepul va hech qanday pul yechilmaydi. Naqd
-        toʻlovda pul ilovada saqlanmaydi, shuning uchun qaytariladigan summa ham boʻlmaydi.
+        Usta yetib kelgunicha bekor qilish bepul va hech qanday pul yechilmaydi. Naqd toʻlovda
+        pul ilovada saqlanmaydi, shuning uchun qaytariladigan summa ham boʻlmaydi.
       </Banner>
+      <button
+        type="button"
+        onClick={() => navigate('/app/guarantee')}
+        className="mt-8 px-4 text-caption text-primary-pressed"
+      >
+        Bugungi himoya qanday ishlaydi?
+      </button>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

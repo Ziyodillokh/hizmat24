@@ -26,24 +26,28 @@ interface Slide {
   description: string;
 }
 
+/*
+ * Ilovaning birinchi uchta jumlasi — eng qimmat vaʼdalar. Har biri bugun
+ * ISHLAYDIGAN narsani aytadi va chegarasini oʻzi bilan olib yuradi.
+ */
 const SLIDES: Slide[] = [
   {
     icon: ShieldCheck,
-    title: 'Xohlasangiz — pulingiz xavfsiz',
+    title: 'Pul ish bajarilgach beriladi',
     description:
-      'Toʻlov paytida ixtiyoriy kafolat Click va Payme ulangach ochiladi: pulingiz ish tugaguncha saqlanadi, usta kelmasa toʻliq qaytariladi.',
+      'Hozir buyurtma naqd toʻlanadi — pul ilova orqali oʻtmaydi va ishni koʻrmaguningizcha sizda qoladi. Ixtiyoriy kafolatli toʻlov Click va Payme ulangach qoʻshiladi.',
   },
   {
     icon: SealCheck,
-    title: 'Barcha ustalar tekshirilgan',
+    title: 'Ustani oʻzingiz tekshirasiz',
     description:
-      'Passport, ID va mutaxassislik tasdiqlangan. Eng yaqin usta joylashuvingizga qarab tanlanadi.',
+      'Sertifikat belgisi, reyting va bajarilgan buyurtmalar soni har bir usta kartasida koʻrsatiladi. Usta eshik oldida kelganda suratini solishtirasiz — mos kelmasa buyurtma toʻxtatiladi.',
   },
   {
     icon: Robot,
     title: 'AI yordamchi doim yoningizda',
     description:
-      'Savol bering — narx, jadval, eng mos usta. 24/7 javob, hech narsa yoʻqolmaydi.',
+      'Narx, jadval va kafolat boʻyicha savol bering. Javoblar hozircha tayyor matnlardan keladi — bu haqiqiy AI emas.',
   },
 ];
 

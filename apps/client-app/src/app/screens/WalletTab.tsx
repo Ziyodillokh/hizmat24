@@ -1,4 +1,4 @@
-import { CreditCard, Medal, Money, Receipt, SealPercent, ShieldCheck, Wallet } from '@phosphor-icons/react';
+import { CreditCard, LockSimple, Medal, Money, Receipt, SealPercent, ShieldCheck, Wallet } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
@@ -126,15 +126,20 @@ export function WalletTab() {
   };
 
   /*
-   * Uchala qator ham BOSILMAYDI: ular holatni tushuntiradi, biror ekranga
+   * Oxirgi UCHTA qator BOSILMAYDI: ular holatni tushuntiradi, biror ekranga
    * olib bormaydi. `onSelect` berilmagan qator `MenuGroup` da `div` boʻlib
    * chiziladi va chevron ham qoʻyilmaydi.
+   *
+   * "Kafolatli toʻlov · Tez orada" qatori ATAYLAB bosilmaydi: chevron berilsa,
+   * foydalanuvchi funksiyaning oʻzi ochiladi deb oʻylardi.
    */
   const terms: MenuSection = {
     title: 'Toʻlov va himoya',
     items: [
+      { icon: ShieldCheck, label: 'Kafolat va himoya', onSelect: () => navigate('/app/guarantee') },
       { icon: SealPercent, label: 'Sizdan komissiya', hint: formatPercent(CLIENT_COMMISSION_PERCENT) },
-      { icon: ShieldCheck, label: 'Kafolatli toʻlov', hint: 'Tez orada' },
+      // Ikki qatorda bir xil ikona turmasin.
+      { icon: LockSimple, label: 'Kafolatli toʻlov', hint: 'Tez orada' },
       { icon: Wallet, label: 'Hisob balansi', hint: 'Tez orada' },
     ],
   };
@@ -247,7 +252,8 @@ export function WalletTab() {
           </div>
 
           <p className="mt-8 px-4 text-body-sm text-text-secondary">
-            Kafolatli toʻlovda pul ish yakunlangunga qadar platformada saqlanadi.
+            Kafolatli toʻlov Click va Payme ulangach ishga tushadi. Hozircha barcha toʻlovlar
+            naqd amalga oshiriladi va pul ilova orqali oʻtmaydi.
           </p>
         </section>
       )}

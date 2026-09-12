@@ -173,13 +173,51 @@ Qo'shimcha qarorlar:
 usta ilovasi kelgach; nizo ochish — 5-bosqich; `MapStep` dagi "Mening
 joylashuvim" tugmasi hamon hech narsa qilmaydi.
 
-### 5-bosqich — Nizo va kafolat
+### 5-bosqich — Nizo va kafolat ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
-| Nizo ochish | `/app/order/:id/dispute` |
-| Nizolarim | `/app/disputes` |
-| Kafolat va sug'urta | `/app/guarantee` |
+| Muammo haqida xabar | `/app/order/:id/dispute` |
+| Murojaat matni | `/app/disputes/:disputeId` |
+| Murojaatlarim | `/app/disputes` |
+| Kafolat va himoya | `/app/guarantee` |
+
+**Nizo tizimi BAJARILMADI va bu ataylab.** Murojaatni ko'rib chiqadigan
+hakam ham, operator ham, backend ham yo'q. "Ariza qabul qilindi ·
+ko'rib chiqilmoqda" degan ekran ilovaning eng ishonchsiz daqiqasida
+aytilgan eng katta yolg'on bo'lardi: holat hech qachon o'zgarmasdi.
+
+O'rniga ilova bajarishi mumkin bo'lgan ish bajarildi va u haqiqiy:
+**murojaat matnini tayyorlash**. Foydalanuvchi sabab va kutilmani
+tanlaydi, nima bo'lganini yozadi — ilova esa buyurtma raqami, sana,
+usta ismi, summa, to'lov usuli, manzil va telefon raqamini qo'shib
+to'liq matn yig'adi. Bugun bu ma'lumotni foydalanuvchi qo'lda qidirib
+topishi kerak edi.
+
+Qo'shimcha qarorlar:
+- Tugma yorlig'i **"Matnni tayyorlash"** — "Nizo ochish" emas. Yorliq
+  amalni aytadi, natijani emas.
+- Kanal jurnalida **"Yuborildi" hech qachon yozilmaydi**: ilova Telegram
+  havolasi ochilganini biladi, matn qo'yilganini bilmaydi.
+- Yagona holat — foydalanuvchi o'zi qo'yadigan "Hal bo'ldi" belgisi.
+  Platforma nomidan qaror yozilmaydi.
+- Xavfsizlik sababi tanlansa **`tel:102`** blokini ko'rsatadi va ilova
+  militsiyaga xabar yubormasligini darhol aytadi.
+- Kafolat sahifasidagi har bir bandda **`limit` maydoni majburiy**
+  (TypeScript darajasida `?` yo'q) — chegarasiz yozilgan band marketing
+  bo'lardi. Nomdan "sug'urta" so'zi olib tashlandi: shartnoma yo'q.
+- Murojaat matnidagi sana **mutlaq** (`12.09.2026, 10:57`): "Bugun"
+  matn ichida muzlab qolardi va ertaga noto'g'ri kunni ko'rsatardi.
+  Ekrandagi yorliq nisbiy qoladi — u qayta hisoblanadi.
+
+**Bir vaqtning o'zida tuzatilgan eski va'dalar:** xavfsizlik oqimidagi
+"Operatorimiz siz bilan bog'lanadi", qo'llab-quvvatlash ekranidagi
+begona mock buyurtma raqami, kirish va tanishtiruv ekranlaridagi
+"Passport va ID tekshirilgan" hamda "24/7 AI", AI yordamchining
+o'lchanmagan "15 daqiqa", "20% farq" va "3 daqiqagacha" qoidalari.
+
+**Ochiq uchlar:** kafolatli to'lov, pulni qaytarish va murojaatni
+platforma tomonida ko'rib chiqish — Click/Payme va backend kelgach.
 
 ### 6-bosqich — Shaxsiy bo'lim
 

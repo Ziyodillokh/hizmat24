@@ -4,6 +4,8 @@ import { CancelBlockedModal } from './CancelBlockedModal';
 import { SupportScreen } from './SupportScreen';
 import { PermissionScreen } from './PermissionScreen';
 import { StatePatternsScreen } from './StatePatternsScreen';
+// Mock buyurtma FAQAT galereyada qoladi — ekranning oʻzida emas.
+import { ORDERS_BY_ID } from '@/mocks/orders';
 
 /** Bosqich 5 — holatlar, modallar, ruxsatlar (13-boʻlim). */
 const STAGE_5: ScreenEntry[] = [
@@ -21,7 +23,7 @@ const STAGE_5: ScreenEntry[] = [
 
   { id: '30', name: "Qoʻllab-quvvatlash xizmati", stage: 5, component: SupportScreen },
   { id: '30', name: "Qoʻllab-quvvatlash xizmati", stage: 5, variant: 'Buyurtmadan',
-    component: () => <SupportScreen variant="with-order" /> },
+    component: () => <SupportScreen orderShortId={ORDERS_BY_ID['o-progress'].shortId} /> },
 
   { id: '31', name: 'Joylashuvga ruxsat', stage: 5, component: PermissionScreen },
   { id: '31', name: 'Joylashuvga ruxsat', stage: 5, variant: 'Rad etilgan',

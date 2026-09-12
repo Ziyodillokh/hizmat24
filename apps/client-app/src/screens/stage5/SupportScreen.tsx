@@ -1,22 +1,33 @@
 import { CaretRight, Clock, PaperPlaneTilt, Phone } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
+import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
-import { ORDERS_BY_ID } from '@/mocks/orders';
+import { useMinuteClock } from '@/lib/useMinuteClock';
+import {
+  SUPPORT_PHONE,
+  SUPPORT_PHONE_LABEL,
+  SUPPORT_TELEGRAM_LABEL,
+  SUPPORT_TELEGRAM_URL,
+  supportStatusLine,
+} from '@/lib/support';
 
 /**
  * 30 · Qoʻllab-quvvatlash xizmati.
  *
- * Buyurtma ekranidan ochilganda buyurtma raqami avtomatik toʻldiriladi —
- * foydalanuvchi uni qoʻlda koʻchirib yozmasin.
+ * Buyurtma raqami bloki `variant` bilan emas, `orderShortId` mavjudligi
+ * bilan boshqariladi. Ilgari ekran mock buyurtmaning raqamini koʻrsatardi:
+ * jonli ilovada bu foydalanuvchiga BEGONA raqamni "sizning buyurtmangiz"
+ * deb koʻrsatish edi.
  */
-export type SupportVariant = 'default' | 'with-order';
-
 export interface SupportScreenProps {
-  variant?: SupportVariant;
+  /** Buyurtmadan ochilganda — HAQIQIY raqam. Berilmasa blok chizilmaydi. */
+  orderShortId?: string;
   /** Berilmasa sarlavhada orqaga strelkasi chizilmaydi. */
   onBack?: () => void;
+  /** Berilmasa «Murojaatlarim» havolasi chizilmaydi (preview galereyasi). */
+  onDisputes?: () => void;
 }
 
 interface ChannelItem {
@@ -31,24 +42,27 @@ interface ChannelItem {
  * Qatorlar HAQIQATAN ochiladi. Ilgari ular oddiy `<button>` edi va hech
  * qanday `onClick` yoʻq edi: foydalanuvchi shevronni koʻrib bosardi, hech
  * nima boʻlmasdi. Ishlamaydigan boshqaruv ilovani buzuq koʻrsatadi.
+ *
+ * Raqam va manzil `lib/support.ts` dan: ular uchta ekranda koʻrsatiladi va
+ * takrorlansa bir joyda oʻzgarib, boshqasida eski qolardi.
  */
 const CHANNELS: ChannelItem[] = [
   {
     icon: Phone,
     label: 'Telefon orqali bogʻlanish',
-    value: '+998 71 200 24 24',
-    href: 'tel:+998712002424',
+    value: SUPPORT_PHONE_LABEL,
+    href: `tel:${SUPPORT_PHONE}`,
   },
   {
     icon: PaperPlaneTilt,
     label: 'Telegram orqali yozish',
-    value: '@hizmat24_support',
-    href: 'https://t.me/hizmat24_support',
+    value: SUPPORT_TELEGRAM_LABEL,
+    href: SUPPORT_TELEGRAM_URL,
   },
 ];
 
-export function SupportScreen({ variant = 'default', onBack }: SupportScreenProps) {
-  const order = ORDERS_BY_ID['o-progress'];
+export function SupportScreen({ orderShortId, onBack, onDisputes }: SupportScreenProps) {
+  const now = useMinuteClock();
 
   return (
     <ScreenShell
@@ -77,19 +91,26 @@ export function SupportScreen({ variant = 'default', onBack }: SupportScreenProp
         ))}
       </nav>
 
-      {variant === 'with-order' && (
+      {orderShortId && (
         <div className="mt-20 rounded-sm bg-surface-sunken p-16">
           <p className="text-caption text-text-secondary">Buyurtma raqami</p>
-          <p className="mt-4 text-body-lg text-text-primary tabular tracking-[0.4px]">
-            {order.shortId}
+          <p className="tabular mt-4 text-body-lg tracking-[0.4px] text-text-primary">
+            {orderShortId}
           </p>
         </div>
       )}
 
+      {/* Ish vaqti jonli: yopiq boʻlsa, qachon ochilishi aytiladi. */}
       <div className="mt-20 flex items-center gap-8">
         <Icon icon={Clock} size={16} className="text-text-secondary" />
-        <p className="text-caption text-text-secondary">Har kuni 08:00 — 22:00</p>
+        <p className="text-caption text-text-secondary">{supportStatusLine(now)}</p>
       </div>
+
+      {onDisputes && (
+        <Button variant="ghost" className="mt-20" onClick={onDisputes}>
+          Murojaatlarim
+        </Button>
+      )}
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

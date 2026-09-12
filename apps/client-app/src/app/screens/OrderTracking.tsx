@@ -245,6 +245,15 @@ export function OrderTracking() {
           <p className="mt-8 text-caption text-text-secondary">
             Ish yakunlangach usta isbot yuboradi va baholash ochiladi.
           </p>
+          {/* Ish boshlangach bekor qilish tugmasi chizilmaydi — bu havolasiz
+              foydalanuvchida ayni damda hech qanday tutqich qolmasdi. */}
+          <button
+            type="button"
+            onClick={() => navigate(`/app/order/${order.id}/dispute`)}
+            className="mt-12 block px-4 text-caption text-primary-pressed"
+          >
+            Muammo bormi? Xabar bering
+          </button>
         </>
       )}
 
@@ -259,10 +268,22 @@ export function OrderTracking() {
         </div>
       )}
 
+      {/* "Operatorimiz bogʻlanadi" OLIB TASHLANDI: `rejectMaster` faqat lokal
+          holatni oʻzgartiradi va signal hech qayerga ketmaydi. */}
       {order.status === ORDER_STATUS.SAFETY_FLAGGED && (
-        <Banner variant="danger" className="mt-24">
-          Buyurtma xavfsizlik tekshiruvida. Operatorimiz siz bilan bogʻlanadi.
-        </Banner>
+        <>
+          <Banner variant="danger" className="mt-24">
+            Buyurtma xavfsizlik sababli toʻxtatilgan va ish boshlanmaydi. Qoʻllab-quvvatlash
+            xizmatiga oʻzingiz bogʻlaning — buyurtma raqami: {order.shortId}.
+          </Banner>
+          <Button
+            variant="primary"
+            className="mt-16"
+            onClick={() => navigate(`/app/support?order=${order.id}`)}
+          >
+            Qoʻllab-quvvatlash xizmati
+          </Button>
+        </>
       )}
 
       {/* Rejalashtirilgan buyurtma kunlab qidiruvda turadi — sabab

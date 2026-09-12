@@ -1,4 +1,4 @@
-import { Bell, BellSlash, ChatCircleDots, ClipboardText, FileMagnifyingGlass, Headset, Info, Medal, Moon, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
+import { Bell, BellSlash, ChatCircleDots, ClipboardText, FileMagnifyingGlass, Headset, Info, Medal, Moon, NotePencil, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -28,6 +28,7 @@ import {
 } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
 import { MASTERS } from '@/mocks/masters';
+import { useDisputes } from '../dispute-store';
 import { USER } from '@/mocks/user';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
@@ -222,6 +223,7 @@ export function NotificationsTab() {
 export function ProfileTab() {
   const navigate = useNavigate();
   const { phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
+  const { openCount } = useDisputes();
   const { level } = useWallet();
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
@@ -298,6 +300,19 @@ export function ProfileTab() {
       title: 'Yordam',
       items: [
         {
+          icon: NotePencil,
+          label: 'Murojaatlarim',
+          // Nol boʻlsa ishora umuman chizilmaydi: "0 ta" hech narsa aytmaydi,
+          // lekin xato bordir degan shubha tugʻdiradi.
+          hint: openCount > 0 ? `${openCount} ta` : undefined,
+          onSelect: () => navigate('/app/disputes'),
+        },
+        {
+          icon: ShieldCheck,
+          label: 'Kafolat va himoya',
+          onSelect: () => navigate('/app/guarantee'),
+        },
+        {
           icon: Headset,
           label: "Qoʻllab-quvvatlash xizmati",
           onSelect: () => navigate('/app/support'),
@@ -359,6 +374,13 @@ export function ProfileTab() {
         onClose={() => setLogoutOpen(false)}
       >
         <div className="mt-20 flex flex-col gap-12">
+          {/* Murojaat matnlari faqat shu qurilmada — chiqish ularni ham
+              oʻchiradi va buni oldindan aytish shart. */}
+          {openCount > 0 && (
+            <p className="text-center text-body-sm text-text-secondary">
+              Chiqsangiz, tayyorlangan murojaat matnlari ham oʻchadi.
+            </p>
+          )}
           <Button
             variant="destructive"
             onClick={() => {

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { DeviceView } from '@/preview/DeviceView';
 import { AppLaunch } from './AppLaunch';
 import { PageTransition } from './PageTransition';
@@ -9,6 +9,7 @@ import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
 import { ChatProvider } from './chat-store';
+import { DisputeProvider } from './dispute-store';
 import { LoginScreen } from './screens/LoginScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { OtpScreen } from './screens/OtpScreen';
@@ -35,6 +36,10 @@ import { AiAssistantScreen } from './screens/AiAssistant';
 import { ChatListScreen } from './screens/ChatList';
 import { ChatThreadScreen } from './screens/ChatThread';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
+import { ProblemReportScreen } from './screens/ProblemReport';
+import { DisputeDetailScreen } from './screens/DisputeDetail';
+import { DisputeListScreen } from './screens/DisputeList';
+import { GuaranteeScreen } from './screens/Guarantee';
 
 /**
  * `SupportScreen` preview galereyasida ham ishlatiladi va u yerda marshrut
@@ -42,7 +47,21 @@ import { SupportScreen } from '@/screens/stage5/SupportScreen';
  */
 function SupportRoute() {
   const navigate = useNavigate();
-  return <SupportScreen onBack={() => navigate(-1)} />;
+  // `location.state` EMAS: u sahifa qayta yuklanganda va Capacitor sovuq
+  // startida yoʻqoladi, qidiruv parametri esa URL da qoladi.
+  const [params] = useSearchParams();
+  const { findOrder } = useApp();
+
+  const orderId = params.get('order');
+  const order = orderId ? findOrder(orderId) : undefined;
+
+  return (
+    <SupportScreen
+      orderShortId={order?.shortId}
+      onBack={() => navigate(-1)}
+      onDisputes={() => navigate('/app/disputes')}
+    />
+  );
 }
 
 /** Login qilmagan foydalanuvchini kirish oqimiga qaytaradi (1-boʻlim, 14-qoida). */
@@ -235,6 +254,14 @@ function AppRoutes() {
               </RequireAuth>
             }
           />
+          <Route
+            path="order/:orderId/dispute"
+            element={
+              <RequireAuth>
+                <ProblemReportScreen />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path="orders"
@@ -358,6 +385,32 @@ function AppRoutes() {
               </RequireAuth>
             }
           />
+          {/* Statik `disputes` va dinamik `disputes/:disputeId` toʻqnashmaydi —
+              Router aniqroq marshrutni oʻzi tanlaydi (`chat/ai` bilan bir xil). */}
+          <Route
+            path="disputes"
+            element={
+              <RequireAuth>
+                <DisputeListScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="disputes/:disputeId"
+            element={
+              <RequireAuth>
+                <DisputeDetailScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="guarantee"
+            element={
+              <RequireAuth>
+                <GuaranteeScreen />
+              </RequireAuth>
+            }
+          />
 
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
@@ -377,7 +430,9 @@ export function AppRouter() {
     <ThemeProvider>
       <AppProvider>
         <ChatProvider>
-          <AppShell />
+          <DisputeProvider>
+            <AppShell />
+          </DisputeProvider>
         </ChatProvider>
       </AppProvider>
     </ThemeProvider>

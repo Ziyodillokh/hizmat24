@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ACTIVE_ORDER_STATUSES,
   canCancel,
+  canOpenDispute,
   canOpenEnRoute,
   canRate,
   DETAIL_ACTION_LABELS,
@@ -168,11 +169,11 @@ describe('getDetailActions (23-ekran jadvali)', () => {
     [ORDER_STATUS.ASSIGNED, ['call', 'cancel']],
     [ORDER_STATUS.MASTER_EN_ROUTE, ['call', 'cancel']],
     [ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION, ['confirm-master', 'reject-master']],
-    [ORDER_STATUS.IN_PROGRESS, ['call', 'support']],
-    [ORDER_STATUS.COMPLETED_BY_MASTER, ['rate', 'receipt']],
-    [ORDER_STATUS.CLOSED, ['receipt', 'reorder']],
-    [ORDER_STATUS.CANCELLED, ['reorder']],
-    [ORDER_STATUS.SAFETY_FLAGGED, ['support']],
+    [ORDER_STATUS.IN_PROGRESS, ['call', 'support', 'dispute']],
+    [ORDER_STATUS.COMPLETED_BY_MASTER, ['rate', 'receipt', 'dispute']],
+    [ORDER_STATUS.CLOSED, ['receipt', 'reorder', 'dispute']],
+    [ORDER_STATUS.CANCELLED, ['reorder', 'dispute']],
+    [ORDER_STATUS.SAFETY_FLAGGED, ['support', 'dispute']],
   ])('%s → %s', (status, expected) => {
     expect(getDetailActions(status)).toEqual(expected);
   });
@@ -303,6 +304,44 @@ describe('canOpenEnRoute (4-bosqich)', () => {
   it('bitta buyurtma bir vaqtda ikki ekranga tegishli boʻlmaydi', () => {
     for (const status of Object.values(ORDER_STATUS)) {
       expect(canOpenEnRoute(status) && hasReceipt(status)).toBe(false);
+    }
+  });
+});
+
+describe('canOpenDispute (5-bosqich)', () => {
+  it('faqat ish boshlangandan keyin ochiladi', () => {
+    for (const status of [
+      ORDER_STATUS.IN_PROGRESS,
+      ORDER_STATUS.COMPLETED_BY_MASTER,
+      ORDER_STATUS.CLOSED,
+      ORDER_STATUS.CANCELLED,
+      ORDER_STATUS.SAFETY_FLAGGED,
+    ]) {
+      expect(canOpenDispute(status)).toBe(true);
+    }
+  });
+
+  it('qidiruv va yoʻldagi holatlarda ochilmaydi', () => {
+    for (const status of [
+      ORDER_STATUS.SEARCHING,
+      ORDER_STATUS.SEARCHING_QUEUED,
+      ORDER_STATUS.ASSIGNED,
+      ORDER_STATUS.MASTER_EN_ROUTE,
+      ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION,
+    ]) {
+      expect(canOpenDispute(status)).toBe(false);
+    }
+  });
+
+  it('amallar jadvali predikat bilan qulflangan', () => {
+    for (const status of Object.values(ORDER_STATUS)) {
+      expect(getDetailActions(status).includes('dispute')).toBe(canOpenDispute(status));
+    }
+  });
+
+  it('bepul bekor qilish va murojaat hech qachon birga taklif qilinmaydi', () => {
+    for (const status of Object.values(ORDER_STATUS)) {
+      expect(canCancel(status) && canOpenDispute(status)).toBe(false);
     }
   });
 });
