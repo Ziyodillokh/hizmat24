@@ -30,6 +30,7 @@ function order(extra: Partial<LiveOrder> = {}): LiveOrder {
     description: 'Oshxonadagi kran oqmoqda',
     invoice: buildInvoice({ base: 150_000, isUrgent: false, discountPercent: 0 }),
     paymentMethod: 'cash' as PaymentMethod,
+    preferredMasterId: null,
     scheduledAt: null,
     isUrgent: false,
     address: { label: 'Chilonzor 9-kvartal, 12-uy', entrance: '2', floor: '5', apartment: '34' },
@@ -58,6 +59,7 @@ function order(extra: Partial<LiveOrder> = {}): LiveOrder {
 const build = (extra: Partial<Parameters<typeof buildDisputeMessage>[0]> = {}) =>
   buildDisputeMessage({
     order: order(),
+    fullName: null,
     phoneNumber: '+998901234567',
     reason: 'Ish sifatsiz',
     goal: 'fix',
@@ -156,6 +158,13 @@ describe('buildDisputeMessage', () => {
 
   it('soxta identifikator yasalmaydi', () => {
     expect(build()).not.toMatch(/#[A-Z0-9]{4,}/);
+  });
+
+  it('ism kiritilgan boʻlsa matnga qoʻshiladi, kiritilmagan boʻlsa qator YOʻQ', () => {
+    expect(build({ fullName: 'Dilshod' })).toContain('Mening ismim: Dilshod');
+    expect(build({ fullName: null })).not.toContain('Mening ismim');
+    // Faqat boʻshliqdan iborat ism ham qator chizmaydi.
+    expect(build({ fullName: '   ' })).not.toContain('Mening ismim');
   });
 
   it('sana MUTLAQ yoziladi — matn keyin nusxalansa ham maʼnosi oʻzgarmaydi', () => {

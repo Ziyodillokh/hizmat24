@@ -14,9 +14,12 @@ import { USER, USER_WITHOUT_NAME } from '@/mocks/user';
 /**
  * 26 · Profil — READ-ONLY.
  *
- * Profilni tahrirlash formasi, avatar yuklash, ism/telefon oʻzgartirish,
- * "Manzillarim", toʻlov usullari, til/tema tanlash CHIZILMAYDI
- * (14.4-band, 28–31-punkt).
+ * Bu GALEREYA ekrani: u 14.4-bandning asl holatini koʻrsatadi.
+ *
+ * Jonli ilovada (`src/app/screens/Tabs.tsx`) 6-bosqich ism kiritishni va
+ * "Manzillarim" ni QOʻSHDI — ular endi haqiqiy manbaga ega. Taqiqda
+ * qolgani: avatar yuklash, telefon oʻzgartirish (qayta tasdiqlash oqimi
+ * yoʻq), toʻlov usullari va til tanlash.
  */
 export type ProfileVariant = 'with-name' | 'without-name' | 'logout-confirm';
 

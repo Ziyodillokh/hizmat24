@@ -59,8 +59,8 @@ export function useBackButton(): void {
        * koʻrinardi. Buyurtma yoʻqolmaydi: u aktiv roʻyxatda qoladi va bosh
        * sahifadagi karta orqali ochiladi.
        *
-       * Naqsh ANIQ yoziladi: `endsWith('/map')` kabi qoida buyurtma berish
-       * oqimidagi `/app/new/map` ni ham ushlab olardi.
+       * Naqsh ANIQ yoziladi: `endsWith('/rate')` kabi qoida boshqa
+       * oqimlarning oxirgi qadamini ham ushlab olardi.
        */
       if (/^\/app\/order\/[^/]+\/rate$/.test(path)) {
         navigate('/app/home', { replace: true });

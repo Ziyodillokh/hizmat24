@@ -46,6 +46,8 @@ const isInvoice = (value: unknown): value is OrderInvoice => {
 interface StoredSession {
   isAuthenticated: boolean;
   phoneNumber: string;
+  /** 6-bosqichdan oldingi yozuvda bu maydon YOʻQ — `null` boʻlib tiklanadi. */
+  fullName: string | null;
   /** Tanishtiruv oqimi bir marta koʻrsatiladi. */
   hasOnboarded: boolean;
   /** Tanlangan rol; hali tanlanmagan boʻlsa `null`. */
@@ -57,6 +59,7 @@ interface StoredSession {
 export interface RestoredSession {
   isAuthenticated: boolean;
   phoneNumber: string;
+  fullName: string | null;
   hasOnboarded: boolean;
   role: UserRole | null;
   orders: LiveOrder[];
@@ -95,6 +98,10 @@ function reviveOrder(raw: unknown): LiveOrder | null {
     paymentMethod: isPaymentMethod(order.paymentMethod)
       ? order.paymentMethod
       : LEGACY_PAYMENT_METHOD,
+    // 6-bosqichdan oldingi buyurtmada usta tanlanmagan — `null` toʻgʻri
+    // javob, chunki oʻsha paytda tanlash imkoni umuman yoʻq edi.
+    preferredMasterId:
+      typeof order.preferredMasterId === 'string' ? order.preferredMasterId : null,
     // Eski buyurtmada chegirma HAQIQATAN boʻlmagan, demak yakuniy summa
     // aynan eski `price` ga teng — bu toʻqima emas.
     invoice: isInvoice(order.invoice)
@@ -107,26 +114,46 @@ function reviveOrder(raw: unknown): LiveOrder | null {
   };
 }
 
+/**
+ * SOF: saqlangan shakldan sessiyani tiklaydi.
+ *
+ * `localStorage` dan ALOHIDA eksport qilinadi — eski yozuvning migratsiyasi
+ * (`price` → `invoice`, `tags` yoʻqligi, yangi `fullName` va
+ * `preferredMasterId` maydonlari) test bilan qoplanishi shart. Boshqa
+ * persistensiya modullarida ham xuddi shu naqsh: `reviveDisputes`,
+ * `reviveAddresses`, `reviveFavorites`.
+ */
+export function reviveSession(raw: unknown): RestoredSession | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+
+  const parsed = raw as Partial<StoredSession>;
+
+  return {
+    isAuthenticated: parsed.isAuthenticated === true,
+    phoneNumber: typeof parsed.phoneNumber === 'string' ? parsed.phoneNumber : '',
+    // Boʻsh satr ham `null` ga tushadi: "ism yoʻq" bitta koʻrinishda
+    // boʻlmasa, ekranlar ikki xil boʻshliqni tekshirishga majbur boʻlardi.
+    fullName:
+      typeof parsed.fullName === 'string' && parsed.fullName.trim().length > 0
+        ? parsed.fullName
+        : null,
+    hasOnboarded: parsed.hasOnboarded === true,
+    // Notoʻgʻri qiymat saqlangan boʻlsa rol tanlanmagan deb qaraladi.
+    role: parsed.role === 'client' || parsed.role === 'master' ? parsed.role : null,
+    orders: Array.isArray(parsed.orders)
+      ? parsed.orders.map(reviveOrder).filter((order): order is LiveOrder => order !== null)
+      : [],
+    readNotificationIds: Array.isArray(parsed.readNotificationIds)
+      ? parsed.readNotificationIds.filter((id): id is string => typeof id === 'string')
+      : [],
+  };
+}
+
 export function loadSession(): RestoredSession | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-
-    const parsed = JSON.parse(raw) as Partial<StoredSession>;
-
-    return {
-      isAuthenticated: parsed.isAuthenticated === true,
-      phoneNumber: typeof parsed.phoneNumber === 'string' ? parsed.phoneNumber : '',
-      hasOnboarded: parsed.hasOnboarded === true,
-      // Notoʻgʻri qiymat saqlangan boʻlsa rol tanlanmagan deb qaraladi.
-      role: parsed.role === 'client' || parsed.role === 'master' ? parsed.role : null,
-      orders: Array.isArray(parsed.orders)
-        ? parsed.orders.map(reviveOrder).filter((order): order is LiveOrder => order !== null)
-        : [],
-      readNotificationIds: Array.isArray(parsed.readNotificationIds)
-        ? parsed.readNotificationIds.filter((id): id is string => typeof id === 'string')
-        : [],
-    };
+    return reviveSession(JSON.parse(raw));
   } catch {
     // Buzilgan yozuv ilovani qulatmasin — toza holatdan boshlanadi.
     return null;
@@ -138,6 +165,7 @@ export function saveSession(session: RestoredSession): void {
     const payload: StoredSession = {
       isAuthenticated: session.isAuthenticated,
       phoneNumber: session.phoneNumber,
+      fullName: session.fullName,
       hasOnboarded: session.hasOnboarded,
       role: session.role,
       orders: session.orders.map((order) => ({

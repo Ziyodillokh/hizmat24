@@ -219,13 +219,76 @@ o'lchanmagan "15 daqiqa", "20% farq" va "3 daqiqagacha" qoidalari.
 **Ochiq uchlar:** kafolatli to'lov, pulni qaytarish va murojaatni
 platforma tomonida ko'rib chiqish — Click/Payme va backend kelgach.
 
-### 6-bosqich — Shaxsiy bo'lim
+### 6-bosqich — Shaxsiy bo'lim ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
-| Manzillar (Uy / Ish) | `/app/addresses` |
+| Shaxsiy ma'lumotlar | `/app/profile/edit` |
+| Manzillarim | `/app/addresses` |
+| Manzil qo'shish / tahrirlash | `/app/addresses/new` · `/app/addresses/:id` |
 | Sevimli ustalar | `/app/favorites` |
-| Kelgan takliflar | `/app/offers` |
+| Manzilni tanlash (buyurtma oqimida) | `/app/new/address` |
+
+**"Kelgan takliflar" QILINMADI va o'rniga "Shaxsiy ma'lumotlar" qilindi.**
+Sabab: taklif yuboradigan tizim yo'q. `NotificationKind` — faqat buyurtma
+hodisalaridan iborat yopiq ro'yxat, push plagini o'rnatilmagan, promokod
+va referal kodi yo'q. Yagona haqiqiy chegirma — daraja va keshbek, ular
+esa allaqachon Bonuslar sahifasida. Doim bo'sh turadigan sahifa
+foydalanuvchini bir marta chalg'itib, boshqa ochilmasdi.
+
+**Uch yolg'on tuzatildi — bosqichning asosiy qiymati shunda:**
+
+1. **To'qilgan ism.** Profil va bosh sahifa `src/mocks/user.ts` dagi
+   "Jasur" ni ko'rsatardi — foydalanuvchi hech qachon aytmagan ism. Endi
+   ism foydalanuvchidan keladi yoki "Ism kiritilmagan" deb turadi.
+   Ism murojaat matniga ham qo'shiladi.
+2. **Soxta joylashuv aniqlash.** `/app/new/map` ekrani "Manzilni tanlang"
+   deb turib, qattiq yozilgan `DETECTED_ADDRESS` ni aniqlangan manzil
+   sifatida ko'rsatardi; "Mening joylashuvim" tugmasining esa `onClick` i
+   umuman yo'q edi (`@capacitor/geolocation` o'rnatilmagan). Ekran o'chirildi
+   va o'rniga saqlangan manzilni tanlash ekrani keldi. `MapPreview` buyurtma
+   oqimidan olib tashlandi: yozilgan matn yonidagi xarita geokodlash
+   bo'lgandek ko'rsatardi.
+3. **Boshqa odam tayinlanishi.** `assignMaster()` argumentsiz edi va HAR
+   BIR buyurtmaga bitta odam — Akmal Rahimov — tayinlanardi, bosh sahifadagi
+   "Buyurtma berish" tugmasi boshqa ustaning kartasida turgan bo'lsa ham.
+   Endi `OrderDraft.preferredMasterId` va `LiveOrder.preferredMasterId`
+   bor: tanlangan usta buyurtmaga yoziladi va aynan u tayinlanadi.
+
+Qo'shimcha qarorlar:
+- Saqlangan manzil FAQAT yozishni tejaydi. Koordinata yo'q, shuning uchun
+  masofa, ETA va "eng yaqin usta" haqida bir so'z ham yozilmaydi.
+- `AddressStep` endi `draft.address` dan tiklanadi. Ilgari u `draft` ni
+  umuman o'qimasdi: foydalanuvchi manzilini yozib, keyingi qadamga o'tib,
+  orqaga bosganda o'z matnini yo'qotardi.
+- Sevimli ustada UCHTA amal bor va uchalasi ishlaydi: profil, yozish va
+  chaqirish. Bandlik, narx va masofa YOZILMAYDI — `Master` tipida bu
+  maydonlar yo'q.
+- Usta profilidagi "Pasport ma'lumotlari tekshirilgan" olib tashlandi: u
+  Kafolat sahifasining "Passport va ID tekshiruvi ilovada
+  ko'rsatilmaydi" jumlasiga qarama-qarshi turardi.
+- Telefon raqamini o'zgartirish QILINMADI: u SMS bilan tasdiqlangan va
+  qayta tasdiqlash oqimi yo'q. Maydon read-only va sabab yozilgan.
+- Manzil maydonlarida yorliq endi KO'RINADI (`AddressPartFields`):
+  placeholder to'ldirilgach yo'qolardi va "3" nimani bildirishi
+  noma'lum qolardi.
+- `applyServerStep` va `advanceOrder` dagi takroriy mantiq `buildStepPatch`
+  ga yig'ildi — tanlangan ustani faqat bittasiga qo'shish jimgina
+  nomuvofiqlik berardi.
+- `reviveSession` sof funksiya sifatida ajratildi va eski yozuv
+  migratsiyasi endi test bilan qoplangan (`price` → `invoice`, `fullName`,
+  `preferredMasterId`).
+- `Tabs.tsx` 500 satrdan oshgani uchun `MasterProfile` alohida faylga
+  chiqarildi.
+
+**`docs/frontend-prompt.md` §14 bilan ziddiyat:** o'sha bo'lim
+"Manzillarim" ni (14.4.29), ism o'zgartirishni (14.4.28) va
+"yoqtirish" tugmasini (14.1.5) TAQIQLAGAN edi. Taqiqning sababi
+ma'lumot manbai yo'qligi edi; endi manba bor. §14 ga bekor qilingan
+bandlar jadvali qo'shildi va kuchda qolganlari sanab o'tildi.
+
+**Ochiq uchlar:** xarita va geolokatsiya, telefon raqamini o'zgartirish,
+tanlangan ustaning bandligini tekshirish — backend kelgach.
 
 ### 7-bosqich — Usta tomoni: kirish
 

@@ -1,8 +1,7 @@
-import { Bell, BellSlash, ChatCircleDots, ClipboardText, FileMagnifyingGlass, Headset, Info, Medal, Moon, NotePencil, Phone, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
+import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Heart, Info, MapPin, Medal, Moon, NotePencil, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
-import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
@@ -12,8 +11,7 @@ import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { NotificationRow } from '@/components/NotificationRow';
 import { OrderCard } from '@/components/OrderCard';
 import { SegmentControl } from '@/components/SegmentControl';
-import { StarRating } from '@/components/StarRating';
-import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
+import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
 import { serviceIcon } from '@/lib/serviceIcons';
@@ -22,17 +20,15 @@ import {
   HISTORY_FILTER_LABELS,
   ORDER_STATUS,
   isTerminal,
-  isMasterPhoneVisible,
   matchesHistoryFilter,
   type HistoryFilter,
 } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
-import { MASTERS } from '@/mocks/masters';
 import { useDisputes } from '../dispute-store';
-import { USER } from '@/mocks/user';
+import { useAddresses } from '../address-store';
+import { useFavorites } from '../favorites-store';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
-import { useChat } from '../chat-store';
 import { useWallet } from '../useWallet';
 import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
@@ -222,8 +218,10 @@ export function NotificationsTab() {
 /** 26 · Profil — read-only. */
 export function ProfileTab() {
   const navigate = useNavigate();
-  const { phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
+  const { fullName, phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
   const { openCount } = useDisputes();
+  const { addresses } = useAddresses();
+  const { count: favoriteCount } = useFavorites();
   const { level } = useWallet();
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
@@ -297,6 +295,24 @@ export function ProfileTab() {
       ],
     },
     {
+      title: 'Shaxsiy',
+      items: [
+        {
+          icon: MapPin,
+          label: 'Manzillarim',
+          // Nol boʻlsa ishora chizilmaydi: "0 ta" hech narsa aytmaydi.
+          hint: addresses.length > 0 ? `${addresses.length} ta` : undefined,
+          onSelect: () => navigate('/app/addresses'),
+        },
+        {
+          icon: Heart,
+          label: 'Sevimli ustalar',
+          hint: favoriteCount > 0 ? `${favoriteCount} ta` : undefined,
+          onSelect: () => navigate('/app/favorites'),
+        },
+      ],
+    },
+    {
       title: 'Yordam',
       items: [
         {
@@ -331,21 +347,39 @@ export function ProfileTab() {
       header={<Header variant="inner" title="Profil" />}
       footer={<AppTabBar active="profile" />}
     >
-      {/* Foydalanuvchi kartasi — ilovadagi boshqa kartalar bilan bir tilda. */}
-      <div
+      {/*
+        Karta BOSILADI: shevron qoʻyilgani uchun u shaxsiy maʼlumotlar
+        ekraniga olib borishi shart — bosilmaydigan qatordagi shevron
+        ishlamaydigan tugmaning eng jimgina koʻrinishi.
+      */}
+      <button
+        type="button"
+        onClick={() => navigate('/app/profile/edit')}
         className={cn(
-          'mt-8 flex items-center gap-12 rounded-lg border border-transparent bg-surface-elevated p-12 shadow-e1',
+          'mt-8 flex w-full items-center gap-12 rounded-lg border border-transparent bg-surface-elevated p-12 text-left shadow-e1',
           "[[data-theme='dark']_&]:border-border",
+          'transition-transform duration-press ease-std active:scale-[0.99]',
         )}
       >
-        <Avatar name={USER.fullName} size={64} />
+        {/*
+          Ism foydalanuvchidan keladi. Ilgari bu yerda `mocks/user.ts` dagi
+          "Jasur" turardi — foydalanuvchi hech qachon aytmagan ism.
+        */}
+        <Avatar name={fullName} size={64} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-h3 text-text-primary">{USER.fullName}</p>
+          {fullName ? (
+            <p className="truncate text-h3 text-text-primary">{fullName}</p>
+          ) : (
+            // Toʻqilgan ism ham, boʻsh joy ham qoldirilmaydi: qator
+            // oʻzining amalini aytadi.
+            <p className="truncate text-h3 text-text-secondary">Ism kiritilmagan</p>
+          )}
           <p className="mt-2 truncate text-body-sm text-text-secondary">
             {formatPhone(phoneNumber)}
           </p>
         </div>
-      </div>
+        <Icon icon={CaretRight} size={16} className="shrink-0 text-text-secondary" />
+      </button>
 
       {orders.length > 0 && (
         <div className="mt-12 grid grid-cols-3 gap-8">
@@ -395,131 +429,6 @@ export function ProfileTab() {
           </Button>
         </div>
       </Modal>
-
-      <div className="h-bottom-reserve" aria-hidden />
-    </ScreenShell>
-  );
-}
-
-export function MasterProfile() {
-  const navigate = useNavigate();
-  const { masterId } = useParams<{ masterId: string }>();
-  const { activeOrder } = useApp();
-  const { openThread } = useChat();
-
-  const master = Object.values(MASTERS).find((item) => item.id === masterId);
-  if (!master) return <Navigate to="/app/home" replace />;
-
-  const canCall =
-    activeOrder !== null &&
-    isMasterPhoneVisible(activeOrder.status) &&
-    Boolean(master.phoneNumber);
-
-  return (
-    <ScreenShell
-      header={<Header variant="inner" title="Usta profili" onBack={() => navigate(-1)} />}
-      footer={
-        <StickyFooter>
-          <div className="flex flex-col gap-12">
-            {/*
-              Yozish HAR DOIM ochiq, qoʻngʻiroq esa faqat buyurtma aktiv
-              paytda: usta raqami ish tugagach yopiladi. Ilgari bu holatda
-              ekranda faqat "qoʻllab-quvvatlashga yozing" degan matn qolardi.
-            */}
-            <div className="flex gap-12">
-              {canCall && (
-                <a
-                  href={`tel:${master.phoneNumber}`}
-                  className="flex h-[52px] flex-1 items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
-                >
-                  <Icon icon={Phone} size={20} weight="fill" />
-                  Qoʻngʻiroq
-                </a>
-              )}
-              <Button
-                variant={canCall ? 'secondary' : 'primary'}
-                leadingIcon={ChatCircleDots}
-                className="flex-1"
-                onClick={() =>
-                  navigate(
-                    `/app/chat/${openThread(
-                      master.id,
-                      activeOrder?.master?.id === master.id
-                        ? activeOrder.categoryName
-                        : 'Savol-javob',
-                    )}`,
-                  )
-                }
-              >
-                Yozish
-              </Button>
-            </div>
-
-            {!canCall && (
-              <>
-                <p className="text-center text-body-sm text-text-secondary">
-                  Ish yakunlangan — usta raqami yopiq
-                </p>
-                <Button variant="ghost" onClick={() => navigate('/app/support')}>
-                  Qoʻllab-quvvatlashga murojaat
-                </Button>
-              </>
-            )}
-          </div>
-        </StickyFooter>
-      }
-    >
-      <div className="mt-16 flex flex-col items-center">
-        {/* 120px avatar ekranning uchdan birini egallardi — 80px hero blokni
-            ixchamlashtiradi va ostidagi maʼlumotga joy ochadi. */}
-        <Avatar name={master.fullName} src={master.photoUrl} size={80} shape="square" />
-        <h1 className="mt-12 text-center text-h2 text-text-primary">{master.fullName}</h1>
-        <p className="mt-2 text-body text-text-secondary">{master.profession}</p>
-
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
-          <Badge variant={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'} />
-          {master.hasGovCertificate && <Badge variant="certified" />}
-        </div>
-      </div>
-
-      {/*
-        Reyting va bajarilgan ishlar koʻrsatkichlari. Ilgari ular sarlavha
-        ostida oddiy matn boʻlib turardi va ekranning pastki yarmi butunlay
-        boʻsh qolardi — bu sahifani tugallanmagandek koʻrsatardi.
-      */}
-      <div className="mt-20 grid grid-cols-2 gap-12">
-        <div className="rounded-lg border border-border bg-surface-elevated px-16 py-12">
-          <StarRating value={master.ratingAvg} size="sm" showValue />
-          <p className="mt-4 text-body-sm text-text-secondary">Reyting</p>
-        </div>
-        <div className="rounded-lg border border-border bg-surface-elevated px-16 py-12">
-          <p className="tabular text-h3 text-text-primary">{master.completedOrdersCount}</p>
-          <p className="mt-4 text-body-sm text-text-secondary">Bajarilgan buyurtma</p>
-        </div>
-      </div>
-
-      {/*
-        Tekshiruv maʼlumoti — foydalanuvchi ustaga nega ishonishi mumkinligini
-        tushuntiradi va sahifaning pastki qismini mazmun bilan toʻldiradi.
-        Ilgari bu yerda faqat boʻsh maydon turardi.
-      */}
-      <div className="mt-12 rounded-lg border border-border bg-surface-elevated px-16 py-12">
-        <div className="flex items-start gap-12">
-          <Icon icon={ShieldCheck} size={20} className="mt-2 shrink-0 text-success" />
-          <div className="min-w-0 flex-1">
-            <p className="text-title text-text-primary">Shaxsi tasdiqlangan</p>
-            <p className="mt-2 text-body-sm text-text-secondary">
-              {master.hasGovCertificate
-                ? "Davlat sertifikati va pasport maʼlumotlari tekshirilgan"
-                : "Pasport maʼlumotlari tekshirilgan"}
-            </p>
-          </div>
-        </div>
-
-        <p className="mt-12 border-t border-border pt-12 text-body-sm text-text-secondary">
-          Usta kelganda uning ismi va rasmini shu sahifadagi maʼlumot bilan solishtiring.
-        </p>
-      </div>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

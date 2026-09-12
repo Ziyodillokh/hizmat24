@@ -45,7 +45,7 @@ import { useToast } from '../ToastHost';
 export function ProblemReportScreen() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
-  const { findOrder, phoneNumber } = useApp();
+  const { findOrder, fullName, phoneNumber } = useApp();
   const { createDispute } = useDisputes();
   const showToast = useToast();
   const now = useMinuteClock();
@@ -64,7 +64,7 @@ export function ProblemReportScreen() {
   const submit = () => {
     if (!canSubmit || reason === null || goal === null) return;
 
-    const id = createDispute({ order, phoneNumber, reason, goal, note });
+    const id = createDispute({ order, fullName, phoneNumber, reason, goal, note });
     void tapFeedback();
     showToast('Matn tayyorlandi');
     // `replace`: orqaga bosganda toʻldirilgan forma emas, buyurtma ochiladi
@@ -221,8 +221,10 @@ export function ProblemReportScreen() {
         </div>
         {phoneNumber.trim() && (
           <p className="border-t border-border pt-12 text-body-sm text-text-secondary">
-            Telefon raqamingiz ham qoʻshiladi: {formatPhone(phoneNumber)} — qoʻllab-quvvatlash
-            siz bilan bogʻlana olishi uchun.
+            {/* Qoʻshiladigan shaxsiy maʼlumot tugma bosilishidan OLDIN va
+                QIYMATI bilan koʻrsatiladi. */}
+            Aloqa uchun{fullName?.trim() ? ` ismingiz (${fullName.trim()}) va` : ''} telefon
+            raqamingiz ham qoʻshiladi: {formatPhone(phoneNumber)}.
           </p>
         )}
       </Card>

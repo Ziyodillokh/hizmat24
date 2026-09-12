@@ -9,10 +9,10 @@ import {
   type ReactNode,
 } from 'react';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
-import { MASTERS } from '@/mocks/masters';
+import { MASTERS, masterById } from '@/mocks/masters';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { NOTIFICATIONS } from '@/mocks/notifications';
-import type { AppNotification, OrderAddress } from '@/mocks/types';
+import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 import { buildInvoice } from '@/lib/pricing';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
@@ -39,6 +39,14 @@ const SERVER_STEPS: Partial<Record<OrderStatus, { next: OrderStatus; delayMs: nu
 interface AppState {
   isAuthenticated: boolean;
   phoneNumber: string;
+  /**
+   * Foydalanuvchi OʻZI kiritgan ism; kiritmagan boʻlsa `null`.
+   *
+   * Ilgari profil va bosh sahifa mock fayldagi "Jasur" ni koʻrsatardi —
+   * foydalanuvchi hech qachon aytmagan ism. Ism boʻsh boʻlishi normal
+   * holat va ekranlar unga tayyor.
+   */
+  fullName: string | null;
   /** Tanishtiruv oqimi tugatilganmi. */
   hasOnboarded: boolean;
   role: UserRole | null;
@@ -52,9 +60,13 @@ interface AppActions {
   /** Tanishtiruv yakunlandi va rol tanlandi. */
   completeOnboarding: (role: UserRole) => void;
   signOut: () => void;
+  /** Boʻsh satr `null` ga aylantiriladi — "ism yoʻq" bitta koʻrinishda. */
+  setFullName: (name: string) => void;
   setDraftCategory: (categoryId: string) => void;
   setDraftDetails: (description: string) => void;
   setDraftAddress: (address: OrderAddress) => void;
+  /** Sevimli roʻyxatidan tanlangan usta; `null` — tanlov yoʻq. */
+  setDraftMaster: (masterId: string | null) => void;
   /** Vaqt tanlash: `scheduledAt === null` — imkon qadar tez. */
   setDraftSchedule: (scheduledAt: Date | null, isUrgent: boolean) => void;
   setDraftPayment: (method: PaymentMethod) => void;
@@ -136,8 +148,43 @@ function waitMsFor(order: LiveOrder, delayMs: number): number {
   return Math.max(0, order.scheduledAt.getTime() - Date.now()) + delayMs;
 }
 
-/** Usta tayinlanganda telefon koʻrinadi; boshqa holatlarda `null` boʻladi. */
-const assignMaster = () => ({ ...MASTERS.akmal });
+/**
+ * Buyurtmaga usta tayinlaydi.
+ *
+ * Foydalanuvchi sevimli roʻyxatidan usta tanlagan boʻlsa AYNAN shu usta
+ * tayinlanadi. Ilgari funksiya argumentsiz edi va har bir buyurtmaga bitta
+ * odam — Akmal Rahimov — tayinlanardi; bosh sahifadagi "Buyurtma berish"
+ * tugmasi boshqa ustaning kartasida turgan boʻlsa ham. Tanlovni hisobga
+ * olish shu yolgʻonni yoʻq qiladi.
+ *
+ * Topilmagan `id` zaxira ustaga tushadi: qurilmadagi yozuv eskirgan boʻlsa
+ * buyurtma ustasiz qolmasligi kerak.
+ */
+const assignMaster = (preferredMasterId: string | null): Master => ({
+  ...(masterById(preferredMasterId ?? undefined) ?? MASTERS.akmal),
+});
+
+/**
+ * Server oʻtishining buyurtmaga tushadigan oʻzgarishi.
+ *
+ * `applyServerStep` (taymer) va `advanceOrder` (demo tugmasi) AYNAN bir xil
+ * ishni bajaradi. Ilgari mantiq ikki joyda takrorlangan edi va tanlangan
+ * ustani faqat bittasiga qoʻshish jimgina nomuvofiqlik berardi.
+ */
+function buildStepPatch(order: LiveOrder, next: OrderStatus): Partial<LiveOrder> {
+  const patch: Partial<LiveOrder> = { status: next };
+
+  if (next === ORDER_STATUS.ASSIGNED) {
+    patch.master = assignMaster(order.preferredMasterId);
+    patch.etaMinutes = 15;
+  }
+  if (next === ORDER_STATUS.COMPLETED_BY_MASTER) {
+    patch.completedAt = new Date();
+    patch.etaMinutes = null;
+  }
+
+  return patch;
+}
 
 export function AppProvider({ children }: { children: ReactNode }) {
   // Boshlangʻich holat qurilmadan tiklanadi — ilova qayta ochilganda
@@ -149,6 +196,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return {
         isAuthenticated: false,
         phoneNumber: '',
+        fullName: null,
         hasOnboarded: false,
         role: null,
         draft: EMPTY_DRAFT,
@@ -164,6 +212,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       isAuthenticated: restored.isAuthenticated,
       phoneNumber: restored.phoneNumber,
+      fullName: restored.fullName,
       hasOnboarded: restored.hasOnboarded,
       role: restored.role,
       draft: EMPTY_DRAFT,
@@ -191,19 +240,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const step = SERVER_STEPS[status];
       if (!step) return;
 
-      const patch: Partial<LiveOrder> = { status: step.next };
-      if (step.next === ORDER_STATUS.ASSIGNED) {
-        patch.master = assignMaster();
-        patch.etaMinutes = 15;
-      }
-      if (step.next === ORDER_STATUS.COMPLETED_BY_MASTER) {
-        patch.completedAt = new Date();
-        patch.etaMinutes = null;
-      }
+      // Buyurtma `setState` ichidan oʻqiladi: taymer ishga tushganda
+      // tanlangan usta allaqachon yozuvda turgan boʻlishi shart.
+      setState((prev) => {
+        const order = prev.orders.find((item) => item.id === orderId);
+        if (!order || order.status !== status) return prev;
 
-      patchOrder(orderId, patch);
+        const patch = buildStepPatch(order, step.next);
+        return {
+          ...prev,
+          orders: prev.orders.map((item) => (item.id === orderId ? { ...item, ...patch } : item)),
+        };
+      });
     },
-    [patchOrder],
+    [],
   );
 
   // Har bir aktiv buyurtma uchun keyingi avtomatik oʻtishni rejalashtiramiz.
@@ -233,6 +283,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveSession({
       isAuthenticated: state.isAuthenticated,
       phoneNumber: state.phoneNumber,
+      fullName: state.fullName,
       hasOnboarded: state.hasOnboarded,
       role: state.role,
       orders: state.orders,
@@ -243,6 +294,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [
     state.isAuthenticated,
     state.phoneNumber,
+    state.fullName,
     state.hasOnboarded,
     state.role,
     state.orders,
@@ -271,12 +323,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
           ...prev,
           isAuthenticated: false,
           phoneNumber: '',
+          fullName: null,
           hasOnboarded: false,
           role: null,
           draft: EMPTY_DRAFT,
           orders: [],
         }));
       },
+
+      setFullName: (name) =>
+        setState((prev) => ({ ...prev, fullName: name.trim() || null })),
 
       setDraftCategory: (categoryId) =>
         setState((prev) => ({ ...prev, draft: { ...prev.draft, categoryId } })),
@@ -297,6 +353,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       setDraftAddress: (address) =>
         setState((prev) => ({ ...prev, draft: { ...prev.draft, address } })),
+
+      setDraftMaster: (preferredMasterId) =>
+        setState((prev) => ({ ...prev, draft: { ...prev.draft, preferredMasterId } })),
 
       resetDraft: () => setState((prev) => ({ ...prev, draft: EMPTY_DRAFT })),
 
@@ -329,6 +388,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
               discountPercent,
             }),
             paymentMethod: prev.draft.paymentMethod,
+            preferredMasterId: prev.draft.preferredMasterId,
             scheduledAt: prev.draft.scheduledAt,
             isUrgent: prev.draft.isUrgent,
             address: prev.draft.address,
@@ -387,15 +447,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const step = SERVER_STEPS[order.status];
           if (!step) return prev;
 
-          const patch: Partial<LiveOrder> = { status: step.next };
-          if (step.next === ORDER_STATUS.ASSIGNED) {
-            patch.master = assignMaster();
-            patch.etaMinutes = 15;
-          }
-          if (step.next === ORDER_STATUS.COMPLETED_BY_MASTER) {
-            patch.completedAt = new Date();
-            patch.etaMinutes = null;
-          }
+          const patch = buildStepPatch(order, step.next);
 
           return {
             ...prev,

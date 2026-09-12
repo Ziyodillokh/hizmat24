@@ -982,6 +982,27 @@ Chiqishda: ishlatilgan tokenlar va yaratilgan komponentlar ro'yxatini chiqar.
 
 Quyidagilarning har biri backend qoidasini buzadi yoki ma'lumot manbai bo'lmagan element yaratadi. **Birortasi ham chizilmasin.**
 
+> **DIQQAT — bu bo'lim 31 ekranli DEMO GALEREYASI uchun yozilgan.**
+>
+> Jonli ilova `docs/roadmap.md` bo'yicha rivojlanadi va ro'yxatdagi
+> ayrim bandlar o'sha yo'l xaritasi bilan **bekor qilingan**. Bekor
+> qilingan band chizilganda, u endi ma'lumot manbaiga ega bo'ladi —
+> taqiqning asosiy sababi shu edi.
+>
+> | Band | Holati | Sabab |
+> |---|---|---|
+> | 14.1.1 · Ustalar katalogi | Bekor qilingan | `/app/masters` mavjud; `MASTER_LIST` real manba |
+> | 14.1.4 · Ustalar bo'yicha qidiruv va filtr | Bekor qilingan | `MastersTab` da ishlaydi |
+> | 14.1.5 · "Yoqtirish"/"Saqlash" tugmalari | Bekor qilingan (6-bosqich) | Sevimli ustaga yozish va uni buyurtmada so'rash ishlaydi |
+> | 14.4.28 · Ism o'zgartirish | Bekor qilingan (6-bosqich) | Ilgari profil mock "Jasur" ni ko'rsatardi — **bu taqiq yolg'onni saqlab turgan edi**. Telefon o'zgartirish TAQIQ qolmoqda: qayta tasdiqlash oqimi yo'q |
+> | 14.4.29 · "Manzillarim" | Bekor qilingan (6-bosqich) | Manzil `localStorage` da saqlanadi va buyurtma oqimida ishlatiladi |
+> | 14.4.31 · Tema tanlash | Bekor qilingan (5-bosqichdan oldin) | Profildagi "Tungi rejim" almashtirgichi |
+>
+> **Kuchda qolgan taqiqlar** (ular hamon ma'lumot manbaisiz): avatar
+> yuklash (14.4.28 ning bir qismi), to'lov usullari va promokod (30),
+> til tanlash (31), referal (32), xaritada ustaning real-vaqt
+> joylashuvi (14.1.7), server vaqtlariga tayangan timeline (14.1.8).
+
 ### 14.1. Ustalar bilan bog'liq
 1. Ustalar katalogi, ro'yxati, karuseli, "Barcha ustalar" ekrani.
 2. "Ustani tanlang", "Takliflar", "Nomzodlar" ekrani yoki bir nechta usta kartasi.

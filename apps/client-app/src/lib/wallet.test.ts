@@ -54,6 +54,7 @@ function order(status: LiveOrder['status'], options: Partial<LiveOrder> = {}): L
     description: '',
     invoice: buildInvoice({ base: 100_000, isUrgent: false, discountPercent: 0 }),
     paymentMethod: 'escrow' as PaymentMethod,
+    preferredMasterId: null,
     scheduledAt: null,
     isUrgent: false,
     address: { label: 'Chilonzor' },

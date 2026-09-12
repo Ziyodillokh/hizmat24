@@ -30,6 +30,8 @@ import type { LiveOrder } from './types';
  */
 export interface CreateDisputeInput {
   order: LiveOrder;
+  /** Foydalanuvchi kiritgan ism; kiritmagan boʻlsa `null`. */
+  fullName: string | null;
   /** Formatlanmagan telefon; boʻsh boʻlishi mumkin. */
   phoneNumber: string;
   reason: string;
@@ -95,6 +97,7 @@ export function DisputeProvider({ children }: { children: ReactNode }) {
       note: input.note.trim(),
       message: buildDisputeMessage({
         order: input.order,
+        fullName: input.fullName,
         phoneNumber: input.phoneNumber,
         reason: input.reason,
         goal: input.goal,

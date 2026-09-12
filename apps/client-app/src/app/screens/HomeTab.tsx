@@ -15,9 +15,9 @@ import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatte
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
 import { MASTER_LIST, MASTERS } from '@/mocks/masters';
-import { USER } from '@/mocks/user';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import { useApp } from '../store';
+import { useToast } from '../ToastHost';
 import type { LiveOrder } from '../types';
 
 /**
@@ -63,7 +63,8 @@ function secondaryLine(order: LiveOrder): string | null {
 
 export function HomeTab() {
   const navigate = useNavigate();
-  const { activeOrder, phoneNumber, unreadCount } = useApp();
+  const { activeOrder, fullName, phoneNumber, unreadCount, setDraftMaster } = useApp();
+  const showToast = useToast();
 
   const groups = SERVICE_GROUPS.slice(0, VISIBLE_GROUPS);
 
@@ -85,7 +86,7 @@ export function HomeTab() {
           <Header
             variant="home"
             onHero
-            name={USER.fullName}
+            name={fullName}
             phone={phoneNumber}
             unreadCount={unreadCount}
             onNotificationsClick={() => navigate('/app/notifications')}
@@ -186,8 +187,18 @@ export function HomeTab() {
                 profession={master.profession}
                 rating={master.ratingAvg}
                 photoUrl={master.photoUrl}
-                actionLabel="Buyurtma berish"
-                onAction={() => navigate('/app/services')}
+                actionLabel="Chaqirish"
+                /*
+                  Tanlov endi BUYURTMAGA YOZILADI. Ilgari bu tugma
+                  "Buyurtma berish" deb turardi va oqim oxirida buyurtmaga
+                  boshqa odam — har doim Akmal Rahimov — tayinlanardi,
+                  kartada esa mutlaqo boshqa usta koʻrinardi.
+                */
+                onAction={() => {
+                  setDraftMaster(master.id);
+                  showToast(`${master.fullName} tanlandi`, 'success');
+                  navigate('/app/services');
+                }}
                 onOpen={() => navigate(`/app/master/${master.id}`)}
               />
             </li>

@@ -15,6 +15,15 @@ export interface OrderDraft {
    */
   isUrgent: boolean;
   address: OrderAddress | null;
+  /**
+   * Foydalanuvchi sevimli roʻyxatidan tanlagan usta; tanlanmagan boʻlsa `null`.
+   *
+   * Bu SOʻROV, kafolat emas: haqiqiy tizimda usta band boʻlishi yoki rad
+   * etishi mumkin. Hozir backend yoʻq, shuning uchun ilova soʻrovni
+   * buyurtmaga yozadi va aynan shu ustani tayinlaydi — ekranlar buni ochiq
+   * aytadi.
+   */
+  preferredMasterId: string | null;
   /** `null` — "imkon qadar tez". Aks holda tanlangan sana va soat. */
   scheduledAt: Date | null;
   /** Toʻlov ekrani yozadi; tanlanmaguncha `null`. */
@@ -42,6 +51,13 @@ export interface LiveOrder {
    */
   invoice: OrderInvoice;
   paymentMethod: PaymentMethod;
+  /**
+   * Buyurtma berilganda soʻralgan usta.
+   *
+   * Qoralamadan buyurtmaga KOʻCHIRILADI: usta `SEARCHING` dan keyin
+   * tayinlanadi, qoralama esa bunga qadar tozalanadi.
+   */
+  preferredMasterId: string | null;
   /** `null` — buyurtma darhol yuborilgan. */
   scheduledAt: Date | null;
   isUrgent: boolean;
@@ -62,6 +78,7 @@ export const EMPTY_DRAFT: OrderDraft = {
   description: '',
   isUrgent: false,
   address: null,
+  preferredMasterId: null,
   scheduledAt: null,
   paymentMethod: null,
 };

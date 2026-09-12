@@ -110,6 +110,8 @@ export function disputeHint(
 
 export interface DisputeMessageInput {
   order: LiveOrder;
+  /** Foydalanuvchi kiritgan ism; kiritmagan boʻlsa `null` va qator chizilmaydi. */
+  fullName: string | null;
   /** Formatlanmagan telefon. Boʻsh boʻlsa qator umuman chizilmaydi. */
   phoneNumber: string;
   reason: string;
@@ -127,7 +129,7 @@ export interface DisputeMessageInput {
  * Funksiya determinik: `Date.now()` ham, tasodif ham ishlatilmaydi.
  */
 export function buildDisputeMessage(input: DisputeMessageInput): string {
-  const { order, phoneNumber, reason, goal, note } = input;
+  const { order, fullName, phoneNumber, reason, goal, note } = input;
 
   const details = addressDetailsLine(order.address);
   const address = details ? `${order.address.label} · ${details}` : order.address.label;
@@ -158,6 +160,7 @@ export function buildDisputeMessage(input: DisputeMessageInput): string {
 
   // Boʻsh qiymatda qator UMUMAN chizilmaydi — "—" ham yozilmaydi, chunki
   // bu maʼlumot yoʻqligi emas, kiritilmaganligi.
+  if (fullName?.trim()) lines.push(`Mening ismim: ${fullName.trim()}`);
   if (phoneNumber.trim()) lines.push(`Mening raqamim: ${formatPhone(phoneNumber)}`);
 
   lines.push('');

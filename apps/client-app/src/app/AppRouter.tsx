@@ -10,12 +10,19 @@ import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
 import { ChatProvider } from './chat-store';
 import { DisputeProvider } from './dispute-store';
+import { AddressProvider } from './address-store';
+import { FavoritesProvider } from './favorites-store';
 import { LoginScreen } from './screens/LoginScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { OtpScreen } from './screens/OtpScreen';
 import { HomeTab } from './screens/HomeTab';
 import { AllServicesTab, GroupServicesTab } from './screens/CatalogScreens';
-import { AddressStep, ConfirmStep, MapStep, OrderDetailsStep } from './screens/CreateOrderScreens';
+import {
+  AddressStep,
+  ConfirmStep,
+  OrderDetailsStep,
+  SavedAddressStep,
+} from './screens/CreateOrderScreens';
 import { ScheduleStep } from './screens/ScheduleStep';
 import { PaymentStep } from './screens/PaymentStep';
 import { PaymentReceipt } from './screens/PaymentReceipt';
@@ -24,7 +31,8 @@ import { WorkProofScreen } from './screens/WorkProof';
 import { OrderTracking } from './screens/OrderTracking';
 import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
-import { MasterProfile, NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
+import { NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
+import { MasterProfile } from './screens/MasterProfile';
 import { MarketTab } from './screens/MarketTab';
 import { ProductDetail } from './screens/ProductDetail';
 import { ShopDetail } from './screens/ShopDetail';
@@ -40,6 +48,10 @@ import { ProblemReportScreen } from './screens/ProblemReport';
 import { DisputeDetailScreen } from './screens/DisputeDetail';
 import { DisputeListScreen } from './screens/DisputeList';
 import { GuaranteeScreen } from './screens/Guarantee';
+import { AddressBookScreen } from './screens/AddressBook';
+import { AddressFormScreen } from './screens/AddressForm';
+import { FavoritesScreen } from './screens/Favorites';
+import { ProfileEditScreen } from './screens/ProfileEdit';
 
 /**
  * `SupportScreen` preview galereyasida ham ishlatiladi va u yerda marshrut
@@ -149,16 +161,18 @@ function AppRoutes() {
               </RequireAuth>
             }
           />
+          {/* Saqlangan manzil tanlash — roʻyxat boʻsh boʻlsa oʻzi formaga
+              yoʻnaltiradi, boʻsh oraliq ekran koʻrsatilmaydi. */}
           <Route
-            path="new/map"
+            path="new/address"
             element={
               <RequireAuth>
-                <MapStep />
+                <SavedAddressStep />
               </RequireAuth>
             }
           />
           <Route
-            path="new/address"
+            path="new/address/new"
             element={
               <RequireAuth>
                 <AddressStep />
@@ -412,6 +426,49 @@ function AppRoutes() {
             }
           />
 
+          {/* Shaxsiy boʻlim. `addresses/new` (statik) va `addresses/:addressId`
+              (dinamik) toʻqnashmaydi — Router aniqroq marshrutni oʻzi tanlaydi. */}
+          <Route
+            path="profile/edit"
+            element={
+              <RequireAuth>
+                <ProfileEditScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="addresses"
+            element={
+              <RequireAuth>
+                <AddressBookScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="addresses/new"
+            element={
+              <RequireAuth>
+                <AddressFormScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="addresses/:addressId"
+            element={
+              <RequireAuth>
+                <AddressFormScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="favorites"
+            element={
+              <RequireAuth>
+                <FavoritesScreen />
+              </RequireAuth>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
       </PageTransition>
@@ -431,7 +488,11 @@ export function AppRouter() {
       <AppProvider>
         <ChatProvider>
           <DisputeProvider>
-            <AppShell />
+            <AddressProvider>
+              <FavoritesProvider>
+                <AppShell />
+              </FavoritesProvider>
+            </AddressProvider>
           </DisputeProvider>
         </ChatProvider>
       </AppProvider>
