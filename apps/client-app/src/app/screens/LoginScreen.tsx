@@ -59,7 +59,7 @@ export function LoginScreen() {
   return (
     <ScreenShell>
       <div className="flex flex-col items-center pt-24">
-        <BrandMark className="h-[76px] w-[76px]" />
+        <BrandMark className="h-[96px] w-[96px]" />
         <p className="mt-12 text-wordmark text-text-primary">Hizmat24</p>
         <p className="mt-8 text-center text-body text-text-secondary">
           Oʻzbekistonning professional xizmatlar platformasi

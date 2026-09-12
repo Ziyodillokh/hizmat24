@@ -61,8 +61,8 @@ def tinted_icon(source: Image.Image, size: int) -> Image.Image:
     return Image.composite(white, gradient((size, size)), alpha)
 
 
-def mark_only(source: Image.Image, size: int, scale: float) -> Image.Image:
-    """Shaffof fonda oq belgi — adaptiv ikonkaning old qatlami uchun."""
+def mark_only(source: Image.Image, size: int, scale: float, color=(255, 255, 255)) -> Image.Image:
+    """Shaffof fonda belgi — adaptiv ikonkaning old qatlami va ilova uchun."""
     alpha = mark_alpha(source)
     box = alpha.point(lambda v: 255 if v > 128 else 0).getbbox()
     cropped = alpha.crop(box)
@@ -73,9 +73,8 @@ def mark_only(source: Image.Image, size: int, scale: float) -> Image.Image:
     canvas = Image.new('L', (size, size), 0)
     canvas.paste(fitted, ((size - side) // 2, (size - side) // 2))
 
-    layer = Image.new('RGBA', (size, size), (255, 255, 255, 0))
-    layer.putalpha(canvas)
-    layer.paste((255, 255, 255, 255), mask=canvas)
+    layer = Image.new('RGBA', (size, size), color + (0,))
+    layer.paste(color + (255,), mask=canvas)
     layer.putalpha(canvas)
     return layer
 
@@ -121,6 +120,14 @@ def splash(source: Image.Image, size: tuple) -> Image.Image:
     return canvas
 
 
+# Adaptiv ikonkada old qatlam XML tomonidan 16,7% ga siqiladi, yaʼni
+# kanvasning 66,6% i qoladi. Android kafolatlaydigan koʻrinadigan doira —
+# 108dp dan 66dp. Belgi shu doiraning ichida NAFAS OLISHI kerak:
+#   0.78 x 66.6% x 108dp = 56dp  (66dp doira ichida 10dp zaxira)
+# Ilgari bu qiymat 0.92 edi va belgi 66,9dp ga chiqib, doira chetiga
+# tiqilib qolardi — strelka uchi va "24" kesilishga bir piksel qolgandi.
+ADAPTIVE_MARK_SCALE = 0.78
+
 MIPMAPS = {
     'mipmap-mdpi': 48,
     'mipmap-hdpi': 72,
@@ -135,8 +142,11 @@ def main() -> None:
     BRAND.mkdir(parents=True, exist_ok=True)
 
     # Ilova ichidagi belgi (kirish ekrani).
+    #
+    # Gradientli plitka SAQLANADI: tekis bitta rangdagi variant lentaning
+    # ustunlar ustidan oʻtishini koʻrsatadigan soyani yoʻqotadi va toʻq
+    # temada kontrast yetarli boʻlmaydi.
     tinted_icon(source, 512).save(BRAND / 'hizmat24-mark.png')
-    mark_only(source, 512, 0.92).save(BRAND / 'hizmat24-mark-white.png')
     print('brend aktivlari:', BRAND)
 
     for folder, size in MIPMAPS.items():
@@ -145,10 +155,7 @@ def main() -> None:
         rounded(icon, 0.22).save(target / 'ic_launcher.png')
         circular(icon).save(target / 'ic_launcher_round.png')
         gradient((size, size)).save(target / 'ic_launcher_background.png')
-        # Old qatlam XML da 16,7% ga siqiladi, shuning uchun belgi
-        # kanvasning 92% ini egallaydi — siqilgandan keyin xavfsiz zonaga
-        # aynan tushadi.
-        mark_only(source, size, 0.92).save(target / 'ic_launcher_foreground.png')
+        mark_only(source, size, ADAPTIVE_MARK_SCALE).save(target / 'ic_launcher_foreground.png')
     print('ikonkalar:', len(MIPMAPS), 'ta zichlik')
 
     count = 0
