@@ -1,14 +1,18 @@
 """
 Brend aktivlarini yasaydi: ilova ikonkasi, splash va ilova ichidagi belgi.
 
-MANBA — loyiha egasi bergan logo (oq belgi koʻk gradient ustida). Bu yerda
-belgining SHAKLI aynan saqlanadi, RANGI esa ilovaning turkuaz palitrasiga
-oʻtkaziladi: koʻk logo turkuaz ilovada begona koʻrinardi.
+MANBA — loyiha egasi bergan logo (oq belgi koʻk gradient ustida). Belgining
+SHAKLI aynan saqlanadi. RANG — logoning OʻZ gradienti: chuqur tungi koʻkdan
+(#03123C, past-chap) yorqin osmon koʻkiga (#139BFE, tepa-oʻng). Ilgari rang
+ilovaning turkuaz palitrasiga oʻtkazilgan edi; ilova 2026-09-13 da koʻkka
+oʻtgach, egasi asl koʻk logoni qaytarishni soʻradi.
 
 Usul: `min(R,G,B)` oq belgining alfa niqobini beradi (oq piksellarda ~255,
 koʻk fonda ~0, chekkalarda oraliq qiymat). Shu niqob bilan oq belgi
-ilovaning oʻz gradienti ustiga qoʻyiladi — shakl ham, chekkalardagi
-tekislash ham buzilmaydi.
+gradient ustiga BERILGAN MASSHTABDA qoʻyiladi — shakl ham, chekkalardagi
+tekislash ham buzilmaydi, belgi atrofidagi boʻsh joy esa boshqariladi.
+Manba rasmida belgi kvadratning 60% ini egallaydi; ikonkada u kichikroq
+turadi — egasining talabi: "H yaqinroq boʻlib qolgan, uzoqroq qilish kerak".
 
 Ishga tushirish:
     python3 scripts/build-brand-assets.py <manba.png>
@@ -21,20 +25,29 @@ ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / 'android/app/src/main/res'
 BRAND = ROOT / 'src/assets/brand'
 
-# Ilovaning hero gradienti (tokens/colors.ts, light palitra).
-HERO_TOP = (0x22, 0xCF, 0xCC)
-HERO_MID = (0x14, 0xAE, 0xAB)
-HERO_DEEP = (0x0B, 0x7E, 0x7C)
+# Logoning oʻz gradienti — manbaning chetlaridan olingan besh nuqta.
+# t — diagonal boʻylab oʻrin: 0 past-chap, 1 tepa-oʻng.
+RAMP_STOPS = (
+    (0.00, (0x03, 0x12, 0x3C)),
+    (0.25, (0x02, 0x1B, 0x5E)),
+    (0.50, (0x01, 0x44, 0xD0)),
+    (0.75, (0x00, 0x67, 0xFE)),
+    (1.00, (0x13, 0x9B, 0xFE)),
+)
+
+# Splash ramkasining rangi (capacitor.config.ts → SplashScreen.backgroundColor):
+# rasm chetida koʻrinadigan oʻrtacha tus.
+SPLASH_FRAME = '#0144D0'
 
 
 def ramp(t: float) -> tuple:
-    """Uch toʻxtashli turkuaz gradient: 0 — chuqur, 1 — yorqin."""
+    """Besh toʻxtashli koʻk gradient: 0 — chuqur, 1 — yorqin."""
     t = max(0.0, min(1.0, t))
-    if t < 0.55:
-        a, b, k = HERO_DEEP, HERO_MID, t / 0.55
-    else:
-        a, b, k = HERO_MID, HERO_TOP, (t - 0.55) / 0.45
-    return tuple(round(a[i] + (b[i] - a[i]) * k) for i in range(3))
+    for (t0, a), (t1, b) in zip(RAMP_STOPS, RAMP_STOPS[1:]):
+        if t <= t1:
+            k = (t - t0) / (t1 - t0)
+            return tuple(round(a[i] + (b[i] - a[i]) * k) for i in range(3))
+    return RAMP_STOPS[-1][1]
 
 
 def gradient(size: tuple) -> Image.Image:
@@ -54,11 +67,12 @@ def mark_alpha(source: Image.Image) -> Image.Image:
     return ImageChops.darker(ImageChops.darker(r, g), b)
 
 
-def tinted_icon(source: Image.Image, size: int) -> Image.Image:
-    """Toʻliq ikonka: turkuaz gradient + oq belgi."""
-    alpha = mark_alpha(source).resize((size, size), Image.LANCZOS)
-    white = Image.new('RGB', (size, size), (255, 255, 255))
-    return Image.composite(white, gradient((size, size)), alpha)
+def tinted_icon(source: Image.Image, size: int, scale: float) -> Image.Image:
+    """Toʻliq ikonka: gradient + oq belgi berilgan masshtabda."""
+    mark = mark_only(source, size, scale)
+    canvas = gradient((size, size)).convert('RGBA')
+    canvas.alpha_composite(mark)
+    return canvas.convert('RGB')
 
 
 def mark_only(source: Image.Image, size: int, scale: float, color=(255, 255, 255)) -> Image.Image:
@@ -123,10 +137,15 @@ def splash(source: Image.Image, size: tuple) -> Image.Image:
 # Adaptiv ikonkada old qatlam XML tomonidan 16,7% ga siqiladi, yaʼni
 # kanvasning 66,6% i qoladi. Android kafolatlaydigan koʻrinadigan doira —
 # 108dp dan 66dp. Belgi shu doiraning ichida NAFAS OLISHI kerak:
-#   0.78 x 66.6% x 108dp = 56dp  (66dp doira ichida 10dp zaxira)
-# Ilgari bu qiymat 0.92 edi va belgi 66,9dp ga chiqib, doira chetiga
-# tiqilib qolardi — strelka uchi va "24" kesilishga bir piksel qolgandi.
-ADAPTIVE_MARK_SCALE = 0.78
+#   0.64 x 66.6% x 108dp = 46dp  (66dp doira ichida 10dp zaxira har tomonda)
+# Ilgari 0.78 (56dp) edi — egasi belgini doira chetiga yaqin deb topdi.
+# Undan oldin 0.92 — belgi 66,9dp ga chiqib doiradan oshib ketardi.
+ADAPTIVE_MARK_SCALE = 0.64
+
+# Eski (adaptivgacha) ikonka va ilova ichidagi belgi: kvadratning shuncha
+# qismi. Adaptiv doiradagi nisbat (46/66 = 70%) bilan bir xil koʻrinsin
+# deb tanlangan — ikki turdagi ikonka bir xil "nafas" olsin.
+LEGACY_MARK_SCALE = 0.60
 
 MIPMAPS = {
     'mipmap-mdpi': 48,
@@ -146,12 +165,12 @@ def main() -> None:
     # Gradientli plitka SAQLANADI: tekis bitta rangdagi variant lentaning
     # ustunlar ustidan oʻtishini koʻrsatadigan soyani yoʻqotadi va toʻq
     # temada kontrast yetarli boʻlmaydi.
-    tinted_icon(source, 512).save(BRAND / 'hizmat24-mark.png')
+    tinted_icon(source, 512, LEGACY_MARK_SCALE).save(BRAND / 'hizmat24-mark.png')
     print('brend aktivlari:', BRAND)
 
     for folder, size in MIPMAPS.items():
         target = RES / folder
-        icon = tinted_icon(source, size)
+        icon = tinted_icon(source, size, LEGACY_MARK_SCALE)
         rounded(icon, 0.22).save(target / 'ic_launcher.png')
         circular(icon).save(target / 'ic_launcher_round.png')
         gradient((size, size)).save(target / 'ic_launcher_background.png')

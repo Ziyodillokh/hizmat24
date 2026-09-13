@@ -28,9 +28,10 @@ const config: CapacitorConfig = {
        */
       launchAutoHide: true,
       launchShowDuration: 3000,
-      // Splash rasmi turkuaz gradient — ramka rangi ham shunga mos boʻlsin,
-      // aks holda rasm chetida toʻq yoʻl koʻrinardi.
-      backgroundColor: '#0B7E7C',
+      // Splash rasmi — logoning oʻz koʻk gradienti; ramka rangi uning
+      // oʻrtacha tusi (scripts/build-brand-assets.py → SPLASH_FRAME), aks
+      // holda rasm chetida boshqa rangdagi yoʻl koʻrinardi.
+      backgroundColor: '#0144D0',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
     },

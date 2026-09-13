@@ -7,9 +7,10 @@ import { cn } from '@/lib/cn';
  * Belgi loyiha egasi bergan logodan olingan: oʻzaro kesishgan "H" ustunlari
  * va ular orasidan oʻtuvchi strelka-lenta, pastda "24".
  *
- * Manba koʻk edi, bu yerda esa ilovaning turkuaz gradienti ustida chiziladi:
- * koʻk belgi turkuaz ilovada begona koʻrinardi. Shakl aynan saqlangan —
- * `scripts/build-brand-assets.py` faqat rangni almashtiradi.
+ * Rang — logoning OʻZ koʻk gradienti (ilova 2026-09-13 da koʻkka oʻtdi va
+ * asl rang qaytarildi). Belgi plitka ichida kichikroq turadi — ilova
+ * ikonkasi bilan bir xil "nafas" (`scripts/build-brand-assets.py`,
+ * LEGACY_MARK_SCALE).
  *
  * Rasm ilova ichiga joylangan (tashqi soʻrov yoʻq) — ilova internetsiz
  * ochiladi degan qoidaga muvofiq.
