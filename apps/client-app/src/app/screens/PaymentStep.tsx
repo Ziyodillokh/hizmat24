@@ -1,21 +1,26 @@
-import { CreditCard, Info, LockSimple, Money, ShieldCheck } from '@phosphor-icons/react';
+import { ArrowRight, CreditCard, Medal, Money, ShieldCheck } from '@phosphor-icons/react';
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
-import { Icon } from '@/components/Icon';
 import { StepDots } from '@/components/StepDots';
-import { SummaryRow } from '@/components/SummaryRow';
+import { InfoChip } from '@/components/InfoChip';
+import { Card } from '@/components/Card';
+import { ChoiceCard } from '@/components/order/ChoiceCard';
+import { PriceBreakdown } from '@/components/order/PriceBreakdown';
+import { ServiceSummaryCard } from '@/components/order/ServiceSummaryCard';
+import { StepSection } from '@/components/order/StepSection';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
-import { cn } from '@/lib/cn';
-import { formatPercent, formatPrice } from '@/lib/formatters';
+import { formatPercent } from '@/lib/formatters';
+import { firstMissingStep, ORDER_STEP_ROUTES } from '@/lib/orderFlow';
 import { buildInvoice } from '@/lib/pricing';
 import { timingLabel } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { CASHBACK_BLOCK, METHOD_LABELS } from '@/lib/wallet';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useApp } from '../store';
+import { MissingStepGuard } from './order/MissingStepGuard';
 import { useWallet } from '../useWallet';
 import type { PaymentMethod } from '../types';
 
@@ -52,7 +57,7 @@ const METHODS: readonly MethodOption[] = [
     key: 'cash',
     icon: Money,
     tone: 'bg-neutral-surface text-text-secondary',
-    hint: 'Usta ish tugagach joyida toʻlaysiz',
+    hint: 'Ish tugagach ustaga joyida toʻlaysiz',
     comingSoon: false,
   },
   {
@@ -70,11 +75,6 @@ const METHODS: readonly MethodOption[] = [
     comingSoon: true,
   },
 ];
-
-const CARD_CLASSES = cn(
-  'mt-8 rounded-lg border border-transparent bg-surface-elevated p-16 shadow-e1',
-  "[[data-theme='dark']_&]:border-border",
-);
 
 export function PaymentStep() {
   const navigate = useNavigate();
@@ -98,18 +98,20 @@ export function PaymentStep() {
     [category?.basePrice, draft.isUrgent, level.discountPercent],
   );
 
-  if (!category || !draft.address) {
+  const missing = firstMissingStep(draft, ['category', 'address']);
+  if (!category || !draft.address || missing) {
     return (
-      <ScreenShell
-        header={<Header variant="inner" title="Toʻlov" onBack={() => navigate('/app/home')} />}
-      >
-        <Banner variant="warning" className="mt-16">
-          Avval xizmat turi va manzilni tanlang
-        </Banner>
-        <Button variant="secondary" className="mt-16" onClick={() => navigate('/app/services')}>
-          Xizmat tanlash
-        </Button>
-      </ScreenShell>
+      <MissingStepGuard
+        title="Toʻlov"
+        missing={
+          missing ?? {
+            key: 'category',
+            route: ORDER_STEP_ROUTES.services,
+            title: 'Avval xizmat turini tanlang',
+            cta: 'Xizmat tanlash',
+          }
+        }
+      />
     );
   }
 
@@ -138,7 +140,7 @@ export function PaymentStep() {
 
   const submit = () => {
     setDraftPayment(method);
-    navigate('/app/new/confirm');
+    navigate(ORDER_STEP_ROUTES.confirm);
   };
 
   return (
@@ -146,182 +148,62 @@ export function PaymentStep() {
       header={<Header variant="inner" title="Toʻlov" onBack={() => navigate(-1)} />}
       footer={
         <StickyFooter>
-          {/* `disabled` YOʻQ: naqd oldindan tanlangan, demak tugma hech
-              qachon oʻchmaydi. Soxta validatsiya yozilmaydi. */}
-          <Button variant="primary" onClick={submit}>
-            Davom etish
-          </Button>
+          <Button variant="primary" onClick={submit}>Buyurtmani koʻrib chiqish</Button>
         </StickyFooter>
       }
     >
       <StepDots currentStep={3} />
+      <ServiceSummaryCard
+        service={category}
+        basePrice={category.basePrice}
+        meta={[timingLabel(draft, now), draft.address.label]}
+        className="mt-16"
+      />
 
-      <h2 className="mt-20 px-4 text-overline uppercase text-text-secondary">Buyurtma</h2>
-      <div className={CARD_CLASSES}>
-        <SummaryRow label="Xizmat" value={category.name} />
-        <SummaryRow label="Vaqt" value={timingLabel(draft, now)} />
-        <SummaryRow label="Manzil" value={draft.address.label} />
-      </div>
-
-      {/* Demodagi "SSL · PCI DSS" daʼvosi koʻchirilmaydi — u ulanmagan
-          holda yolgʻon boʻlardi. */}
-      <div className="mt-16 flex items-start gap-8 px-4">
-        <Icon icon={LockSimple} size={16} className="mt-2 shrink-0 text-text-secondary" aria-hidden />
-        <p className="text-caption text-text-secondary">
-          Ilova karta maʼlumotini soʻramaydi va saqlamaydi. Onlayn toʻlov ulanganda u Click yoki
-          Payme sahifasida amalga oshiriladi.
-        </p>
-      </div>
-
-      <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">
-        Toʻlov usulini tanlang
-      </h2>
-
-      <Banner variant="info" icon={Info} className="mt-12">
-        Click va Payme hali ulanmagan. Hozircha faqat naqd toʻlov ishlaydi — pul ilova orqali
-        koʻchmaydi, usta ishni tugatgach summani joyida oladi.
-      </Banner>
-
-      <div
-        role="radiogroup"
-        aria-label="Toʻlov usuli"
-        onKeyDown={onMethodKeyDown}
-        className={cn(
-          'mt-8 overflow-hidden rounded-lg border border-transparent bg-surface-elevated shadow-e1',
-          "[[data-theme='dark']_&]:border-border",
-        )}
+      <StepSection
+        title="Toʻlov usuli"
+        hint="Hozircha faqat naqd ishlaydi. Ilova karta maʼlumotini soʻramaydi — Click va Payme ulanganda toʻlov ularning sahifasida boʻladi."
       >
-        {METHODS.map((item, index) => {
-          const isSelected = item.key === method;
-
-          return (
-            <button
+        <div role="radiogroup" aria-label="Toʻlov usuli" onKeyDown={onMethodKeyDown} className="flex flex-col gap-8">
+          {METHODS.map((item) => (
+            <ChoiceCard
               key={item.key}
-              type="button"
-              role="radio"
-              aria-checked={isSelected}
-              tabIndex={isSelected ? 0 : -1}
+              icon={item.icon}
+              tone={item.tone}
+              title={METHOD_LABELS[item.key]}
+              hint={item.hint}
+              isSelected={item.key === method}
               disabled={item.comingSoon}
-              onClick={() => setMethod(item.key)}
-              className={cn(
-                'flex min-h-touch w-full items-center gap-12 px-12 py-12 text-left',
-                'transition-colors duration-state ease-std',
-                index > 0 && 'border-t border-border',
-                isSelected && 'bg-surface-sunken',
-                !item.comingSoon && 'active:bg-surface-sunken',
-              )}
-            >
-              <span
-                className={cn(
-                  'flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm',
-                  item.comingSoon ? 'bg-neutral-surface text-text-disabled' : item.tone,
-                )}
-                aria-hidden
-              >
-                <Icon icon={item.icon} size={20} weight="duotone" />
-              </span>
-
-              <span className="min-w-0 flex-1">
-                <span
-                  className={cn(
-                    'block truncate text-body-lg',
-                    item.comingSoon ? 'text-text-disabled' : 'text-text-primary',
-                  )}
-                >
-                  {METHOD_LABELS[item.key]}
-                </span>
-                <span className="mt-2 block text-caption text-text-secondary">{item.hint}</span>
-              </span>
-
-              {item.comingSoon ? (
-                <span className="shrink-0 text-body-sm text-text-secondary">Tez orada</span>
-              ) : (
-                // Haqiqiy radio nishoni: tanlanmaganda yadro UMUMAN yoʻq —
-                // farq rangda emas, shaklda ham.
-                <span
-                  className={cn(
-                    'flex h-20 w-20 shrink-0 items-center justify-center rounded-full',
-                    isSelected
-                      ? 'ring-2 ring-inset ring-primary'
-                      : 'ring-1 ring-inset ring-border-strong',
-                  )}
-                  aria-hidden
-                >
-                  {isSelected && <span className="h-8 w-8 rounded-full bg-primary" />}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* `span`, `button` EMAS: bajaradigan amali yoʻq. */}
-      <span className="ml-4 mt-12 inline-flex h-[32px] items-center rounded-full border border-dashed border-border-strong px-12 text-caption text-text-secondary">
-        Demo · onlayn toʻlov hali ishlamaydi
-      </span>
-
-      <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">Hisob</h2>
-      <div className={CARD_CLASSES}>
-        <SummaryRow label="Xizmat narxi" value={formatPrice(invoice.base)} />
-        {invoice.urgentFee > 0 && (
-          <SummaryRow label="Shoshilinch yuborish" value={formatPrice(invoice.urgentFee)} />
-        )}
-        {/* Chegirma nol boʻlsa qator umuman chizilmaydi: "-0 soʻm" hech
-            narsa aytmaydi, lekin xato bordir degan shubha tugʻdiradi. */}
-        {invoice.discount > 0 && (
-          <SummaryRow
-            label={`Daraja chegirmasi · ${level.label} ${formatPercent(invoice.discountPercent)}`}
-            value={formatPrice(-invoice.discount)}
-            tone="success"
-          />
-        )}
-        <SummaryRow label="Xizmat haqi" value="Bepul" tone="success" />
-
-        <div className="border-t border-dashed border-border pt-16" />
-        <div className="flex items-baseline justify-between gap-16">
-          <span className="text-body-lg text-text-secondary">Jami</span>
-          <span className="tabular text-display text-text-primary">
-            {formatPrice(invoice.total)}
-          </span>
+              tabIndex={item.key === method ? 0 : -1}
+              onSelect={() => setMethod(item.key)}
+            />
+          ))}
         </div>
-      </div>
+      </StepSection>
 
-      <p className="mt-8 px-4 text-caption text-text-secondary">
-        Xizmat haqi ustaning komissiyasidan olinadi — sizdan komissiya olinmaydi.
-      </p>
-
-      {invoice.discount > 0 && (
-        <button
-          type="button"
-          onClick={() => navigate('/app/wallet/bonus')}
-          className="mt-8 px-4 text-caption text-primary-pressed"
-        >
-          Chegirma qanday ishlaydi?
-        </button>
-      )}
-
-      {/*
-        Keshbek SUMMASI yozilmaydi: blokning yigʻindisi boshqa buyurtmalar
-        yopilishiga ham bogʻliq va hozir aytilgan raqam keyin oʻzgarardi.
-      */}
-      <p className="mt-12 px-4 text-caption text-text-secondary">
-        Bu buyurtma yakunlangach keshbek bloki:{' '}
-        {Math.min(cashback.filled + 1, CASHBACK_BLOCK)}/{CASHBACK_BLOCK}
-      </p>
-
-      {/* `canCancel` `MASTER_EN_ROUTE` da HAM ruxsat beradi — matn
-          foydalanuvchining haqiqiy huquqini kam koʻrsatmasligi kerak. */}
-      <Banner variant="warning" className="mt-16">
-        Usta yetib kelgunicha bekor qilish bepul va hech qanday pul yechilmaydi. Naqd toʻlovda
-        pul ilovada saqlanmaydi, shuning uchun qaytariladigan summa ham boʻlmaydi.
-      </Banner>
-      <button
-        type="button"
-        onClick={() => navigate('/app/guarantee')}
-        className="mt-8 px-4 text-caption text-primary-pressed"
+      <StepSection
+        title="Hisob"
+        trailing={invoice.discount > 0 ? (
+          <InfoChip tone="primary" icon={Medal}>{level.label} · {formatPercent(level.discountPercent)}</InfoChip>
+        ) : undefined}
       >
+        <Card>
+          <PriceBreakdown invoice={invoice} isEstimate />
+        </Card>
+        <p className="mt-8 px-4 text-caption text-text-secondary">
+          Xizmat haqi ustaning komissiyasidan olinadi — sizdan komissiya olinmaydi. Bu buyurtma yakunlangach keshbek bloki: {Math.min(cashback.filled + 1, CASHBACK_BLOCK)}/{CASHBACK_BLOCK}.
+        </p>
+        <Button variant="ghost" size="small" fullWidth={false} trailingIcon={ArrowRight} onClick={() => navigate('/app/wallet/bonus')} className="-ml-16 mt-4">
+          Chegirma va keshbek qanday ishlaydi?
+        </Button>
+      </StepSection>
+
+      <Banner variant="warning" icon={ShieldCheck} className="mt-24">
+        Usta yetib kelgunicha bekor qilish bepul — hech qanday pul yechilmaydi.
+      </Banner>
+      <Button variant="ghost" size="small" fullWidth={false} trailingIcon={ArrowRight} onClick={() => navigate('/app/guarantee')} className="-ml-16 mt-4">
         Bugungi himoya qanday ishlaydi?
-      </button>
+      </Button>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

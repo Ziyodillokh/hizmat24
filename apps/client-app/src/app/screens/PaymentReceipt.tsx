@@ -1,31 +1,43 @@
 import {
-  CalendarCheck,
+  ChatText,
   CheckCircle,
   Clock,
+  Lightning,
+  MapPin,
+  Money,
   Prohibit,
   Receipt,
   Star,
+  Wrench,
   XCircle,
 } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Banner } from '@/components/Banner';
+import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
+import { Icon } from '@/components/Icon';
 import { InfoChip, type InfoChipTone } from '@/components/InfoChip';
-import { SummaryRow } from '@/components/SummaryRow';
+import { DetailRow } from '@/components/order/DetailRow';
+import { PriceBreakdown } from '@/components/order/PriceBreakdown';
+import { ServiceSummaryCard } from '@/components/order/ServiceSummaryCard';
+import { StepSection } from '@/components/order/StepSection';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
+import { addressDetailsLine } from '@/lib/address';
 import { cn } from '@/lib/cn';
-import { formatDateTime, formatPercent, formatPrice } from '@/lib/formatters';
+import { formatDateTime } from '@/lib/formatters';
 import {
   isBlockingConfirmation,
   isTerminal,
   paymentStateFor,
   type PaymentStateKey,
 } from '@/lib/orderStateMachine';
+import { receiptHeadline } from '@/lib/receipt';
 import { timingLabel } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_LABELS } from '@/lib/wallet';
+import { masterById } from '@/mocks/masters';
 import { useApp } from '../store';
 
 /**
@@ -35,6 +47,9 @@ import { useApp } from '../store';
  * chiziladi va unda usta, baho, yakunlangan sana boʻladi. Bu yerda ular hali
  * yoʻq, lekin toʻlov usuli, tanlangan vaqt va hisob-faktura tafsiloti bor.
  *
+ * Bosh gap (`receiptHeadline`) buyurtma holatiga qarab, lekin har doim rost:
+ * pul koʻchmagan, onlayn toʻlov ulanmagan, qidiruv qachon boshlanadi.
+ *
  * "Yuklab olish", "Ulashish", "Nusxa olish" tugmalari YOʻQ: kerakli
  * Capacitor plaginlari oʻrnatilmagan va ular ishlamaydigan tugma boʻlardi.
  */
@@ -42,34 +57,13 @@ interface PaymentStateVisual {
   chip: string;
   tone: InfoChipTone;
   icon: IconGlyph;
-  note: (method: string) => string;
 }
 
 const PAYMENT_STATES: Record<PaymentStateKey, PaymentStateVisual> = {
-  pending: {
-    chip: 'Toʻlov kutilmoqda',
-    tone: 'warning',
-    icon: Clock,
-    note: (method) => `Ish yakunlangach ${method.toLowerCase()} bilan toʻlanadi.`,
-  },
-  confirm: {
-    chip: 'Baholang va toʻlovni tasdiqlang',
-    tone: 'warning',
-    icon: Star,
-    note: () => 'Ishni baholaganingizdan keyin buyurtma yopiladi.',
-  },
-  paid: {
-    chip: 'Toʻlandi',
-    tone: 'primary',
-    icon: CheckCircle,
-    note: (method) => `Toʻlov usuli: ${method}.`,
-  },
-  none: {
-    chip: 'Toʻlov boʻlmadi',
-    tone: 'neutral',
-    icon: Prohibit,
-    note: () => 'Buyurtma bekor qilindi — hech qanday pul yechilmagan.',
-  },
+  pending: { chip: 'Toʻlov kutilmoqda', tone: 'warning', icon: Clock },
+  confirm: { chip: 'Baholang va toʻlovni tasdiqlang', tone: 'warning', icon: Star },
+  paid: { chip: 'Toʻlandi', tone: 'primary', icon: CheckCircle },
+  none: { chip: 'Toʻlov boʻlmadi', tone: 'neutral', icon: Prohibit },
 };
 
 export function PaymentReceipt() {
@@ -90,9 +84,11 @@ export function PaymentReceipt() {
     return <Navigate to={`/app/order/${order.id}/confirm-master`} replace />;
   }
 
+  const headline = receiptHeadline(order, now);
   const state = PAYMENT_STATES[paymentStateFor(order.status)];
   const methodLabel = METHOD_LABELS[order.paymentMethod];
-  const isCancelled = paymentStateFor(order.status) === 'none';
+  // Usta hali tayinlanmagan boʻlsa — soʻralgan usta (SOʻROV, kafolat emas).
+  const requested = order.master === null ? masterById(order.preferredMasterId ?? undefined) : undefined;
   const isScheduledAhead = order.scheduledAt !== null && order.scheduledAt.getTime() > now.getTime();
 
   // `navigate(-1)` EMAS: bu ekranga tasdiqlashdan `replace` bilan kelinadi
@@ -101,7 +97,7 @@ export function PaymentReceipt() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Toʻlov cheki" onBack={backToOrder} />}
+      header={<Header variant="inner" title="Buyurtma" onBack={backToOrder} />}
       footer={
         <StickyFooter>
           <Button variant={isTerminal(order.status) ? 'secondary' : 'primary'} onClick={backToOrder}>
@@ -110,72 +106,83 @@ export function PaymentReceipt() {
         </StickyFooter>
       }
     >
-      {isCancelled ? (
-        <Banner variant="warning" icon={XCircle} className="mt-4">
-          Buyurtma bekor qilindi. Hech qanday pul yechilmagan.
-        </Banner>
-      ) : (
-        <Banner variant="info" icon={Receipt} className="mt-4">
-          Buyurtma qabul qilindi. Onlayn toʻlov hali ulanmagan — summa ish yakunlangach ustaga
-          naqd toʻlanadi.
-        </Banner>
-      )}
+      <div className="mt-16 flex flex-col items-center text-center">
+        <span
+          className={cn(
+            'flex h-[64px] w-[64px] items-center justify-center rounded-full',
+            headline.tone === 'warning'
+              ? 'bg-warning-surface text-warning'
+              : 'bg-success-surface text-success',
+          )}
+          aria-hidden
+        >
+          <Icon icon={headline.tone === 'warning' ? XCircle : CheckCircle} size={32} weight="fill" />
+        </span>
+        <h1 className="mt-12 text-h2 text-text-primary">{headline.title}</h1>
+        <p className="tabular mt-4 text-body-sm tracking-[0.4px] text-text-secondary">
+          Buyurtma № {order.shortId}
+        </p>
+        <p className="mt-8 text-body-sm text-text-secondary">{headline.body}</p>
+      </div>
 
-      {isScheduledAhead && order.scheduledAt && (
-        <Banner variant="info" icon={CalendarCheck} className="mt-12">
-          Buyurtma {formatDateTime(order.scheduledAt, now)} ga rejalashtirilgan. Usta qidiruvi
-          oʻsha vaqtda boshlanadi.
-        </Banner>
-      )}
+      <ServiceSummaryCard
+        service={{ id: order.categoryId, iconKey: order.categoryIconKey, name: order.categoryName }}
+        className="mt-24"
+      />
 
-      <div
-        className={cn(
-          'mt-16 rounded-lg border border-transparent bg-surface-elevated p-16 shadow-e1',
-          "[[data-theme='dark']_&]:border-border",
-        )}
-      >
-        <SummaryRow label="Buyurtma raqami" value={order.shortId} mono />
-        <SummaryRow label="Xizmat" value={order.categoryName} />
-        <SummaryRow label="Manzil" value={order.address.label} />
-        <SummaryRow label="Vaqt" value={timingLabel(order, now)} />
-        <SummaryRow label="Toʻlov usuli" value={methodLabel} />
-        <SummaryRow label="Berilgan sana" value={formatDateTime(order.createdAt, now)} />
-
-        <div className="border-t border-dashed border-border" />
-
-        <SummaryRow label="Xizmat narxi" value={formatPrice(order.invoice.base)} />
-        {order.invoice.urgentFee > 0 && (
-          <SummaryRow label="Shoshilinch yuborish" value={formatPrice(order.invoice.urgentFee)} />
-        )}
-        {order.invoice.discount > 0 && (
-          <SummaryRow
-            label={`Daraja chegirmasi (${formatPercent(order.invoice.discountPercent)})`}
-            value={formatPrice(-order.invoice.discount)}
-            tone="success"
+      <Card className="mt-12 divide-y divide-border py-4">
+        {order.master ? (
+          <DetailRow
+            leading={<Avatar src={order.master.photoUrl} name={order.master.fullName} size={44} shape="square" />}
+            icon={Wrench}
+            label="Usta"
+            value={order.master.fullName}
+            detail={order.master.profession}
           />
-        )}
-        <SummaryRow label="Xizmat haqi" value="Bepul" tone="success" />
+        ) : requested ? (
+          <DetailRow
+            leading={<Avatar src={requested.photoUrl} name={requested.fullName} size={44} shape="square" />}
+            icon={Wrench}
+            label="Soʻralgan usta"
+            value={requested.fullName}
+            detail="Soʻrov — tayinlanishi hali tasdiqlanmagan"
+          />
+        ) : null}
+        <DetailRow icon={ChatText} label="Muammo" value={order.description} />
+        <DetailRow
+          icon={MapPin}
+          label="Manzil"
+          value={order.address.label}
+          detail={addressDetailsLine(order.address) ?? undefined}
+        />
+        <DetailRow
+          icon={order.isUrgent ? Lightning : Clock}
+          label="Vaqt"
+          value={timingLabel(order, now)}
+          detail={
+            isScheduledAhead
+              ? 'Usta qidiruvi shu vaqtda boshlanadi'
+              : order.isUrgent
+                ? 'Shoshilinch'
+                : undefined
+          }
+        />
+        <DetailRow icon={Money} label="Toʻlov" value={methodLabel} />
+        <DetailRow icon={Receipt} label="Berilgan sana" value={formatDateTime(order.createdAt, now)} />
+      </Card>
 
-        <div className="border-t border-dashed border-border pt-16" />
-        <div className="flex items-baseline justify-between gap-16">
-          <span className="text-body-lg text-text-secondary">Jami</span>
-          <span className="tabular text-display text-text-primary">
-            {formatPrice(order.invoice.total)}
-          </span>
-        </div>
-      </div>
+      <StepSection title="Hisob">
+        <Card>
+          <InfoChip icon={state.icon} tone={state.tone}>
+            {state.chip}
+          </InfoChip>
+          <PriceBreakdown invoice={order.invoice} className="mt-8" />
+        </Card>
+      </StepSection>
 
-      <div className="mt-12 px-4">
-        <InfoChip icon={state.icon} tone={state.tone}>
-          {state.chip}
-        </InfoChip>
-        <p className="mt-8 text-body-sm text-text-secondary">{state.note(methodLabel)}</p>
-      </div>
-
-      {/* `span`, `button` EMAS: bajaradigan amali yoʻq. */}
-      <span className="ml-4 mt-12 inline-flex h-[32px] items-center rounded-full border border-dashed border-border-strong px-12 text-caption text-text-secondary">
-        Demo · Click va Payme keyingi bosqichda
-      </span>
+      <Button variant="ghost" onClick={() => navigate('/app/home', { replace: true })} className="mt-16">
+        Bosh sahifaga
+      </Button>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

@@ -1,29 +1,34 @@
-import { CalendarX, Lightning } from '@phosphor-icons/react';
+import { CalendarBlank, CalendarX, Lightning } from '@phosphor-icons/react';
 import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
-import { SegmentControl } from '@/components/SegmentControl';
 import { StepDots } from '@/components/StepDots';
 import { Toggle } from '@/components/Toggle';
+import { ChoiceCard } from '@/components/order/ChoiceCard';
+import { ServiceSummaryCard } from '@/components/order/ServiceSummaryCard';
+import { StepSection } from '@/components/order/StepSection';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
-import { cn } from '@/lib/cn';
-import {
-  formatDayLabel,
-  formatDayNumber,
-  formatPrice,
-  formatTime,
-  formatWeekdayShort,
-} from '@/lib/formatters';
+import { formatDayLabel, formatPrice, formatTime } from '@/lib/formatters';
+import { firstMissingStep, ORDER_STEP_ROUTES, resolveNextRoute } from '@/lib/orderFlow';
 import { URGENT_FEE } from '@/lib/pricing';
-import { buildDayStrip, buildHours, groupHours, slotAt, type DayOption } from '@/lib/schedule';
+import {
+  buildDayStrip,
+  buildHours,
+  groupHours,
+  selectionFromSchedule,
+  slotAt,
+  type ScheduleMode,
+} from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useApp } from '../store';
+import { useReturnTo } from '../useReturnTo';
+import { MissingStepGuard } from './order/MissingStepGuard';
+import { DayCell, HourButton } from './order/ScheduleParts';
 
 /**
  * Vaqt tanlash — buyurtma oqimining uchinchi qadami.
@@ -35,13 +40,6 @@ import { useApp } from '../store';
  * Tanlov `Date` emas, KALIT sifatida saqlanadi: sana tasmasi har daqiqada
  * qayta quriladi va yangi `Date` obyektlari havola boʻyicha tenglashmaydi.
  */
-type ScheduleMode = 'asap' | 'scheduled';
-
-const MODES = [
-  { value: 'asap' as const, label: 'Imkon qadar tez' },
-  { value: 'scheduled' as const, label: 'Sana tanlash' },
-];
-
 /** Roving tabindex uchun: strelkalar tanlanadigan qoʻshniga oʻtadi. */
 function moveIndex(current: number, step: number, length: number): number {
   return Math.max(0, Math.min(length - 1, current + step));
@@ -54,10 +52,13 @@ export function ScheduleStep() {
   const now = useMinuteClock();
   const days = useMemo(() => buildDayStrip(now), [now]);
 
-  const [mode, setMode] = useState<ScheduleMode>(draft.scheduledAt === null ? 'asap' : 'scheduled');
+  const returnTo = useReturnTo();
+  const restored = useMemo(() => selectionFromSchedule(draft.scheduledAt, now), [draft.scheduledAt, now]);
+  const [mode, setMode] = useState<ScheduleMode>(restored.mode);
   const [isUrgent, setIsUrgent] = useState(draft.isUrgent);
-  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
-  const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(restored.dayKey);
+  const [selectedHour, setSelectedHour] = useState<number | null>(restored.hour);
+  const wasSlotLost = draft.scheduledAt !== null && restored.hour === null;
 
   const selectedDay = days.find((day) => day.key === selectedDayKey) ?? null;
   const hours = selectedDay ? buildHours(selectedDay.date, now) : [];
@@ -83,19 +84,9 @@ export function ScheduleStep() {
 
   const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
 
-  if (!category || !draft.address) {
-    return (
-      <ScreenShell
-        header={<Header variant="inner" title="Qachon kelsin?" onBack={() => navigate('/app/home')} />}
-      >
-        <Banner variant="warning" className="mt-16">
-          Avval xizmat turi va manzilni tanlang
-        </Banner>
-        <Button variant="secondary" className="mt-16" onClick={() => navigate('/app/services')}>
-          Xizmat tanlash
-        </Button>
-      </ScreenShell>
-    );
+  const missing = firstMissingStep(draft, ['category', 'address']);
+  if (!category || missing) {
+    return <MissingStepGuard title="Qachon kelsin?" missing={missing ?? { key: 'category', route: ORDER_STEP_ROUTES.services, title: 'Avval xizmat turini tanlang', cta: 'Xizmat tanlash' }} />;
   }
 
   const changeMode = (next: ScheduleMode) => {
@@ -176,7 +167,7 @@ export function ScheduleStep() {
         : null;
 
     setDraftSchedule(scheduledAt, mode === 'asap' && isUrgent);
-    navigate('/app/new/payment');
+    navigate(resolveNextRoute(ORDER_STEP_ROUTES.payment, returnTo));
   };
 
   return (
@@ -185,201 +176,92 @@ export function ScheduleStep() {
       footer={
         <StickyFooter>
           <Button variant="primary" disabled={!canContinue} onClick={submit}>
-            Davom etish
+            {returnTo ? 'Saqlash' : 'Toʻlovga oʻtish'}
           </Button>
         </StickyFooter>
       }
     >
       <StepDots currentStep={2} />
+      <ServiceSummaryCard service={category} basePrice={category.basePrice} className="mt-16" />
 
-      <SegmentControl className="mt-20" options={MODES} value={mode} onChange={changeMode} />
+      <StepSection title="Qachon kelsin?">
+        <div role="radiogroup" aria-label="Vaqt rejimi" className="grid grid-cols-2 gap-8">
+          <ChoiceCard orientation="stack" icon={Lightning} title="Imkon qadar tez" hint="Usta topilishi bilan" isSelected={mode === 'asap'} onSelect={() => changeMode('asap')} />
+          <ChoiceCard orientation="stack" icon={CalendarBlank} title="Sana tanlash" hint="Kun va soatni oʻzingiz belgilaysiz" isSelected={mode === 'scheduled'} onSelect={() => changeMode('scheduled')} />
+        </div>
+      </StepSection>
 
       {mode === 'asap' ? (
-        <>
-          <Card className="mt-16">
-            <div className="flex items-start gap-12">
-              <span
-                className="flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm bg-primary-surface text-primary-pressed"
-                aria-hidden
-              >
-                <Icon icon={Lightning} size={20} weight="duotone" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-title text-text-primary">Usta imkon qadar tez yuboriladi</p>
-                <p className="mt-4 text-body-sm text-text-secondary">
-                  Odatda 15–40 daqiqa ichida. Aniq vaqt usta topilgach maʼlum boʻladi.
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          {/*
-            Shoshilinch qoʻshimchasi AYNAN shu yerda aytiladi. Toʻlov
-            ekranida birinchi marta koʻrinsa, u yashirin toʻlov boʻlardi.
-          */}
-          <div className="mt-24 flex items-start justify-between gap-16">
+        <Card className="mt-16">
+          <div className="flex items-start gap-12">
+            <span className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-md bg-primary-surface text-primary-pressed" aria-hidden>
+              <Icon icon={Lightning} size={20} weight="duotone" />
+            </span>
             <div className="min-w-0 flex-1">
-              <p className="text-body-lg text-text-primary">Shoshilinch</p>
-              <p className="mt-2 text-body-sm text-text-secondary">
-                Usta navbatdan tashqari yuboriladi · +{formatPrice(URGENT_FEE)}
-              </p>
+              <p className="text-title text-text-primary">Usta qidiruvi darhol boshlanadi</p>
+              <p className="mt-2 text-body-sm text-text-secondary">Aniq kelish vaqti usta topilgach maʼlum boʻladi.</p>
+            </div>
+          </div>
+          {/* Shoshilinch qoʻshimchasi AYNAN shu yerda aytiladi (pricing.ts). */}
+          <div className="mt-12 flex items-center justify-between gap-16 border-t border-border pt-12">
+            <div className="min-w-0 flex-1">
+              <p className="text-title text-text-primary">Shoshilinch</p>
+              <p className="tabular mt-2 text-body-sm text-text-secondary">Navbatdan tashqari yuboriladi · +{formatPrice(URGENT_FEE)}</p>
             </div>
             <Toggle checked={isUrgent} onChange={setIsUrgent} label="Shoshilinch" />
           </div>
-        </>
+        </Card>
       ) : (
         <>
-          <h3 className="mt-20 px-4 text-overline uppercase text-text-secondary">Qaysi kun</h3>
+          {wasSlotLost && (
+            <p className="mt-12 px-4 text-caption text-warning">Avval tanlangan vaqt oʻtib ketdi — yangi vaqt tanlang.</p>
+          )}
 
-          {/* Tasma ekran chetigacha suriladi, chetdagi kataklar sahifa
-              paddingiga tekislanadi. */}
-          <div
-            role="radiogroup"
-            aria-label="Sana"
-            onKeyDown={onDayKeyDown}
-            className="-mx-20 mt-12 flex gap-8 overflow-x-auto px-20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          <StepSection title="Qaysi kun">
+            <div
+              role="radiogroup"
+              aria-label="Sana"
+              onKeyDown={onDayKeyDown}
+              className="-mx-20 flex gap-8 overflow-x-auto px-20 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {days.map((day) => (
+                <DayCell key={day.key} day={day} now={now} isSelected={day.key === selectedDayKey} onSelect={() => selectDay(day.key)} />
+              ))}
+            </div>
+          </StepSection>
+
+          <StepSection
+            title="Qaysi vaqt"
+            hint={selectedDay ? `${formatDayLabel(selectedDay.date, now)} · usta qidiruvi shu vaqtda boshlanadi` : undefined}
           >
-            {days.map((day) => (
-              <DayCell
-                key={day.key}
-                day={day}
-                now={now}
-                isSelected={day.key === selectedDayKey}
-                onSelect={() => selectDay(day.key)}
-              />
-            ))}
-          </div>
+            {hours.length === 0 ? (
+              <EmptyState icon={CalendarX} title="Bugungi soatlar oʻtib ketdi" description="Boshqa kunni tanlang yoki «Imkon qadar tez» rejimiga oʻting" inline compact />
+            ) : (
+              <Card className="flex flex-col gap-16">
+                {groupHours(hours).map((group) => (
+                  <div key={group.key}>
+                    <p className="text-caption text-text-secondary">{group.label}</p>
+                    <div role="radiogroup" aria-label={group.label} onKeyDown={onHourKeyDown} className="mt-8 grid grid-cols-3 gap-8">
+                      {group.hours.map((hour) => (
+                        <HourButton
+                          key={hour}
+                          label={formatTime(slotAt(selectedDay?.date ?? now, hour))}
+                          isSelected={hour === selectedHour}
+                          onSelect={() => setSelectedHour(hour)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            )}
+          </StepSection>
 
-          {selectedDay && (
-            <p className="mt-8 px-4 text-body-sm text-text-secondary">
-              {formatDayLabel(selectedDay.date, now)}
-            </p>
-          )}
-
-          <h3 className="mt-24 px-4 text-overline uppercase text-text-secondary">Qaysi vaqt</h3>
-          <p className="mt-8 px-4 text-body-sm text-text-secondary">
-            Bu — siz uchun qulay vaqt. Usta topilgach vaqt tasdiqlanadi.
-          </p>
-
-          {hours.length === 0 ? (
-            <EmptyState
-              icon={CalendarX}
-              title="Bu kun uchun boʻsh vaqt qolmadi"
-              description="Boshqa kunni tanlang yoki «Imkon qadar tez» rejimiga oʻting"
-              className="mt-16"
-              inline
-            />
-          ) : (
-            groupHours(hours).map((group) => (
-              <section key={group.key}>
-                <h4 className="mt-16 px-4 text-overline uppercase text-text-secondary">
-                  {group.label}
-                </h4>
-                <div
-                  role="radiogroup"
-                  aria-label={group.label}
-                  onKeyDown={onHourKeyDown}
-                  className="mt-12 grid grid-cols-3 gap-8"
-                >
-                  {group.hours.map((hour) => {
-                    const label = formatTime(slotAt(selectedDay?.date ?? now, hour));
-                    const isSelected = hour === selectedHour;
-
-                    return (
-                      <button
-                        key={hour}
-                        type="button"
-                        role="radio"
-                        aria-checked={isSelected}
-                        tabIndex={isSelected ? 0 : -1}
-                        aria-label={label}
-                        onClick={() => setSelectedHour(hour)}
-                        className={cn(
-                          'tabular flex min-h-touch items-center justify-center rounded-sm px-8 py-12 text-body-sm',
-                          'transition-[transform,background-color,box-shadow] duration-press ease-std',
-                          'active:scale-[0.98]',
-                          isSelected
-                            ? 'bg-primary-surface text-primary-pressed ring-2 ring-inset ring-primary'
-                            : 'bg-surface-elevated text-text-primary ring-1 ring-inset ring-border',
-                        )}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            ))
-          )}
-
-          <p className="mt-16 px-4 text-caption text-text-secondary">
-            Belgilangan vaqtga yozilgan buyurtmada shoshilinch yuborish qoʻllanmaydi — usta
-            oʻsha vaqtga rejalashtiriladi.
-          </p>
+          <p className="mt-12 px-4 text-caption text-text-secondary">Belgilangan vaqtga shoshilinch yuborish qoʻllanmaydi.</p>
         </>
       )}
-
-      <p className="mt-20 px-4 text-caption text-text-secondary">
-        Buyurtma tasdiqlangandan keyin vaqtni oʻzgartirib boʻlmaydi — bekor qilib, qaytadan
-        berish kerak.
-      </p>
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>
-  );
-}
-
-/**
- * Sana katagi.
- *
- * `SelectableChip` ISHLATILMAYDI: uning balandligi 36px (teginish nishoni
- * 44px), kengligi esa matnga bogʻliq — "1" katagi "28" dan tor chiqardi.
- *
- * `ring`, `border` EMAS: `border-width` oʻzgarsa katakning ichki qutisi
- * oʻzgarib qoʻshni kataklar siljiydi.
- */
-function DayCell({
-  day,
-  now,
-  isSelected,
-  onSelect,
-}: {
-  day: DayOption;
-  now: Date;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={isSelected}
-      tabIndex={isSelected ? 0 : -1}
-      disabled={!day.hasSlots}
-      aria-label={
-        day.hasSlots
-          ? formatDayLabel(day.date, now)
-          : `${formatDayLabel(day.date, now)} — boʻsh vaqt yoʻq`
-      }
-      onClick={onSelect}
-      className={cn(
-        'flex h-[64px] w-[56px] shrink-0 flex-col items-center justify-center gap-2 rounded-md',
-        'transition-[transform,background-color,box-shadow] duration-press ease-std',
-        'active:scale-[0.97] disabled:active:scale-100',
-        isSelected
-          ? 'bg-primary-surface text-primary-pressed ring-2 ring-inset ring-primary'
-          : 'bg-surface-elevated text-text-primary ring-1 ring-inset ring-border',
-        !day.hasSlots && 'bg-surface-sunken text-text-disabled ring-1 ring-inset ring-border',
-      )}
-    >
-      <span className="text-caption">{formatWeekdayShort(day.date)}</span>
-      <span className="tabular text-title">{formatDayNumber(day.date)}</span>
-      {/* Uchinchi signal: rang va halqadan tashqari ostidagi chiziq. Joyi
-          tanlanmaganda ham band — kataklar sakramaydi. */}
-      <span
-        className={cn('h-4 w-16 rounded-full', isSelected ? 'bg-primary' : 'bg-transparent')}
-        aria-hidden
-      />
-    </button>
   );
 }

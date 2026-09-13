@@ -3,6 +3,8 @@ import {
   buildDayStrip,
   buildHours,
   dayKey,
+  isScheduleStale,
+  selectionFromSchedule,
   DAY_STRIP_LENGTH,
   groupHours,
   slotAt,
@@ -144,5 +146,28 @@ describe('timingLabel', () => {
     expect(timingLabel({ scheduledAt: new Date(2026, 8, 11, 9, 0), isUrgent: true }, now)).toBe(
       'Ertaga, 09:00',
     );
+  });
+});
+
+describe('selectionFromSchedule / isScheduleStale', () => {
+  const now = new Date(2026, 8, 13, 9, 0); // 09:00
+
+  it('maps null to asap', () => {
+    expect(selectionFromSchedule(null, now)).toEqual({ mode: 'asap', dayKey: null, hour: null });
+    expect(isScheduleStale(null, now)).toBe(false);
+  });
+  it('restores a slot that is still selectable', () => {
+    const slot = slotAt(now, 12);
+    expect(selectionFromSchedule(slot, now)).toEqual({ mode: 'scheduled', dayKey: dayKey(now), hour: 12 });
+    expect(isScheduleStale(slot, now)).toBe(false);
+  });
+  it('drops the hour inside the lead window but keeps the day', () => {
+    const slot = slotAt(now, 9); // 09:00 < 09:00 + 60 min
+    expect(selectionFromSchedule(slot, now)).toEqual({ mode: 'scheduled', dayKey: dayKey(now), hour: null });
+    expect(isScheduleStale(slot, now)).toBe(true);
+  });
+  it('drops day and hour for a date outside the strip', () => {
+    const yesterday = slotAt(new Date(2026, 8, 12), 12);
+    expect(selectionFromSchedule(yesterday, now)).toEqual({ mode: 'scheduled', dayKey: null, hour: null });
   });
 });

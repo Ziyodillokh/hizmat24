@@ -52,6 +52,7 @@ export function AddressRow({
   now,
   onSelect,
   action,
+  isSelected,
   className,
 }: {
   saved: SavedAddress;
@@ -59,6 +60,8 @@ export function AddressRow({
   onSelect: () => void;
   /** Oʻng tomondagi belgi — tanlangan holat yoki qoʻshimcha ishora. */
   action?: React.ReactNode;
+  /** Berilsa qator radio boʻladi (buyurtma oqimi). Manzillarim uzatmaydi. */
+  isSelected?: boolean;
   className?: string;
 }) {
   const details = addressDetailsLine(saved.address);
@@ -66,20 +69,23 @@ export function AddressRow({
   return (
     <button
       type="button"
+      role={isSelected === undefined ? undefined : 'radio'}
+      aria-checked={isSelected === undefined ? undefined : isSelected}
       onClick={onSelect}
       className={cn(
         'flex w-full items-start gap-12 rounded-lg p-12 text-left',
         'border border-transparent bg-surface-elevated shadow-e1',
         "[[data-theme='dark']_&]:border-border",
         'transition-transform duration-press ease-std active:scale-[0.99]',
+        isSelected && 'ring-2 ring-inset ring-primary',
         className,
       )}
     >
       <span
-        className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-md bg-surface-sunken"
+        className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-md bg-primary-surface text-primary-pressed"
         aria-hidden
       >
-        <Icon icon={ADDRESS_KIND_ICONS[saved.kind]} size={20} className="text-primary" />
+        <Icon icon={ADDRESS_KIND_ICONS[saved.kind]} size={20} weight="duotone" />
       </span>
 
       <span className="min-w-0 flex-1">

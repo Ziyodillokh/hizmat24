@@ -123,3 +123,32 @@ export function groupHours(hours: readonly number[]): SlotGroup[] {
     hours: hours.filter((hour) => hour >= group.from && hour <= group.to),
   })).filter((group) => group.hours.length > 0);
 }
+
+export type ScheduleMode = 'asap' | 'scheduled';
+
+export interface ScheduleSelection {
+  mode: ScheduleMode;
+  dayKey: string | null;
+  hour: number | null;
+}
+
+/** Slot hali tanlanadigan vaqtdami — `buildHours` bilan bir xil qoida. */
+export const isSlotSelectable = (slot: Date, now: Date): boolean =>
+  buildHours(slot, now).includes(slot.getHours());
+
+/**
+ * Qoralamadagi vaqtni ekran holatiga qaytaradi.
+ * Oʻtib ketgan slot `hour: null` — foydalanuvchi qayta tanlaydi, ilova
+ * oʻtgan vaqtga jimgina buyurtma bermaydi.
+ */
+export function selectionFromSchedule(scheduledAt: Date | null, now: Date): ScheduleSelection {
+  if (!scheduledAt) return { mode: 'asap', dayKey: null, hour: null };
+  const key = dayKey(scheduledAt);
+  const inStrip = buildDayStrip(now).some((day) => day.key === key);
+  const hour = inStrip && isSlotSelectable(scheduledAt, now) ? scheduledAt.getHours() : null;
+  return { mode: 'scheduled', dayKey: inStrip ? key : null, hour };
+}
+
+/** Tasdiqlash ekrani uchun: rejalashtirilgan vaqt oʻtib ketganmi. */
+export const isScheduleStale = (scheduledAt: Date | null, now: Date): boolean =>
+  scheduledAt !== null && !isSlotSelectable(scheduledAt, now);

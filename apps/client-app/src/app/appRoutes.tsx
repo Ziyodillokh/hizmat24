@@ -4,12 +4,10 @@ import { useApp } from './store';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { HomeTab } from './screens/HomeTab';
 import { AllServicesTab, GroupServicesTab } from './screens/CatalogScreens';
-import {
-  AddressStep,
-  ConfirmStep,
-  OrderDetailsStep,
-  SavedAddressStep,
-} from './screens/CreateOrderScreens';
+import { AddressStep } from './screens/order/AddressStep';
+import { ConfirmStep } from './screens/order/ConfirmStep';
+import { OrderDetailsStep } from './screens/order/OrderDetailsStep';
+import { SavedAddressStep } from './screens/order/SavedAddressStep';
 import { ScheduleStep } from './screens/ScheduleStep';
 import { PaymentStep } from './screens/PaymentStep';
 import { PaymentReceipt } from './screens/PaymentReceipt';
