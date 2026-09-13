@@ -59,19 +59,20 @@ export const EMPTY_MASTER_PROFILE: MasterProfile = {
 };
 
 /**
- * Sohalar — mijoz katalogidagi ustalar bilan BIR XIL lugʻat.
+ * Sohalar — mijoz katalogidagi ustalar bilan BIR XIL lugʻat. Platforma
+ * hozircha faqat santexnika (2026-09-13), shuning uchun roʻyxat santexnika
+ * mutaxassisliklaridan iborat.
  *
  * Test buni tekshiradi: katalogda bu roʻyxatda yoʻq soha paydo boʻlsa,
  * ikki tomon bir-birini tushunmay qoladi.
  */
 export const MASTER_PROFESSIONS: readonly string[] = [
   'Santexnik',
-  'Elektrik',
-  'Gaz ustasi',
-  'Duradgor',
-  'Boʻyoqchi',
-  'Texnika ustasi',
-  'Tozalash ustasi',
+  'Suv isitgich ustasi',
+  'Kanalizatsiya ustasi',
+  'Quvur ustasi',
+  'Smesitel ustasi',
+  'Isitish tizimi ustasi',
 ];
 
 /** Toshkent shahrining 12 tumani. */

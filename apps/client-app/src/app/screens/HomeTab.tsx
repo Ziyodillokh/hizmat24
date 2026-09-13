@@ -32,9 +32,9 @@ import type { LiveOrder } from '../types';
  * Namuna sharhlar bosh sahifada belgisiz koʻrsatiladi (egasining qarori);
  * ularning namuna ekani /app/reviews sahifasida va src/mocks/reviews.ts da
  * aytilgan.
- * Qolgan guruhlar (Elektrika, Gaz, …) "Barcha xizmatlar" orqali —
- * /app/services. "Mashhur" demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki
- * guruh roʻyxatining boshi.
+ * Platforma hozircha faqat santexnika; qolgan ikki xizmat (kanalizatsiya
+ * tozalash, isitish) "Barcha xizmatlar" orqali — /app/services. "Mashhur"
+ * demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki roʻyxatning boshi.
  */
 const HOME_GROUP_ID = 'g-plumbing';
 const HOME_SERVICE_COUNT = 5;

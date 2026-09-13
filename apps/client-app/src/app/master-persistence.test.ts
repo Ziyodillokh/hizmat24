@@ -7,7 +7,7 @@ const NOW = new Date(2026, 8, 12, 14, 30);
 function state(extra: Partial<MasterState> = {}): MasterState {
   return {
     profile: {
-      profession: 'Elektrik',
+      profession: 'Smesitel ustasi',
       experienceLevel: 'NEW',
       claimsCertificate: true,
       about: 'Rozetka va lyustra oʻrnataman.',
@@ -88,7 +88,7 @@ describe('reviveMasterState — buzuq maʼlumot', () => {
     const stored = serializeMasterState(state());
     const result = reviveMasterState({ ...stored, application: { message: '', createdAt: 'x' } });
     expect(result?.application).toBeNull();
-    expect(result?.profile.profession).toBe('Elektrik');
+    expect(result?.profile.profession).toBe('Smesitel ustasi');
   });
 
   it('buzuq kanal hodisasi arizani tashlamaydi', () => {

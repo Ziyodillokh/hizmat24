@@ -66,8 +66,13 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
             <Avatar name={master.fullName} src={master.photoUrl} size={44} />
           </span>
 
+          {/*
+            Yorliq — ISM, kasb emas: platforma faqat santexnika (2026-09-13),
+            beshta "Santexnik" yozuvi hech narsa aytmasdi va uzun
+            mutaxassisliklar 64px da qirqilardi. Kasb `aria-label` da qoladi.
+          */}
           <span className="w-full truncate text-center text-caption text-on-primary-deep">
-            {master.profession}
+            {master.fullName.split(' ')[0]}
           </span>
         </button>
       ))}

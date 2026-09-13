@@ -44,6 +44,16 @@ Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
 | **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
 | **Profil** | Shaxsiy ma'lumotlar, manzillar, sevimlilar, rol, usta kabineti, yordam |
 
+**PLATFORMA HOZIRCHA FAQAT SANTEXNIKA (2026-09-13, egasining qarori).**
+Elektrika, gaz, texnika, duradgorlik, bo'yoqchilik va tozalash guruhlari
+katalogdan olib tashlandi; barcha mock ustalar santexnika
+mutaxassisliklarida (Santexnik, Suv isitgich ustasi, Kanalizatsiya ustasi,
+Quvur ustasi, Smesitel ustasi, Isitish tizimi ustasi); hamyon seedlari
+santexnika xizmatlariga ko'chirildi. Tuzilma ikki qavatli qoldi — yangi
+soha qo'shish bitta guruh yozuvi. Katalogda bitta guruh bo'lgani uchun
+guruh chiplari chizilmaydi; bosh sahifa tasmasida usta ISMI ko'rsatiladi
+(kasb hammada bir xil bo'lib qoldi).
+
 **Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan** (egasining maketi).
 3×2 panjara egasining talabi; telefonda sig'ishi uchun ixcham rejim
 (≤800px): karta hoshiyasi 4px, foto 16:9 (oddiy rejimda 3:2), qatorlar

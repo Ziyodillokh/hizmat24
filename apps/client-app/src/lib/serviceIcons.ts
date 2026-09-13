@@ -1,4 +1,4 @@
-import { Armchair, CookingPot, Door, Drop, Fan, Fire, Hammer, Lightbulb, Lightning, PaintBrush, PaintRoller, Pipe, PipeWrench, Plug, Plugs, SprayBottle, SquaresFour, Thermometer, ThermometerHot, ToggleLeft, Toilet, WashingMachine, Waves, Wrench } from '@phosphor-icons/react';
+import { Drop, Pipe, PipeWrench, SquaresFour, Thermometer, ThermometerHot, Toilet, Waves, Wrench } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 
 /**
@@ -12,26 +12,11 @@ import type { Icon as IconGlyph } from '@phosphor-icons/react';
  * vertikal roʻyxatda bitta gliftni toʻrt marta takrorlamaydi.
  */
 const ICONS: Record<string, IconGlyph> = {
-  // Guruhlar
-  // `Plug` katakchadagi eng yengil glif edi; `Lightning` xizmat turini aniqroq beradi.
-  electrician: Lightning,
+  // Guruh — platforma hozircha faqat santexnika (2026-09-13).
   plumber: Drop,
-  gas: Fire,
-  // `Blocks` ilova vidjetiga oʻxshardi, "Texnika" ga emas.
-  appliance: WashingMachine,
-  carpenter: Hammer,
-  painter: PaintRoller,
-  // `Sparkles` — sunʼiy intellekt mahsulotlarining eng tanish belgisi.
-  cleaning: SprayBottle,
 
-  // Xizmatlar
-  socket: Plug,
-  lamp: Lightbulb,
-  breaker: ToggleLeft,
-  rewire: Plugs,
-  // Santexnika: "Rakovina va smesitel" ostida dush boshi notoʻgʻri edi;
-  // Phosphorʼda Faucet glifi yoʻq, shuning uchun tomchi. Guruh kaliti
-  // `plumber` ham Drop — ikkalasi hech qachon bitta panjarada turmaydi.
+  // Xizmatlar. "Rakovina va smesitel" ostida dush boshi notoʻgʻri edi;
+  // Phosphorʼda Faucet glifi yoʻq, shuning uchun tomchi.
   tap: Drop,
   toilet: Toilet,
   drain: Waves,
@@ -39,14 +24,6 @@ const ICONS: Record<string, IconGlyph> = {
   'plumbing-repair': PipeWrench,
   'water-heater': ThermometerHot,
   pipes: Pipe,
-  stove: CookingPot,
-  boiler: ThermometerHot,
-  washer: WashingMachine,
-  ac: Fan,
-  door: Door,
-  furniture: Armchair,
-  wall: PaintBrush,
-  general: SprayBottle,
 };
 
 /** Nomaʼlum kalit kelsa ham layout buzilmasin — neytral zaxira ikona. */

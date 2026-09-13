@@ -20,11 +20,16 @@ import type { Master } from './types';
  * kabi mavjud boʻlmagan kalit ham tipdan oʻtib ketardi va xato faqat ish
  * vaqtida, `undefined` koʻrinishida chiqardi.
  */
+/*
+ * PLATFORMA HOZIRCHA FAQAT SANTEXNIKA (2026-09-13): barcha ustalar
+ * santexnika mutaxassisliklarida. Bu mock — haqiqiy ustalar backend bilan
+ * keladi.
+ */
 export const MASTERS = {
   sardor: {
     id: 'm-sardor',
     fullName: 'Sardor Nazarov',
-    profession: 'Gaz ustasi',
+    profession: 'Suv isitgich ustasi',
     experienceLevel: 'EXPERIENCED',
     hasGovCertificate: true,
     ratingAvg: 4.9,
@@ -36,7 +41,7 @@ export const MASTERS = {
   feruza: {
     id: 'm-feruza',
     fullName: 'Feruza Salimova',
-    profession: 'Tozalash ustasi',
+    profession: 'Santexnik',
     experienceLevel: 'EXPERIENCED',
     hasGovCertificate: true,
     ratingAvg: 4.9,
@@ -60,7 +65,7 @@ export const MASTERS = {
   jahongir: {
     id: 'm-jahongir',
     fullName: 'Jahongir Qodirov',
-    profession: 'Duradgor',
+    profession: 'Quvur ustasi',
     experienceLevel: 'EXPERIENCED',
     hasGovCertificate: false,
     ratingAvg: 4.7,
@@ -72,7 +77,7 @@ export const MASTERS = {
   dilshod: {
     id: 'm-dilshod',
     fullName: 'Dilshod Ergashev',
-    profession: 'Elektrik',
+    profession: 'Smesitel ustasi',
     experienceLevel: 'EXPERIENCED',
     hasGovCertificate: true,
     ratingAvg: 4.6,
@@ -84,7 +89,7 @@ export const MASTERS = {
   rustam: {
     id: 'm-rustam',
     fullName: 'Rustam Yoʻldoshev',
-    profession: 'Texnika ustasi',
+    profession: 'Isitish tizimi ustasi',
     experienceLevel: 'EXPERIENCED',
     hasGovCertificate: true,
     ratingAvg: 4.5,
@@ -96,7 +101,7 @@ export const MASTERS = {
   nilufar: {
     id: 'm-nilufar',
     fullName: 'Nilufar Karimova',
-    profession: 'Boʻyoqchi',
+    profession: 'Santexnik',
     experienceLevel: 'NEW',
     hasGovCertificate: false,
     ratingAvg: 4.4,
@@ -107,7 +112,7 @@ export const MASTERS = {
   bekzod: {
     id: 'm-bekzod',
     fullName: 'Bekzod Toʻraev',
-    profession: 'Elektrik',
+    profession: 'Kanalizatsiya ustasi',
     experienceLevel: 'NEW',
     hasGovCertificate: false,
     ratingAvg: 4.2,

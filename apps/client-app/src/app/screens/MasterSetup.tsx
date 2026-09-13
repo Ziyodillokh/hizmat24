@@ -130,9 +130,9 @@ interface StepProps {
 function ProfessionStep({ profile, onChange }: StepProps) {
   return (
     <>
-      <h1 className="mt-20 text-h1 text-text-primary">Qaysi sohada ishlaysiz?</h1>
+      <h1 className="mt-20 text-h1 text-text-primary">Qaysi yoʻnalishda ishlaysiz?</h1>
       <p className="mt-8 text-body text-text-secondary">
-        Asosiy sohangizni tanlang. Mijozlar ustani aynan shu nom bilan qidiradi.
+        Asosiy yoʻnalishingizni tanlang. Mijozlar ustani aynan shu nom bilan koʻradi.
       </p>
       <div className="mt-16 flex flex-wrap gap-8">
         {MASTER_PROFESSIONS.map((item) => (
@@ -187,7 +187,7 @@ function ExperienceStep({ profile, onChange }: StepProps) {
         <div className="min-w-0 flex-1">
           <p className="text-title text-text-primary">Davlat sertifikatim bor</p>
           <p className="mt-2 text-body-sm text-text-secondary">
-            Gaz va elektr ishlari uchun talab qilinadi
+            Gaz suv isitgichlari va isitish tizimi ishlari uchun talab qilinadi
           </p>
         </div>
         <Toggle

@@ -3,19 +3,13 @@ import type { ServiceCategory, ServiceGroup } from './types';
 /**
  * Katalog ikki qavatli: guruh → xizmat (1-boʻlim, 16-qoida).
  * Narxlar HAR XIL — bir xil narx yagona tarif taassurotini beradi (07a-ekran).
+ *
+ * PLATFORMA HOZIRCHA FAQAT SANTEXNIKA (egasining qarori, 2026-09-13):
+ * elektrika, gaz, texnika, duradgorlik, boʻyoqchilik va tozalash guruhlari
+ * olib tashlandi. Tuzilma ikki qavatli qoldi — yangi soha qoʻshish bitta
+ * guruh yozuvi.
  */
 export const SERVICE_GROUPS: ServiceGroup[] = [
-  {
-    id: 'g-electric',
-    name: 'Elektrika',
-    iconKey: 'electrician',
-    categories: [
-      { id: 'c-socket', iconKey: 'socket', name: "Rozetka oʻrnatish", description: "Bitta nuqta, devor ichida", groupId: 'g-electric', basePrice: 80_000 },
-      { id: 'c-lamp', iconKey: 'lamp', name: "Lyustra oʻrnatish", description: null, groupId: 'g-electric', basePrice: 120_000 },
-      { id: 'c-breaker', iconKey: 'breaker', name: 'Avtomat almashtirish', description: 'Shchitdagi avtomat', groupId: 'g-electric', basePrice: 150_000 },
-      { id: 'c-rewire', iconKey: 'rewire', name: "Toʻliq elektr simlarini almashtirish", description: "Xonadon boʻylab", groupId: 'g-electric', basePrice: 1_500_000 },
-    ],
-  },
   {
     id: 'g-plumbing',
     name: 'Santexnika',
@@ -34,34 +28,6 @@ export const SERVICE_GROUPS: ServiceGroup[] = [
       { id: 'c-heating', iconKey: 'heating', name: 'Isitish tizimini ulash', description: null, groupId: 'g-plumbing', basePrice: 900_000 },
     ],
   },
-  {
-    id: 'g-gas',
-    name: 'Gaz',
-    iconKey: 'gas',
-    categories: [
-      { id: 'c-stove', iconKey: 'stove', name: 'Gaz plitasi ulash', description: 'Sertifikatli usta talab qilinadi', groupId: 'g-gas', basePrice: 350_000 },
-      { id: 'c-boiler', iconKey: 'boiler', name: 'Gaz kolonkasi ulash', description: null, groupId: 'g-gas', basePrice: 500_000 },
-    ],
-  },
-  {
-    id: 'g-appliance',
-    name: 'Texnika',
-    iconKey: 'appliance',
-    categories: [
-      { id: 'c-washer', iconKey: 'washer', name: 'Kir yuvish mashinasini ulash', description: null, groupId: 'g-appliance', basePrice: 150_000 },
-      { id: 'c-ac', iconKey: 'ac', name: "Konditsioner oʻrnatish", description: 'Split tizim', groupId: 'g-appliance', basePrice: 400_000 },
-    ],
-  },
-  { id: 'g-carpentry', name: 'Duradgorlik', iconKey: 'carpenter', categories: [
-    { id: 'c-door', iconKey: 'door', name: "Eshik oʻrnatish", description: null, groupId: 'g-carpentry', basePrice: 300_000 },
-    { id: 'c-furniture', iconKey: 'furniture', name: "Mebel yigʻish", description: null, groupId: 'g-carpentry', basePrice: 180_000 },
-  ] },
-  { id: 'g-painting', name: "Boʻyoqchilik", iconKey: 'painter', categories: [
-    { id: 'c-wall', iconKey: 'wall', name: "Devor boʻyash", description: null, groupId: 'g-painting', basePrice: 220_000 },
-  ] },
-  { id: 'g-cleaning', name: 'Tozalash', iconKey: 'cleaning', categories: [
-    { id: 'c-general', iconKey: 'general', name: 'Umumiy tozalash', description: null, groupId: 'g-cleaning', basePrice: 350_000 },
-  ] },
 ];
 
 /**

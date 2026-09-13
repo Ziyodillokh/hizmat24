@@ -40,24 +40,24 @@ interface OlderSeed extends SeedBase {
 
 const RECENT: RecentSeed[] = [
   { shortId: 'HZ-104488', categoryId: 'c-tap', masterId: 'm-akmal', amount: 100_000, method: 'escrow', daysAgo: 0, hour: 11, minute: 20 },
-  { shortId: 'HZ-104471', categoryId: 'c-socket', masterId: 'm-dilshod', amount: 80_000, method: 'cash', daysAgo: 1, hour: 16, minute: 45 },
-  { shortId: 'HZ-104450', categoryId: 'c-ac', masterId: 'm-jahongir', amount: 420_000, method: 'escrow', daysAgo: 3, hour: 9, minute: 40 },
-  { shortId: 'HZ-104432', categoryId: 'c-general', masterId: 'm-feruza', amount: 350_000, method: 'escrow', daysAgo: 5, hour: 14, minute: 20 },
+  { shortId: 'HZ-104471', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, method: 'cash', daysAgo: 1, hour: 16, minute: 45 },
+  { shortId: 'HZ-104450', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 420_000, method: 'escrow', daysAgo: 3, hour: 9, minute: 40 },
+  { shortId: 'HZ-104432', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, method: 'escrow', daysAgo: 5, hour: 14, minute: 20 },
   { shortId: 'HZ-104419', categoryId: 'c-drain', masterId: 'm-akmal', amount: 200_000, method: 'card', daysAgo: 6, hour: 17, minute: 5 },
 ];
 
 const OLDER: OlderSeed[] = [
-  { shortId: 'HZ-104390', categoryId: 'c-stove', masterId: 'm-sardor', amount: 350_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 26, hour: 10, minute: 15 },
-  { shortId: 'HZ-104371', categoryId: 'c-lamp', masterId: 'm-dilshod', amount: 130_000, method: 'cash', monthsAgo: 1, dayOfMonth: 22, hour: 13, minute: 0 },
-  { shortId: 'HZ-104352', categoryId: 'c-washer', masterId: 'm-jahongir', amount: 150_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 17, hour: 15, minute: 30 },
+  { shortId: 'HZ-104390', categoryId: 'c-water-heater', masterId: 'm-sardor', amount: 350_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 26, hour: 10, minute: 15 },
+  { shortId: 'HZ-104371', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 130_000, method: 'cash', monthsAgo: 1, dayOfMonth: 22, hour: 13, minute: 0 },
+  { shortId: 'HZ-104352', categoryId: 'c-toilet', masterId: 'm-jahongir', amount: 150_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 17, hour: 15, minute: 30 },
   { shortId: 'HZ-104337', categoryId: 'c-tap', masterId: 'm-akmal', amount: 110_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 11, hour: 9, minute: 0 },
-  { shortId: 'HZ-104318', categoryId: 'c-general', masterId: 'm-feruza', amount: 350_000, method: 'cash', monthsAgo: 1, dayOfMonth: 4, hour: 18, minute: 10 },
-  { shortId: 'HZ-104296', categoryId: 'c-breaker', masterId: 'm-dilshod', amount: 150_000, method: 'escrow', monthsAgo: 2, dayOfMonth: 27, hour: 12, minute: 40 },
+  { shortId: 'HZ-104318', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, method: 'cash', monthsAgo: 1, dayOfMonth: 4, hour: 18, minute: 10 },
+  { shortId: 'HZ-104296', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 150_000, method: 'escrow', monthsAgo: 2, dayOfMonth: 27, hour: 12, minute: 40 },
   { shortId: 'HZ-104274', categoryId: 'c-toilet', masterId: 'm-akmal', amount: 250_000, method: 'escrow', monthsAgo: 2, dayOfMonth: 19, hour: 16, minute: 0 },
-  { shortId: 'HZ-104251', categoryId: 'c-boiler', masterId: 'm-sardor', amount: 500_000, method: 'card', monthsAgo: 2, dayOfMonth: 12, hour: 10, minute: 30 },
-  { shortId: 'HZ-104233', categoryId: 'c-socket', masterId: 'm-dilshod', amount: 80_000, method: 'cash', monthsAgo: 2, dayOfMonth: 5, hour: 14, minute: 50 },
+  { shortId: 'HZ-104251', categoryId: 'c-heating', masterId: 'm-sardor', amount: 500_000, method: 'card', monthsAgo: 2, dayOfMonth: 12, hour: 10, minute: 30 },
+  { shortId: 'HZ-104233', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, method: 'cash', monthsAgo: 2, dayOfMonth: 5, hour: 14, minute: 50 },
   { shortId: 'HZ-104186', categoryId: 'c-heating', masterId: 'm-akmal', amount: 900_000, method: 'escrow', monthsAgo: 3, dayOfMonth: 21, hour: 11, minute: 0 },
-  { shortId: 'HZ-104142', categoryId: 'c-ac', masterId: 'm-jahongir', amount: 400_000, method: 'escrow', monthsAgo: 3, dayOfMonth: 9, hour: 15, minute: 20 },
+  { shortId: 'HZ-104142', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 400_000, method: 'escrow', monthsAgo: 3, dayOfMonth: 9, hour: 15, minute: 20 },
 ];
 
 /**

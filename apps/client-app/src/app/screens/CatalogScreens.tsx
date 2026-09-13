@@ -108,8 +108,10 @@ export function AllServicesTab() {
       />
 
       {/* Guruh chiplari — qidiruv paytida yashirin: ikkita filtr bir vaqtda
-          chalgʻitadi va natija qaysi biriga tegishli ekani noaniq qoladi. */}
-      {!results && (
+          chalgʻitadi va natija qaysi biriga tegishli ekani noaniq qoladi.
+          Bitta guruh boʻlsa (hozir faqat santexnika) chiplar umuman
+          chizilmaydi — tanlaydigan narsa yoʻq. */}
+      {!results && SERVICE_GROUPS.length > 1 && (
         <div className="-mx-20 mt-12 flex gap-8 overflow-x-auto px-20 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <SelectableChip
             selected={groupId === ALL_GROUPS}
