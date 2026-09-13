@@ -1,10 +1,17 @@
 # Hizmat24 — rivojlantirish rejasi
 
 Egasi bergan demo (`skillhub_demo_v21`) asosida tuzilgan. Demodan **UX va
-funksionallik** olinadi, **dizayn tizimi bizniki qoladi**: turkuaz palitra,
-Phosphor ikonalari, mavjud token va karta tili.
+funksionallik** olinadi, **dizayn tizimi bizniki qoladi**: Phosphor
+ikonalari, mavjud token va karta tili.
 
-Holat: 2026-yil 9-sentabr.
+**Palitra 2026-yil 13-sentabrda KOʻK ga oʻtdi** (egasining yangi maketi:
+koʻk tepa blok, koʻk tugma va aktiv tab, koʻkka chalingan oq fon, har soha
+oʻz rangida). Turkuaz palitra bekor qilindi. Ranglar hamon faqat
+`src/tokens/colors.ts` tokenlaridan — oʻzgargani qiymatlar, qoida emas.
+Brend aktivlari (ilova ikonkasi, splash, kirish ekranidagi belgi) hali
+turkuaz — alohida vazifa.
+
+Holat: 2026-yil 13-sentabr.
 
 ---
 

@@ -65,5 +65,26 @@ const ICON_SIZES: Record<string, IconSize> = {
 
 export const serviceIconSize = (iconKey: string): IconSize => ICON_SIZES[iconKey] ?? 28;
 
+/**
+ * Guruh ikonasining rangi — kategoriya aksenti (referens maket: har soha oʻz
+ * rangida). Klass nomlari TOʻLIQ satr: Tailwind manbani matn sifatida
+ * skanerlaydi va boʻlaklardan yigʻilgan nomni koʻrmaydi.
+ *
+ * Roʻyxatda yoʻq kalit brend rangiga tushadi — yangi guruh rangsiz qolmaydi.
+ */
+const ICON_TONES: Record<string, string> = {
+  electrician: 'text-accent-electric',
+  plumber: 'text-accent-water',
+  gas: 'text-accent-fire',
+  appliance: 'text-accent-tech',
+  carpenter: 'text-accent-wood',
+  painter: 'text-accent-fire',
+  cleaning: 'text-accent-water',
+  market: 'text-accent-shop',
+};
+
+export const serviceIconTone = (iconKey: string): string =>
+  ICON_TONES[iconKey] ?? 'text-primary-pressed';
+
 /** Gridʼning oxirgi katakchasi — "Barchasi" (06-ekran). */
 export const MORE_ICON = SquaresFour;

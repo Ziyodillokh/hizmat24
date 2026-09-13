@@ -9,10 +9,9 @@ import { Avatar } from './Avatar';
  * faqat tarifni sotib olgan ustalar shu qatorga tushadi va mijoz ilovani
  * ochishi bilan ularni koʻradi.
  *
- * Halqa OLTIN rangda (`illus-hi-vis`, #F5B942): turkuaz hero ustida brend
- * rangidagi halqa fonga singib ketardi. Reyting yulduzining rangi (`star`)
- * bu yerda toʻgʻri kelmadi — u toʻq jigarrang-sariq va halqa "premium"
- * emas, zanglagan koʻrinardi.
+ * Halqa OQ (referens maket): koʻk hero ustida oq halqa eng toza kontrast
+ * beradi va foto atrofida "stories" effektini yaratadi. Ilgari halqa oltin
+ * edi — u turkuaz fon uchun tanlangan va koʻk ustida begona koʻrinardi.
  *
  * Qator hero blokining ichida turadi, shuning uchun yorliqlar oq rangda.
  */
@@ -39,7 +38,7 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
       className={cn(
         // `-mx-20 px-20`: qator ekran chetigacha suriladi, lekin birinchi va
         // oxirgi element sahifa paddingiga tekislanadi.
-        '-mx-20 flex gap-12 overflow-x-auto px-20',
+        '-mx-20 flex gap-8 overflow-x-auto px-20',
         '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className,
       )}
@@ -53,22 +52,21 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
           className="flex w-[64px] shrink-0 flex-col items-center gap-4 transition-transform duration-press ease-emphasized active:scale-[0.94]"
         >
           {/*
-            Oltin halqa va uning ichida SHAFFOF tirqish.
-            Ilgari tirqish `surface-hero` qatʼiy rangida edi, hero esa
-            gradient — tirqish fonga mos kelmay, doira atrofida notoʻgʻri
-            rangdagi ikkinchi halqa boʻlib koʻrinardi. Shaffof tirqishda
-            fonning oʻzi koʻrinadi va halqa qayerda tursa ham toʻgʻri chiqadi.
+            Oq halqa va uning ichida SHAFFOF tirqish: hero gradient boʻlgani
+            uchun qatʼiy rangli tirqish doira atrofida notoʻgʻri rangdagi
+            ikkinchi halqa boʻlib koʻrinardi. Shaffof tirqishda fonning oʻzi
+            koʻrinadi.
           */}
           {/*
             `flex` shart: `block` boʻlganda ichkaridagi inline avatar qator
             qutisini hosil qilib, oʻramning balandligini kengligidan katta
             qilardi (58x65) va halqa DOIRA emas, ellips boʻlib chizilardi.
           */}
-          <span className="flex rounded-full border-[2.5px] border-illus-hi-vis p-[3px]">
+          <span className="flex rounded-full border-2 border-on-primary-deep p-[2px]">
             <Avatar name={master.fullName} src={master.photoUrl} size={48} />
           </span>
 
-          <span className="w-full truncate text-center text-caption text-on-primary-deep/[0.92]">
+          <span className="w-full truncate text-center text-caption text-on-primary-deep">
             {master.profession}
           </span>
         </button>

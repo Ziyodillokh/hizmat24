@@ -13,33 +13,33 @@
  */
 :root {
   color-scheme: light;
-  --color-surface: 242 247 247;
+  --color-surface: 243 247 251;
   --color-surface-elevated: 255 255 255;
-  --color-surface-hero: 20 174 171;
-  --color-surface-sunken: 229 239 239;
-  --color-border: 220 232 232;
-  --color-text-primary: 4 48 47;
-  --color-success: 4 120 87;
+  --color-surface-hero: 47 128 200;
+  --color-surface-sunken: 232 239 247;
+  --color-border: 220 229 239;
+  --color-text-primary: 16 42 67;
+  --color-success: 27 127 74;
   --color-warning: 154 84 8;
   --color-danger: 200 30 30;
-  --color-canvas: 230 247 247;
-  --color-overlay: rgba(4, 48, 47, 0.45);
-  --elevation-e1: 0 1px 1px rgba(6, 44, 44, 0.04), 0 2px 6px -1px rgba(6, 44, 44, 0.07);
-  --elevation-e2: 0 1px 2px rgba(6, 44, 44, 0.05), 0 8px 20px -6px rgba(6, 44, 44, 0.12);
-  --elevation-e3: 0 2px 4px rgba(6, 44, 44, 0.07), 0 20px 40px -12px rgba(6, 44, 44, 0.2);
+  --color-canvas: 227 238 249;
+  --color-overlay: rgba(16, 42, 67, 0.45);
+  --elevation-e1: 0 1px 1px rgba(11, 42, 74, 0.04), 0 2px 6px -1px rgba(11, 42, 74, 0.07);
+  --elevation-e2: 0 1px 2px rgba(11, 42, 74, 0.05), 0 8px 20px -6px rgba(11, 42, 74, 0.12);
+  --elevation-e3: 0 2px 4px rgba(11, 42, 74, 0.07), 0 20px 40px -12px rgba(11, 42, 74, 0.2);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-surface: 14 43 44;
-  --color-surface-elevated: 19 58 59;
-  --color-surface-sunken: 10 35 36;
-  --color-border: 30 79 78;
-  --color-text-primary: 242 250 250;
+  --color-surface: 8 25 43;
+  --color-surface-elevated: 15 39 64;
+  --color-surface-sunken: 5 17 31;
+  --color-border: 30 62 94;
+  --color-text-primary: 241 246 251;
   --color-success: 52 211 153;
   --color-warning: 251 191 36;
   --color-danger: 252 165 165;
-  --color-canvas: 127 165 165;
+  --color-canvas: 110 141 170;
   --color-overlay: rgba(0, 0, 0, 0.6);
   /* Bu blok elevatsiya zaxiralarini umuman bermas edi — birinchi renderda
      Dark tema Light soyalarini olib qolardi. */
@@ -89,16 +89,16 @@ body {
     background-color: rgb(var(--color-surface-hero));
     background-image:
       /*
-       * Tepadagi yumshoq quyuqlashtirish. Usiz oq matn yorqin turkuaz
-       * ustida 2,7:1 berardi — katta qalin matn uchun ham talab qilinadigan
-       * 3:1 dan past. Parda faqat sarlavha qatori ortida ishlaydi va
-       * maydonning umumiy tusini oʻzgartirmaydi.
+       * Tepadagi yumshoq quyuqlashtirish — sarlavha qatori ortida oq matn
+       * kontrasti uchun. Rang `surface-hero-deep` dan olinadi, `on-primary`
+       * dan EMAS: `on-primary` endi oq va u parda oʻrniga tepani oqartirib
+       * qoʻyardi.
        */
       linear-gradient(
         180deg,
-        rgb(var(--color-on-primary) / 0.26) 0%,
-        rgb(var(--color-on-primary) / 0.1) 34%,
-        rgb(var(--color-on-primary) / 0) 58%
+        rgb(var(--color-surface-hero-deep) / 0.4) 0%,
+        rgb(var(--color-surface-hero-deep) / 0.15) 34%,
+        rgb(var(--color-surface-hero-deep) / 0) 58%
       ),
       radial-gradient(
         130% 90% at 18% -12%,

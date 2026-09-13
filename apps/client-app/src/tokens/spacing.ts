@@ -60,9 +60,9 @@ export const RADIUS = {
 export const ELEVATION = {
   light: {
     e0: 'none',
-    e1: '0 1px 1px rgba(6, 44, 44, 0.04), 0 2px 6px -1px rgba(6, 44, 44, 0.07)',
-    e2: '0 1px 2px rgba(6, 44, 44, 0.05), 0 8px 20px -6px rgba(6, 44, 44, 0.12)',
-    e3: '0 2px 4px rgba(6, 44, 44, 0.07), 0 20px 40px -12px rgba(6, 44, 44, 0.20)',
+    e1: '0 1px 1px rgba(11, 42, 74, 0.04), 0 2px 6px -1px rgba(11, 42, 74, 0.07)',
+    e2: '0 1px 2px rgba(11, 42, 74, 0.05), 0 8px 20px -6px rgba(11, 42, 74, 0.12)',
+    e3: '0 2px 4px rgba(11, 42, 74, 0.07), 0 20px 40px -12px rgba(11, 42, 74, 0.20)',
   },
   dark: {
     e0: 'none',

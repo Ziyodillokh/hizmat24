@@ -9,7 +9,7 @@ import { MarqueeText } from './MarqueeText';
  * Bosh sahifadagi "Sizga tavsiya etiladiganlar" kartasi.
  *
  * Tuzilma referens maketdan: chapda yumaloqlangan KVADRAT foto, oʻngda ism,
- * kasb va reyting; ostida ajratuvchi chiziq va butun enlik amal tugmasi.
+ * kasb va reyting; ostida butun enlik amal tugmasi.
  *
  * Ism va familiya BITTA qatorda turadi. Katakcha ~160px keng, shuning uchun
  * uzun nom sigʻmasligi mumkin — bunda `MarqueeText` uni sekin surib
@@ -52,7 +52,7 @@ export function MasterSuggestionCard({
         className="flex min-w-0 items-center gap-8 text-left"
         aria-label={`${name} — ${profession}`}
       >
-        <Avatar name={name} src={photoUrl} size={44} shape="square" className="shrink-0" />
+        <Avatar name={name} src={photoUrl} size={56} shape="square" className="shrink-0" />
 
         <span className="min-w-0 flex-1">
           <MarqueeText
@@ -67,14 +67,12 @@ export function MasterSuggestionCard({
         </span>
       </button>
 
-      {/* `OrderCard` va `ServiceCard` dagi kabi ajratuvchi chiziq. */}
-      <span className="-mx-12 mb-8 mt-8 block h-px bg-border" aria-hidden />
-
+      {/* Ajratuvchi chiziq YOʻQ (referens): karta ichida tugma oʻzi ajralib turadi. */}
       <button
         type="button"
         onClick={onAction}
         className={cn(
-          'mt-auto flex min-h-[36px] w-full items-center justify-center rounded-md px-8',
+          'mt-12 flex min-h-[44px] w-full items-center justify-center rounded-md px-8',
           'bg-primary text-button-sm text-on-primary shadow-primary-lift',
           'transition-[transform,background-color,box-shadow] duration-press ease-emphasized',
           'active:scale-[0.97] active:bg-primary-pressed active:text-on-primary-deep active:shadow-e1',

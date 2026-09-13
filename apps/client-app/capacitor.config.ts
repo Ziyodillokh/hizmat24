@@ -13,7 +13,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   android: {
     // Web qatlami tizim temasiga qarab fon tanlaydi; oq miltillash bo'lmasin.
-    backgroundColor: '#0E2B2C',
+    backgroundColor: '#08192B',
   },
   plugins: {
     SplashScreen: {
@@ -46,7 +46,7 @@ const config: CapacitorConfig = {
     StatusBar: {
       overlaysWebView: false,
       style: 'DARK',
-      backgroundColor: '#0E2B2C',
+      backgroundColor: '#08192B',
     },
   },
 };

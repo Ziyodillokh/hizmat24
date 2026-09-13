@@ -67,10 +67,12 @@ export function ShopCard({
           aria-hidden
           className="h-full w-full object-cover"
         />
-        {/* Fotoning ustidagi yorliqlar oʻqilishi uchun pastdan yengil parda. */}
+        {/* Fotoning ustidagi yorliqlar oʻqilishi uchun pastdan yengil parda.
+            Rang `shadow` — ikkala temada TOʻQ. `on-primary` endi oq va parda
+            oʻrniga fotoni oqartirib qoʻyardi. */}
         <span
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-on-primary/[0.45] to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-shadow/[0.45] to-transparent"
         />
 
         <span

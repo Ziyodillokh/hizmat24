@@ -16,33 +16,24 @@ import { Icon, type IconSize } from './Icon';
  */
 
 /**
- * Doira ichidagi ikona rangi ikki temada ikki xil: Dark — oq, Light — toʻq
- * turkuaz. `primary` (#10A3A0) och doira foni ustida atigi 2,68:1 berardi,
- * yaʼni grafik elementlar uchun 3:1 chegarasidan past edi.
- */
-/**
- * `neutral` — "Barchasi" katakchasi uchun. U kategoriya EMAS, balki roʻyxatga
- * oʻtish yoʻli; xuddi kategoriya kabi chizilsa foydalanuvchi uni toʻqqizinchi
- * xizmat turi deb oʻylaydi.
+ * `neutral` — "Ustalar" va "Barchasi" katakchalari uchun. Ular kategoriya
+ * EMAS, balki roʻyxatga oʻtish yoʻli; ikonasi kulrang, doirasi esa boshqalar
+ * bilan BIR XIL oq (referens maket): sakkizta doira bitta qatorda bir xil
+ * material boʻlishi kerak, farq faqat ikona rangida.
  *
- * Klasslar toʻliq satr sifatida yozilgan — Tailwind manbani MATN sifatida
- * skanerlaydi, shuning uchun klass nomini boʻlaklardan yigʻib boʻlmaydi.
+ * Ikona rangi `iconTone` orqali keladi (`serviceIconTone()` — kategoriya
+ * aksenti). Klasslar toʻliq satr sifatida uzatiladi — Tailwind manbani MATN
+ * sifatida skanerlaydi.
  */
 type TileTone = 'default' | 'neutral';
 
-const TILE_CIRCLE_CLASSES: Record<TileTone, string> = {
-  default: 'disc-lit shadow-e2',
-  neutral: 'bg-neutral-surface',
-};
-
-const TILE_ICON_CLASSES: Record<TileTone, string> = {
-  default: "text-primary-pressed [[data-theme='dark']_&]:text-on-primary-deep",
-  neutral: 'text-text-secondary',
-};
+const NEUTRAL_ICON_CLASSES = 'text-text-secondary';
 
 export interface ServiceGroupTileProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   tone?: TileTone;
+  /** Ikona rangi klassi — `serviceIconTone()` dan. `neutral` tusda eʼtiborsiz. */
+  iconTone?: string;
   /** Optik massani tenglashtirish uchun — `serviceIconSize()` dan keladi. */
   iconSize?: IconSize;
   /**
@@ -58,10 +49,12 @@ export function ServiceGroupTile({
   label,
   icon,
   tone = 'default',
+  iconTone = 'text-primary-pressed',
   iconSize = 28,
   className,
   ...rest
 }: ServiceGroupTileProps) {
+  const iconClasses = tone === 'neutral' ? NEUTRAL_ICON_CLASSES : iconTone;
   return (
     <button
       type="button"
@@ -82,13 +75,12 @@ export function ServiceGroupTile({
           // Dark — toʻldirilgan teal va ingichka chegara. Ikkalasini ham
           // `category-circle` tokeni beradi.
           // Jismoniy disk tepasida koʻproq yorugʻlik ushlaydi — `disc-lit`
-          // shuni beradi. Chegara olib tashlandi: Lightʼda `border` (L* 91,1)
-          // doira foni (94,3) dan TOʻQROQ edi, yaʼni katakcha sakkizta obyekt
-          // emas, sakkizta halqa boʻlib oʻqilardi.
-          TILE_CIRCLE_CLASSES[tone],
+          // shuni beradi. Chegara yoʻq: Lightʼda `border` doira fonidan
+          // toʻqroq edi va katakcha sakkizta halqa boʻlib oʻqilardi.
+          'disc-lit shadow-e2',
         )}
       >
-        <Icon icon={icon} size={iconSize} weight="duotone" className={TILE_ICON_CLASSES[tone]} aria-hidden />
+        <Icon icon={icon} size={iconSize} weight="duotone" className={iconClasses} aria-hidden />
       </span>
 
       {/* Nomni yorliq oʻzi aytadi, ikona dekorativ — shuning uchun u `aria-hidden`. */}

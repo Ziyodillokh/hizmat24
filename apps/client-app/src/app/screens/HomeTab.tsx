@@ -10,7 +10,7 @@ import { StatusChip } from '@/components/StatusChip';
 import { StatusBar } from '@/preview/StatusBar';
 import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
-import { MORE_ICON, serviceIcon, serviceIconSize } from '@/lib/serviceIcons';
+import { MORE_ICON, serviceIcon, serviceIconSize, serviceIconTone } from '@/lib/serviceIcons';
 import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
@@ -79,7 +79,7 @@ export function HomeTab() {
         scroll paytida u konteyner chetida keskin kesilardi.
       */}
       <div className="relative shrink-0">
-        <div className="hero-field absolute inset-x-0 top-0 bottom-[72px] rounded-b-xl" aria-hidden />
+        <div className="hero-field absolute inset-x-0 top-0 bottom-[64px] rounded-b-xl" aria-hidden />
 
         <div className="relative">
           <StatusBar />
@@ -137,7 +137,7 @@ export function HomeTab() {
           </section>
         )}
 
-        <h2 className="pt-12 text-h3 text-text-primary [@media(max-height:800px)]:pt-8">
+        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-12">
           Mashhur xizmatlar
         </h2>
         <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12 [@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:gap-y-8">
@@ -147,18 +147,19 @@ export function HomeTab() {
               label={group.name}
               icon={serviceIcon(group.iconKey)}
               iconSize={serviceIconSize(group.iconKey)}
+              iconTone={serviceIconTone(group.iconKey)}
               onClick={() => navigate(`/app/groups/${group.id}`)}
             />
           ))}
           {/*
-            Uchta neytral katakcha yonma-yon turadi va koʻz ularni bitta
-            guruh — "boshqa boʻlimlar" — sifatida oʻqiydi. `tone="neutral"`
-            majburiy: ular xizmat turi emas, roʻyxatga oʻtish yoʻli.
+            Market — yashil doʻkon (referens maket): u ham "boʻlim", lekin
+            oʻz mahsuloti bor va oʻz rangiga loyiq. "Ustalar" va "Barchasi"
+            esa neytral: ular xizmat turi emas, roʻyxatga oʻtish yoʻli.
           */}
           <ServiceGroupTile
             label="Market"
             icon={Storefront}
-            tone="neutral"
+            iconTone={serviceIconTone('market')}
             onClick={() => navigate('/app/market')}
           />
           <ServiceGroupTile
@@ -176,7 +177,7 @@ export function HomeTab() {
           />
         </div>
 
-        <h2 className="pt-12 text-h3 text-text-primary [@media(max-height:800px)]:pt-8">
+        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-12">
           Sizga tavsiya etiladiganlar
         </h2>
         <ul className="mt-8 grid grid-cols-2 items-stretch gap-12">
@@ -187,13 +188,12 @@ export function HomeTab() {
                 profession={master.profession}
                 rating={master.ratingAvg}
                 photoUrl={master.photoUrl}
-                actionLabel="Chaqirish"
                 /*
-                  Tanlov endi BUYURTMAGA YOZILADI. Ilgari bu tugma
-                  "Buyurtma berish" deb turardi va oqim oxirida buyurtmaga
-                  boshqa odam — har doim Akmal Rahimov — tayinlanardi,
-                  kartada esa mutlaqo boshqa usta koʻrinardi.
+                  "Buyurtma berish" endi HALOL: tanlov buyurtmaga yoziladi va
+                  aynan shu usta tayinlanadi. 6-bosqichgacha bu yorliq
+                  yolgʻon edi — oqim oxirida boshqa odam tayinlanardi.
                 */
+                actionLabel="Buyurtma berish"
                 onAction={() => {
                   setDraftMaster(master.id);
                   showToast(`${master.fullName} tanlandi`, 'success');

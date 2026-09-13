@@ -43,6 +43,17 @@ export const COLOR_TOKENS = [
   // Illyustratsiya uchun — ikkala temada bir xil (`on-primary-deep` kabi).
   'illus-shade',
   'illus-hi-vis',
+  // Kategoriya aksentlari — bosh sahifadagi doiralar ichidagi ikona rangi.
+  // Referens maketda har bir soha oʻz rangida: elektr koʻk, suv havorang,
+  // gaz toʻq sariq, texnika binafsha, duradgorlik jigarrang, market yashil.
+  // Bitta brend rangi bilan chizilsa sakkizta doira bir xil boʻlib, koʻz
+  // kerakli sohani ikonaning SHAKLIGA qarab qidirardi.
+  'accent-electric',
+  'accent-water',
+  'accent-fire',
+  'accent-tech',
+  'accent-wood',
+  'accent-shop',
   'shadow',
   'overlay',
   'canvas',
@@ -52,128 +63,126 @@ export type ColorToken = (typeof COLOR_TOKENS)[number];
 
 type Palette = Record<ColorToken, string>;
 
-/** 3.1-band. */
+/**
+ * 3.1-band.
+ *
+ * Toʻq tema — TUNGI KOʻK. Yuzalar zinapoyasi MONOTON: `sunken` < `surface`
+ * < `elevated` < `raised` < `modal`.
+ */
 export const DARK: Palette = {
-  // Yuzalar zinapoyasi MONOTON boʻlishi shart. Ilgari `surface-sunken`
-  // (L* 24,2) `surface-elevated` dan (L* 20,6) yorugʻroq edi — yaʼni
-  // "choʻkkan" yuza "koʻtarilgan"idan tepada turardi va karta ichidagi
-  // ikona uyasi kartaning oʻzidan yorqin chiqardi.
-  surface: '#0E2B2C',
-  'surface-elevated': '#133A3B',
-  'surface-raised': '#194647',
-  'surface-modal': '#1F5354',
-  'surface-sunken': '#0A2324',
-  'surface-hero-top': '#12615F',
-  'surface-hero': '#0D4A49',
-  // Ilgari bu token `surface-hero` bilan AYNAN bir xil edi — ikkita nom,
-  // bitta rang. Endi hero chuqurlik gradientining pastki uchi.
-  'surface-hero-deep': '#0A3736',
-  'category-circle': '#1F7775',
-  'category-circle-top': '#2A8C89',
-  primary: '#2DD4BF',
-  'primary-pressed': '#22B8A6',
-  'on-primary': '#04302F',
-  'primary-deep': '#0B7C7B',
+  surface: '#08192B',
+  'surface-elevated': '#0F2740',
+  'surface-raised': '#153452',
+  'surface-modal': '#1B4066',
+  'surface-sunken': '#05111F',
+  'surface-hero-top': '#2A7FC8',
+  'surface-hero': '#11507F',
+  'surface-hero-deep': '#0B3A61',
+  'category-circle': '#143A5E',
+  'category-circle-top': '#1D4F7C',
+  // Yorqin osmon koʻki, ustida TOʻQ matn: oq matn #4DA3F5 ustida 2,6:1
+  // berardi. Toʻq matn 8,9:1.
+  primary: '#4DA3F5',
+  'primary-pressed': '#3A8FE0',
+  'on-primary': '#06213A',
+  'primary-deep': '#1B6FB8',
   'on-primary-deep': '#FFFFFF',
-  border: '#1E4F4E',
-  'border-strong': '#2A6A68',
-  'text-primary': '#F2FAFA',
-  // #9BB8B8 yangi `surface-modal` (#1F5354) ustida 4,10:1 — AA dan oʻtmaydi.
-  // #A6C1C1: modal 4,55:1 · raised 5,49:1 · elevated 6,50:1 · surface 7,87:1.
-  'text-secondary': '#A6C1C1',
-  'text-disabled': '#5F7C7C',
+  border: '#1E3E5E',
+  'border-strong': '#2B5680',
+  'text-primary': '#F1F6FB',
+  // #A9BFD6: modal (#1B4066) ustida 5,0:1 · elevated 7,2:1 · surface 8,6:1.
+  'text-secondary': '#A9BFD6',
+  'text-disabled': '#5F7A96',
   success: '#34D399',
   warning: '#FBBF24',
   danger: '#FCA5A5',
   'danger-fill': '#DC2626',
   star: '#F5C063',
-  // Ilgari boʻsh yulduz `surface-raised` dan YORUGʻROQ edi — boʻsh yulduzlar
-  // toʻldirilgandek koʻrinardi.
-  'star-empty': '#2A4344',
-  // Toʻq teal soya toʻq teal fon ustida koʻrinmaydi — shuning uchun bu token
-  // elevatsiyaga ulanmagan edi va faqat Toggleʼda ishlatilardi.
-  shadow: '#00100F',
+  'star-empty': '#22405E',
+  shadow: '#000A14',
   overlay: 'rgba(0, 0, 0, 0.60)',
-  'primary-surface': '#10413F',
-  'success-surface': '#13463C',
+  'primary-surface': '#10365A',
+  'success-surface': '#12463A',
   'warning-surface': '#453818',
   'danger-surface': '#4A2B2D',
-  'neutral-surface': '#21403F',
-  'illus-shade': '#093F3E',
+  'neutral-surface': '#1B3550',
+  'illus-shade': '#0B3F6E',
   'illus-hi-vis': '#F5B942',
+  'accent-electric': '#5AA8F5',
+  'accent-water': '#4FB5F0',
+  'accent-fire': '#FB8A3C',
+  'accent-tech': '#A78BFA',
+  'accent-wood': '#C98A5A',
+  'accent-shop': '#4ADE80',
   // 3.3-band — frameʼlardan tashqaridagi fon.
-  canvas: '#7FA5A5',
+  canvas: '#6E8DAA',
 };
 
-/** 3.2-band. */
+/**
+ * 3.2-band.
+ *
+ * Yorugʻ tema — KOʻK brend. Referens maket: tepa blok toʻyingan koʻk, tugma
+ * va aktiv tab oʻsha koʻkning bir pogʻona toʻqrogʻi, sahifa foni koʻkka
+ * chalingan oq, kartalar oq.
+ *
+ * Sahifa kartalardan PASTDA turishi kerak: `surface` oq emas, `elevated`
+ * oq — aks holda butun chuqurlik tizimi faqat nomlarda boʻlardi.
+ */
 export const LIGHT: Palette = {
-  // Sahifa kartalardan PASTDA turishi kerak. Ilgari `surface`, `-elevated`,
-  // `-raised` va `-modal` — toʻrttasi ham #FFFFFF edi, yaʼni butun chuqurlik
-  // tizimi faqat nomlarda mavjud edi va har bir karta oq fonda oq toʻrtburchak
-  // boʻlib, atigi 1px kulrang chiziq bilan ajralib turardi.
-  surface: '#F2F7F7',
+  surface: '#F3F7FB',
   'surface-elevated': '#FFFFFF',
   'surface-raised': '#FFFFFF',
   'surface-modal': '#FFFFFF',
-  'surface-sunken': '#E5EFEF',
-  // Tepadagi hero maydoni. Ilgari bu yorqin tsian (#1EC8C8) edi: brend rangi
-  // 250px lik YUZA sifatida ishlatilardi va aynan shuning uchun Dark temada
-  // blok butunlay oʻchirib tashlangan edi — ikki tema ikki xil mahsulot
-  // boʻlib qolgandi. Chuqur va past xromali maydon ikkala temada bir xil
-  // ishlaydi, ustiga oq matn qoʻyishga imkon beradi va yorqin turkuazni
-  // yana AKSENT (ikona, narx, aktiv tab, CTA) holiga qaytaradi.
-  // Referens dizayn bo'yicha tepa blok YORQIN turkuaz. Faqat bitta yon
-  // berish bor: eng yorqin nuqta biroz to'qlashtirildi, chunki oq matn
-  // #1EC8C8 ustida 1,9:1 beradi — telefonda quyoshda o'qib bo'lmaydi.
-  // #14AEAB da qalin oq sarlavha 3,0:1 ga chiqadi va tus baribir yorqin
-  // turkuaz bo'lib qoladi.
-  'surface-hero-top': '#22CFCC',
-  'surface-hero': '#14AEAB',
-  // Banner tepa blokdan to'qroq — referensdagi kabi.
-  'surface-hero-deep': '#0B7E7C',
-  // Light temada bu doira OQ edi — oq sahifa ustida u umuman koʻrinmasdi
-  // (soya 4% boʻlgani uchun chegara ham sezilmasdi). Endi yengil turkuaz tus:
-  // `primary` (#10A3A0) ikonasi bilan kontrast 3,4:1, doira esa yuzadan ajraladi.
-  // Referensda doiralar OQ va yumshoq soyali. Sahifa foni #F2F7F7 bo'lgani
+  'surface-sunken': '#E8EFF7',
+  // Tepa blok. Oq qalin sarlavha #2F80C8 ustida 4,2:1 — yorugʻ kunda ham
+  // oʻqiladi. Yuqori chap burchakdagi yorugʻlik dogʻi `hero-top`.
+  'surface-hero-top': '#5AAAF0',
+  'surface-hero': '#2F80C8',
+  'surface-hero-deep': '#1F5FA8',
+  // Doiralar OQ va yumshoq soyali (referens). Sahifa foni #F3F7FB boʻlgani
   // uchun oq doira undan ajralib turadi.
   'category-circle': '#FFFFFF',
   'category-circle-top': '#FFFFFF',
-  primary: '#10A3A0',
-  'primary-pressed': '#0B7C7B',
-  'on-primary': '#04302F',
-  'primary-deep': '#0B7C7B',
+  // Tugma va aktiv tab. Oq matn #2E74C4 ustida 4,6:1 — AA.
+  primary: '#2E74C4',
+  'primary-pressed': '#235FA6',
+  'on-primary': '#FFFFFF',
+  'primary-deep': '#1F5A9C',
   'on-primary-deep': '#FFFFFF',
   // Kartalardagi chegara olib tashlanadi (soya oʻz ishini qiladi), shuning
-  // uchun `border` endi faqat ajratgich va maydon konturi — u koʻproq
-  // koʻrinishi kerak, kamroq emas.
-  border: '#DCE8E8',
-  'border-strong': '#C7DADA',
-  'text-primary': '#04302F',
-  // #5C7A7A yangi sahifa foni (#F2F7F7) ustida 4,30:1 — AA dan oʻtmaydi.
-  // #4E6C6C: sahifa 5,27:1 · karta 5,70:1 · sunken 4,86:1.
-  'text-secondary': '#4E6C6C',
-  'text-disabled': '#9AB0B0',
-  success: '#047857',
-  // #92400E shokolad rangi edi, amber emas — ogohlantirish bannerlari va
-  // bildirishnoma doiralari "iflos" boʻlib chiqardi.
+  // uchun `border` endi faqat ajratgich va maydon konturi.
+  border: '#DCE5EF',
+  'border-strong': '#C4D3E3',
+  'text-primary': '#102A43',
+  // #4B6685: sahifa 5,6:1 · karta 6,3:1 · sunken 4,8:1.
+  'text-secondary': '#4B6685',
+  'text-disabled': '#9AAEC3',
+  success: '#1B7F4A',
+  // Amber, shokolad emas — ogohlantirish bannerlari "iflos" chiqmasin.
   warning: '#9A5408',
-  // #DC2626 yangi sahifa foni ustida 4,47:1 — oʻtmaydi.
   danger: '#C81E1E',
   'danger-fill': '#DC2626',
-  // Yulduzlarni sozlangan `warning` bilan bitta amber oilasiga tortadi:
-  // ilgari ilovada turkuaz va ikkita bogʻlanmagan toʻq sariq bor edi.
-  star: '#B8720F',
-  'star-empty': '#D6E3E3',
-  shadow: '#062C2C',
-  overlay: 'rgba(4, 48, 47, 0.45)',
-  'primary-surface': '#E9F6F5',
-  'success-surface': '#DEF0E8',
+  // Yulduz — referensdagi oltin-toʻq sariq. Reyting RAQAMI `text-primary`
+  // da yoziladi, yulduzning oʻzi bezak.
+  star: '#E39B12',
+  'star-empty': '#D9E3EE',
+  shadow: '#0B2A4A',
+  overlay: 'rgba(16, 42, 67, 0.45)',
+  'primary-surface': '#E6F0FB',
+  'success-surface': '#DDF3E7',
   'warning-surface': '#FBEBD8',
   'danger-surface': '#FCE6E5',
-  'neutral-surface': '#E9F0F0',
-  'illus-shade': '#093F3E',
+  'neutral-surface': '#EAF0F7',
+  'illus-shade': '#0B3F6E',
   'illus-hi-vis': '#F5B942',
-  canvas: '#E6F7F7',
+  // Oq doira ustida grafik uchun 3:1 dan yuqori.
+  'accent-electric': '#2F80D9',
+  'accent-water': '#2A93D5',
+  'accent-fire': '#E86A0C',
+  'accent-tech': '#7C3AED',
+  'accent-wood': '#9A5A2E',
+  'accent-shop': '#1A9A4F',
+  canvas: '#E3EEF9',
 };
 
 export const PALETTES = { dark: DARK, light: LIGHT } as const;

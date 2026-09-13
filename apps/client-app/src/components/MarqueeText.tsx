@@ -75,7 +75,14 @@ export function MarqueeText({ text, className }: MarqueeTextProps) {
       // yordamchi texnologiyalariga yetib borsin.
       title={text}
       className={cn(
-        'block overflow-hidden whitespace-nowrap',
+        /*
+         * Oʻram har ikki tomonga 10px kengaytirilgan, ichki matn esa 10px
+         * ichki hoshiya bilan — koʻrinadigan matn oʻz joyida qoladi, lekin
+         * maskaning soʻnuvchi chekkasi harfga emas, BOʻSH hoshiyaga tushadi.
+         * Ilgari maska matn tinch turganda ham birinchi harfni xira
+         * qilardi: "Sardor" "Sardor" boʻlib, "S" yarim koʻrinmas edi.
+         */
+        'block overflow-hidden whitespace-nowrap -mx-[10px]',
         /*
          * Surilish paytida matn chekkada KESKIN kesilardi va bu buzuq
          * renderdek koʻrinardi ("Sardor" -> "ardor"). Maska chekkalarni
@@ -88,7 +95,7 @@ export function MarqueeText({ text, className }: MarqueeTextProps) {
     >
       <span
         ref={innerRef}
-        className={cn('inline-block', isScrolling && 'motion-safe:animate-marquee')}
+        className={cn('inline-block px-[10px]', isScrolling && 'motion-safe:animate-marquee')}
         style={
           isScrolling
             ? ({
