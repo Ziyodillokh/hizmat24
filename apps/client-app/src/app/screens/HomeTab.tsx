@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkle } from '@phosphor-icons/react';
+import { ArrowRight } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -20,6 +20,7 @@ import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
 import { ALL_SERVICES_IMAGE, SERVICE_IMAGES } from '@/mocks/serviceImages';
 import { MASTER_LIST } from '@/mocks/masters';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
+import aiRobot from '@/assets/brand/ai-robot.webp';
 import { useApp } from '../store';
 import { useSelectService } from '../useSelectService';
 import type { LiveOrder } from '../types';
@@ -229,9 +230,13 @@ export function HomeTab() {
         type="button"
         onClick={() => navigate('/app/ai')}
         aria-label="AI yordamchi"
-        className="hero-field absolute bottom-12 right-20 flex h-[56px] w-[56px] items-center justify-center rounded-full text-on-primary-deep shadow-e3 ring-[3px] ring-surface transition-transform duration-press ease-emphasized active:scale-[0.94] [@media(max-height:800px)]:bottom-8"
+        className="absolute bottom-12 right-20 flex h-[60px] w-[60px] items-center justify-center overflow-hidden rounded-full bg-surface-elevated shadow-e3 ring-2 ring-primary transition-transform duration-press ease-emphasized active:scale-[0.94] [@media(max-height:800px)]:bottom-8"
       >
-        <Icon icon={Sparkle} size={28} weight="fill" />
+        {/*
+          Egasi bergan robot maskoti (224px WebP, 5 KB) — oq doira, koʻk
+          halqa: kontent ustida ham aniq ajralib turadi, tungi temada ham.
+        */}
+        <img src={aiRobot} alt="" draggable={false} className="h-full w-full object-cover" />
       </button>
       </div>
 

@@ -4,11 +4,42 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { SearchField } from '@/components/SearchField';
-import { ServiceCard } from '@/components/ServiceCard';
+import { SelectableChip } from '@/components/SelectableChip';
+import { ServicePhotoCard } from '@/components/ServicePhotoCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { serviceIcon } from '@/lib/serviceIcons';
-import { ALL_CATEGORIES, SERVICE_GROUPS } from '@/mocks/serviceGroups';
+import { ALL_CATEGORIES, SERVICE_GROUPS, type FlatServiceCategory } from '@/mocks/serviceGroups';
+import { SERVICE_IMAGES } from '@/mocks/serviceImages';
 import { useSelectService } from '../useSelectService';
+
+/** "Barchasi" chipining kaliti — hech bir guruh id si bilan toʻqnashmaydi. */
+const ALL_GROUPS = 'all';
+
+/** Ikki ustunli foto-kartalar panjarasi — ikkala katalog ekrani uchun bitta. */
+function ServiceGrid({
+  items,
+  onSelect,
+}: {
+  items: readonly FlatServiceCategory[];
+  onSelect: (categoryId: string) => void;
+}) {
+  return (
+    <ul className="grid grid-cols-2 gap-8">
+      {items.map((category) => (
+        <li key={category.id} className="min-w-0">
+          <ServicePhotoCard
+            name={category.name}
+            description={category.description}
+            price={category.basePrice}
+            icon={serviceIcon(category.iconKey)}
+            imageUrl={SERVICE_IMAGES[category.id]}
+            onSelect={() => onSelect(category.id)}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** 07a · Guruh xizmatlari. */
 export function GroupServicesTab() {
@@ -17,38 +48,54 @@ export function GroupServicesTab() {
   const select = useSelectService();
 
   const group = SERVICE_GROUPS.find((item) => item.id === groupId) ?? SERVICE_GROUPS[0];
+  const items = ALL_CATEGORIES.filter((item) => item.groupId === group.id);
 
   return (
     <ScreenShell header={<Header variant="inner" title={group.name} onBack={() => navigate(-1)} />}>
-      <ul className="mt-4 flex flex-col gap-12 pb-bottom-reserve">
-        {group.categories.map((category) => (
-          <li key={category.id}>
-            <ServiceCard
-              name={category.name}
-              description={category.description}
-              price={category.basePrice}
-              icon={serviceIcon(category.iconKey ?? group.iconKey)}
-              onSelect={() => select(category.id)}
-            />
-          </li>
-        ))}
-      </ul>
+      <p className="mt-4 text-body-sm text-text-secondary">
+        {items.length} ta xizmat · narxlar taxminiy, yakuniy summa buyurtmada hisoblanadi
+      </p>
+      <div className="mt-12 pb-bottom-reserve">
+        <ServiceGrid items={items} onSelect={select} />
+      </div>
     </ScreenShell>
   );
 }
 
-/** 07 · Barcha xizmatlar — mahalliy filtr. */
+/**
+ * 07 · Barcha xizmatlar.
+ *
+ * Qidiruv + guruh chiplari + guruhlar boʻyicha boʻlimlar. Qidiruv yozilganda
+ * boʻlimlar yoʻqoladi va natijalar bitta panjarada chiqadi — foydalanuvchi
+ * qaysi guruhda ekanini emas, nima topilganini koʻrishi kerak.
+ */
 export function AllServicesTab() {
   const navigate = useNavigate();
   const select = useSelectService();
   const [query, setQuery] = useState('');
+  const [groupId, setGroupId] = useState(ALL_GROUPS);
+
+  const needle = query.trim().toLowerCase();
 
   const results = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (!needle) return ALL_CATEGORIES;
-    return ALL_CATEGORIES.filter((item) => item.name.toLowerCase().includes(needle));
-  }, [query]);
+    if (!needle) return null;
+    return ALL_CATEGORIES.filter(
+      (item) =>
+        item.name.toLowerCase().includes(needle) ||
+        (item.description ?? '').toLowerCase().includes(needle),
+    );
+  }, [needle]);
 
+  const sections = useMemo(
+    () =>
+      SERVICE_GROUPS.filter((group) => groupId === ALL_GROUPS || group.id === groupId).map(
+        (group) => ({
+          group,
+          items: ALL_CATEGORIES.filter((item) => item.groupId === group.id),
+        }),
+      ),
+    [groupId],
+  );
 
   return (
     <ScreenShell
@@ -60,27 +107,60 @@ export function AllServicesTab() {
         placeholder="Xizmat qidirish"
       />
 
-      {results.length === 0 ? (
-        <EmptyState
-          icon={FileMagnifyingGlass}
-          title="Hech narsa topilmadi"
-          action={{ label: "Barcha xizmatlarni koʻrish", onClick: () => setQuery('') }}
-          inline
-        />
-      ) : (
-        <ul className="mt-16 flex flex-col gap-12 pb-bottom-reserve">
-          {results.map((category) => (
-            <li key={category.id}>
-              <ServiceCard
-                name={category.name}
-                description={category.description}
-                price={category.basePrice}
-                icon={serviceIcon(category.iconKey)}
-                onSelect={() => select(category.id)}
-              />
-            </li>
+      {/* Guruh chiplari — qidiruv paytida yashirin: ikkita filtr bir vaqtda
+          chalgʻitadi va natija qaysi biriga tegishli ekani noaniq qoladi. */}
+      {!results && (
+        <div className="-mx-20 mt-12 flex gap-8 overflow-x-auto px-20 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <SelectableChip
+            selected={groupId === ALL_GROUPS}
+            onSelect={() => setGroupId(ALL_GROUPS)}
+            className="shrink-0"
+          >
+            Barchasi
+          </SelectableChip>
+          {SERVICE_GROUPS.map((group) => (
+            <SelectableChip
+              key={group.id}
+              selected={groupId === group.id}
+              onSelect={() => setGroupId(group.id)}
+              className="shrink-0"
+            >
+              {group.name}
+            </SelectableChip>
           ))}
-        </ul>
+        </div>
+      )}
+
+      {results ? (
+        results.length === 0 ? (
+          <EmptyState
+            icon={FileMagnifyingGlass}
+            title="Hech narsa topilmadi"
+            description="Boshqa soʻz bilan urinib koʻring yoki roʻyxatdan tanlang"
+            action={{ label: 'Barcha xizmatlarni koʻrish', onClick: () => setQuery('') }}
+            inline
+            className="mt-24"
+          />
+        ) : (
+          <div className="mt-12 pb-bottom-reserve">
+            <p className="mb-12 text-body-sm text-text-secondary">{results.length} ta natija</p>
+            <ServiceGrid items={results} onSelect={select} />
+          </div>
+        )
+      ) : (
+        <div className="pb-bottom-reserve">
+          {sections.map(({ group, items }) => (
+            <section key={group.id}>
+              <div className="mt-16 flex items-baseline justify-between gap-8 px-4">
+                <h2 className="min-w-0 truncate text-h3 text-text-primary">{group.name}</h2>
+                <span className="shrink-0 text-caption text-text-secondary">{items.length} ta</span>
+              </div>
+              <div className="mt-8">
+                <ServiceGrid items={items} onSelect={select} />
+              </div>
+            </section>
+          ))}
+        </div>
       )}
     </ScreenShell>
   );
