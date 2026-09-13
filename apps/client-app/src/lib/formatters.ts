@@ -166,24 +166,6 @@ export function formatDayLabel(date: Date, now: Date): string {
 export const formatDateTime = (date: Date, now: Date): string =>
   `${formatDayLabel(date, now)}, ${formatTime(date)}`;
 
-/**
- * Suhbatlar roʻyxatidagi vaqt — bitta qatorga sigʻadigan eng qisqa shakl.
- *
- * Bugungi xabar uchun soat, kechagisi uchun "Kecha", undan eskisi uchun
- * "05.09". Toʻliq sana yozilsa qator ismni siqib qoʻyardi.
- */
-export function formatChatTime(date: Date, now: Date): string {
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-
-  if (isSameDay(date, now)) return formatTime(date);
-  if (isSameDay(date, yesterday)) return 'Kecha';
-  if (date.getFullYear() === now.getFullYear())
-    return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}`;
-
-  return formatShortDate(date);
-}
-
 /** Roʻyxatlar uchun qisqa shakl. */
 export const formatShortDate = (date: Date): string =>
   `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`;

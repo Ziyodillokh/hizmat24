@@ -256,7 +256,6 @@ export function ProfileTab() {
           onSelect: () => navigate('/app/orders'),
         },
         {
-          // Chat endi tab bar'da — menyudagi takroriy qator oʻrniga bonus.
           icon: Medal,
           label: 'Bonuslar',
           hint: level.label,

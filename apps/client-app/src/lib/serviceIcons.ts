@@ -78,9 +78,10 @@ const ICON_TONES: Record<string, string> = {
   gas: 'text-accent-fire',
   appliance: 'text-accent-tech',
   carpenter: 'text-accent-wood',
+  // Yettita soha, oltita aksent: boʻyoqchilik gaz bilan bir tusda, lekin
+  // ular panjarada yonma-yon turmaydi (1-qator 3-ustun va 2-qator 2-ustun).
   painter: 'text-accent-fire',
-  cleaning: 'text-accent-water',
-  market: 'text-accent-shop',
+  cleaning: 'text-accent-fresh',
 };
 
 export const serviceIconTone = (iconKey: string): string =>

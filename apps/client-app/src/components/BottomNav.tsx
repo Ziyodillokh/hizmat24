@@ -1,23 +1,25 @@
-import { ChatsCircle, ClipboardText, CreditCard, House, User } from '@phosphor-icons/react';
+import { ClipboardText, CreditCard, House, User } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
 /**
- * Pastki navigatsiya — beshta boʻlim.
+ * Pastki navigatsiya — TOʻRTTA boʻlim.
+ *
+ * Chat boʻlimi 2026-09-13 da olib tashlandi (egasining qarori: usta bilan
+ * yozishish kerak emas; AI yordamchi bosh sahifadagi suzuvchi tugmadan
+ * ochiladi). Market va Mutaxassislar ham shu kuni butunlay olib tashlandi.
  *
  * Xavfsiz zonani (home indicator) bu komponent EGALLAMAYDI — uni
  * `ScreenShell` dagi `BottomInset` beradi. Ikkalasi ham qoʻyganda 34px
  * ikki marta zahiralanardi va bu bosh sahifani past ekranlarda scrollga
  * majbur qilardi.
  *
- * Yorliqlar QISQA: 360px ekranda beshta tabga 72px dan tushadi va uzun soʻz
- * kesilib qolardi. Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
+ * Yorliqlar QISQA: 360px ekranda toʻrtta tabga 90px dan tushadi, lekin
+ * uzun soʻz baribir kesilishi mumkin. Ekran sarlavhalari toʻliq nomni saqlaydi — u yerda joy bor.
  *
- * Market va Mutaxassislar bu yerdan CHIQARILDI: beshta oʻringa asosiy oqim
- * sigʻishi kerak, ular esa bosh sahifadagi katakchalardan ochiladi.
  */
-export type TabKey = 'home' | 'wallet' | 'orders' | 'chat' | 'profile';
+export type TabKey = 'home' | 'wallet' | 'orders' | 'profile';
 
 interface TabDefinition {
   key: TabKey;
@@ -29,7 +31,6 @@ const TABS: readonly TabDefinition[] = [
   { key: 'home', label: 'Bosh', icon: House },
   { key: 'wallet', label: 'Karta', icon: CreditCard },
   { key: 'orders', label: 'Buyurtma', icon: ClipboardText },
-  { key: 'chat', label: 'Chat', icon: ChatsCircle },
   { key: 'profile', label: 'Profil', icon: User },
 ];
 

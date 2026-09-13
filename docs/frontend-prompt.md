@@ -991,8 +991,8 @@ Quyidagilarning har biri backend qoidasini buzadi yoki ma'lumot manbai bo'lmagan
 >
 > | Band | Holati | Sabab |
 > |---|---|---|
-> | 14.1.1 · Ustalar katalogi | Bekor qilingan | `/app/masters` mavjud; `MASTER_LIST` real manba |
-> | 14.1.4 · Ustalar bo'yicha qidiruv va filtr | Bekor qilingan | `MastersTab` da ishlaydi |
+> | 14.1.1 · Ustalar katalogi | Bekor qilingan, so'ng 2026-09-13 da katalog OLIB TASHLANDI | Usta profili (`/app/master/:id`) va bosh sahifadagi tasma qoldi |
+> | 14.1.4 · Ustalar bo'yicha qidiruv va filtr | Katalog bilan birga olib tashlandi | — |
 > | 14.1.5 · "Yoqtirish"/"Saqlash" tugmalari | Bekor qilingan (6-bosqich) | Sevimli ustaga yozish va uni buyurtmada so'rash ishlaydi |
 > | 14.4.28 · Ism o'zgartirish | Bekor qilingan (6-bosqich) | Ilgari profil mock "Jasur" ni ko'rsatardi — **bu taqiq yolg'onni saqlab turgan edi**. Telefon o'zgartirish TAQIQ qolmoqda: qayta tasdiqlash oqimi yo'q |
 > | 14.4.29 · "Manzillarim" | Bekor qilingan (6-bosqich) | Manzil `localStorage` da saqlanadi va buyurtma oqimida ishlatiladi |

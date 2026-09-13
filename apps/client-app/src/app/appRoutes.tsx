@@ -20,16 +20,10 @@ import { ConfirmMasterFlow, SafetyAlertResult } from './screens/SafetyFlow';
 import { RateOrderScreen, ReceiptScreen } from './screens/RateAndReceipt';
 import { NotificationsTab, OrdersTab, ProfileTab } from './screens/Tabs';
 import { MasterProfile } from './screens/MasterProfile';
-import { MarketTab } from './screens/MarketTab';
-import { ProductDetail } from './screens/ProductDetail';
-import { ShopDetail } from './screens/ShopDetail';
-import { MastersTab } from './screens/MastersTab';
 import { WalletTab } from './screens/WalletTab';
 import { WalletBonus } from './screens/WalletBonus';
 import { WalletHistory } from './screens/WalletHistory';
 import { AiAssistantScreen } from './screens/AiAssistant';
-import { ChatListScreen } from './screens/ChatList';
-import { ChatThreadScreen } from './screens/ChatThread';
 import { SupportScreen } from '@/screens/stage5/SupportScreen';
 import { ProblemReportScreen } from './screens/ProblemReport';
 import { DisputeDetailScreen } from './screens/DisputeDetail';
@@ -74,9 +68,8 @@ function SupportRoute() {
  * 500 satrdan oshdi. Jadval shaklida bitta marshrut — bitta satr, va
  * tartib qoidalari izohda oʻqiladi.
  *
- * TARTIB MUHIM: statik segment dinamikdan OLDIN turadi (`chat/ai` →
- * `chat/:threadId`, `addresses/new` → `addresses/:addressId`, `master` →
- * `master/:masterId`). Router aniqroq marshrutni oʻzi tanlaydi, lekin
+ * TARTIB MUHIM: statik segment dinamikdan OLDIN turadi (`addresses/new` →
+ * `addresses/:addressId`, `master` → `master/:masterId`). Router aniqroq marshrutni oʻzi tanlaydi, lekin
  * jadvalni oʻqiydigan odam uchun tartib hujjat.
  */
 export interface AppRoute {
@@ -88,15 +81,11 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   // Kirish
   { path: 'onboarding', element: <OnboardingScreen /> },
 
-  // Bosh sahifa, katalog, ustalar, market
+  // Bosh sahifa, katalog, usta profili
   { path: 'home', element: <HomeTab /> },
   { path: 'groups/:groupId', element: <GroupServicesTab /> },
   { path: 'services', element: <AllServicesTab /> },
-  { path: 'masters', element: <MastersTab /> },
   { path: 'master/:masterId', element: <MasterProfile /> },
-  { path: 'market', element: <MarketTab /> },
-  { path: 'market/:shopId', element: <ShopDetail /> },
-  { path: 'market/:shopId/:productId', element: <ProductDetail /> },
 
   // Buyurtma berish oqimi
   { path: 'new/details', element: <OrderDetailsStep /> },
@@ -123,10 +112,8 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'wallet/bonus', element: <WalletBonus /> },
   { path: 'wallet/history', element: <WalletHistory /> },
 
-  // Chat va bildirishnomalar
-  { path: 'chat', element: <ChatListScreen /> },
-  { path: 'chat/ai', element: <AiAssistantScreen /> },
-  { path: 'chat/:threadId', element: <ChatThreadScreen /> },
+  // AI yordamchi va bildirishnomalar
+  { path: 'ai', element: <AiAssistantScreen /> },
   { path: 'notifications', element: <NotificationsTab /> },
 
   // Profil va shaxsiy boʻlim

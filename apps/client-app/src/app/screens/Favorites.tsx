@@ -1,4 +1,4 @@
-import { ChatCircleDots, Heart, Info, Wrench } from '@phosphor-icons/react';
+import { Heart, Info, Wrench } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
@@ -7,7 +7,6 @@ import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { MasterListCard } from '@/components/MasterListCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
-import { useChat } from '../chat-store';
 import { useFavorites } from '../favorites-store';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
@@ -16,8 +15,9 @@ import { tapFeedback } from '../native';
 /**
  * Sevimli ustalar.
  *
- * Har bir qatorda UCHTA amal bor va uchalasi ham haqiqatan ishlaydi:
- * profilni ochish, yozishish va keyingi buyurtmada shu ustani soʻrash.
+ * Har bir qatorda IKKITA amal bor va ikkalasi ham haqiqatan ishlaydi:
+ * profilni ochish va keyingi buyurtmada shu ustani soʻrash. ("Yozish" Chat
+ * boʻlimi bilan birga olib tashlandi.)
  *
  * Bandlik, narx, ish jadvali va masofa YOZILMAYDI: `Master` tipida bu
  * maydonlar yoʻq va har qanday qiymat oʻylab chiqarilgan boʻlardi.
@@ -26,7 +26,6 @@ export function FavoritesScreen() {
   const navigate = useNavigate();
   const { favorites, toggleFavorite } = useFavorites();
   const { setDraftMaster, draft } = useApp();
-  const { openThread } = useChat();
   const showToast = useToast();
 
   const requestMaster = (masterId: string, name: string) => {
@@ -50,15 +49,15 @@ export function FavoritesScreen() {
             title="Sevimli usta yoʻq"
             description="Usta profilidagi yurak belgisi uni shu roʻyxatga qoʻshadi"
             action={{
-              label: 'Ustalarni koʻrish',
+              label: 'Bosh sahifaga',
               variant: 'secondary',
-              onClick: () => navigate('/app/masters'),
+              onClick: () => navigate('/app/home'),
             }}
           />
           {/* Uzun tushuntirish `description` da emas: u ikki satrdan keyin kesiladi. */}
           <Banner variant="info" icon={Info} className="mt-20">
-            Sevimli roʻyxat ustani keyin qidirib oʻtirmaslik uchun. Roʻyxatdan ustani ochasiz,
-            unga yozasiz yoki keyingi buyurtmada aynan uni soʻraysiz.
+            Sevimli roʻyxat ustani keyin qidirib oʻtirmaslik uchun. Usta profili bosh
+            sahifadagi qatordan yoki tavsiya kartasidan ochiladi.
           </Banner>
         </>
       ) : (
@@ -89,15 +88,7 @@ export function FavoritesScreen() {
                     className="flex-1"
                     onClick={() => requestMaster(master.id, master.fullName)}
                   >
-                    Chaqirish
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    leadingIcon={ChatCircleDots}
-                    className="flex-1"
-                    onClick={() => navigate(`/app/chat/${openThread(master.id, 'Savol-javob')}`)}
-                  >
-                    Yozish
+                    Buyurtma berish
                   </Button>
                   <button
                     type="button"

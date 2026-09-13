@@ -11,6 +11,5 @@ export const TAB_ROUTES: Record<TabKey, string> = {
   home: '/app/home',
   wallet: '/app/wallet',
   orders: '/app/orders',
-  chat: '/app/chat',
   profile: '/app/profile',
 };

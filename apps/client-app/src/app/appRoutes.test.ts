@@ -29,7 +29,6 @@ describe('PROTECTED_ROUTES', () => {
     // oʻzi hal qiladi, lekin jadval odam uchun hujjat va tartib saqlanadi.
     const paths = PROTECTED_ROUTES.map((route) => route.path);
     const pairs: [string, string][] = [
-      ['chat/ai', 'chat/:threadId'],
       ['addresses/new', 'addresses/:addressId'],
       ['disputes', 'disputes/:disputeId'],
     ];

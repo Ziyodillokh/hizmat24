@@ -14,7 +14,6 @@ export const ROOT_ROUTES = new Set([
   '/app/home',
   '/app/wallet',
   '/app/orders',
-  '/app/chat',
   '/app/notifications',
   '/app/profile',
 ]);

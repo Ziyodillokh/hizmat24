@@ -163,8 +163,8 @@ export function GuaranteeScreen() {
           </div>
         </div>
         <p className="mt-12 border-t border-border pt-12 text-body-sm text-text-secondary">
-          {supportStatusLine(now)}. Ilova ichida operator chati yoʻq; ustaga yozilgan xabar ham
-          unga yetib bormaydi.
+          {supportStatusLine(now)}. Ilova ichida operator chati yoʻq — AI yordamchi ham
+          murojaatni qabul qilmaydi, u faqat tayyor javob beradi.
         </p>
       </div>
 

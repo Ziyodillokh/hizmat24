@@ -83,35 +83,7 @@ export const EMPTY_DRAFT: OrderDraft = {
   paymentMethod: null,
 };
 
-/**
- * Chat — ish vaqtidagi shakl.
- *
- * Mockʼda vaqt "necha daqiqa oldin" sifatida saqlanadi (`src/mocks/chats.ts`),
- * bu yerda esa allaqachon ANIQ sana: ekran vaqtni formatlaydi va har renderda
- * qayta hisoblanadigan nisbiy qiymat xabarlarni sekin "surib" yuborardi.
- */
-export interface LiveChatMessage {
-  id: string;
-  from: 'client' | 'master';
-  text: string;
-  sentAt: Date;
-}
-
-export interface LiveChatThread {
-  id: string;
-  masterId: string;
-  orderTitle: string;
-  messages: LiveChatMessage[];
-  unreadCount: number;
-  /**
-   * Suhbat ochilgan vaqt. Xabar yozilmagan yangi suhbat roʻyxatning eng
-   * tepasida turishi kerak — bu foydalanuvchining eng oxirgi harakati —
-   * lekin uning saralanadigan xabari yoʻq.
-   */
-  startedAt: Date;
-}
-
-/** AI yordamchi xabari — suhbatdoshi usta emas, shuning uchun alohida tip. */
+/** AI yordamchi xabari — javoblar mock; suhbat qurilmaga yozilmaydi. */
 export interface AiMessage {
   id: string;
   from: 'client' | 'assistant';

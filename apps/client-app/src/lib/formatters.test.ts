@@ -3,7 +3,6 @@ import {
   EMPTY_VALUE,
   formatApproxDuration,
   formatApproxPrice,
-  formatChatTime,
   formatDateTime,
   formatDayLabel,
   formatMonth,
@@ -170,24 +169,6 @@ describe('formatDayLabel (chat kun ajratkichi)', () => {
 
   it('boshqa yildagi sanada yil yoziladi', () => {
     expect(formatDayLabel(new Date(2025, 11, 31, 10, 0), NOW)).toBe('2025-yil 31-dekabr');
-  });
-});
-
-describe('formatChatTime (suhbatlar roʻyxati)', () => {
-  it('bugungi xabar uchun soat koʻrsatadi', () => {
-    expect(formatChatTime(new Date(2026, 8, 5, 9, 5), NOW)).toBe('09:05');
-  });
-
-  it('kechagi xabar uchun "Kecha"', () => {
-    expect(formatChatTime(new Date(2026, 8, 4, 9, 5), NOW)).toBe('Kecha');
-  });
-
-  it('shu yildagi eski xabar uchun kun.oy', () => {
-    expect(formatChatTime(new Date(2026, 8, 1, 9, 5), NOW)).toBe('01.09');
-  });
-
-  it('boshqa yildagi xabar uchun toʻliq sana', () => {
-    expect(formatChatTime(new Date(2025, 11, 31, 9, 5), NOW)).toBe('31.12.2025');
   });
 });
 

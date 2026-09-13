@@ -1,4 +1,4 @@
-import { ChatCircleDots, Heart, Phone, ShieldCheck } from '@phosphor-icons/react';
+import { Heart, Phone, ShieldCheck, Wrench } from '@phosphor-icons/react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
@@ -10,7 +10,6 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { isMasterPhoneVisible } from '@/lib/orderStateMachine';
 import { MASTERS } from '@/mocks/masters';
-import { useChat } from '../chat-store';
 import { useFavorites } from '../favorites-store';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
@@ -25,18 +24,29 @@ import { tapFeedback } from '../native';
 export function MasterProfile() {
   const navigate = useNavigate();
   const { masterId } = useParams<{ masterId: string }>();
-  const { activeOrder } = useApp();
-  const { openThread } = useChat();
+  const { activeOrder, setDraftMaster } = useApp();
   const { isFavorite, toggleFavorite } = useFavorites();
   const showToast = useToast();
 
   const master = Object.values(MASTERS).find((item) => item.id === masterId);
   if (!master) return <Navigate to="/app/home" replace />;
 
+  /*
+   * Raqam FAQAT shu ustaga tegishli aktiv buyurtma paytida ochiq. Ilgari
+   * shart ustani tekshirmasdi: istalgan buyurtma yoʻlda boʻlsa, boshqa
+   * ustaning profili ham uning raqamini koʻrsatardi.
+   */
   const canCall =
     activeOrder !== null &&
+    activeOrder.master?.id === master.id &&
     isMasterPhoneVisible(activeOrder.status) &&
     Boolean(master.phoneNumber);
+
+  const order = () => {
+    setDraftMaster(master.id);
+    showToast(`${master.fullName} tanlandi`, 'success');
+    navigate('/app/services');
+  };
 
   return (
     <ScreenShell
@@ -45,47 +55,26 @@ export function MasterProfile() {
         <StickyFooter>
           <div className="flex flex-col gap-12">
             {/*
-              Yozish HAR DOIM ochiq, qoʻngʻiroq esa faqat buyurtma aktiv
-              paytda: usta raqami ish tugagach yopiladi. Ilgari bu holatda
-              ekranda faqat "qoʻllab-quvvatlashga yozing" degan matn qolardi.
+              "Yozish" Chat boʻlimi bilan birga olib tashlandi. Aktiv buyurtma
+              paytida — qoʻngʻiroq; aks holda — shu ustaga buyurtma berish
+              (tanlov buyurtmaga yoziladi, 6-bosqich).
             */}
-            <div className="flex gap-12">
-              {canCall && (
-                <a
-                  href={`tel:${master.phoneNumber}`}
-                  className="flex h-[52px] flex-1 items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
-                >
-                  <Icon icon={Phone} size={20} weight="fill" />
-                  Qoʻngʻiroq
-                </a>
-              )}
-              <Button
-                variant={canCall ? 'secondary' : 'primary'}
-                leadingIcon={ChatCircleDots}
-                className="flex-1"
-                onClick={() =>
-                  navigate(
-                    `/app/chat/${openThread(
-                      master.id,
-                      activeOrder?.master?.id === master.id
-                        ? activeOrder.categoryName
-                        : 'Savol-javob',
-                    )}`,
-                  )
-                }
+            {canCall ? (
+              <a
+                href={`tel:${master.phoneNumber}`}
+                className="flex h-[52px] w-full items-center justify-center gap-8 rounded-md bg-primary px-16 text-button text-on-primary shadow-primary-lift"
               >
-                Yozish
-              </Button>
-            </div>
-
-            {!canCall && (
+                <Icon icon={Phone} size={20} weight="fill" />
+                Qoʻngʻiroq
+              </a>
+            ) : (
               <>
-                <p className="text-center text-body-sm text-text-secondary">
-                  Ish yakunlangan — usta raqami yopiq
-                </p>
-                <Button variant="ghost" onClick={() => navigate('/app/support')}>
-                  Qoʻllab-quvvatlashga murojaat
+                <Button variant="primary" leadingIcon={Wrench} onClick={order}>
+                  Buyurtma berish
                 </Button>
+                <p className="text-center text-caption text-text-secondary">
+                  Usta raqami faqat aktiv buyurtma paytida ochiladi.
+                </p>
               </>
             )}
           </div>
@@ -108,8 +97,7 @@ export function MasterProfile() {
       {/*
         Sevimli belgisi. Spetsifikatsiyaning 14.1.5-bandi bu tugmani
         taqiqlagan edi, chunki oʻsha paytda uning ortida hech narsa yoʻq edi.
-        Endi bor: roʻyxatdagi ustaga yozish ham, keyingi buyurtmada aynan
-        uni soʻrash ham ishlaydi.
+        Endi bor: keyingi buyurtmada aynan shu ustani soʻrash ishlaydi.
       */}
       <button
         type="button"

@@ -1,8 +1,9 @@
-import { Storefront, UsersThree } from '@phosphor-icons/react';
+import { Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
+import { Icon } from '@/components/Icon';
 import { MasterSuggestionCard } from '@/components/MasterSuggestionCard';
 import { PremiumMastersRail } from '@/components/PremiumMastersRail';
 import { ServiceGroupTile } from '@/components/ServiceGroupTile';
@@ -21,17 +22,14 @@ import { useToast } from '../ToastHost';
 import type { LiveOrder } from '../types';
 
 /**
- * Panjarada 4x2 = 8 oʻrin bor va uchtasi navigatsiyaga ketadi (Market,
- * Ustalar, Barchasi). Qolgan beshtasi eng katta xizmat guruhlariga beriladi;
- * tushib qolgan ikkitasi ("Boʻyoqchilik", "Tozalash" — har birida bittadan
- * xizmat) "Barchasi" orqali bitta bosishda topiladi.
+ * Panjarada 4x2 = 8 oʻrin bor: yettita xizmat guruhi va "Barchasi".
  *
- * Nega aynan panjara: Market va Mutaxassislar tab bardan chiqdi va ularga
- * bosh sahifadan yoʻl kerak, lekin sahifa toʻrtta oʻlchamda SCROLLSIZ
- * sigʻishi shart. 390x844 da zaxira ~23px — yangi qator qoʻshib boʻlmaydi,
- * shuning uchun mavjud panjaradagi ikkita oʻrin almashtirildi (+0px).
+ * Ilgari ikkita oʻrin Market va Ustalar boʻlimlariga ketardi — ikkalasi ham
+ * 2026-09-13 da butunlay olib tashlandi (egasining qarori), shuning uchun
+ * endi HAMMA guruh bitta bosishda ochiladi va "Barchasi" faqat toʻliq
+ * roʻyxat (qidiruv bilan) uchun qoladi.
  */
-const VISIBLE_GROUPS = 5;
+const VISIBLE_GROUPS = 7;
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
@@ -111,7 +109,13 @@ export function HomeTab() {
         </div>
       </div>
 
-      <main data-app-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-20">
+      {/*
+        Oʻram `relative`: suzuvchi AI tugmasi scroll konteynerining USTIDA
+        turadi va u bilan surilmaydi. Pastki chekkasi tab bar boshlanadigan
+        joy — tugma tab bar ustiga chiqmaydi.
+      */}
+      <div className="relative min-h-0 flex-1">
+      <main data-app-scroll className="h-full overflow-y-auto overscroll-contain px-20">
         {activeOrder && (
           <section className="pt-16">
             <h2 className="text-h3 text-text-primary">Aktiv buyurtmangiz</h2>
@@ -137,10 +141,10 @@ export function HomeTab() {
           </section>
         )}
 
-        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-12">
+        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-8">
           Mashhur xizmatlar
         </h2>
-        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12 [@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:gap-y-8">
+        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12 [@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:gap-y-4">
           {groups.map((group) => (
             <ServiceGroupTile
               key={group.id}
@@ -151,23 +155,7 @@ export function HomeTab() {
               onClick={() => navigate(`/app/groups/${group.id}`)}
             />
           ))}
-          {/*
-            Market — yashil doʻkon (referens maket): u ham "boʻlim", lekin
-            oʻz mahsuloti bor va oʻz rangiga loyiq. "Ustalar" va "Barchasi"
-            esa neytral: ular xizmat turi emas, roʻyxatga oʻtish yoʻli.
-          */}
-          <ServiceGroupTile
-            label="Market"
-            icon={Storefront}
-            iconTone={serviceIconTone('market')}
-            onClick={() => navigate('/app/market')}
-          />
-          <ServiceGroupTile
-            label="Ustalar"
-            icon={UsersThree}
-            tone="neutral"
-            onClick={() => navigate('/app/masters')}
-          />
+          {/* "Barchasi" neytral: u xizmat turi emas, roʻyxatga oʻtish yoʻli. */}
           <ServiceGroupTile
             label="Barchasi"
             icon={MORE_ICON}
@@ -177,10 +165,10 @@ export function HomeTab() {
           />
         </div>
 
-        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-12">
+        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-8">
           Sizga tavsiya etiladiganlar
         </h2>
-        <ul className="mt-8 grid grid-cols-2 items-stretch gap-12">
+        <ul className="mt-8 grid grid-cols-2 items-stretch gap-12 [@media(max-height:800px)]:mt-4">
           {SUGGESTED_MASTERS.map((master) => (
             <li key={master.id} className="min-w-0">
               <MasterSuggestionCard
@@ -206,6 +194,23 @@ export function HomeTab() {
         </ul>
 
       </main>
+
+      {/*
+        AI yordamchi — bosh sahifaning pastki oʻng burchagidagi suzuvchi
+        tugma (egasining talabi). Chat boʻlimi olib tashlangach AI faqat shu
+        yerdan ochiladi. Kontent ostida qolmasligi uchun sahifa ixcham
+        rejimda 64px zaxira qoldiradi (yuqoridagi `max-height:800px`
+        qoidalari) — 360×730 da ham tugma kartaning ustiga tushmaydi.
+      */}
+      <button
+        type="button"
+        onClick={() => navigate('/app/ai')}
+        aria-label="AI yordamchi"
+        className="hero-field absolute bottom-12 right-20 flex h-[52px] w-[52px] [@media(max-height:800px)]:bottom-8 items-center justify-center rounded-full text-on-primary-deep shadow-e3 transition-transform duration-press ease-emphasized active:scale-[0.94]"
+      >
+        <Icon icon={Sparkle} size={24} weight="fill" />
+      </button>
+      </div>
 
       <AppTabBar active="home" />
       <BottomInset />

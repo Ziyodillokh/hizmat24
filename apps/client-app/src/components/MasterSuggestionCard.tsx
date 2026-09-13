@@ -73,6 +73,7 @@ export function MasterSuggestionCard({
         onClick={onAction}
         className={cn(
           'mt-12 flex min-h-[44px] w-full items-center justify-center rounded-md px-8',
+          '[@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:min-h-[40px]',
           'bg-primary text-button-sm text-on-primary shadow-primary-lift',
           'transition-[transform,background-color,box-shadow] duration-press ease-emphasized',
           'active:scale-[0.97] active:bg-primary-pressed active:text-on-primary-deep active:shadow-e1',

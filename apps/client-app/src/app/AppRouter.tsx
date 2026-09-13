@@ -11,7 +11,7 @@ import { OtpScreen } from './screens/OtpScreen';
 import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
-import { ChatProvider } from './chat-store';
+import { AiProvider } from './ai-store';
 import { DisputeProvider } from './dispute-store';
 import { AddressProvider } from './address-store';
 import { FavoritesProvider } from './favorites-store';
@@ -86,7 +86,7 @@ export function AppRouter() {
   return (
     <ThemeProvider>
       <AppProvider>
-        <ChatProvider>
+        <AiProvider>
           <DisputeProvider>
             <AddressProvider>
               <FavoritesProvider>
@@ -96,7 +96,7 @@ export function AppRouter() {
               </FavoritesProvider>
             </AddressProvider>
           </DisputeProvider>
-        </ChatProvider>
+        </AiProvider>
       </AppProvider>
     </ThemeProvider>
   );

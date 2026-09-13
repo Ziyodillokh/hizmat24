@@ -123,10 +123,9 @@ export function MasterEnRouteScreen() {
       <Card className="mt-16 flex flex-col gap-8">
         <p className="text-h3 text-text-primary">Usta kechiksa</p>
         <p className="text-body-sm text-text-secondary">
-          Avval ustaga yozing yoki qoʻngʻiroq qiling — koʻpincha sabab yoʻldagi
-          tirbandlik boʻladi. Manzilda xato boʻlsa ham xabarni shu yerdan yuboring.
-          Javob boʻlmasa buyurtmani bekor qilishingiz mumkin: hozircha hech qanday pul
-          yechilmagan.
+          Avval ustaga qoʻngʻiroq qiling — koʻpincha sabab yoʻldagi tirbandlik boʻladi.
+          Manzilda xato boʻlsa ham telefonda ayting. Javob boʻlmasa buyurtmani bekor
+          qilishingiz mumkin: hozircha hech qanday pul yechilmagan.
         </p>
       </Card>
 

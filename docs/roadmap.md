@@ -35,19 +35,27 @@ ma'lumot `src/mocks` dan keladi.
 
 ## 2. Navigatsiya tuzilmasi
 
-Tab bar demodagi kabi **5 ta bo'lim** bo'ladi:
+Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
 
 | Tab | Ichida nima bor |
 |---|---|
-| **Bosh** | Premium ustalar tasmasi, qidiruv, banner, kategoriyalar, tavsiya etilgan ustalar. **Market** va **Mutaxassislar** shu yerdan ochiladi |
+| **Bosh** | Premium ustalar tasmasi, banner, 7 ta xizmat guruhi + "Barchasi", tavsiya etilgan ustalar, pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
 | **Karta** | Shu oyda sarflangan pul, soha va to'lov usuli bo'yicha taqsimot, oxirgi 6 oy, daraja va keshbek |
 | **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
-| **Chat** | Suhbatlar ro'yxati, usta bilan yozishma, AI yordamchi |
-| **Profil** | Manzillar, sevimlilar, rol, sozlamalar, yordam |
+| **Profil** | Shaxsiy ma'lumotlar, manzillar, sevimlilar, rol, usta kabineti, yordam |
 
-**Market va Mutaxassislar tab bardan chiqadi.** Sabab: beshta tabga demo
-bo'limlari sig'ishi kerak, va bu ikkisi asosiy oqim emas — ular Bosh
-sahifadan kiriladi.
+**2026-09-13 da OLIB TASHLANDI (egasining qarori):**
+- **Chat bo'limi** — usta bilan yozishish umuman kerak emas. Chat tab,
+  suhbatlar ro'yxati, yozishma ekrani, chat store va persistensiyasi
+  o'chirildi; "Yozish" tugmalari (usta profili, sevimlilar, buyurtma
+  kuzatuvi) olib tashlandi. Usta bilan aloqa — faqat `tel:`.
+  **AI yordamchi qoldi** (`/app/ai`), o'z kichik provideri bilan; bosh
+  sahifadagi suzuvchi tugmadan ochiladi. AI keyinroq ulanadi.
+- **Ustalar katalogi** (`/app/masters`) — o'chirildi. Usta profili
+  (`/app/master/:id`) qoldi: u tasma, tavsiya kartasi va sevimlilardan
+  ochiladi.
+- **Market** — to'liq: ekranlar, kartalar, mock do'kon va mahsulotlar,
+  16 ta rasm.
 
 ---
 
@@ -57,7 +65,7 @@ Har bosqichda kamida uchta yangi sahifa. Tegishli eski sahifalar shu
 bosqichning o'zida yangilanadi — alohida "tuzatish" bosqichi qilinmadi,
 chunki kontekst yo'qoladi.
 
-### 1-bosqich — Chat ✅ bajarildi
+### 1-bosqich — Chat ✅ bajarildi → ❌ 2026-09-13 da olib tashlandi (AI yordamchi qoldi)
 
 | Sahifa | Marshrut |
 |---|---|

@@ -45,7 +45,7 @@ export const COLOR_TOKENS = [
   'illus-hi-vis',
   // Kategoriya aksentlari — bosh sahifadagi doiralar ichidagi ikona rangi.
   // Referens maketda har bir soha oʻz rangida: elektr koʻk, suv havorang,
-  // gaz toʻq sariq, texnika binafsha, duradgorlik jigarrang, market yashil.
+  // gaz toʻq sariq, texnika binafsha, duradgorlik jigarrang, tozalash yashil.
   // Bitta brend rangi bilan chizilsa sakkizta doira bir xil boʻlib, koʻz
   // kerakli sohani ikonaning SHAKLIGA qarab qidirardi.
   'accent-electric',
@@ -53,7 +53,7 @@ export const COLOR_TOKENS = [
   'accent-fire',
   'accent-tech',
   'accent-wood',
-  'accent-shop',
+  'accent-fresh',
   'shadow',
   'overlay',
   'canvas',
@@ -113,7 +113,7 @@ export const DARK: Palette = {
   'accent-fire': '#FB8A3C',
   'accent-tech': '#A78BFA',
   'accent-wood': '#C98A5A',
-  'accent-shop': '#4ADE80',
+  'accent-fresh': '#4ADE80',
   // 3.3-band — frameʼlardan tashqaridagi fon.
   canvas: '#6E8DAA',
 };
@@ -181,7 +181,7 @@ export const LIGHT: Palette = {
   'accent-fire': '#E86A0C',
   'accent-tech': '#7C3AED',
   'accent-wood': '#9A5A2E',
-  'accent-shop': '#1A9A4F',
+  'accent-fresh': '#1A9A4F',
   canvas: '#E3EEF9',
 };
 

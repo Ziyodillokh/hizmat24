@@ -10,7 +10,7 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { formatTime } from '@/lib/formatters';
 import { AI_TOPICS } from '@/mocks/aiAssistant';
-import { useChat } from '../chat-store';
+import { useAi } from '../ai-store';
 
 /**
  * AI yordamchi.
@@ -22,7 +22,7 @@ import { useChat } from '../chat-store';
  */
 export function AiAssistantScreen() {
   const navigate = useNavigate();
-  const { aiMessages, isAiTyping, askAi } = useChat();
+  const { messages: aiMessages, isTyping: isAiTyping, ask: askAi } = useAi();
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +44,7 @@ export function AiAssistantScreen() {
         <Header
           variant="inner"
           title="AI yordamchi"
-          onBack={() => navigate('/app/chat')}
+          onBack={() => navigate('/app/home')}
           action={
             <span
               className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-primary-surface text-primary-pressed"
