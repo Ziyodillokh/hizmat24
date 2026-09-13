@@ -1,6 +1,5 @@
-import { Armchair, CookingPot, Door, Drop, Fan, Fire, Hammer, Lightbulb, Lightning, PaintBrush, PaintRoller, Plug, Plugs, Shower, SprayBottle, SquaresFour, Thermometer, ThermometerHot, ToggleLeft, Toilet, WashingMachine, Waves, Wrench } from '@phosphor-icons/react';
+import { Armchair, CookingPot, Door, Drop, Fan, Fire, Hammer, Lightbulb, Lightning, PaintBrush, PaintRoller, Pipe, PipeWrench, Plug, Plugs, SprayBottle, SquaresFour, Thermometer, ThermometerHot, ToggleLeft, Toilet, WashingMachine, Waves, Wrench } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
-import type { IconSize } from '@/components/Icon';
 
 /**
  * Server `iconKey` kalitini yuboradi, rasm URL emas (1-boʻlim, 16-qoida).
@@ -30,10 +29,16 @@ const ICONS: Record<string, IconGlyph> = {
   lamp: Lightbulb,
   breaker: ToggleLeft,
   rewire: Plugs,
-  tap: Shower,
+  // Santexnika: "Rakovina va smesitel" ostida dush boshi notoʻgʻri edi;
+  // Phosphorʼda Faucet glifi yoʻq, shuning uchun tomchi. Guruh kaliti
+  // `plumber` ham Drop — ikkalasi hech qachon bitta panjarada turmaydi.
+  tap: Drop,
   toilet: Toilet,
   drain: Waves,
   heating: Thermometer,
+  'plumbing-repair': PipeWrench,
+  'water-heater': ThermometerHot,
+  pipes: Pipe,
   stove: CookingPot,
   boiler: ThermometerHot,
   washer: WashingMachine,
@@ -46,46 +51,6 @@ const ICONS: Record<string, IconGlyph> = {
 
 /** Nomaʼlum kalit kelsa ham layout buzilmasin — neytral zaxira ikona. */
 export const serviceIcon = (iconKey: string): IconGlyph => ICONS[iconKey] ?? Wrench;
-
-/**
- * Optik massani tenglashtirish: ixcham gliflar kattaroq, keng va zich
- * boʻlganlari kichikroq chiziladi — aks holda katakchalar qatorida baʼzilari
- * "ogʻir", baʼzilari "yengil" boʻlib koʻrinadi.
- */
-const ICON_SIZES: Record<string, IconSize> = {
-  electrician: 32,
-  plumber: 32,
-  gas: 32,
-  carpenter: 32,
-  appliance: 28,
-  painter: 28,
-  cleaning: 28,
-  more: 24,
-};
-
-export const serviceIconSize = (iconKey: string): IconSize => ICON_SIZES[iconKey] ?? 28;
-
-/**
- * Guruh ikonasining rangi — kategoriya aksenti (referens maket: har soha oʻz
- * rangida). Klass nomlari TOʻLIQ satr: Tailwind manbani matn sifatida
- * skanerlaydi va boʻlaklardan yigʻilgan nomni koʻrmaydi.
- *
- * Roʻyxatda yoʻq kalit brend rangiga tushadi — yangi guruh rangsiz qolmaydi.
- */
-const ICON_TONES: Record<string, string> = {
-  electrician: 'text-accent-electric',
-  plumber: 'text-accent-water',
-  gas: 'text-accent-fire',
-  appliance: 'text-accent-tech',
-  carpenter: 'text-accent-wood',
-  // Yettita soha, oltita aksent: boʻyoqchilik gaz bilan bir tusda, lekin
-  // ular panjarada yonma-yon turmaydi (1-qator 3-ustun va 2-qator 2-ustun).
-  painter: 'text-accent-fire',
-  cleaning: 'text-accent-fresh',
-};
-
-export const serviceIconTone = (iconKey: string): string =>
-  ICON_TONES[iconKey] ?? 'text-primary-pressed';
 
 /** Gridʼning oxirgi katakchasi — "Barchasi" (06-ekran). */
 export const MORE_ICON = SquaresFour;

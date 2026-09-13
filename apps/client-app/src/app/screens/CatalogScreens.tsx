@@ -8,20 +8,15 @@ import { ServiceCard } from '@/components/ServiceCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { serviceIcon } from '@/lib/serviceIcons';
 import { ALL_CATEGORIES, SERVICE_GROUPS } from '@/mocks/serviceGroups';
-import { useApp } from '../store';
+import { useSelectService } from '../useSelectService';
 
 /** 07a · Guruh xizmatlari. */
 export function GroupServicesTab() {
   const navigate = useNavigate();
   const { groupId } = useParams<{ groupId: string }>();
-  const { setDraftCategory } = useApp();
+  const select = useSelectService();
 
   const group = SERVICE_GROUPS.find((item) => item.id === groupId) ?? SERVICE_GROUPS[0];
-  
-  const select = (categoryId: string) => {
-    setDraftCategory(categoryId);
-    navigate('/app/new/details');
-  };
 
   return (
     <ScreenShell header={<Header variant="inner" title={group.name} onBack={() => navigate(-1)} />}>
@@ -45,7 +40,7 @@ export function GroupServicesTab() {
 /** 07 · Barcha xizmatlar — mahalliy filtr. */
 export function AllServicesTab() {
   const navigate = useNavigate();
-  const { setDraftCategory } = useApp();
+  const select = useSelectService();
   const [query, setQuery] = useState('');
 
   const results = useMemo(() => {
@@ -54,10 +49,6 @@ export function AllServicesTab() {
     return ALL_CATEGORIES.filter((item) => item.name.toLowerCase().includes(needle));
   }, [query]);
 
-  const select = (categoryId: string) => {
-    setDraftCategory(categoryId);
-    navigate('/app/new/details');
-  };
 
   return (
     <ScreenShell

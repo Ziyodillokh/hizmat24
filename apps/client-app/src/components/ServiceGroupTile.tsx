@@ -21,9 +21,10 @@ import { Icon, type IconSize } from './Icon';
  * bilan BIR XIL oq (referens maket): sakkizta doira bitta qatorda bir xil
  * material boʻlishi kerak, farq faqat ikona rangida.
  *
- * Ikona rangi `iconTone` orqali keladi (`serviceIconTone()` — kategoriya
- * aksenti). Klasslar toʻliq satr sifatida uzatiladi — Tailwind manbani MATN
- * sifatida skanerlaydi.
+ * Ikona rangi `iconTone` orqali keladi (sukut — `text-primary-pressed`).
+ * Klasslar toʻliq satr sifatida uzatiladi — Tailwind manbani MATN sifatida
+ * skanerlaydi. Komponent endi faqat preview galereyasida ishlatiladi: bosh
+ * sahifa 2026-09-13 dan `ServiceTile` kartalarini chizadi.
  */
 type TileTone = 'default' | 'neutral';
 
@@ -32,9 +33,9 @@ const NEUTRAL_ICON_CLASSES = 'text-text-secondary';
 export interface ServiceGroupTileProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   tone?: TileTone;
-  /** Ikona rangi klassi — `serviceIconTone()` dan. `neutral` tusda eʼtiborsiz. */
+  /** Ikona rangi klassi (masalan `text-primary-pressed`). `neutral` tusda eʼtiborsiz. */
   iconTone?: string;
-  /** Optik massani tenglashtirish uchun — `serviceIconSize()` dan keladi. */
+  /** Optik massani tenglashtirish uchun — chaqiruvchi beradi, sukut 28. */
   iconSize?: IconSize;
   /**
    * Katakcha yorligʻi — guruh nomi. Nom serverdan keladi, UI uni

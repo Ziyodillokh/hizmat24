@@ -29,6 +29,7 @@ import { ProblemReportScreen } from './screens/ProblemReport';
 import { DisputeDetailScreen } from './screens/DisputeDetail';
 import { DisputeListScreen } from './screens/DisputeList';
 import { GuaranteeScreen } from './screens/Guarantee';
+import { ReviewsScreen } from './screens/Reviews';
 import { AddressBookScreen } from './screens/AddressBook';
 import { AddressFormScreen } from './screens/AddressForm';
 import { FavoritesScreen } from './screens/Favorites';
@@ -129,6 +130,7 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'disputes', element: <DisputeListScreen /> },
   { path: 'disputes/:disputeId', element: <DisputeDetailScreen /> },
   { path: 'guarantee', element: <GuaranteeScreen /> },
+  { path: 'reviews', element: <ReviewsScreen /> },
 
   // Usta rejimi (foydalanuvchining oʻzi usta sifatida)
   { path: 'master', element: <MasterHubScreen /> },

@@ -43,17 +43,11 @@ export const COLOR_TOKENS = [
   // Illyustratsiya uchun — ikkala temada bir xil (`on-primary-deep` kabi).
   'illus-shade',
   'illus-hi-vis',
-  // Kategoriya aksentlari — bosh sahifadagi doiralar ichidagi ikona rangi.
-  // Referens maketda har bir soha oʻz rangida: elektr koʻk, suv havorang,
-  // gaz toʻq sariq, texnika binafsha, duradgorlik jigarrang, tozalash yashil.
-  // Bitta brend rangi bilan chizilsa sakkizta doira bir xil boʻlib, koʻz
-  // kerakli sohani ikonaning SHAKLIGA qarab qidirardi.
-  'accent-electric',
+  // Santexnika aksenti — bosh sahifadagi xizmat kartalari ichidagi ikona
+  // rangi (havorang). Ilgari yettita soha uchun oltita aksent bor edi;
+  // bosh sahifa santexnikaga qaratilgach (2026-09-13) qolganlari ishlatilmay
+  // qoldi va olib tashlandi — kerak boʻlganda qaytariladi.
   'accent-water',
-  'accent-fire',
-  'accent-tech',
-  'accent-wood',
-  'accent-fresh',
   'shadow',
   'overlay',
   'canvas',
@@ -108,12 +102,7 @@ export const DARK: Palette = {
   'neutral-surface': '#1B3550',
   'illus-shade': '#0B3F6E',
   'illus-hi-vis': '#F5B942',
-  'accent-electric': '#5AA8F5',
   'accent-water': '#4FB5F0',
-  'accent-fire': '#FB8A3C',
-  'accent-tech': '#A78BFA',
-  'accent-wood': '#C98A5A',
-  'accent-fresh': '#4ADE80',
   // 3.3-band — frameʼlardan tashqaridagi fon.
   canvas: '#6E8DAA',
 };
@@ -175,13 +164,8 @@ export const LIGHT: Palette = {
   'neutral-surface': '#EAF0F7',
   'illus-shade': '#0B3F6E',
   'illus-hi-vis': '#F5B942',
-  // Oq doira ustida grafik uchun 3:1 dan yuqori.
-  'accent-electric': '#2F80D9',
+  // Och koʻk plitka ustida grafik uchun 3:1 dan yuqori.
   'accent-water': '#2A93D5',
-  'accent-fire': '#E86A0C',
-  'accent-tech': '#7C3AED',
-  'accent-wood': '#9A5A2E',
-  'accent-fresh': '#1A9A4F',
   canvas: '#E3EEF9',
 };
 

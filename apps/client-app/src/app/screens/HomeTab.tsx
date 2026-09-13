@@ -1,35 +1,38 @@
-import { Sparkle } from '@phosphor-icons/react';
+import { ArrowRight, Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
-import { MasterSuggestionCard } from '@/components/MasterSuggestionCard';
 import { PremiumMastersRail } from '@/components/PremiumMastersRail';
-import { ServiceGroupTile } from '@/components/ServiceGroupTile';
+import { ReviewCard } from '@/components/ReviewCard';
+import { ServiceTile } from '@/components/ServiceTile';
 import { StatusChip } from '@/components/StatusChip';
 import { StatusBar } from '@/preview/StatusBar';
 import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
-import { MORE_ICON, serviceIcon, serviceIconSize, serviceIconTone } from '@/lib/serviceIcons';
+import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
 import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
-import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
-import { MASTER_LIST, MASTERS } from '@/mocks/masters';
+import { useMinuteClock } from '@/lib/useMinuteClock';
+import { findGroup } from '@/mocks/serviceGroups';
+import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
+import { MASTER_LIST } from '@/mocks/masters';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import { useApp } from '../store';
-import { useToast } from '../ToastHost';
+import { useSelectService } from '../useSelectService';
 import type { LiveOrder } from '../types';
 
 /**
- * Panjarada 4x2 = 8 oʻrin bor: yettita xizmat guruhi va "Barchasi".
- *
- * Ilgari ikkita oʻrin Market va Ustalar boʻlimlariga ketardi — ikkalasi ham
- * 2026-09-13 da butunlay olib tashlandi (egasining qarori), shuning uchun
- * endi HAMMA guruh bitta bosishda ochiladi va "Barchasi" faqat toʻliq
- * roʻyxat (qidiruv bilan) uchun qoladi.
+ * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
+ * 3×2 panjarada guruhning birinchi BESH xizmati + "Barcha xizmatlar".
+ * Qolgan guruhlar (Elektrika, Gaz, …) "Barcha xizmatlar" orqali —
+ * /app/services. "Mashhur" demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki
+ * guruh roʻyxatining boshi.
  */
-const VISIBLE_GROUPS = 7;
+const HOME_GROUP_ID = 'g-plumbing';
+const HOME_SERVICE_COUNT = 5;
+const HOME_SERVICES = (findGroup(HOME_GROUP_ID)?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
@@ -37,8 +40,29 @@ const VISIBLE_GROUPS = 7;
  */
 const PREMIUM_MASTERS = MASTER_LIST.filter((master) => master.isPremium);
 
-/** Tavsiya blokida ikkita usta — referens maketdagi ikki ustunli qator. */
-const SUGGESTED_MASTERS = Object.values(MASTERS).slice(0, 2);
+/**
+ * Boʻlim sarlavhasi + "Barchasini koʻrish" havolasi.
+ *
+ * Sarlavha text-h3 (h2 emas): h2 "Santexnika xizmatlari" 360 da 199px,
+ * yonidagi havola bilan 320px qatorga sigʻmaydi va ikkinchi satrga tushadi.
+ * Havoladagi strelka Icon: "→" belgisi Inter latin-ext da yoʻq. `-my-12
+ * py-12` — havolaga 44px bosish balandligi, qator balandligi oʻzgarmaydi.
+ */
+function SectionTitleRow({ title, onMore }: { title: string; onMore: () => void }) {
+  return (
+    <div className="flex items-center justify-between gap-8 pt-16 [@media(max-height:800px)]:pt-8">
+      <h2 className="min-w-0 truncate text-h3 text-text-primary">{title}</h2>
+      <button
+        type="button"
+        onClick={onMore}
+        className="-my-12 -mr-8 inline-flex shrink-0 items-center gap-4 whitespace-nowrap py-12 pr-8 text-body-sm font-semibold text-primary active:opacity-70"
+      >
+        Barchasini koʻrish
+        <Icon icon={ArrowRight} size={14} weight="bold" aria-hidden />
+      </button>
+    </div>
+  );
+}
 
 /** Aktiv buyurtma kartasidagi ikkinchi qator — holatga qarab. */
 function secondaryLine(order: LiveOrder): string | null {
@@ -61,10 +85,9 @@ function secondaryLine(order: LiveOrder): string | null {
 
 export function HomeTab() {
   const navigate = useNavigate();
-  const { activeOrder, fullName, phoneNumber, unreadCount, setDraftMaster } = useApp();
-  const showToast = useToast();
-
-  const groups = SERVICE_GROUPS.slice(0, VISIBLE_GROUPS);
+  const { activeOrder, fullName, phoneNumber, unreadCount } = useApp();
+  const now = useMinuteClock();
+  const selectService = useSelectService();
 
   return (
     <div className="flex h-full flex-col bg-surface">
@@ -141,66 +164,70 @@ export function HomeTab() {
           </section>
         )}
 
-        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-8">
-          Mashhur xizmatlar
-        </h2>
-        <div className="mt-12 grid grid-cols-4 gap-8 gap-y-12 [@media(max-height:800px)]:mt-8 [@media(max-height:800px)]:gap-y-4">
-          {groups.map((group) => (
-            <ServiceGroupTile
-              key={group.id}
-              label={group.name}
-              icon={serviceIcon(group.iconKey)}
-              iconSize={serviceIconSize(group.iconKey)}
-              iconTone={serviceIconTone(group.iconKey)}
-              onClick={() => navigate(`/app/groups/${group.id}`)}
+        <SectionTitleRow
+          title="Santexnika xizmatlari"
+          onMore={() => navigate(`/app/groups/${HOME_GROUP_ID}`)}
+        />
+        <div className="mt-12 grid grid-cols-3 gap-8 [@media(max-height:800px)]:mt-8">
+          {HOME_SERVICES.map((category) => (
+            <ServiceTile
+              key={category.id}
+              label={category.name}
+              icon={serviceIcon(category.iconKey ?? 'plumber')}
+              onClick={() => selectService(category.id)}
             />
           ))}
-          {/* "Barchasi" neytral: u xizmat turi emas, roʻyxatga oʻtish yoʻli. */}
-          <ServiceGroupTile
-            label="Barchasi"
+          {/* Neytral: xizmat emas, toʻliq katalogga (barcha guruhlar) yoʻl. */}
+          <ServiceTile
+            label="Barcha xizmatlar"
             icon={MORE_ICON}
-            iconSize={serviceIconSize('more')}
             tone="neutral"
             onClick={() => navigate('/app/services')}
           />
         </div>
 
-        <h2 className="pt-16 text-h2 text-text-primary [@media(max-height:800px)]:pt-8">
-          Sizga tavsiya etiladiganlar
-        </h2>
-        <ul className="mt-8 grid grid-cols-2 items-stretch gap-12 [@media(max-height:800px)]:mt-4">
-          {SUGGESTED_MASTERS.map((master) => (
-            <li key={master.id} className="min-w-0">
-              <MasterSuggestionCard
-                name={master.fullName}
-                profession={master.profession}
-                rating={master.ratingAvg}
-                photoUrl={master.photoUrl}
-                /*
-                  "Buyurtma berish" endi HALOL: tanlov buyurtmaga yoziladi va
-                  aynan shu usta tayinlanadi. 6-bosqichgacha bu yorliq
-                  yolgʻon edi — oqim oxirida boshqa odam tayinlanardi.
-                */
-                actionLabel="Buyurtma berish"
-                onAction={() => {
-                  setDraftMaster(master.id);
-                  showToast(`${master.fullName} tanlandi`, 'success');
-                  navigate('/app/services');
-                }}
-                onOpen={() => navigate(`/app/master/${master.id}`)}
+        <SectionTitleRow title="Mijozlarimiz fikrlari" onMore={() => navigate('/app/reviews')} />
+        {/*
+          Halollik belgisi BIRINCHI ekranda, iqtiboslardan OLDIN: serverda
+          sharhlar yoʻq, quyidagi kartalar namuna. Sarlavha qatoriga sigʻmaydi
+          (h3 + havola + chip > 320px), shuning uchun alohida 20px qator.
+          Oʻram `flex` — inline-flex span toʻgʻridan-toʻgʻri <main> ichida
+          satr qutisi bilan balandroq boʻlardi. `span`, `button` EMAS.
+        */}
+        <div className="mt-4 flex">
+          <span className="inline-flex h-[20px] items-center rounded-full border border-dashed border-border-strong px-8 text-caption text-text-secondary">
+            Demo · namuna fikrlar
+          </span>
+        </div>
+        {/*
+          Gorizontal tasma — PremiumMastersRail naqshi (-mx-20). Oʻng padding
+          80px: AI tugmasi oʻngdagi 20+52=72px ni egallaydi; 80px oxirgi karta
+          tugmadan 8px chiqib scroll qilishiga imkon beradi. pb — e1 soyasi
+          overflow qutisida kesilmasin.
+        */}
+        <ul className="-mx-20 mt-8 flex gap-8 overflow-x-auto pb-8 pl-20 pr-[80px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [@media(max-height:800px)]:pb-4">
+          {SAMPLE_REVIEWS.map((review) => (
+            <li key={review.id} className="w-[248px] shrink-0">
+              <ReviewCard
+                customerName={review.customerName}
+                stars={review.stars}
+                comment={review.comment}
+                likeCount={review.likeCount}
+                createdAt={reviewDate(review, now)}
+                now={now}
               />
             </li>
           ))}
         </ul>
-
       </main>
 
       {/*
-        AI yordamchi — bosh sahifaning pastki oʻng burchagidagi suzuvchi
-        tugma (egasining talabi). Chat boʻlimi olib tashlangach AI faqat shu
-        yerdan ochiladi. Kontent ostida qolmasligi uchun sahifa ixcham
-        rejimda 64px zaxira qoldiradi (yuqoridagi `max-height:800px`
-        qoidalari) — 360×730 da ham tugma kartaning ustiga tushmaydi.
+        AI yordamchi — pastki oʻng burchakdagi suzuvchi tugma (egasining
+        talabi). Ostidagi statik kontent (sarlavhalar, panjara, Demo belgisi)
+        har bir telefonda tugmadan yuqorida tugaydi. Tugma ostiga faqat
+        gorizontal sharhlar tasmasining IKKINCHI kartasining burchagi tushadi:
+        birinchi karta 248px — tugma boshlanadigan 268px dan chapda; tasmada
+        pr-[80px] bor, shuning uchun har bir karta tugmadan chiqib oʻqiladi.
       */}
       <button
         type="button"

@@ -57,7 +57,7 @@ export function FavoritesScreen() {
           {/* Uzun tushuntirish `description` da emas: u ikki satrdan keyin kesiladi. */}
           <Banner variant="info" icon={Info} className="mt-20">
             Sevimli roʻyxat ustani keyin qidirib oʻtirmaslik uchun. Usta profili bosh
-            sahifadagi qatordan yoki tavsiya kartasidan ochiladi.
+            sahifadagi premium ustalar qatoridan ochiladi.
           </Banner>
         </>
       ) : (

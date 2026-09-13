@@ -39,10 +39,24 @@ Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
 
 | Tab | Ichida nima bor |
 |---|---|
-| **Bosh** | Premium ustalar tasmasi, banner, 7 ta xizmat guruhi + "Barchasi", tavsiya etilgan ustalar, pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
+| **Bosh** | Premium ustalar tasmasi, banner, **"Santexnika xizmatlari"** (3×2: guruhning birinchi 5 xizmati + "Barcha xizmatlar"), **"Mijozlarimiz fikrlari"** (gorizontal sharh kartalari — NAMUNA, "Demo · namuna fikrlar" belgisi bilan, "Barchasini ko'rish" → `/app/reviews`), pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
 | **Karta** | Shu oyda sarflangan pul, soha va to'lov usuli bo'yicha taqsimot, oxirgi 6 oy, daraja va keshbek |
 | **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
 | **Profil** | Shaxsiy ma'lumotlar, manzillar, sevimlilar, rol, usta kabineti, yordam |
+
+**Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan** (egasining maketi).
+Santexnika guruhi 7 xizmatga kengaydi: Santexnika ta'miri, Suv isitgich
+xizmatlari, Unitaz va kanalizatsiya, Rakovina va smesitel, Quvurlarni
+o'rnatish (birinchi beshtasi bosh sahifada), Kanalizatsiya tozalash,
+Isitish tizimini ulash. Eski ID lar saqlangan (hamyon seedlari). Xizmat
+rasmlari yo'q — kartalarda hozircha soha ikonasi; `ServiceTile.imageUrl`
+berilsa rasm chiziladi.
+
+**"Mijozlarimiz fikrlari" — NAMUNA.** Serverda mijozlar sharhlari modeli
+yo'q; `src/mocks/reviews.ts` dagi ismlar va matnlar to'qima va bosh
+sahifada ham, `/app/reviews` da ham shunday deb belgilangan. `/app/reviews`
+avval foydalanuvchining o'z baholarini (yagona haqiqiy ma'lumot), keyin
+namunalarni ko'rsatadi.
 
 **2026-09-13 da OLIB TASHLANDI (egasining qarori):**
 - **Chat bo'limi** — usta bilan yozishish umuman kerak emas. Chat tab,
@@ -52,8 +66,8 @@ Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
   **AI yordamchi qoldi** (`/app/ai`), o'z kichik provideri bilan; bosh
   sahifadagi suzuvchi tugmadan ochiladi. AI keyinroq ulanadi.
 - **Ustalar katalogi** (`/app/masters`) — o'chirildi. Usta profili
-  (`/app/master/:id`) qoldi: u tasma, tavsiya kartasi va sevimlilardan
-  ochiladi.
+  (`/app/master/:id`) qoldi: u premium ustalar tasmasi, sevimlilar va
+  buyurtma kuzatuvidan ochiladi.
 - **Market** — to'liq: ekranlar, kartalar, mock do'kon va mahsulotlar,
   16 ta rasm.
 
