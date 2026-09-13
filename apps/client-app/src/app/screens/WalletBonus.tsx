@@ -6,10 +6,12 @@ import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { InfoChip } from '@/components/InfoChip';
 import { SummaryRow } from '@/components/SummaryRow';
+import { DashedChip } from '@/components/DashedChip';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { formatPercent, formatPrice } from '@/lib/formatters';
 import { CASHBACK_BLOCK, CASHBACK_PERCENT, LEVELS, type LevelKey } from '@/lib/wallet';
+import { levelRangeLabel, stampHint } from '@/lib/walletCard';
 import { useWallet } from '../useWallet';
 
 /**
@@ -34,24 +36,11 @@ const LEVEL_TONES: Record<LevelKey, string> = {
   gold: 'bg-warning-surface text-warning',
 };
 
-const LEVEL_RANGES: Record<LevelKey, string> = {
-  bronze: '0–9 ta buyurtma',
-  silver: '10–29 ta buyurtma',
-  gold: '30 ta buyurtmadan boshlab',
-};
-
 export function WalletBonus() {
   const navigate = useNavigate();
   const { level, nextLevel, ordersTotal, ordersToNextLevel, levelPercent, cashback } = useWallet();
 
   const stamps = Array.from({ length: CASHBACK_BLOCK }, (_, index) => index < cashback.filled);
-
-  const stampHint =
-    cashback.filled === 0
-      ? `Blok boshlanmagan · ${CASHBACK_BLOCK} ta buyurtma qoldi`
-      : cashback.remaining === 0
-        ? `${CASHBACK_BLOCK} ta toʻldirildi · blok yakunlandi`
-        : `${cashback.filled} ta toʻldirildi · ${cashback.remaining} ta qoldi`;
 
   return (
     <ScreenShell
@@ -79,7 +68,7 @@ export function WalletBonus() {
           {ordersTotal > 0 ? `${ordersTotal} ta buyurtma yakunlandi` : 'Hali buyurtma yakunlanmagan'}
         </p>
 
-        <span className="mt-12 inline-flex h-[28px] items-center gap-8 rounded-full bg-on-primary/[0.16] px-12 text-badge text-on-primary-deep">
+        <span className="mt-12 inline-flex h-[28px] items-center gap-8 rounded-full bg-on-primary-deep/[0.16] px-12 text-badge text-on-primary-deep">
           {formatPercent(level.discountPercent)} chegirma
         </span>
 
@@ -109,7 +98,7 @@ export function WalletBonus() {
             </p>
           </>
         ) : (
-          <span className="mt-12 ml-8 inline-flex h-[28px] items-center gap-8 rounded-full bg-on-primary/[0.16] px-12 text-badge text-on-primary-deep">
+          <span className="mt-12 inline-flex h-[28px] items-center gap-8 rounded-full bg-on-primary-deep/[0.16] px-12 text-badge text-on-primary-deep">
             Eng yuqori daraja
           </span>
         )}
@@ -152,7 +141,8 @@ export function WalletBonus() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-body-lg text-text-primary">{item.label}</span>
                 <span className="mt-2 block text-caption text-text-secondary">
-                  {LEVEL_RANGES[item.key]}
+                  {/* Diapazon `LEVELS` dan hisoblanadi — chegaralar ikki joyda yashamaydi. */}
+                  {levelRangeLabel(item)}
                 </span>
               </span>
 
@@ -215,7 +205,7 @@ export function WalletBonus() {
             cashback.remaining === 0 ? 'text-success' : 'text-text-secondary',
           )}
         >
-          {stampHint}
+          {stampHint(cashback)}
         </p>
 
         <span className="-mx-16 my-16 block h-px bg-border" aria-hidden />
@@ -232,9 +222,7 @@ export function WalletBonus() {
           Keshbek hisobi toʻlov tizimi ulangach ochiladi — hozircha faqat hisob koʻrsatiladi.
         </p>
         {/* `span`, `button` EMAS: bajaradigan amali yoʻq. */}
-        <span className="mt-12 inline-flex h-[32px] items-center rounded-full border border-dashed border-border-strong px-12 text-caption text-text-secondary">
-          Demo · keshbek hali toʻlovda qoʻllanmaydi
-        </span>
+        <DashedChip className="mt-12">Demo · keshbek hali toʻlovda qoʻllanmaydi</DashedChip>
       </Card>
 
       <Card className="mt-20">

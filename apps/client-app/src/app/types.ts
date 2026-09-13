@@ -112,6 +112,8 @@ export interface WalletTransaction {
   orderId: string | null;
   /** "HZ-104312" — chekdagi bilan bir xil raqam. */
   shortId: string;
+  /** Katalog kaliti — `ServicePhoto` rasmni shu boʻyicha topadi. */
+  categoryId: string;
   categoryName: string;
   /** `serviceIcon()` kaliti — rasm manzili emas. */
   categoryIconKey: string;

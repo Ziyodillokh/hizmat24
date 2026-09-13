@@ -18,6 +18,7 @@ import { buildInvoice } from '@/lib/pricing';
 import { timingLabel } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { CASHBACK_BLOCK, METHOD_LABELS } from '@/lib/wallet';
+import { isMethodAvailable } from '@/lib/walletCard';
 import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useApp } from '../store';
 import { MissingStepGuard } from './order/MissingStepGuard';
@@ -41,6 +42,7 @@ interface MethodOption {
   icon: typeof Money;
   tone: string;
   hint: string;
+  /** `METHOD_AVAILABILITY` dan — "Karta" sahifasi bilan bitta manba. */
   comingSoon: boolean;
 }
 
@@ -49,32 +51,34 @@ interface MethodOption {
  * tanlanadigan qator ikkita oʻlik qatordan keyin tursa, foydalanuvchi ikki
  * marta muvaffaqiyatsiz bosishga majbur boʻlardi.
  *
- * Ikona va tuslar hamyondagi taqsimot qatorlari bilan bir xil: foydalanuvchi
- * bu qatorni keyin tranzaksiyalar tarixida darhol tanib oladi.
+ * Ikona va tuslar "Karta" sahifasidagi `PaymentMethodRow` bilan bir tilda:
+ * usul qaysi ekranda chiqmasin, foydalanuvchi uni bir koʻrinishda taniydi.
  */
-const METHODS: readonly MethodOption[] = [
+const METHOD_SEEDS: readonly Omit<MethodOption, 'comingSoon'>[] = [
   {
     key: 'cash',
     icon: Money,
     tone: 'bg-neutral-surface text-text-secondary',
     hint: 'Ish tugagach ustaga joyida toʻlaysiz',
-    comingSoon: false,
   },
   {
     key: 'escrow',
     icon: ShieldCheck,
     tone: 'bg-success-surface text-success',
     hint: 'Click va Payme ulangach ishga tushadi',
-    comingSoon: true,
   },
   {
     key: 'card',
     icon: CreditCard,
     tone: 'bg-primary-surface text-primary-pressed',
     hint: 'Click va Payme ulangach ishga tushadi',
-    comingSoon: true,
   },
 ];
+
+const METHODS: readonly MethodOption[] = METHOD_SEEDS.map((item) => ({
+  ...item,
+  comingSoon: !isMethodAvailable(item.key),
+}));
 
 export function PaymentStep() {
   const navigate = useNavigate();

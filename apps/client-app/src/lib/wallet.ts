@@ -92,6 +92,7 @@ export function orderToTransaction(order: LiveOrder): WalletTransaction | null {
     id: order.id,
     orderId: order.id,
     shortId: order.shortId,
+    categoryId: order.categoryId,
     categoryName: order.categoryName,
     categoryIconKey: order.categoryIconKey,
     // Nomaʼlum kategoriya tashlab yuborilmaydi: pulni jamidan yoʻqotish

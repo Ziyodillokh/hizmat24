@@ -3,7 +3,7 @@ import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
-import { InfoChip } from '@/components/InfoChip';
+import { DashedChip } from '@/components/DashedChip';
 import { cn } from '@/lib/cn';
 
 /**
@@ -36,7 +36,7 @@ export function ChoiceCard({
   disabledBadge, orientation = 'row', onSelect, tabIndex, className,
 }: ChoiceCardProps) {
   const trailing = disabled
-    ? (disabledBadge ?? <InfoChip tone="neutral">Tez orada</InfoChip>)
+    ? (disabledBadge ?? <DashedChip size="compact">Tez orada</DashedChip>)
     : isSelected
       ? <Icon icon={CheckCircle} size={24} weight="fill" className="text-primary" aria-hidden />
       : <span className="block h-[24px] w-[24px] rounded-full ring-1 ring-inset ring-border-strong" aria-hidden />;

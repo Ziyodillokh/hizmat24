@@ -42,9 +42,13 @@ export function StatusChip({ status, inline = false, className }: StatusChipProp
 
   if (inline) {
     return (
-      <span className={cn('inline-flex items-center gap-4 text-caption', TONE_TEXT[tone], className)}>
+      // Yorliq `truncate`: "Xavfsizlik tekshiruvida" tor qatorda ikki satrga
+      // sinib, nuqta ikki satr orasida qolardi — endi bir satrda qisqaradi.
+      <span
+        className={cn('inline-flex min-w-0 items-center gap-4 whitespace-nowrap text-caption', TONE_TEXT[tone], className)}
+      >
         <span className={cn('h-[6px] w-[6px] shrink-0 rounded-full', classes.dot)} aria-hidden />
-        {label}
+        <span className="min-w-0 truncate">{label}</span>
       </span>
     );
   }

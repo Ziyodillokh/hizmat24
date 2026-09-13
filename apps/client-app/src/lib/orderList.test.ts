@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { LiveOrder } from '@/app/types';
 import type { Master } from '@/mocks/types';
 import {
+  adjacentHistoryFilter,
   countByHistoryFilter,
   EMPTY_CTA_LABELS,
   emptyStateFor,
@@ -25,6 +26,7 @@ import {
   isBlockingConfirmation,
   isTerminal,
   ORDER_STATUS,
+  type HistoryFilter,
   type OrderStatus,
 } from './orderStateMachine';
 
@@ -419,5 +421,34 @@ describe('emptyStateFor', () => {
       expect(copy?.description).toMatch(NO_ASCII_APOSTROPHE);
     }
     for (const label of Object.values(EMPTY_CTA_LABELS)) expect(label).toMatch(NO_ASCII_APOSTROPHE);
+  });
+});
+
+describe('adjacentHistoryFilter', () => {
+  it('chapga surish keyingi filtrga oʻtadi', () => {
+    expect(adjacentHistoryFilter('all', 'left')).toBe('active');
+    expect(adjacentHistoryFilter('active', 'left')).toBe('done');
+    expect(adjacentHistoryFilter('done', 'left')).toBe('cancelled');
+  });
+
+  it('oʻngga surish oldingi filtrga qaytadi', () => {
+    expect(adjacentHistoryFilter('cancelled', 'right')).toBe('done');
+    expect(adjacentHistoryFilter('active', 'right')).toBe('all');
+  });
+
+  it('chekkalarda null — aylanib oʻtmaydi', () => {
+    expect(adjacentHistoryFilter('all', 'right')).toBeNull();
+    expect(adjacentHistoryFilter('cancelled', 'left')).toBeNull();
+  });
+
+  it('har bir filtr uchun ketma-ket surish HISTORY_FILTERS tartibini beradi', () => {
+    const walked = HISTORY_FILTERS.reduce<HistoryFilter[]>(
+      (acc) => {
+        const next = adjacentHistoryFilter(acc[acc.length - 1], 'left');
+        return next ? [...acc, next] : acc;
+      },
+      ['all'],
+    );
+    expect(walked).toEqual(HISTORY_FILTERS);
   });
 });

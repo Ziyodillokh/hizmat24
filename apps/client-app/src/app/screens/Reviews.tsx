@@ -5,6 +5,7 @@ import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { ReviewCard } from '@/components/ReviewCard';
 import { StarRating } from '@/components/StarRating';
+import { DashedChip } from '@/components/DashedChip';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { formatDayLabel } from '@/lib/formatters';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
@@ -78,9 +79,7 @@ export function ReviewsScreen() {
 
       <h2 className="mt-24 text-h3 text-text-primary">Namuna fikrlar</h2>
       {/* `span`, `button` EMAS: bajaradigan amali yoʻq. */}
-      <span className="mt-12 inline-flex h-[32px] items-center rounded-full border border-dashed border-border-strong px-12 text-caption text-text-secondary">
-        Demo · namuna fikrlar
-      </span>
+      <DashedChip className="mt-12">Demo · namuna fikrlar</DashedChip>
       <ul className="mt-12 flex flex-col gap-12">
         {SAMPLE_REVIEWS.map((review) => (
           <li key={review.id}>

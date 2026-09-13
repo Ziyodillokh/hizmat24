@@ -1,149 +1,68 @@
-import { FileMagnifyingGlass, Receipt } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { Receipt } from '@phosphor-icons/react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
-import { Icon } from '@/components/Icon';
-import { SegmentControl } from '@/components/SegmentControl';
+import { DashedChip } from '@/components/DashedChip';
+import { TransactionRow } from '@/components/wallet/TransactionRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
-import {
-  formatDayLabel,
-  formatPrice,
-  formatTime,
-  orderDateGroup,
-  orEmpty,
-  splitFormattedPrice,
-} from '@/lib/formatters';
-import { serviceIcon } from '@/lib/serviceIcons';
+import { formatDayLabel, formatPrice, formatTime, orderDateGroup } from '@/lib/formatters';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { METHOD_LABELS, METHOD_SHORT_LABELS } from '@/lib/wallet';
-import type { PaymentMethod, WalletTransaction } from '../types';
+import { DEMO_HISTORY_LABEL, hasDemoHistory } from '@/lib/walletCard';
+import type { WalletTransaction } from '../types';
 import { useWallet } from '../useWallet';
 
 /**
  * Tranzaksiyalar tarixi.
  *
- * Tuzilma "Buyurtmalar" ekranidan aynan koʻchirilgan: filtr, sana boʻyicha
- * guruhlash, bir xil karta tili. Foydalanuvchi bu ekranni birinchi marta
- * ochganda ham uni allaqachon biladi.
+ * Tuzilma "Buyurtmalar" ekranidan koʻchirilgan: sana boʻyicha guruhlar, har
+ * guruh bitta karta, qatorlar ingichka chiziq bilan (chek). Foydalanuvchi bu
+ * ekranni birinchi marta ochganda ham uni allaqachon biladi.
+ *
+ * Toʻlov usuli boʻyicha filtr YOʻQ: ilova hozircha faqat naqd qabul qiladi,
+ * demo tarix ham naqd — bitta usul boʻlsa filtr hech narsa qilmaydi.
+ * Filtr Click/Payme ulangach, ikkinchi usul paydo boʻlganda qaytadi.
  */
-type TxFilter = 'all' | PaymentMethod;
+interface DateGroup {
+  title: string;
+  items: WalletTransaction[];
+}
 
-const FILTER_ORDER: readonly TxFilter[] = ['all', 'escrow', 'cash', 'card'];
+const GROUP_CARD_CLASSES = cn(
+  'mt-8 overflow-hidden rounded-lg border border-transparent bg-surface-elevated shadow-e1',
+  "[[data-theme='dark']_&]:border-border",
+);
 
-const FILTER_LABELS: Record<TxFilter, string> = {
-  all: 'Barchasi',
-  escrow: METHOD_SHORT_LABELS.escrow,
-  cash: METHOD_SHORT_LABELS.cash,
-  card: METHOD_SHORT_LABELS.card,
-};
-
-/** Plitka TUSI toʻlov usulini, GLIF esa xizmat turini bildiradi. */
-const METHOD_TONES: Record<PaymentMethod, string> = {
-  escrow: 'bg-success-surface text-success',
-  card: 'bg-primary-surface text-primary-pressed',
-  cash: 'bg-neutral-surface text-text-secondary',
-};
-
-function TransactionRow({
-  transaction,
-  timeLabel,
-}: {
-  transaction: WalletTransaction;
-  timeLabel: string;
-}) {
-  const { value, currency } = splitFormattedPrice(transaction.amount);
-
-  return (
-    <div
-      className={cn(
-        'flex items-start gap-12 rounded-lg border border-transparent bg-surface-elevated p-12 shadow-e1',
-        "[[data-theme='dark']_&]:border-border",
-      )}
-    >
-      <span
-        className={cn(
-          'flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm',
-          METHOD_TONES[transaction.method],
-        )}
-        aria-hidden
-      >
-        <Icon icon={serviceIcon(transaction.categoryIconKey)} size={20} weight="duotone" />
-      </span>
-
-      {/*
-        Xizmat nomi OʻZ QATORIDA, toʻliq kenglikda — `OrderCard` dagi kabi.
-        Nom va narx bitta qatorga qoʻyilganda "Kir yuvish mashinasini ulash"
-        kabi uzun nomlar 393px ekranda ham kesilib qolardi.
-      */}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-body-lg text-text-primary">{transaction.categoryName}</p>
-
-        <div className="mt-4 flex items-baseline justify-between gap-12">
-          <p className="min-w-0 truncate text-body-sm text-text-secondary">
-            {orEmpty(transaction.masterName)} · {METHOD_LABELS[transaction.method]}
-          </p>
-          <p className="shrink-0">
-            <span className="tabular text-price text-text-primary">{value}</span>{' '}
-            <span className="text-currency text-text-secondary">{currency}</span>
-          </p>
-        </div>
-
-        <p className="tabular mt-2 text-caption text-text-secondary">
-          {transaction.shortId} · {timeLabel}
-        </p>
-      </div>
-    </div>
-  );
+/** Roʻyxat allaqachon yangidan eskiga tartiblangan — guruhlar ketma-ket yigʻiladi. */
+function groupByDate(items: readonly WalletTransaction[], now: Date): DateGroup[] {
+  return items.reduce<DateGroup[]>((groups, item) => {
+    const title = orderDateGroup(item.paidAt, now);
+    const last = groups[groups.length - 1];
+    if (last && last.title === title) {
+      return [...groups.slice(0, -1), { ...last, items: [...last.items, item] }];
+    }
+    return [...groups, { title, items: [item] }];
+  }, []);
 }
 
 export function WalletHistory() {
   const navigate = useNavigate();
   const now = useMinuteClock();
-  const { transactions } = useWallet();
-  const [filter, setFilter] = useState<TxFilter>('all');
+  const { transactions, spentTotal } = useWallet();
+  const isDemo = hasDemoHistory(transactions);
 
-  const visible = useMemo(
-    () => (filter === 'all' ? transactions : transactions.filter((item) => item.method === filter)),
-    [transactions, filter],
-  );
-
-  const visibleTotal = visible.reduce((sum, item) => sum + item.amount, 0);
-
-  /*
-   * Sana boʻyicha guruhlash — "Buyurtmalar" ekranidagi bilan bir xil
-   * funksiya. Roʻyxat allaqachon yangidan eskiga tartiblangan.
-   */
-  const groups = useMemo(() => {
-    const result: { title: string; items: WalletTransaction[] }[] = [];
-
-    for (const item of visible) {
-      const title = orderDateGroup(item.paidAt, now);
-      const last = result[result.length - 1];
-      if (last && last.title === title) last.items.push(item);
-      else result.push({ title, items: [item] });
-    }
-
-    return result;
-    // Guruh sarlavhasi kun aniqligida hisoblanadi — `now` ni bogʻliqlikka
-    // qoʻshish har daqiqada keraksiz qayta hisoblash beradi.
+  // Guruh sarlavhasi kun aniqligida — `now` har daqiqada oʻzgaradi, lekin
+  // guruhlash faqat roʻyxat oʻzgarganda qayta hisoblanadi.
+  const groups = useMemo(
+    () => groupByDate(transactions, now),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
-
-  // Bitta usul boʻlsa filtr hech narsa qilmaydi — u holda chizilmaydi ham.
-  const methodCount = new Set(transactions.map((item) => item.method)).size;
-  const showFilter = transactions.length > 0 && methodCount > 1;
+    [transactions],
+  );
 
   return (
     <ScreenShell
-      header={
-        <Header
-          variant="inner"
-          title="Tranzaksiyalar tarixi"
-          onBack={() => navigate(-1)}
-        />
-      }
+      header={<Header variant="inner" title="Tranzaksiyalar tarixi" onBack={() => navigate(-1)} />}
     >
       {transactions.length === 0 ? (
         <EmptyState
@@ -155,53 +74,40 @@ export function WalletHistory() {
         />
       ) : (
         <>
-          {showFilter && (
-            <SegmentControl
-              value={filter}
-              onChange={setFilter}
-              options={FILTER_ORDER.map((value) => ({ value, label: FILTER_LABELS[value] }))}
-            />
-          )}
-
-          {/* Ikkala raqam ham bitta filtrlangan roʻyxatdan hisoblanadi. */}
-          <div className="flex items-center justify-between gap-12 pt-8">
+          {/* Ikkala raqam ham bitta roʻyxatdan hisoblanadi. */}
+          <div className="flex items-center justify-between gap-12 pt-12">
             <p className="shrink-0 text-body-sm text-text-secondary">
-              {visible.length} ta tranzaksiya
+              {transactions.length} ta tranzaksiya
             </p>
             <p className="tabular shrink-0 text-numeric-sm text-text-primary">
-              {formatPrice(visibleTotal)}
+              {formatPrice(spentTotal)}
             </p>
           </div>
 
-          {visible.length === 0 ? (
-            <EmptyState
-              icon={FileMagnifyingGlass}
-              title="Bu boʻlimda tranzaksiya yoʻq"
-              description="Boshqa filtrni tanlab koʻring"
-              className="mt-24"
-              inline
-            />
-          ) : (
-            groups.map((group) => (
-              <section key={group.title} className="mt-20 first:mt-16">
-                <h2 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h2>
-                <ul className="mt-8 flex flex-col gap-8">
-                  {group.items.map((item) => (
-                    <li key={item.id}>
-                      <TransactionRow
-                        transaction={item}
-                        timeLabel={
-                          group.title === 'Bugun' || group.title === 'Kecha'
-                            ? formatTime(item.paidAt)
-                            : formatDayLabel(item.paidAt, now)
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))
+          {/* `span`, tugma EMAS — demo yozuvlar haqiqiy deb oʻqilmasin. */}
+          {isDemo && (
+            <DashedChip size="compact" className="mt-8">{DEMO_HISTORY_LABEL}</DashedChip>
           )}
+
+          {groups.map((group) => (
+            <section key={group.title} className="mt-20" aria-label={group.title}>
+              <h2 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h2>
+              <div className={GROUP_CARD_CLASSES}>
+                {group.items.map((item, index) => (
+                  <TransactionRow
+                    key={item.id}
+                    transaction={item}
+                    isFirst={index === 0}
+                    dateLabel={
+                      group.title === 'Bugun' || group.title === 'Kecha'
+                        ? formatTime(item.paidAt)
+                        : formatDayLabel(item.paidAt, now)
+                    }
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
         </>
       )}
 

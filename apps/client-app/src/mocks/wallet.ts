@@ -1,6 +1,6 @@
 import { masterById } from './masters';
 import { ALL_CATEGORIES } from './serviceGroups';
-import type { PaymentMethod, WalletTransaction } from '@/app/types';
+import type { WalletTransaction } from '@/app/types';
 
 /**
  * Mock toʻlovlar — "Karta" boʻlimi uchun.
@@ -21,7 +21,6 @@ interface SeedBase {
   categoryId: string;
   masterId: string;
   amount: number;
-  method: PaymentMethod;
   hour: number;
   minute: number;
 }
@@ -39,25 +38,25 @@ interface OlderSeed extends SeedBase {
 }
 
 const RECENT: RecentSeed[] = [
-  { shortId: 'HZ-104488', categoryId: 'c-tap', masterId: 'm-akmal', amount: 100_000, method: 'escrow', daysAgo: 0, hour: 11, minute: 20 },
-  { shortId: 'HZ-104471', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, method: 'cash', daysAgo: 1, hour: 16, minute: 45 },
-  { shortId: 'HZ-104450', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 420_000, method: 'escrow', daysAgo: 3, hour: 9, minute: 40 },
-  { shortId: 'HZ-104432', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, method: 'escrow', daysAgo: 5, hour: 14, minute: 20 },
-  { shortId: 'HZ-104419', categoryId: 'c-drain', masterId: 'm-akmal', amount: 200_000, method: 'card', daysAgo: 6, hour: 17, minute: 5 },
+  { shortId: 'HZ-104488', categoryId: 'c-tap', masterId: 'm-akmal', amount: 100_000, daysAgo: 0, hour: 11, minute: 20 },
+  { shortId: 'HZ-104471', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, daysAgo: 1, hour: 16, minute: 45 },
+  { shortId: 'HZ-104450', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 420_000, daysAgo: 3, hour: 9, minute: 40 },
+  { shortId: 'HZ-104432', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, daysAgo: 5, hour: 14, minute: 20 },
+  { shortId: 'HZ-104419', categoryId: 'c-drain', masterId: 'm-akmal', amount: 200_000, daysAgo: 6, hour: 17, minute: 5 },
 ];
 
 const OLDER: OlderSeed[] = [
-  { shortId: 'HZ-104390', categoryId: 'c-water-heater', masterId: 'm-sardor', amount: 350_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 26, hour: 10, minute: 15 },
-  { shortId: 'HZ-104371', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 130_000, method: 'cash', monthsAgo: 1, dayOfMonth: 22, hour: 13, minute: 0 },
-  { shortId: 'HZ-104352', categoryId: 'c-toilet', masterId: 'm-jahongir', amount: 150_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 17, hour: 15, minute: 30 },
-  { shortId: 'HZ-104337', categoryId: 'c-tap', masterId: 'm-akmal', amount: 110_000, method: 'escrow', monthsAgo: 1, dayOfMonth: 11, hour: 9, minute: 0 },
-  { shortId: 'HZ-104318', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, method: 'cash', monthsAgo: 1, dayOfMonth: 4, hour: 18, minute: 10 },
-  { shortId: 'HZ-104296', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 150_000, method: 'escrow', monthsAgo: 2, dayOfMonth: 27, hour: 12, minute: 40 },
-  { shortId: 'HZ-104274', categoryId: 'c-toilet', masterId: 'm-akmal', amount: 250_000, method: 'escrow', monthsAgo: 2, dayOfMonth: 19, hour: 16, minute: 0 },
-  { shortId: 'HZ-104251', categoryId: 'c-heating', masterId: 'm-sardor', amount: 500_000, method: 'card', monthsAgo: 2, dayOfMonth: 12, hour: 10, minute: 30 },
-  { shortId: 'HZ-104233', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, method: 'cash', monthsAgo: 2, dayOfMonth: 5, hour: 14, minute: 50 },
-  { shortId: 'HZ-104186', categoryId: 'c-heating', masterId: 'm-akmal', amount: 900_000, method: 'escrow', monthsAgo: 3, dayOfMonth: 21, hour: 11, minute: 0 },
-  { shortId: 'HZ-104142', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 400_000, method: 'escrow', monthsAgo: 3, dayOfMonth: 9, hour: 15, minute: 20 },
+  { shortId: 'HZ-104390', categoryId: 'c-water-heater', masterId: 'm-sardor', amount: 350_000, monthsAgo: 1, dayOfMonth: 26, hour: 10, minute: 15 },
+  { shortId: 'HZ-104371', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 130_000, monthsAgo: 1, dayOfMonth: 22, hour: 13, minute: 0 },
+  { shortId: 'HZ-104352', categoryId: 'c-toilet', masterId: 'm-jahongir', amount: 150_000, monthsAgo: 1, dayOfMonth: 17, hour: 15, minute: 30 },
+  { shortId: 'HZ-104337', categoryId: 'c-tap', masterId: 'm-akmal', amount: 110_000, monthsAgo: 1, dayOfMonth: 11, hour: 9, minute: 0 },
+  { shortId: 'HZ-104318', categoryId: 'c-pipes', masterId: 'm-feruza', amount: 350_000, monthsAgo: 1, dayOfMonth: 4, hour: 18, minute: 10 },
+  { shortId: 'HZ-104296', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 150_000, monthsAgo: 2, dayOfMonth: 27, hour: 12, minute: 40 },
+  { shortId: 'HZ-104274', categoryId: 'c-toilet', masterId: 'm-akmal', amount: 250_000, monthsAgo: 2, dayOfMonth: 19, hour: 16, minute: 0 },
+  { shortId: 'HZ-104251', categoryId: 'c-heating', masterId: 'm-sardor', amount: 500_000, monthsAgo: 2, dayOfMonth: 12, hour: 10, minute: 30 },
+  { shortId: 'HZ-104233', categoryId: 'c-repair', masterId: 'm-dilshod', amount: 80_000, monthsAgo: 2, dayOfMonth: 5, hour: 14, minute: 50 },
+  { shortId: 'HZ-104186', categoryId: 'c-heating', masterId: 'm-akmal', amount: 900_000, monthsAgo: 3, dayOfMonth: 21, hour: 11, minute: 0 },
+  { shortId: 'HZ-104142', categoryId: 'c-water-heater', masterId: 'm-jahongir', amount: 400_000, monthsAgo: 3, dayOfMonth: 9, hour: 15, minute: 20 },
 ];
 
 /**
@@ -76,13 +75,20 @@ function toTransaction(seed: SeedBase, paidAt: Date): WalletTransaction | null {
     // Mock yozuv hech qanday jonli buyurtmaga bogʻlanmagan.
     orderId: null,
     shortId: seed.shortId,
+    categoryId: category.id,
     categoryName: category.name,
     categoryIconKey: category.iconKey,
     groupId: category.groupId,
     groupName: category.groupName,
     masterName: masterById(seed.masterId)?.fullName ?? null,
     amount: seed.amount,
-    method: seed.method,
+    /*
+     * Ilova hozircha FAQAT naqd qabul qiladi (`PaymentStep`: escrow va karta
+     * "Tez orada"). Demo tarix ham shu haqiqatga boʻysunadi — aks holda
+     * "Toʻlov usuli" taqsimoti ilova hech qachon qilmagan toʻlovni
+     * koʻrsatardi va "pul ilova orqali oʻtmaydi" jumlasi yolgʻon boʻlardi.
+     */
+    method: 'cash',
     paidAt,
   };
 }

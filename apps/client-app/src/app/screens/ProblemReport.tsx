@@ -9,6 +9,7 @@ import { Icon } from '@/components/Icon';
 import { SelectableChip } from '@/components/SelectableChip';
 import { SummaryRow } from '@/components/SummaryRow';
 import { Textarea } from '@/components/Textarea';
+import { DashedChip } from '@/components/DashedChip';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import {
@@ -230,9 +231,7 @@ export function ProblemReportScreen() {
       </Card>
 
       {/* `span`, `button` EMAS: bajaradigan amali yoʻq. */}
-      <span className="ml-4 mt-16 inline-flex h-[32px] items-center rounded-full border border-dashed border-border-strong px-12 text-caption text-text-secondary">
-        Demo · murojaat platformaga tushmaydi, uni siz yuborasiz
-      </span>
+      <DashedChip className="ml-4 mt-16">Demo · murojaat platformaga tushmaydi, uni siz yuborasiz</DashedChip>
 
       {/* Formada uchta majburiy maydon bor; bu darvoza faqat shuning uchun
           halolki, yonida hech narsa talab qilmaydigan ishlaydigan yoʻl bor. */}

@@ -1,19 +1,20 @@
 import { CheckCircle, ClipboardText, Prohibit, Wrench } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/Card';
 import { EmptyState } from '@/components/EmptyState';
+import { FilterTabs, type FilterTabItem } from '@/components/FilterTabs';
 import { Header } from '@/components/Header';
-import { SelectableChip } from '@/components/SelectableChip';
 import { OrderHistoryRow } from '@/components/order/OrderHistoryRow';
 import { OrderListCard } from '@/components/order/OrderListCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import {
+  adjacentHistoryFilter,
   countByHistoryFilter,
   EMPTY_CTA_LABELS,
   emptyStateFor,
-  filterLabelWithCount,
   HISTORY_FILTERS,
   historyDateLabel,
   ORDER_ROUTES,
@@ -22,8 +23,18 @@ import {
   type ListAction,
   type OrderCounts,
 } from '@/lib/orderList';
+import {
+  FILTER_TAB_LABELS,
+  filterStepDirection,
+  filterTabAriaLabel,
+  formatTabCount,
+  type FilterStep,
+} from '@/lib/orderListView';
 import type { HistoryFilter } from '@/lib/orderStateMachine';
 import { useMinuteClock } from '@/lib/useMinuteClock';
+import { tapFeedback } from '../native';
+import { PREVIEW_MAX_OFFSET } from '@/lib/swipe';
+import { SwipeSurface } from './orders/SwipeSurface';
 import { AppTabBar } from '../AppTabBar';
 import { useApp } from '../store';
 
@@ -31,14 +42,24 @@ import { useApp } from '../store';
  * 24 · Buyurtmalar — ildiz tab (orqaga strelka yoʻq, tab bar bor).
  *
  * Ikki zona: "Faol buyurtmalar" (boy karta, holatga bogʻliq amal) va tarix
- * (sana guruhlarida ixcham qatorlar). Filtr chiplaridagi sonlar faqat
- * `orders` massividan hisoblanadi. Barcha boʻlish/saralash/guruhlash
- * `src/lib/orderList.ts` da — ekran holatni qoʻlda tekshirmaydi.
+ * (sana guruhlari kartalarida chek satrlari). Filtr — scroll qilmaydigan
+ * tab qatori (`FilterTabs`), u `sticky`: uzun tarixda ham koʻrinib turadi.
+ * Sonlar faqat `orders` massividan hisoblanadi. Boʻlish/saralash/guruhlash
+ * `src/lib/orderList.ts` da, ekran matnlari `src/lib/orderListView.ts` da.
+ *
+ * Filtr uch yoʻl bilan almashadi: tab bosish, ← → klaviatura va roʻyxat
+ * ustida gorizontal surish (`SwipeSurface`). Har safar roʻyxat `key` bilan
+ * qayta chiziladi va yoʻnalish tomonidan siljib kiradi: tabda 12px, surishda
+ * barmoq masofasi bilan bir xil 24px (`--list-enter-x`). `motion-safe` —
+ * harakat kamaytirilgan boʻlsa roʻyxat shunchaki almashadi.
  *
  * Ichki ekranlarga `returnTo` uzatiladi: buyurtma sahifasidan "orqaga"
  * bosh sahifaga emas, shu tabga qaytadi.
  */
 const RETURN_STATE = { returnTo: '/app/orders' } as const;
+
+/** Tab bosilganda roʻyxat shuncha px yon tomondan kiradi; surishda — `PREVIEW_MAX_OFFSET`. */
+const TAB_ENTER_OFFSET_PX = 12;
 
 const EMPTY_ICONS: Record<HistoryFilter, IconGlyph> = {
   all: ClipboardText,
@@ -47,41 +68,66 @@ const EMPTY_ICONS: Record<HistoryFilter, IconGlyph> = {
   cancelled: Prohibit,
 };
 
-interface FilterChipsProps {
-  value: HistoryFilter;
-  counts: OrderCounts;
-  onChange: (filter: HistoryFilter) => void;
+/** Filtr va u qaysi tomondan, qancha masofadan kirgani — kirish animatsiyasi uchun birga. */
+interface FilterView {
+  filter: HistoryFilter;
+  enterDirection: FilterStep;
+  enterOffsetPx: number;
+  /** Faqat surishda toʻldiriladi — ekran oʻquvchiga aytish uchun. */
+  announcement: string;
 }
 
-/** Gorizontal aylanadigan chip qatori — sonlar bilan toʻrtta yorliq 390px ga sigʻmaydi. */
-function FilterChips({ value, counts, onChange }: FilterChipsProps) {
-  return (
-    <div
-      role="group"
-      aria-label="Buyurtma filtrlari"
-      className="-mx-20 flex gap-8 overflow-x-auto px-20 py-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      {HISTORY_FILTERS.map((filter) => (
-        <SelectableChip
-          key={filter}
-          selected={value === filter}
-          onSelect={() => onChange(filter)}
-          className="shrink-0 whitespace-nowrap"
-        >
-          {filterLabelWithCount(filter, counts[filter])}
-        </SelectableChip>
-      ))}
-    </div>
-  );
-}
+const INITIAL_VIEW: FilterView = {
+  filter: 'all',
+  enterDirection: 0,
+  enterOffsetPx: 0,
+  announcement: '',
+};
+
+const buildTabItems = (counts: OrderCounts): FilterTabItem<HistoryFilter>[] =>
+  HISTORY_FILTERS.map((filter) => ({
+    key: filter,
+    label: FILTER_TAB_LABELS[filter],
+    ariaLabel: filterTabAriaLabel(filter, counts[filter]),
+    count: formatTabCount(counts[filter]),
+  }));
 
 export function OrdersTab() {
   const navigate = useNavigate();
   const { orders } = useApp();
   const now = useMinuteClock();
-  const [filter, setFilter] = useState<HistoryFilter>('all');
-
+  const [{ filter, enterDirection, enterOffsetPx, announcement }, setView] =
+    useState<FilterView>(INITIAL_VIEW);
   const counts = useMemo(() => countByHistoryFilter(orders.map((order) => order.status)), [orders]);
+
+  // Tab/klaviatura: tanlangan `role="tab"` holatni oʻzi eʼlon qiladi — jonli
+  // hudud boʻsh qoladi, aks holda ikki marta oʻqilardi.
+  const setFilter = (next: HistoryFilter) =>
+    setView((view) => ({
+      filter: next,
+      enterDirection: filterStepDirection(view.filter, next),
+      enterOffsetPx: TAB_ENTER_OFFSET_PX,
+      announcement: '',
+    }));
+
+  // Surish: fokus oʻzgarmaydi, shuning uchun yangi filtr jonli hududda aytiladi.
+  const swipeTo = (target: HistoryFilter) => {
+    setView((view) => ({
+      filter: target,
+      enterDirection: filterStepDirection(view.filter, target),
+      enterOffsetPx: PREVIEW_MAX_OFFSET,
+      announcement: filterTabAriaLabel(target, counts[target]),
+    }));
+    void tapFeedback();
+  };
+
+  // Filtr almashganda roʻyxat tepadan koʻrinsin: eski scrollTop saqlansa,
+  // foydalanuvchi yangi roʻyxatning oʻrtasiga yoki sarlavha yopishqoq tab
+  // qatori ostiga tushib qolgan holatga kelardi.
+  useLayoutEffect(() => {
+    document.querySelector('[data-app-scroll]')?.scrollTo({ top: 0 });
+  }, [filter]);
+  const tabItems = useMemo(() => buildTabItems(counts), [counts]);
   const { active, history } = useMemo(
     () => splitOrderList(orders, filter, now),
     [orders, filter, now],
@@ -100,73 +146,101 @@ export function OrdersTab() {
     'show-all': () => setFilter('all'),
   };
 
+  const enterStyle = {
+    '--list-enter-x': `${enterDirection * enterOffsetPx}px`,
+  } as CSSProperties;
+
   return (
     <ScreenShell
       header={<Header variant="inner" title="Buyurtmalar" />}
       footer={<AppTabBar active="orders" />}
+      // Flex ustun: `SwipeSurface` qolgan joyni `flex-1` bilan toʻldiradi.
+      className="flex flex-col"
     >
-      <FilterChips value={filter} counts={counts} onChange={setFilter} />
+      <FilterTabs
+        items={tabItems}
+        value={filter}
+        onChange={setFilter}
+        ariaLabel="Buyurtma filtrlari"
+        className="sticky top-0 z-10 shrink-0 bg-surface"
+      />
 
-      {empty ? (
-        <EmptyState
-          icon={EMPTY_ICONS[counts.all === 0 ? 'all' : filter]}
-          title={empty.title}
-          description={empty.description}
-          action={{ label: EMPTY_CTA_LABELS[empty.cta], onClick: EMPTY_CTA_HANDLERS[empty.cta] }}
-          inline
-        />
-      ) : (
-        <>
-          {active.length > 0 && (
-            <section className="mt-4">
-              <div className="flex items-center gap-8">
-                <h2 className="text-h3 text-text-primary">Faol buyurtmalar</h2>
-                <span className="tabular inline-flex h-20 min-w-[20px] items-center justify-center rounded-full bg-primary-surface px-8 text-badge text-primary-pressed">
-                  {active.length}
-                </span>
-              </div>
-              <ul className="mt-12 flex flex-col gap-12">
-                {active.map((order) => (
-                  <li key={order.id}>
-                    <OrderListCard
-                      order={order}
-                      now={now}
-                      onOpen={() => open(order.id)}
-                      onAction={runAction}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+      {/* Surish bilan almashgan filtr ekran oʻquvchiga ham aytiladi. */}
+      <p className="sr-only" aria-live="polite">
+        {announcement}
+      </p>
 
-          {showsHistoryTitle && <h2 className="mt-24 text-h3 text-text-primary">Tarix</h2>}
-
-          {history.length > 0 && (
-            <div className={cn('flex flex-col gap-20', showsHistoryTitle ? 'mt-12' : 'mt-4')}>
-              {history.map((group) => (
-                <section key={group.title}>
-                  <h3 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h3>
-                  <ul className="mt-8 flex flex-col gap-8">
-                    {group.orders.map((order) => (
+      <SwipeSurface
+        neighbour={(direction) => adjacentHistoryFilter(filter, direction)}
+        onSwipe={swipeTo}
+      >
+        {/* `key` — filtr almashganda roʻyxat qaytadan kiradi (shaffoflik + yon siljish). */}
+        <div key={filter} className="motion-safe:animate-list-enter" style={enterStyle}>
+          {empty ? (
+            <EmptyState
+              icon={EMPTY_ICONS[counts.all === 0 ? 'all' : filter]}
+              title={empty.title}
+              description={empty.description}
+              action={{ label: EMPTY_CTA_LABELS[empty.cta], onClick: EMPTY_CTA_HANDLERS[empty.cta] }}
+              inline
+            />
+          ) : (
+            <>
+              {active.length > 0 && (
+                <section className="pt-16">
+                  <div className="flex items-center gap-8">
+                    <h2 className="text-h3 text-text-primary">Faol buyurtmalar</h2>
+                    <span className="tabular inline-flex h-20 min-w-[20px] items-center justify-center rounded-full bg-primary-surface px-8 text-badge text-primary-pressed">
+                      {active.length}
+                    </span>
+                  </div>
+                  <ul className="mt-12 flex flex-col gap-12">
+                    {active.map((order) => (
                       <li key={order.id}>
-                        <OrderHistoryRow
+                        <OrderListCard
                           order={order}
-                          dateLabel={historyDateLabel(order.createdAt, group.title, now)}
                           now={now}
                           onOpen={() => open(order.id)}
+                          onAction={runAction}
                         />
                       </li>
                     ))}
                   </ul>
                 </section>
-              ))}
-            </div>
-          )}
-        </>
-      )}
+              )}
 
-      <div className="h-bottom-reserve" aria-hidden />
+              {showsHistoryTitle && <h2 className="mt-24 text-h3 text-text-primary">Tarix</h2>}
+
+              {history.length > 0 && (
+                <div className={cn('flex flex-col gap-20', showsHistoryTitle ? 'mt-12' : 'pt-16')}>
+                  {history.map((group) => (
+                    <section key={group.title} aria-label={group.title}>
+                      <h3 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h3>
+                      {/* Bitta guruh — bitta karta; qatorlar ingichka chiziq bilan ajraladi (chek). */}
+                      <Card className="mt-8 overflow-hidden p-0">
+                        <ul className="divide-y divide-border">
+                          {group.orders.map((order) => (
+                            <li key={order.id}>
+                              <OrderHistoryRow
+                                order={order}
+                                dateLabel={historyDateLabel(order.createdAt, group.title, now)}
+                                now={now}
+                                onOpen={() => open(order.id)}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </Card>
+                    </section>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="h-bottom-reserve" aria-hidden />
+      </SwipeSurface>
     </ScreenShell>
   );
 }

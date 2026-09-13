@@ -7,6 +7,7 @@
  * chiqmasdan oldin koʻrsatiladi. Tugma esa faqat mavjud marshrutga olib boradi.
  */
 import type { LiveOrder } from '@/app/types';
+import type { SwipeDirection } from './swipe';
 import {
   formatApproxDuration,
   formatDateTime,
@@ -26,6 +27,17 @@ import {
 } from './orderStateMachine';
 
 export const HISTORY_FILTERS: readonly HistoryFilter[] = ['all', 'active', 'done', 'cancelled'];
+
+/**
+ * Surish boʻyicha qoʻshni filtr: chapga surish → keyingisi (all → active → done
+ * → cancelled), oʻngga → oldingisi. Chekkada `null` — aylanib oʻtish YOʻQ.
+ */
+export function adjacentHistoryFilter(filter: HistoryFilter, direction: SwipeDirection): HistoryFilter | null {
+  const index = HISTORY_FILTERS.indexOf(filter);
+  if (index === -1) return null;
+  const next = direction === 'left' ? index + 1 : index - 1;
+  return HISTORY_FILTERS[next] ?? null;
+}
 
 // ───────────────────────────────────────────── saralash va guruhlash ──
 

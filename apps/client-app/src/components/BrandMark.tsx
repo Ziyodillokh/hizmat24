@@ -17,13 +17,20 @@ import { cn } from '@/lib/cn';
  */
 export interface BrandMarkProps {
   className?: string;
+  /**
+   * Bezak sifatida (masalan, aʼzolik kartasida): `alt=""` — ekran oʻquvchi
+   * konteynerning oʻz `aria-label` ini oʻqiydi, "Hizmat24" ikki marta
+   * aytilmaydi.
+   */
+  decorative?: boolean;
 }
 
-export function BrandMark({ className }: BrandMarkProps) {
+export function BrandMark({ className, decorative = false }: BrandMarkProps) {
   return (
     <img
       src={markUrl}
-      alt="Hizmat24"
+      alt={decorative ? '' : 'Hizmat24'}
+      aria-hidden={decorative || undefined}
       // `rounded-lg` — ikonka burchaklari: kvadrat rasm ilovadagi boshqa
       // kartalar bilan bir tilda turishi kerak.
       className={cn('block rounded-lg object-contain', className)}

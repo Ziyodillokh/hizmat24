@@ -32,6 +32,7 @@ function tx(
     id: `tx-${counter}`,
     orderId: null,
     shortId: `HZ-1041${counter.toString().padStart(2, '0')}`,
+    categoryId: 'c-tap',
     categoryName: "Kran taʼmirlash",
     categoryIconKey: 'tap',
     groupId: 'g-plumbing',
@@ -383,9 +384,12 @@ describe('MOCK_TRANSACTIONS (demo maʼlumoti)', () => {
     expect(view.cashback.filled).toBe(6);
   });
 
-  it('toʻlov usullarining uchalasi ham roʻyxatda bor', () => {
+  // Ilova boshqa usulni hali qabul qilmaydi — demo tarix ham shunga boʻysunadi
+  // (ilgari escrow/card urugʻlari "Kafolatli toʻlov 76%" deb koʻrsatardi).
+  it('demo tranzaksiyalarning hammasi naqd — ilova boshqa usulni hali qabul qilmaydi', () => {
+    expect(items.every((item) => item.method === 'cash')).toBe(true);
     const view = buildWalletView(items, [], new Date(anchor));
-    expect(view.methods.map((row) => row.key).sort()).toEqual(['card', 'cash', 'escrow']);
+    expect(view.methods).toEqual([expect.objectContaining({ key: 'cash', percent: 100, count: 5 })]);
   });
 });
 

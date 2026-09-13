@@ -1,281 +1,198 @@
-import { CreditCard, LockSimple, Medal, Money, Receipt, SealPercent, ShieldCheck, Wallet } from '@phosphor-icons/react';
+import { ArrowRight, Receipt, SealPercent, ShieldCheck } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
-import { ShareBar } from '@/components/ShareBar';
+import { BonusCard } from '@/components/wallet/BonusCard';
+import { MemberCard } from '@/components/wallet/MemberCard';
+import { DashedChip } from '@/components/DashedChip';
+import { PaymentMethodRow } from '@/components/wallet/PaymentMethodRow';
+import { StatTile } from '@/components/wallet/StatTile';
+import { TransactionRow } from '@/components/wallet/TransactionRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
-import { formatDayLabel, formatMonth, formatMonthShort, formatPercent, formatPrice } from '@/lib/formatters';
-import { serviceIcon } from '@/lib/serviceIcons';
+import { formatDayLabel, formatMonth, formatPercent, splitFormattedPrice } from '@/lib/formatters';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import type { Breakdown, MonthBar } from '@/lib/wallet';
+import {
+  cardHolder,
+  DEMO_HISTORY_LABEL,
+  hasDemoHistory,
+  monthCaption,
+  PAYMENT_OPTIONS,
+  recentTransactions,
+  spentOverline,
+  totalCaption,
+} from '@/lib/walletCard';
+import { useApp } from '../store';
 import { useWallet } from '../useWallet';
 import { AppTabBar } from '../AppTabBar';
 
 /**
- * "Karta va moliya" — mijozning sarflagan puli.
+ * "Karta" — Hizmat24 aʼzolik kartasi sahifasi.
  *
- * Bu HAMYON EMAS: hisob balansi va uni toʻldirish toʻlov tizimi ulangach
- * paydo boʻladi. Hozircha sahifa faqat allaqachon toʻlangan pulni koʻrsatadi
- * va buni ochiq aytadi — mavjud boʻlmagan balansni "0 soʻm" deb chizish
- * ishlamaydigan tugmaning maʼlumot tomonidagi koʻrinishi boʻlardi.
+ * Bu HAMYON EMAS: balans, bank kartasi, Click/Payme hali yoʻq va ular
+ * chiziqli "Tez orada" chipi bilan OCHIQ koʻrsatiladi, tugma sifatida emas.
+ * Sahifadagi har bir raqam haqiqiy manbadan: shu oyda toʻlangan pul, real
+ * daraja chegirmasi (checkoutʼda `createOrder(level.discountPercent)`),
+ * soʻnggi toʻlovlar. Demo tarix bor boʻlsa u bitta chip bilan belgilanadi.
+ *
+ * Olti blok, ShareBar jadvallari YOʻQ: karta → ikki plitka → soʻnggi
+ * toʻlovlar (chek) → toʻlov usullari → bonuslar chiptasi → himoya.
  */
 
 /** Mijozdan olinadigan komissiya. Xizmat haqi ustaning ulushidan olinadi. */
 const CLIENT_COMMISSION_PERCENT = 0;
 
-/** Toʻlov usuli qatoridagi ikona va plitka tusi. */
-const METHOD_VISUALS: Record<string, { icon: typeof ShieldCheck; tone: string }> = {
-  escrow: { icon: ShieldCheck, tone: 'bg-success-surface text-success' },
-  card: { icon: CreditCard, tone: 'bg-primary-surface text-primary-pressed' },
-  cash: { icon: Money, tone: 'bg-neutral-surface text-text-secondary' },
-};
-
-const CARD_CLASSES = cn(
+const LIST_CARD_CLASSES = cn(
   'mt-8 overflow-hidden rounded-lg border border-transparent bg-surface-elevated shadow-e1',
   "[[data-theme='dark']_&]:border-border",
 );
 
-/** Taqsimot qatori: nom, summa va ulush chizigʻi. Bosilmaydi — orqasida ekran yoʻq. */
-function DistributionRow({
-  row,
-  index,
-  icon,
-  tone,
-}: {
-  row: Breakdown;
-  index: number;
-  icon: typeof ShieldCheck;
-  tone: string;
-}) {
-  return (
-    <div className={cn('flex items-center gap-12 px-12 py-12', index > 0 && 'border-t border-border')}>
-      <span
-        className={cn(
-          'flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-sm',
-          tone,
-        )}
-        aria-hidden
-      >
-        <Icon icon={icon} size={20} weight="duotone" />
-      </span>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-12">
-          <p className="min-w-0 truncate text-body-lg text-text-primary">{row.label}</p>
-          <p className="tabular shrink-0 text-numeric-sm text-text-primary">
-            {formatPrice(row.amount)}
-          </p>
-        </div>
-        <div className="mt-8 flex items-center gap-8">
-          <ShareBar value={row.percent} className="min-w-0 flex-1" />
-          <span className="tabular shrink-0 text-caption text-text-secondary">
-            {formatPercent(row.percent)}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Oylik dinamika qatori — ustunli diagramma emas: toʻliq summa sigʻishi kerak. */
-function TrendRow({ row, index, now }: { row: MonthBar; index: number; now: Date }) {
-  return (
-    <div
-      // `role` siz `aria-label` eʼlon qilinmaydi: nomsiz `generic` elementga
-      // nom berib boʻlmaydi.
-      role="group"
-      aria-label={`${formatMonth(row.monthStart, now)}: ${formatPrice(row.amount)}`}
-      className={cn('flex items-center gap-12 px-12 py-8', index > 0 && 'border-t border-border')}
-    >
-      <p className="shrink-0 basis-[72px] truncate text-body-sm text-text-secondary">
-        {formatMonthShort(row.monthStart)}
-      </p>
-      <ShareBar value={row.percent} className="min-w-0 flex-1" />
-      <p className="tabular shrink-0 text-numeric-sm text-text-primary">{formatPrice(row.amount)}</p>
-    </div>
-  );
-}
+const OVERLINE_CLASSES = 'mt-20 px-4 text-overline uppercase text-text-secondary';
 
 export function WalletTab() {
   const navigate = useNavigate();
   const now = useMinuteClock();
   const wallet = useWallet();
+  const { fullName, phoneNumber } = useApp();
 
   const monthLabel = formatMonth(now, now);
-  const isMonthEmpty = wallet.monthTransactions.length === 0;
+  const holder = cardHolder(fullName, phoneNumber);
+  const recent = recentTransactions(wallet.transactions);
+  const isDemo = hasDemoHistory(wallet.transactions);
+  const total = splitFormattedPrice(wallet.spentTotal);
+  const monthTotal = splitFormattedPrice(wallet.spentThisMonth);
+  const lastPaidAt = wallet.transactions[0]?.paidAt ?? null;
 
-  const navigation: MenuSection = {
-    title: 'Bonus va tarix',
-    items: [
-      {
-        icon: Medal,
-        label: 'Bonuslar',
-        hint: wallet.level.label,
-        onSelect: () => navigate('/app/wallet/bonus'),
-      },
-      {
-        icon: Receipt,
-        label: 'Tranzaksiyalar tarixi',
-        hint: wallet.hasHistory ? `${wallet.transactions.length} ta` : undefined,
-        onSelect: () => navigate('/app/wallet/history'),
-      },
-    ],
-  };
+  const goToBonus = () => navigate('/app/wallet/bonus');
+  const goToHistory = () => navigate('/app/wallet/history');
 
   /*
-   * Oxirgi UCHTA qator BOSILMAYDI: ular holatni tushuntiradi, biror ekranga
-   * olib bormaydi. `onSelect` berilmagan qator `MenuGroup` da `div` boʻlib
-   * chiziladi va chevron ham qoʻyilmaydi.
-   *
-   * "Kafolatli toʻlov · Tez orada" qatori ATAYLAB bosilmaydi: chevron berilsa,
-   * foydalanuvchi funksiyaning oʻzi ochiladi deb oʻylardi.
+   * "Sizdan komissiya" BOSILMAYDI: `onSelect` siz qator `MenuGroup` da `div`
+   * boʻlib chiziladi, chevron ham qoʻyilmaydi. "Hisob balansi · Tez orada"
+   * qatori ATAYLAB yoʻq — balans vaʼda qilingan funksiya emas, unga "Tez
+   * orada" yozish uni oʻylab topish boʻlardi.
    */
-  const terms: MenuSection = {
+  const protection: MenuSection = {
     title: 'Toʻlov va himoya',
     items: [
       { icon: ShieldCheck, label: 'Kafolat va himoya', onSelect: () => navigate('/app/guarantee') },
       { icon: SealPercent, label: 'Sizdan komissiya', hint: formatPercent(CLIENT_COMMISSION_PERCENT) },
-      // Ikki qatorda bir xil ikona turmasin.
-      { icon: LockSimple, label: 'Kafolatli toʻlov', hint: 'Tez orada' },
-      { icon: Wallet, label: 'Hisob balansi', hint: 'Tez orada' },
     ],
   };
 
   return (
-    <ScreenShell
-      header={<Header variant="inner" title="Karta va moliya" />}
-      footer={<AppTabBar active="wallet" />}
-    >
-      {/* Hero — doim koʻrinadi va nolni ham halol koʻrsatadi. */}
-      <div className="banner-field relative mt-4 overflow-hidden rounded-lg p-16">
-        <p className="text-overline uppercase text-on-primary-deep/[0.92]">Shu oyda sarflangan</p>
-        <p className="tabular mt-4 text-display text-on-primary-deep">
-          {formatPrice(wallet.spentThisMonth)}
-        </p>
-        <p className="mt-4 text-caption text-on-primary-deep/[0.92]">
-          {monthLabel} ·{' '}
-          {wallet.ordersThisMonth > 0 ? `${wallet.ordersThisMonth} ta buyurtma` : 'buyurtma yoʻq'}
-        </p>
-
-        {/*
-          Uchala qiymat ham QISQA son: 360px ekranda plitkaning ichki eni
-          ~74px va pul summasi u yerga sigʻmaydi.
-        */}
-        <div className="mt-16 grid grid-cols-3 gap-8">
-          <div className="rounded-sm bg-on-primary/[0.16] px-8 py-12 text-center">
-            <p className="tabular text-h3 text-on-primary-deep">{wallet.ordersThisMonth}</p>
-            <p className="mt-2 truncate text-caption text-on-primary-deep/[0.92]">Buyurtma</p>
-          </div>
-          <div className="rounded-sm bg-on-primary/[0.16] px-8 py-12 text-center">
-            <p className="tabular text-h3 text-on-primary-deep">{wallet.ordersTotal}</p>
-            <p className="mt-2 truncate text-caption text-on-primary-deep/[0.92]">Jami</p>
-          </div>
-          <div className="rounded-sm bg-on-primary/[0.16] px-8 py-12 text-center">
-            <p className="tabular text-h3 text-on-primary-deep">
-              {formatPercent(CLIENT_COMMISSION_PERCENT)}
-            </p>
-            <p className="mt-2 truncate text-caption text-on-primary-deep/[0.92]">Komissiya</p>
-          </div>
+    <ScreenShell header={<Header variant="inner" title="Karta" />} footer={<AppTabBar active="wallet" />}>
+      {/*
+        Demo chipi KARTADAN TEPADA: kartadagi oy summasi, daraja va plitkalar
+        ham namunaviy tarixdan hisoblanadi — belgi faqat roʻyxat yonida tursa,
+        eng katta raqamlar "haqiqiy" boʻlib oʻqilardi. Chip `span`, tugma EMAS.
+      */}
+      {isDemo && (
+        <div className="mt-8 flex justify-end px-4">
+          <DashedChip size="compact">{DEMO_HISTORY_LABEL}</DashedChip>
         </div>
+      )}
+
+      {/* 1 — Karta. Nol ham halol chiziladi: "0 soʻm · buyurtma yoʻq". */}
+      <MemberCard
+        holder={holder}
+        level={wallet.level}
+        spentThisMonth={wallet.spentThisMonth}
+        overline={spentOverline(monthLabel)}
+        caption={monthCaption(wallet.ordersThisMonth, lastPaidAt, now)}
+        className={isDemo ? 'mt-4' : 'mt-8'}
+      />
+
+      {/* 2 — Ikki plitka: chegirma (real) va jami toʻlangan. Ikkalasi ham bosiladi. */}
+      <div className="mt-12 grid grid-cols-2 gap-8">
+        <StatTile
+          label="Chegirma"
+          value={formatPercent(wallet.level.discountPercent)}
+          hint={`${wallet.level.label} daraja`}
+          onSelect={goToBonus}
+        />
+        <StatTile
+          label="Jami toʻlangan"
+          value={total.value}
+          unit={total.currency}
+          hint={totalCaption(wallet.ordersTotal)}
+          onSelect={goToHistory}
+        />
       </div>
 
-      {/* Ikkala ichki sahifa scrollsiz koʻrinadigan joyda turishi shart. */}
-      <MenuGroup section={navigation} />
+      {/* 3 — Soʻnggi toʻlovlar: chek sarlavhasi + uch qator + "barchasi" qatori. */}
+      <section>
+        <h2 className="mt-20 text-h3 text-text-primary">Soʻnggi toʻlovlar</h2>
 
-      {!wallet.hasHistory && (
-        <EmptyState
-          icon={Receipt}
-          title="Hali xarajat yoʻq"
-          description="Birinchi buyurtmangiz yakunlangach, sarflangan pul shu yerda koʻrinadi"
-          action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
-          className="mt-24"
-          inline
-        />
-      )}
+        {wallet.hasHistory ? (
+          <div className={LIST_CARD_CLASSES}>
+            {/* Chek sarlavhasi: oy jami — kartadagi raqam bilan AYNAN bir xil manbadan. */}
+            <div className="flex items-baseline justify-between gap-12 px-12 py-12">
+              <p className="min-w-0 truncate text-body-sm text-text-secondary">
+                {monthLabel} · {monthCaption(wallet.ordersThisMonth, lastPaidAt, now)}
+              </p>
+              <p className="tabular shrink-0 text-price text-text-primary">
+                {monthTotal.value} <span className="text-currency text-text-secondary">{monthTotal.currency}</span>
+              </p>
+            </div>
 
-      {wallet.hasHistory && isMonthEmpty && (
-        <p className="mt-12 px-4 text-body-sm text-text-secondary">
-          Bu oyda hali xarajat yoʻq. Oxirgi toʻlov:{' '}
-          {formatDayLabel(wallet.transactions[0].paidAt, now)}.
-        </p>
-      )}
-
-      {wallet.groups.length > 0 && (
-        <section>
-          {/* Oy nomi sarlavhada: blok FAQAT joriy oyni koʻrsatadi. */}
-          <div className="mt-20 flex items-baseline justify-between gap-12 px-4">
-            <h2 className="min-w-0 truncate text-overline uppercase text-text-secondary">
-              Soha boʻyicha
-            </h2>
-            <span className="shrink-0 text-caption text-text-secondary">{monthLabel}</span>
-          </div>
-
-          <div className={CARD_CLASSES}>
-            {wallet.groups.map((row, index) => (
-              <DistributionRow
-                key={row.key}
-                row={row}
-                index={index}
-                icon={serviceIcon(row.iconKey)}
-                tone="bg-neutral-surface text-text-secondary"
+            {recent.map((item) => (
+              <TransactionRow
+                key={item.id}
+                transaction={item}
+                dateLabel={formatDayLabel(item.paidAt, now)}
               />
             ))}
+
+            <button
+              type="button"
+              onClick={goToHistory}
+              className="flex min-h-touch w-full items-center justify-between gap-12 border-t border-border px-12 py-8 text-left transition-colors duration-press ease-std active:bg-surface-sunken"
+            >
+              <span className="text-body-sm font-semibold text-primary">Barcha tranzaksiyalar</span>
+              <span className="tabular flex shrink-0 items-center gap-4 text-caption text-text-secondary">
+                {wallet.ordersTotal} ta
+                <Icon icon={ArrowRight} size={14} weight="bold" className="text-primary" aria-hidden />
+              </span>
+            </button>
           </div>
-        </section>
-      )}
+        ) : (
+          <EmptyState
+            icon={Receipt}
+            title="Hali toʻlov yoʻq"
+            description="Birinchi buyurtmangiz yakunlangach, toʻlangan pul shu yerda koʻrinadi"
+            action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
+            className="mt-8"
+            inline
+            compact
+          />
+        )}
+      </section>
 
-      {wallet.methods.length > 0 && (
-        <section>
-          <div className="mt-20 flex items-baseline justify-between gap-12 px-4">
-            <h2 className="min-w-0 truncate text-overline uppercase text-text-secondary">
-              Toʻlov usuli
-            </h2>
-            <span className="shrink-0 text-caption text-text-secondary">{monthLabel}</span>
-          </div>
+      {/* 4 — Toʻlov usullari. Karta raqami yoʻq, chunki karta yoʻq. */}
+      <section>
+        <h2 className={OVERLINE_CLASSES}>Toʻlov usullari</h2>
+        <div className={LIST_CARD_CLASSES}>
+          {PAYMENT_OPTIONS.map((option, index) => (
+            <PaymentMethodRow key={option.key} option={option} isFirst={index === 0} />
+          ))}
+        </div>
+        <p className="mt-8 px-4 text-caption text-text-secondary">
+          Pul ilova orqali oʻtmaydi — usul har buyurtmada alohida tanlanadi. Ilova karta
+          maʼlumotini soʻramaydi va saqlamaydi.
+        </p>
+      </section>
 
-          <div className={CARD_CLASSES}>
-            {wallet.methods.map((row, index) => {
-              const visual = METHOD_VISUALS[row.key] ?? METHOD_VISUALS.cash;
-              return (
-                <DistributionRow
-                  key={row.key}
-                  row={row}
-                  index={index}
-                  icon={visual.icon}
-                  tone={visual.tone}
-                />
-              );
-            })}
-          </div>
+      {/* 5 — Bonuslar chiptasi: daraja progressi + keshbek shtamplari, butun karta bosiladi. */}
+      <section>
+        <h2 className={OVERLINE_CLASSES}>Bonuslar</h2>
+        <BonusCard wallet={wallet} onSelect={goToBonus} className="mt-8" />
+      </section>
 
-          <p className="mt-8 px-4 text-body-sm text-text-secondary">
-            Kafolatli toʻlov Click va Payme ulangach ishga tushadi. Hozircha barcha toʻlovlar
-            naqd amalga oshiriladi va pul ilova orqali oʻtmaydi.
-          </p>
-        </section>
-      )}
-
-      {wallet.hasTrend && (
-        <section>
-          <h2 className="mt-20 px-4 text-overline uppercase text-text-secondary">Oxirgi 6 oy</h2>
-          <div className={CARD_CLASSES}>
-            {wallet.months.map((row, index) => (
-              <TrendRow key={row.monthStart.toISOString()} row={row} index={index} now={now} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <MenuGroup section={terms} />
-
-      <p className="mt-8 px-4 text-body-sm text-text-secondary">
-        Xizmat haqi ustaning komissiyasidan olinadi — siz faqat ish narxini toʻlaysiz. Hisob
-        balansi va uni toʻldirish Click hamda Payme ulangach ishga tushadi; hozircha toʻlov
-        usuli har bir buyurtmada alohida tanlanadi va karta ilovada saqlanmaydi.
-      </p>
+      {/* 6 — Kafolat va komissiya. */}
+      <MenuGroup section={protection} />
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>

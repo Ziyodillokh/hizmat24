@@ -118,6 +118,15 @@ export default {
           '0%, 60%, 100%': { opacity: '0.3', transform: 'translateY(0)' },
           '30%': { opacity: '1', transform: 'translateY(-2px)' },
         },
+        /*
+         * Filtr almashganda roʻyxat kirishi: shaffoflik 0→1 va yon tomondan
+         * `--list-enter-x` (ekran beradi: +12px oʻngdan, −12px chapdan, 0 —
+         * joyida, faqat shaffoflik). Faqat `motion-safe:` bilan ishlatiladi.
+         */
+        'list-enter': {
+          '0%': { opacity: '0', transform: 'translateX(var(--list-enter-x, 0px))' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
       },
       animation: {
         marquee: 'marquee var(--marquee-duration, 6s) ease-in-out infinite',
@@ -127,6 +136,7 @@ export default {
         shake: 'shake 0.3s ease-in-out',
         indeterminate: 'indeterminate 1.4s ease-in-out infinite',
         'typing-dot': 'typing-dot 1.2s ease-in-out infinite',
+        'list-enter': 'list-enter 220ms cubic-bezier(0.2, 0, 0, 1) both',
       },
     },
   },

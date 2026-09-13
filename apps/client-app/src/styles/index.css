@@ -126,6 +126,63 @@ body {
       );
   }
 
+  /*
+   * Aʼzolik kartasi — "Hizmat24 karta" (`MemberCard`). Bank kartasi EMAS,
+   * lekin plastik kabi his qilinishi kerak: oʻng yuqoridan tushgan yorugʻlik
+   * dogʻi, chap pastdagi koʻk aks, diagonal asos va uni kesib oʻtuvchi
+   * ingichka yaltiroq tasma. Ustki chetida 1px oq chiziq — plastikning qirrasi.
+   *
+   * Hamma rang TOKEN kanallaridan: dogʻ alfasi 0.45 dan oshmaydi, shunda
+   * oʻng yuqoridagi daraja nishoni matni oq boʻlib qoladi (kontrast ≥ 4.5).
+   * Koʻk soya faqat Lightʼda; Darkʼda soya qora (`shadow` tokeni) — koʻk
+   * soya qora fonda loyqa halo boʻlib koʻrinardi.
+   */
+  .member-card {
+    background-color: rgb(var(--color-surface-hero-deep));
+    background-image:
+      linear-gradient(
+        112deg,
+        rgb(var(--color-on-primary-deep) / 0) 40%,
+        rgb(var(--color-on-primary-deep) / 0.07) 50%,
+        rgb(var(--color-on-primary-deep) / 0) 60%
+      ),
+      /*
+       * Oʻng yuqori yorugʻlik dogʻi 0.15: 0.45 da Light temada sarlavha va
+       * overline ostidagi fon oqarib, oq matn 4.1:1 gacha tushardi.
+       */
+      radial-gradient(
+        95% 85% at 100% 0%,
+        rgb(var(--color-surface-hero-top) / 0.15) 0%,
+        rgb(var(--color-surface-hero-top) / 0) 60%
+      ),
+      radial-gradient(
+        70% 60% at 0% 100%,
+        rgb(var(--color-primary) / 0.45) 0%,
+        rgb(var(--color-primary) / 0) 62%
+      ),
+      /*
+       * Asos `surface-hero-deep` dan boshlanadi (`surface-hero` emas): u oq
+       * matn bilan 6:1 beradi, `surface-hero` esa 4.2:1 — karta matni kichik,
+       * AA uchun 4.5:1 kerak.
+       */
+      linear-gradient(
+        160deg,
+        rgb(var(--color-surface-hero-deep)) 0%,
+        rgb(var(--color-primary-deep)) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgb(var(--color-on-primary-deep) / 0.22),
+      inset 0 0 0 1px rgb(var(--color-on-primary-deep) / 0.08),
+      0 18px 32px -14px rgb(var(--color-surface-hero-deep) / 0.6);
+  }
+
+  :root[data-theme='dark'] .member-card {
+    box-shadow:
+      inset 0 1px 0 rgb(var(--color-on-primary-deep) / 0.14),
+      inset 0 0 0 1px rgb(var(--color-on-primary-deep) / 0.06),
+      0 18px 32px -14px rgb(var(--color-shadow) / 0.6);
+  }
+
   /* Kategoriya doirasi: tepadan yorugʻlik tushgan gumbaz, tekis dog' emas. */
   .disc-lit {
     background-color: rgb(var(--color-category-circle));
