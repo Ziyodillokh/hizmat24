@@ -7,7 +7,6 @@ import { Icon } from '@/components/Icon';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { useApp } from '../store';
-import { useToast } from '../ToastHost';
 import type { UserRole } from '../types';
 
 /**
@@ -78,7 +77,6 @@ const TOTAL_STEPS = SLIDES.length + 1;
 
 export function OnboardingScreen() {
   const navigate = useNavigate();
-  const showToast = useToast();
   const { completeOnboarding } = useApp();
   const [step, setStep] = useState(0);
 
@@ -87,16 +85,12 @@ export function OnboardingScreen() {
   const finish = (role: UserRole) => {
     completeOnboarding(role);
 
-    if (role === 'master') {
-      /*
-       * Usta ilovasi hali yoʻq. Tanlov SAQLANADI, lekin mijoz oqimi
-       * ochiladi — mavjud boʻlmagan ekranga yoʻnaltirish foydalanuvchini
-       * boshi berk koʻchaga olib borardi.
-       */
-      showToast('Usta ilovasi tayyorlanmoqda — hozircha mijoz rejimi');
-    }
-
-    navigate('/app/home', { replace: true });
+    /*
+     * Usta rejimining endi oʻz uyi bor: kabinet profil sozlashga olib boradi.
+     * Ilgari bu yerda "Usta ilovasi tayyorlanmoqda" toasti turardi va tanlov
+     * hech narsa qilmasdi.
+     */
+    navigate(role === 'master' ? '/app/master' : '/app/home', { replace: true });
   };
 
   return (

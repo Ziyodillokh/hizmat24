@@ -46,3 +46,22 @@ export function supportStatusLine(now: Date): string {
     ? `${SUPPORT_HOURS_LABEL} · hozir ochiq`
     : `${SUPPORT_HOURS_LABEL} · hozir yopiq, ${formatTime(nextOpenAt(now))} da ochiladi`;
 }
+
+/** Foydalanuvchi ochishi mumkin boʻlgan haqiqiy kanallar. */
+export type SupportChannel = 'telegram' | 'phone';
+
+export interface SupportChannelEvent {
+  channel: SupportChannel;
+  openedAt: Date;
+}
+
+/**
+ * Kanal jurnali yorliqlari.
+ *
+ * "Yuborildi" bu yerda YOʻQ va boʻlmaydi: ilova havola ochilganini biladi,
+ * xabar yuborilganini bilmaydi.
+ */
+export const CHANNEL_OPENED_LABELS: Record<SupportChannel, string> = {
+  telegram: 'Telegram ochildi',
+  phone: 'Qoʻngʻiroq qilindi',
+};

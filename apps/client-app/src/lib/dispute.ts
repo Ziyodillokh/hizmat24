@@ -2,6 +2,7 @@ import type { LiveOrder } from '@/app/types';
 import { addressDetailsLine } from './address';
 import { formatPhone, formatPrice, formatShortDate, formatTime, orEmpty } from './formatters';
 import { NEGATIVE_TAGS } from './rating';
+import type { SupportChannel, SupportChannelEvent } from './support';
 import { METHOD_LABELS } from './wallet';
 
 /**
@@ -16,13 +17,12 @@ import { METHOD_LABELS } from './wallet';
  * yordam va u hech qanday backend talab qilmaydi.
  */
 
-/** Foydalanuvchi ochgan kanal. Boshqa qiymat YOʻQ — SMS ham, email ham ulanmagan. */
-export type DisputeChannel = 'telegram' | 'phone';
-
-export interface DisputeChannelEvent {
-  channel: DisputeChannel;
-  openedAt: Date;
-}
+/**
+ * Foydalanuvchi ochgan kanal — `lib/support.ts` bilan BIR XIL tur. Boshqa
+ * qiymat YOʻQ: SMS ham, email ham ulanmagan.
+ */
+export type DisputeChannel = SupportChannel;
+export type DisputeChannelEvent = SupportChannelEvent;
 
 export interface DisputeRecord {
   /** Ichki kalit. EKRANDA HECH QACHON CHIZILMAYDI. */

@@ -290,13 +290,60 @@ bandlar jadvali qo'shildi va kuchda qolganlari sanab o'tildi.
 **Ochiq uchlar:** xarita va geolokatsiya, telefon raqamini o'zgartirish,
 tanlangan ustaning bandligini tekshirish — backend kelgach.
 
-### 7-bosqich — Usta tomoni: kirish
+### 7-bosqich — Usta tomoni: kirish ✅ bajarildi
 
 | Sahifa | Marshrut |
 |---|---|
-| Usta bo'lish (ariza) | `/app/master/apply` |
-| Soha tanlash (1/5 oqim) | `/app/master/setup` |
+| Usta kabineti (rejimning kirish nuqtasi) | `/app/master` |
+| Usta profili — 5 qadam | `/app/master/setup?step=…` |
 | Usta profili sozlamalari | `/app/master/settings` |
+| Usta bo'lish uchun ariza | `/app/master/apply` |
+
+**Ochiq savol №2 ga javob (taxmin):** usta tomoni SHU ILOVA ICHIDA, rol
+almashtirish bilan — demodagi kabi bitta hisob, ikki rejim. Kodda `role`
+allaqachon shunday edi, yo'l xaritasi ham `/app/master/...` yo'llarini
+sanagan. Alohida APK bu bosqichda ko'rib chiqilmadi.
+
+**Ariza YUBORILMAYDI va bu ataylab.** Arizani ko'rib chiqadigan tizim yo'q.
+"Ariza qabul qilindi · ko'rib chiqilmoqda" degan holat hech qachon
+o'zgarmaydigan yolg'on bo'lardi. O'rniga 5-bosqichdagi murojaat naqshi
+qo'llanildi: ilova profil, ism va telefondan **ariza matnini tayyorlaydi**,
+foydalanuvchi uni Telegram yoki telefon orqali o'zi yuboradi. Kanal
+jurnalida "Telegram ochildi" yoziladi, "Yuborildi" — hech qachon.
+
+**Tuzatilgan yolg'on:** "Ustaman" tanlovi va profildagi rol almashtirgichi
+faqat "Usta ilovasi tayyorlanmoqda" toastini ko'rsatib mijoz oqimiga
+qaytarardi — rol hech narsa qilmasdi. Endi rejimning o'z uyi bor.
+
+Qo'shimcha qarorlar:
+- Sertifikat — **o'zi aytgan**. Kalit yonida darhol aytiladi: bu tasdiq
+  emas, arizada «o'zim aytdim, hali tekshirilmagan» deb belgilanadi va
+  mijozga «Sertifikatli» belgisi ko'rsatilmaydi. Usta profili mijoz
+  katalogiga QO'SHILMAYDI — u faqat tekshiruvga yuboriladigan material.
+- "Ishga tayyorman" kaliti faqat qurilmada saqlanadi va ekran buni
+  yashirmaydi: backend yo'q, kalit hech kimga hech narsa yubormaydi.
+- Qadam URL da (`?step=area`): apparat "orqaga" qadamlar bo'ylab yuradi,
+  sozlamalar kerakli qadamga to'g'ri havola qiladi, sovuq startda
+  yo'qolmaydi. Har o'zgarish darhol saqlanadi.
+- Sohalar lug'ati mijoz katalogi bilan BIR XIL — test buni tekshiradi.
+  Tumanlar — Toshkentning 12 rasmiy tumani.
+- Ariza matni tayyorlangan paytdagi profildan yig'iladi va muzlab qoladi;
+  profil o'zgarsa foydalanuvchi qayta tayyorlaydi — eski matn jimgina
+  o'zgarmaydi.
+- Murojaat va ariza bir xil bloklarni chizadi (matn, nusxalash, Telegram,
+  telefon, kanal jurnali) — ular `PreparedMessage` komponentiga chiqarildi,
+  `DisputeDetail` 252 satrdan 169 ga tushdi.
+- `AppRouter` 500 satrdan oshgani uchun marshrut jadvali `appRoutes.tsx` ga
+  ajratildi (bitta marshrut — bitta satr) va invariant testi qo'shildi.
+- `StepDots` endi o'z yorliqlarini qabul qiladi — usta oqimi ham beshta
+  qadam.
+
+**Tab bar o'zgarmadi.** Usta rejimida ham mijoz tab bari turadi; kabinet
+Profil orqali ochiladi. Alohida usta tab bari — 8-bosqich (ish takliflari
+kelganda) masalasi.
+
+**Ochiq uchlar:** sertifikat va shaxs tekshiruvi, ish takliflari, usta
+profilining mijoz katalogida ko'rinishi — backend kelgach.
 
 ### 8-bosqich — Usta tomoni: ish topish
 
@@ -326,8 +373,10 @@ javob kerak:
 1. ~~**Balans qayerdan to'ladi?**~~ Javob berildi: Click va Payme kelajakda
    ulanadi va hisob to'ldiriladi. 2-bosqichda balans chizilmadi — u to'lov
    integratsiyasi bilan birga 3-bosqichda keladi.
-2. **Usta tomoni qayerda?** Shu ilova ichida rejim almashtirish bilanmi
-   (demodagi kabi: bitta hisob, ikki rejim) yoki alohida APK.
+2. ~~**Usta tomoni qayerda?**~~ 7-bosqichda taxmin qilindi: shu ilova
+   ichida, rol almashtirish bilan (bitta hisob, ikki rejim). Alohida APK
+   kerak bo'lsa, `/app/master/*` ekranlari o'sha ilovaga ko'chadi — ular
+   mijoz ekranlaridan mustaqil.
 3. **Backend qachon ulanadi?** Hozir barcha ekran mock'da ishlaydi.
    Ulanish qancha kechiksa, mock va API o'rtasidagi farq shuncha ko'payadi.
 

@@ -10,8 +10,8 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import type { DisputeRecord } from '@/lib/dispute';
 import { formatDateTime } from '@/lib/formatters';
+import { CHANNEL_OPENED_LABELS } from '@/lib/support';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { CHANNEL_OPENED_LABELS } from './disputeLabels';
 import { useDisputes } from '../dispute-store';
 
 /**

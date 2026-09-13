@@ -15,17 +15,26 @@ export type StepDotIndex = 0 | 1 | 2 | 3 | 4;
 export interface StepDotsProps {
   /** 0-indeksli joriy qadam. */
   currentStep: StepDotIndex;
+  /**
+   * Qadam nomlari. Berilmasa — buyurtma oqimi. Usta sozlash oqimi ham
+   * beshta qadamdan iborat va shu komponentni oʻz nomlari bilan ishlatadi.
+   */
+  labels?: readonly string[];
+  /** `aria-label` — oqim nomi. */
+  flowLabel?: string;
   className?: string;
 }
 
-export function StepDots({ currentStep, className }: StepDotsProps) {
+export function StepDots({
+  currentStep,
+  labels = STEP_DOT_LABELS,
+  flowLabel = 'Buyurtma qadamlari',
+  className,
+}: StepDotsProps) {
   return (
-    <div
-      className={cn('flex flex-col items-center gap-8', className)}
-      aria-label="Buyurtma qadamlari"
-    >
+    <div className={cn('flex flex-col items-center gap-8', className)} aria-label={flowLabel}>
       <div className="flex items-center gap-8">
-        {STEP_DOT_LABELS.map((label, index) => (
+        {labels.map((label, index) => (
           <span
             key={label}
             aria-hidden
@@ -41,9 +50,7 @@ export function StepDots({ currentStep, className }: StepDotsProps) {
           />
         ))}
       </div>
-      <span className="text-overline uppercase text-text-secondary">
-        {STEP_DOT_LABELS[currentStep]}
-      </span>
+      <span className="text-overline uppercase text-text-secondary">{labels[currentStep]}</span>
     </div>
   );
 }

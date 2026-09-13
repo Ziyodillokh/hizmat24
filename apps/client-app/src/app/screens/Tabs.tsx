@@ -27,6 +27,7 @@ import { notificationUiType } from '@/mocks/notifications';
 import { useDisputes } from '../dispute-store';
 import { useAddresses } from '../address-store';
 import { useFavorites } from '../favorites-store';
+import { useMaster } from '../master-store';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
 import { useWallet } from '../useWallet';
@@ -222,6 +223,7 @@ export function ProfileTab() {
   const { openCount } = useDisputes();
   const { addresses } = useAddresses();
   const { count: favoriteCount } = useFavorites();
+  const { isComplete: isMasterComplete } = useMaster();
   const { level } = useWallet();
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
@@ -273,11 +275,12 @@ export function ProfileTab() {
           onSelect: () => {
             const next = role === 'master' ? 'client' : 'master';
             completeOnboarding(next);
-            showToast(
-              next === 'master'
-                ? 'Usta ilovasi tayyorlanmoqda — hozircha mijoz rejimi'
-                : 'Mijoz rejimiga oʻtdingiz',
-            );
+            if (next === 'master') {
+              // Rejimning oʻz uyi bor — toast oʻrniga kabinet ochiladi.
+              navigate('/app/master');
+              return;
+            }
+            showToast('Mijoz rejimiga oʻtdingiz');
           },
         },
         {
@@ -294,6 +297,22 @@ export function ProfileTab() {
         },
       ],
     },
+    // Usta rejimida kabinet qatori — rejim faqat profil orqali ochilmasin.
+    ...(role === 'master'
+      ? [
+          {
+            title: 'Usta',
+            items: [
+              {
+                icon: Wrench,
+                label: 'Usta kabineti',
+                hint: isMasterComplete ? 'Profil toʻliq' : 'Profil toʻldirilmagan',
+                onSelect: () => navigate('/app/master'),
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Shaxsiy',
       items: [
