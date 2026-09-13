@@ -1,4 +1,4 @@
-import { Bell, BellSlash, CaretRight, ClipboardText, FileMagnifyingGlass, Headset, Heart, Info, MapPin, Medal, Moon, NotePencil, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
+import { Bell, BellSlash, CaretRight, ClipboardText, Headset, Heart, Info, MapPin, Medal, Moon, NotePencil, ShieldCheck, SignOut, Sun, UserCircle, Wrench } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -9,20 +9,11 @@ import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
 import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { NotificationRow } from '@/components/NotificationRow';
-import { OrderCard } from '@/components/OrderCard';
-import { SegmentControl } from '@/components/SegmentControl';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
-import { serviceIcon } from '@/lib/serviceIcons';
-import { formatPhone, formatTime, orderDateGroup } from '@/lib/formatters';
-import {
-  HISTORY_FILTER_LABELS,
-  ORDER_STATUS,
-  isTerminal,
-  matchesHistoryFilter,
-  type HistoryFilter,
-} from '@/lib/orderStateMachine';
+import { formatPhone, orderDateGroup } from '@/lib/formatters';
+import { ORDER_STATUS, isTerminal } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
 import { useDisputes } from '../dispute-store';
 import { useAddresses } from '../address-store';
@@ -33,102 +24,6 @@ import { useApp } from '../store';
 import { useWallet } from '../useWallet';
 import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
-
-const FILTERS: HistoryFilter[] = ['all', 'active', 'done', 'cancelled'];
-
-/** 24 · Buyurtmalarim. */
-export function OrdersTab() {
-  const navigate = useNavigate();
-  const { orders } = useApp();
-  const [filter, setFilter] = useState<HistoryFilter>('all');
-
-  const now = new Date();
-
-  /*
-   * Buyurtmalar sana boʻyicha guruhlanadi ("Bugun" · "Kecha" · "Sentabr").
-   * Roʻyxat allaqachon yangidan eskiga tartiblangan holda keladi, shuning
-   * uchun guruhlar ham shu tartibda hosil boʻladi — qayta saralash shart emas.
-   */
-  const groups = useMemo(() => {
-    const visible = orders.filter((order) => matchesHistoryFilter(order.status, filter));
-    const result: { title: string; orders: typeof visible }[] = [];
-
-    for (const order of visible) {
-      const title = orderDateGroup(order.createdAt, now);
-      const last = result[result.length - 1];
-      if (last && last.title === title) last.orders.push(order);
-      else result.push({ title, orders: [order] });
-    }
-
-    return result;
-    // `now` har renderda yangilanadi, lekin guruh sarlavhasi kun aniqligida
-    // hisoblanadi — uni bogʻliqlikka qoʻshish keraksiz qayta hisoblash beradi.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orders, filter]);
-
-  const isEmpty = groups.length === 0;
-
-  return (
-    <ScreenShell
-      header={<Header variant="inner" title="Buyurtmalar" />}
-      footer={<AppTabBar active="orders" />}
-    >
-      <SegmentControl
-        value={filter}
-        onChange={setFilter}
-        options={FILTERS.map((value) => ({ value, label: HISTORY_FILTER_LABELS[value] }))}
-      />
-
-      {orders.length === 0 ? (
-        <EmptyState
-          icon={ClipboardText}
-          title="Hozircha buyurtmalaringiz yoʻq"
-          description="Birinchi buyurtmangizni bering"
-          action={{ label: 'Ustani chaqirish', onClick: () => navigate('/app/services') }}
-          inline
-        />
-      ) : isEmpty ? (
-        <EmptyState
-          icon={FileMagnifyingGlass}
-          title="Bu boʻlimda buyurtma yoʻq"
-          description="Boshqa filtrni tanlab koʻring"
-          className="mt-24"
-          inline
-        />
-      ) : (
-        groups.map((group) => (
-          <section key={group.title} className="mt-20 first:mt-16">
-            <h2 className="px-4 text-overline uppercase text-text-secondary">{group.title}</h2>
-            <ul className="mt-8 flex flex-col gap-8">
-              {group.orders.map((order) => (
-                <li key={order.id}>
-                  <OrderCard
-                    serviceIcon={serviceIcon(order.categoryIconKey)}
-                    serviceName={order.categoryName}
-                    status={order.status}
-                    createdAt={order.createdAt}
-                    now={now}
-                    // "Bugun"/"Kecha" guruhida sarlavha kunni allaqachon
-                    // aytgan — kartada faqat vaqt qoladi.
-                    dateLabel={
-                      group.title === 'Bugun' || group.title === 'Kecha'
-                        ? formatTime(order.createdAt)
-                        : undefined
-                    }
-                    price={order.invoice.total}
-                    onSelect={() => navigate(`/app/order/${order.id}`)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
-
-      <div className="h-bottom-reserve" aria-hidden />
-    </ScreenShell>
-  );
-}
 
 export function NotificationsTab() {
   const navigate = useNavigate();

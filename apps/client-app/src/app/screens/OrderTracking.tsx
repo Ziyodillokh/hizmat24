@@ -21,6 +21,7 @@ import { formatApproxDuration, formatDateTime, formatPrice } from '@/lib/formatt
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_SHORT_LABELS } from '@/lib/wallet';
 import { useApp } from '../store';
+import { useReturnTo } from '../useReturnTo';
 import { MasterContactRow } from './MasterContactRow';
 import { useToast } from '../ToastHost';
 import { warnFeedback } from '../native';
@@ -88,6 +89,8 @@ export function OrderTracking() {
   const { findOrder, cancelOrder, advanceOrder } = useApp();
   const now = useMinuteClock();
   const showToast = useToast();
+  // Buyurtmalar tabidan kelinsa "orqaga" oʻsha tabga; aks holda bosh sahifa.
+  const backTo = useReturnTo() ?? '/app/home';
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -102,24 +105,29 @@ export function OrderTracking() {
    * izoh maydoni va tasdiqlash oynasi) ikkinchi nusxasi yasalmaydi.
    */
   useEffect(() => {
-    const state = location.state as { openCancel?: boolean } | null;
+    const state = location.state as { openCancel?: boolean; returnTo?: string } | null;
     if (!state?.openCancel) return;
     if (order && canCancel(order.status)) setSheetOpen(true);
-    // Bir martalik: sahifa yangilanganda varaq qayta ochilmaydi.
-    navigate(location.pathname, { replace: true, state: null });
+    // Bir martalik: sahifa yangilanganda varaq qayta ochilmaydi. `returnTo`
+    // saqlanadi — u boʻlmasa "orqaga" yana bosh sahifaga ketardi.
+    navigate(location.pathname, {
+      replace: true,
+      state: state.returnTo ? { returnTo: state.returnTo } : null,
+    });
   }, [location, navigate, order]);
 
   if (!order) return <Navigate to="/app/home" replace />;
 
   // Usta yetib kelgan boʻlsa — bloklovchi ekran majburan ochiladi.
+  // `state` uzatiladi: yoʻnaltirilgan ekran ham qayerga qaytishni bilsin.
   if (order.status === ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION) {
-    return <Navigate to={`/app/order/${order.id}/confirm-master`} replace />;
+    return <Navigate to={`/app/order/${order.id}/confirm-master`} replace state={location.state} />;
   }
   if (order.status === ORDER_STATUS.COMPLETED_BY_MASTER) {
-    return <Navigate to={`/app/order/${order.id}/rate`} replace />;
+    return <Navigate to={`/app/order/${order.id}/rate`} replace state={location.state} />;
   }
   if (order.status === ORDER_STATUS.CLOSED) {
-    return <Navigate to={`/app/order/${order.id}/receipt`} replace />;
+    return <Navigate to={`/app/order/${order.id}/receipt`} replace state={location.state} />;
   }
 
   const isOther = reason === OTHER;
@@ -142,7 +150,7 @@ export function OrderTracking() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Buyurtma" onBack={() => navigate('/app/home')} />}
+      header={<Header variant="inner" title="Buyurtma" onBack={() => navigate(backTo)} />}
       footer={
         <StickyFooter>
           <div className="flex flex-col gap-12">

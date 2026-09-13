@@ -1,19 +1,15 @@
 import { ArrowRight } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
+import { OrderListCard } from '@/components/order/OrderListCard';
 import { PremiumMastersRail } from '@/components/PremiumMastersRail';
 import { ReviewCard } from '@/components/ReviewCard';
 import { ServiceTile } from '@/components/ServiceTile';
-import { StatusChip } from '@/components/StatusChip';
 import { StatusBar } from '@/preview/StatusBar';
 import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
 import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
-import { formatDuration, formatPrice, formatQueuePosition } from '@/lib/formatters';
-import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { findGroup } from '@/mocks/serviceGroups';
 import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
@@ -23,7 +19,6 @@ import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import aiRobot from '@/assets/brand/ai-robot.webp';
 import { useApp } from '../store';
 import { useSelectService } from '../useSelectService';
-import type { LiveOrder } from '../types';
 
 /**
  * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
@@ -68,25 +63,6 @@ function SectionTitleRow({ title, onMore }: { title: string; onMore: () => void 
       </button>
     </div>
   );
-}
-
-/** Aktiv buyurtma kartasidagi ikkinchi qator — holatga qarab. */
-function secondaryLine(order: LiveOrder): string | null {
-  switch (order.status) {
-    case ORDER_STATUS.SEARCHING:
-      return order.scheduledAt ? 'Belgilangan vaqtga rejalashtirilgan' : 'Usta qidirilmoqda…';
-    case ORDER_STATUS.SEARCHING_QUEUED:
-      return order.queuePosition ? formatQueuePosition(order.queuePosition) : null;
-    case ORDER_STATUS.ASSIGNED:
-    case ORDER_STATUS.MASTER_EN_ROUTE:
-      return order.etaMinutes ? `Taxminiy vaqt: ${formatDuration(order.etaMinutes)}` : null;
-    case ORDER_STATUS.IN_PROGRESS:
-      return order.master?.fullName ?? null;
-    case ORDER_STATUS.COMPLETED_BY_MASTER:
-      return 'Ishingiz yakunlandi';
-    default:
-      return null;
-  }
 }
 
 export function HomeTab() {
@@ -148,25 +124,16 @@ export function HomeTab() {
         {activeOrder && (
           <section className="pt-16">
             <h2 className="text-h3 text-text-primary">Aktiv buyurtmangiz</h2>
-            <Card className="mt-12 flex flex-col gap-12">
-              <StatusChip status={activeOrder.status} className="self-start" />
-              <div className="flex items-start justify-between gap-12">
-                <p className="min-w-0 flex-1 text-title text-text-primary">
-                  {activeOrder.categoryName}
-                </p>
-                <p className="tabular shrink-0 text-price text-text-primary">
-                  {formatPrice(activeOrder.invoice.total)}
-                </p>
-              </div>
-              {secondaryLine(activeOrder) && (
-                <p className="text-body-sm text-text-secondary">{secondaryLine(activeOrder)}</p>
-              )}
-              <Button variant="primary" onClick={() => navigate(`/app/order/${activeOrder.id}`)}>
-                {activeOrder.status === ORDER_STATUS.COMPLETED_BY_MASTER
-                  ? 'Ishni baholash'
-                  : 'Kuzatish'}
-              </Button>
-            </Card>
+            {/* Buyurtmalar tabidagi karta bilan bir xil — faktlar va amallar
+                bitta manbadan (`src/lib/orderList.ts`). `returnTo` yoʻq:
+                bosh sahifaga qaytish standart yoʻl. */}
+            <OrderListCard
+              order={activeOrder}
+              now={now}
+              onOpen={() => navigate(`/app/order/${activeOrder.id}`)}
+              onAction={(action) => navigate(action.route, { state: action.state ?? null })}
+              className="mt-12"
+            />
           </section>
         )}
 
@@ -233,8 +200,9 @@ export function HomeTab() {
         className="absolute bottom-12 right-20 flex h-[60px] w-[60px] items-center justify-center overflow-hidden rounded-full bg-surface-elevated shadow-e3 ring-2 ring-primary transition-transform duration-press ease-emphasized active:scale-[0.94] [@media(max-height:800px)]:bottom-8"
       >
         {/*
-          Egasi bergan robot maskoti (224px WebP, 5 KB) — oq doira, koʻk
-          halqa: kontent ustida ham aniq ajralib turadi, tungi temada ham.
+          Egasi bergan robot maskoti (2026-09-13 kechki versiya, 240px WebP,
+          6 KB) — oq doira, koʻk halqa: kontent ustida ham aniq ajralib
+          turadi, tungi temada ham.
         */}
         <img src={aiRobot} alt="" draggable={false} className="h-full w-full object-cover" />
       </button>

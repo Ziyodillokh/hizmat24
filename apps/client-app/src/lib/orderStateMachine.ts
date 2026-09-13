@@ -193,15 +193,15 @@ export const getDetailActions = (status: OrderStatus): readonly DetailAction[] =
 export type HistoryFilter = 'all' | 'active' | 'done' | 'cancelled';
 
 /**
- * Filtr yorliqlari qisqa: toʻrttasi 390px ekranda bitta qatorga sigʻishi kerak.
- * "Bekor qilingan" bilan qator konteynerdan oshib ketardi va oxirgi segment
- * kesilgandek koʻrinardi.
+ * Filtr yorliqlari toʻliq soʻz: 24-ekranda ular gorizontal aylanadigan chip
+ * qatorida turadi (SegmentControl emas), shuning uchun 390px chegarasi yoʻq.
+ * "Faol" — profil statistikasidagi soʻz bilan bir xil.
  */
 export const HISTORY_FILTER_LABELS: Record<HistoryFilter, string> = {
   all: 'Barchasi',
-  active: 'Aktiv',
+  active: 'Faol',
   done: 'Yakunlangan',
-  cancelled: 'Bekor',
+  cancelled: 'Bekor qilingan',
 };
 
 export function matchesHistoryFilter(status: OrderStatus, filter: HistoryFilter): boolean {

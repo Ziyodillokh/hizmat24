@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { MasterCard } from '@/components/MasterCard';
@@ -26,6 +26,7 @@ import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_LABELS } from '@/lib/wallet';
 import { cn } from '@/lib/cn';
 import { useApp } from '../store';
+import { useReturnTo } from '../useReturnTo';
 import { useToast } from '../ToastHost';
 import { tapFeedback } from '../native';
 
@@ -36,6 +37,8 @@ export function RateOrderScreen() {
   const { findOrder, rateOrder } = useApp();
   const showToast = useToast();
   const now = useMinuteClock();
+  const location = useLocation();
+  const backTo = useReturnTo() ?? '/app/home';
 
   const [stars, setStars] = useState(0);
   const [comment, setComment] = useState('');
@@ -47,9 +50,9 @@ export function RateOrderScreen() {
   // Holat qoʻlda tekshirilmaydi — qoida kutubxonada.
   if (!canRate(order.status)) {
     return hasReceipt(order.status) ? (
-      <Navigate to={`/app/order/${order.id}/receipt`} replace />
+      <Navigate to={`/app/order/${order.id}/receipt`} replace state={location.state} />
     ) : (
-      <Navigate to={`/app/order/${order.id}`} replace />
+      <Navigate to={`/app/order/${order.id}`} replace state={location.state} />
     );
   }
 
@@ -73,7 +76,7 @@ export function RateOrderScreen() {
     // Past bahoda "rahmat" deyish quloqqa yot.
     if (isNegativeRating(stars)) showToast('Baho qabul qilindi');
     else showToast('Bahoingiz uchun rahmat', 'success');
-    navigate(`/app/order/${order.id}/receipt`, { replace: true });
+    navigate(`/app/order/${order.id}/receipt`, { replace: true, state: location.state });
   };
 
   return (
@@ -84,7 +87,7 @@ export function RateOrderScreen() {
           title="Baholash"
           // Chiqib ketish yoʻqotish emas: buyurtma aktiv roʻyxatda qoladi va
           // bosh sahifadagi karta orqali shu yerga qaytish mumkin.
-          onBack={() => navigate('/app/home', { replace: true })}
+          onBack={() => navigate(backTo, { replace: true })}
         />
       }
       footer={
@@ -234,13 +237,14 @@ export function ReceiptScreen() {
   const { orderId } = useParams<{ orderId: string }>();
   const { findOrder } = useApp();
   const now = useMinuteClock();
+  const backTo = useReturnTo() ?? '/app/home';
 
   const order = orderId ? findOrder(orderId) : undefined;
   if (!order) return <Navigate to="/app/home" replace />;
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Chek" onBack={() => navigate('/app/home')} />}
+      header={<Header variant="inner" title="Chek" onBack={() => navigate(backTo)} />}
       footer={
         <StickyFooter>
           <Button variant="secondary" onClick={() => navigate('/app/services')}>

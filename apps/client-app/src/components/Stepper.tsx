@@ -24,12 +24,25 @@ const DOT_CLASSES: Record<StepState, string> = {
   upcoming: 'h-12 w-12 bg-border',
 };
 
+/** Ixcham variant (roʻyxat kartasi): 12px / 8px nuqtalar, yorliqsiz. */
+const COMPACT_DOT_CLASSES: Record<StepState, string> = {
+  completed: 'h-12 w-12 bg-primary',
+  current: 'h-12 w-12 bg-primary',
+  upcoming: 'h-8 w-8 bg-border',
+};
+
 export interface StepperProps {
   status: OrderStatus;
+  /**
+   * Roʻyxat kartasi uchun: tashqi padding va "joriy bosqich · n/5" qatori
+   * chizilmaydi — kartadagi toʻldirilgan holat chipi bosqichni allaqachon
+   * nomlaydi. Nuqtalar kichraytiriladi; sr-only yorliqlar qoladi.
+   */
+  compact?: boolean;
   className?: string;
 }
 
-export function Stepper({ status, className }: StepperProps) {
+export function Stepper({ status, compact = false, className }: StepperProps) {
   const { currentStep, currentCompleted } = getStepperState(status);
 
   // 10.1-band: bloklovchi tasdiqlash, bekor qilingan va xavfsizlik holatlarida
@@ -43,9 +56,10 @@ export function Stepper({ status, className }: StepperProps) {
   };
 
   const currentLabel = STEPPER_LABELS[currentStep];
+  const dotClasses = compact ? COMPACT_DOT_CLASSES : DOT_CLASSES;
 
   return (
-    <div className={cn('px-20 pt-12', className)} aria-label="Buyurtma bosqichlari">
+    <div className={cn(!compact && 'px-20 pt-12', className)} aria-label="Buyurtma bosqichlari">
       <div className="flex items-center">
         {STEPPER_LABELS.map((label, index) => {
           const state = stateOf(index);
@@ -59,7 +73,10 @@ export function Stepper({ status, className }: StepperProps) {
                 />
               )}
               <div
-                className="relative flex h-16 w-16 items-center justify-center"
+                className={cn(
+                  'relative flex items-center justify-center',
+                  compact ? 'h-12 w-12' : 'h-16 w-16',
+                )}
                 aria-current={state === 'current' ? 'step' : undefined}
               >
                 {state === 'current' && (
@@ -73,13 +90,17 @@ export function Stepper({ status, className }: StepperProps) {
                 <span
                   className={cn(
                     'relative flex items-center justify-center rounded-full',
-                    DOT_CLASSES[state],
+                    dotClasses[state],
                   )}
                 >
                   {state === 'completed' && (
                     // Icon oʻramchisi 10px oʻlchamni bilmaydi — klass orqali aniq 10px beriladi.
                     // Rang `on-primary`: 4-boʻlim 1-qoidasi yorqin teal ustida oq matnni taqiqlaydi.
-                    <Icon icon={Check} size={16} className="h-[10px] w-[10px] text-on-primary" />
+                    <Icon
+                      icon={Check}
+                      size={16}
+                      className={cn(compact ? 'h-[8px] w-[8px]' : 'h-[10px] w-[10px]', 'text-on-primary')}
+                    />
                   )}
                 </span>
                 {/* Yorliq matni ekranda koʻrinmaydi, lekin skrin-riderga bosqich
@@ -91,14 +112,16 @@ export function Stepper({ status, className }: StepperProps) {
         })}
       </div>
 
-      <div className="mt-12 flex items-baseline justify-between gap-12">
-        <p className="min-w-0 truncate text-title text-text-primary">
-          {currentLabel}
-        </p>
-        <p className="tabular shrink-0 text-caption text-text-secondary">
-          {currentStep + 1}/{STEPPER_LABELS.length}
-        </p>
-      </div>
+      {!compact && (
+        <div className="mt-12 flex items-baseline justify-between gap-12">
+          <p className="min-w-0 truncate text-title text-text-primary">
+            {currentLabel}
+          </p>
+          <p className="tabular shrink-0 text-caption text-text-secondary">
+            {currentStep + 1}/{STEPPER_LABELS.length}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

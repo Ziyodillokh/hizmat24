@@ -3,8 +3,7 @@ import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/lib/cn';
 import { formatApproxPrice } from '@/lib/formatters';
-import { serviceIcon } from '@/lib/serviceIcons';
-import { SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { ServicePhoto } from './ServicePhoto';
 
 /**
  * Tanlangan xizmat — oqimning har qadamida bir xil karta.
@@ -22,22 +21,6 @@ export interface ServiceSummaryCardProps {
   /** Berilsa "Oʻzgartirish" havolasi (44px teginish nishoni). */
   onChange?: () => void;
   className?: string;
-}
-
-function Photo({ service, className }: { service: ServiceSummaryCardProps['service']; className: string }) {
-  const src = SERVICE_IMAGES[service.id];
-  return (
-    <span
-      className={cn('flex shrink-0 items-center justify-center overflow-hidden rounded-sm bg-primary-surface text-accent-water', className)}
-      aria-hidden
-    >
-      {src ? (
-        <img src={src} alt="" draggable={false} className="h-full w-full object-cover" />
-      ) : (
-        <Icon icon={serviceIcon(service.iconKey)} size={32} weight="duotone" />
-      )}
-    </span>
-  );
 }
 
 function ChangeLink({ onChange }: { onChange: () => void }) {
@@ -71,7 +54,7 @@ export function ServiceSummaryCard({
   if (size === 'hero') {
     return (
       <Card className={cn('p-8', className)}>
-        <Photo service={service} className="aspect-[16/9] w-full" />
+        <ServicePhoto serviceId={service.id} iconKey={service.iconKey} className="aspect-[16/9] w-full" />
         <div className="flex items-center gap-12 px-8 pb-4 pt-12">
           {text}
           {onChange && <ChangeLink onChange={onChange} />}
@@ -82,7 +65,7 @@ export function ServiceSummaryCard({
 
   return (
     <Card className={cn('flex items-center gap-12 p-8', className)}>
-      <Photo service={service} className="h-[56px] w-[84px]" />
+      <ServicePhoto serviceId={service.id} iconKey={service.iconKey} className="h-[56px] w-[84px]" />
       {text}
       {onChange && <ChangeLink onChange={onChange} />}
     </Card>
