@@ -63,7 +63,7 @@ export function PremiumMastersRail({ masters, onSelect, className }: PremiumMast
             qilardi (58x65) va halqa DOIRA emas, ellips boʻlib chizilardi.
           */}
           <span className="flex rounded-full border-2 border-on-primary-deep p-[2px]">
-            <Avatar name={master.fullName} src={master.photoUrl} size={48} />
+            <Avatar name={master.fullName} src={master.photoUrl} size={44} />
           </span>
 
           <span className="w-full truncate text-center text-caption text-on-primary-deep">

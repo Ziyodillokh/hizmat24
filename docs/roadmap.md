@@ -39,22 +39,25 @@ Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
 
 | Tab | Ichida nima bor |
 |---|---|
-| **Bosh** | Ism (salomlashuvsiz), premium ustalar tasmasi, banner, **"Santexnika xizmatlari"** (gorizontal tasma: guruhning birinchi 5 xizmati + "Barcha xizmatlar", har kartada foto katakchasi), **"Mijozlarimiz fikrlari"** (gorizontal sharh kartalari — NAMUNA; bosh sahifada belgisiz, egasining qarori; "Barchasini ko'rish" → `/app/reviews`, u yerda ogohlantirish bor), pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
+| **Bosh** | Ism (salomlashuvsiz), premium ustalar tasmasi, banner, **"Santexnika xizmatlari"** (3×2 panjara: guruhning birinchi 5 xizmati egasi bergan fotolar bilan + "Barcha xizmatlar"), **"Mijozlarimiz fikrlari"** (gorizontal sharh kartalari — NAMUNA; bosh sahifada belgisiz, egasining qarori; "Barchasini ko'rish" → `/app/reviews`, u yerda ogohlantirish bor), pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
 | **Karta** | Shu oyda sarflangan pul, soha va to'lov usuli bo'yicha taqsimot, oxirgi 6 oy, daraja va keshbek |
 | **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
 | **Profil** | Shaxsiy ma'lumotlar, manzillar, sevimlilar, rol, usta kabineti, yordam |
 
 **Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan** (egasining maketi).
-Maketdagi 3×2 panjara telefonda sig'madi (status bar spaceri bilan ikki
-bo'limga ~384px qoladi, panjara o'zi 195px olardi) — xizmatlar gorizontal
-tasmaga o'tdi: bitta qator, foto katakchasi uch barobar katta. Sig'ish
-o'lchangan: 360×700 da ham scrollsiz, AI tugmasi sharhlardan yuqorida.
+3×2 panjara egasining talabi; telefonda sig'ishi uchun ixcham rejim
+(≤800px): karta hoshiyasi 4px, foto 16:9 (oddiy rejimda 3:2), qatorlar
+orasi 4px, sarlavha oraliqlari 4px, tasma avatari 44px. Sig'ish o'lchangan:
+360×700 da ham scrollsiz (13px zaxira). AI tugmasi faqat gorizontal sharh
+tasmasining ikkinchi (baribir qirqilgan) kartasi ustiga tushadi — oq halqa
+uni kontentdan ajratadi. Tizim shrifti "katta" qilingan telefonda sahifa
+ozgina scroll bo'lishi mumkin — bu qabul qilingan chegara.
 Santexnika guruhi 7 xizmatga kengaydi: Santexnika ta'miri, Suv isitgich
 xizmatlari, Unitaz va kanalizatsiya, Rakovina va smesitel, Quvurlarni
 o'rnatish (birinchi beshtasi bosh sahifada), Kanalizatsiya tozalash,
-Isitish tizimini ulash. Eski ID lar saqlangan (hamyon seedlari). Xizmat
-rasmlari yo'q — kartalarda hozircha soha ikonasi; `ServiceTile.imageUrl`
-berilsa rasm chiziladi.
+Isitish tizimini ulash. Eski ID lar saqlangan (hamyon seedlari). Kartalarda egasi bergan
+5 ta foto (`src/assets/services`, `src/mocks/serviceImages.ts`); rasmi
+yo'q kategoriya soha ikonasi bilan chiziladi.
 
 **"Mijozlarimiz fikrlari" — NAMUNA.** Serverda mijozlar sharhlari modeli
 yo'q; `src/mocks/reviews.ts` dagi ismlar va matnlar to'qima. Bosh sahifada

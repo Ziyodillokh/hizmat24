@@ -17,6 +17,7 @@ import { ORDER_STATUS } from '@/lib/orderStateMachine';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { findGroup } from '@/mocks/serviceGroups';
 import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
+import { ALL_SERVICES_IMAGE, SERVICE_IMAGES } from '@/mocks/serviceImages';
 import { MASTER_LIST } from '@/mocks/masters';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import { useApp } from '../store';
@@ -25,7 +26,8 @@ import type { LiveOrder } from '../types';
 
 /**
  * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
- * gorizontal tasmada guruhning birinchi BESH xizmati + "Barcha xizmatlar".
+ * 3×2 panjarada guruhning birinchi BESH xizmati (haqiqiy fotolar bilan) +
+ * "Barcha xizmatlar".
  * Namuna sharhlar bosh sahifada belgisiz koʻrsatiladi (egasining qarori);
  * ularning namuna ekani /app/reviews sahifasida va src/mocks/reviews.ts da
  * aytilgan.
@@ -53,7 +55,7 @@ const PREMIUM_MASTERS = MASTER_LIST.filter((master) => master.isPremium);
  */
 function SectionTitleRow({ title, onMore }: { title: string; onMore: () => void }) {
   return (
-    <div className="flex items-center justify-between gap-8 pt-16 [@media(max-height:800px)]:pt-8">
+    <div className="flex items-center justify-between gap-8 pt-16 [@media(max-height:800px)]:pt-4">
       <h2 className="min-w-0 truncate text-h3 text-text-primary">{title}</h2>
       <button
         type="button"
@@ -129,7 +131,7 @@ export function HomeTab() {
             />
           </div>
 
-          <div className="px-20 pt-12 [@media(max-height:800px)]:pt-8">
+          <div className="px-20 pt-12 [@media(max-height:800px)]:pt-4">
             <HomeBanner onSelect={() => navigate('/app/services')} />
           </div>
         </div>
@@ -171,27 +173,26 @@ export function HomeTab() {
           title="Santexnika xizmatlari"
           onMore={() => navigate(`/app/groups/${HOME_GROUP_ID}`)}
         />
-        {/* Gorizontal tasma — PremiumMastersRail naqshi (-mx-20 px-20). */}
-        <ul className="-mx-20 mt-8 flex gap-8 overflow-x-auto px-20 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [@media(max-height:800px)]:pb-4">
+        {/* 3×2 panjara (egasining maketi). Ixcham rejimda qatorlar orasi 4px. */}
+        <div className="mt-8 grid grid-cols-3 gap-8 [@media(max-height:800px)]:gap-y-4">
           {HOME_SERVICES.map((category) => (
-            <li key={category.id} className="shrink-0">
-              <ServiceTile
-                label={category.name}
-                icon={serviceIcon(category.iconKey ?? 'plumber')}
-                onClick={() => selectService(category.id)}
-              />
-            </li>
+            <ServiceTile
+              key={category.id}
+              label={category.name}
+              icon={serviceIcon(category.iconKey ?? 'plumber')}
+              imageUrl={SERVICE_IMAGES[category.id]}
+              onClick={() => selectService(category.id)}
+            />
           ))}
           {/* Neytral: xizmat emas, toʻliq katalogga (barcha guruhlar) yoʻl. */}
-          <li className="shrink-0">
-            <ServiceTile
-              label="Barcha xizmatlar"
-              icon={MORE_ICON}
-              tone="neutral"
-              onClick={() => navigate('/app/services')}
-            />
-          </li>
-        </ul>
+          <ServiceTile
+            label="Barcha xizmatlar"
+            icon={MORE_ICON}
+            imageUrl={ALL_SERVICES_IMAGE}
+            tone="neutral"
+            onClick={() => navigate('/app/services')}
+          />
+        </div>
 
         <SectionTitleRow title="Mijozlarimiz fikrlari" onMore={() => navigate('/app/reviews')} />
         {/*
@@ -218,8 +219,8 @@ export function HomeTab() {
 
       {/*
         AI yordamchi — pastki oʻng burchakdagi suzuvchi tugma (egasining
-        talabi). Ostidagi statik kontent (sarlavhalar, xizmatlar tasmasi)
-        har bir telefonda tugmadan yuqorida tugaydi. Tugma ostiga faqat
+        talabi). Ostidagi statik kontent (sarlavhalar, panjara) har bir
+        telefonda tugmadan yuqorida tugaydi. Tugma ostiga faqat
         gorizontal sharhlar tasmasining IKKINCHI kartasining burchagi tushadi:
         birinchi karta 248px — tugma boshlanadigan 268px dan chapda; tasmada
         pr-[80px] bor, shuning uchun har bir karta tugmadan chiqib oʻqiladi.
@@ -228,9 +229,9 @@ export function HomeTab() {
         type="button"
         onClick={() => navigate('/app/ai')}
         aria-label="AI yordamchi"
-        className="hero-field absolute bottom-12 right-20 flex h-[52px] w-[52px] [@media(max-height:800px)]:bottom-8 items-center justify-center rounded-full text-on-primary-deep shadow-e3 transition-transform duration-press ease-emphasized active:scale-[0.94]"
+        className="hero-field absolute bottom-12 right-20 flex h-[56px] w-[56px] items-center justify-center rounded-full text-on-primary-deep shadow-e3 ring-[3px] ring-surface transition-transform duration-press ease-emphasized active:scale-[0.94] [@media(max-height:800px)]:bottom-8"
       >
-        <Icon icon={Sparkle} size={24} weight="fill" />
+        <Icon icon={Sparkle} size={28} weight="fill" />
       </button>
       </div>
 
