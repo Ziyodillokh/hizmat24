@@ -1,7 +1,7 @@
 import { ArrowLeft, Bell } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
-import { formatPhone, greeting } from '@/lib/formatters';
+import { formatPhone } from '@/lib/formatters';
 import { Avatar } from './Avatar';
 import { Icon } from './Icon';
 import { UnreadBadge } from './BottomNav';
@@ -27,11 +27,6 @@ type HeaderTone = 'surface' | 'hero';
  * `[[data-theme='dark']_&]:` tarmogʻi bor edi — chunki Lightʼdagi hero yorqin
  * tsian boʻlib, oq matnni koʻtara olmasdi.
  */
-const GREETING_CLASSES: Record<HeaderTone, string> = {
-  surface: 'text-text-secondary',
-  hero: 'text-on-primary-deep',
-};
-
 const TITLE_CLASSES: Record<HeaderTone, string> = {
   surface: 'text-text-primary',
   hero: 'text-on-primary-deep',
@@ -49,7 +44,6 @@ export interface HeaderProps {
   /** `home`: ism yoʻq boʻlsa maskalangan raqam koʻrsatiladi (8.3-band). */
   phone?: string | null;
   /** `home`: salomlashuvni tanlash uchun joriy vaqt (8.3-band). */
-  now?: Date;
   /** `home`: avatarni tashqaridan berish; berilmasa 9.28-komponent (Avatar) 44px oʻlchamda. */
   avatar?: ReactNode;
   /** `home`: qoʻngʻiroq ikonasidagi oʻqilmaganlar soni. */
@@ -72,7 +66,6 @@ export function Header({
   variant = 'home',
   name,
   phone,
-  now,
   avatar,
   unreadCount = 0,
   onNotificationsClick,
@@ -132,15 +125,10 @@ export function Header({
       )}
       <div className="min-w-0 flex-1">
         {/*
-          Salomlashuv — kichik, katta harflarda va kengaytirilgan harf
-          oraligʻi bilan: u ismni TANITIB beruvchi yorliq, ismning oʻzi bilan
-          bir xil ogʻirlikda raqobatlashmasligi kerak.
+          Faqat ism (egasining qarori, 2026-09-13): "Xayrli kun" salomlashuvi
+          olib tashlandi — u ismni tanitib berardi, endi ism oʻzi yetarli.
         */}
-        <p className={cn('truncate text-overline uppercase', GREETING_CLASSES[tone])}>
-          {greeting(now ?? new Date())}
-        </p>
-        {/* Ism — bosh sahifadagi shaxsiy blokning asosiy matni. */}
-        <p className={cn('mt-2 truncate text-h2', TITLE_CLASSES[tone])}>{identity}</p>
+        <p className={cn('truncate text-h2', TITLE_CLASSES[tone])}>{identity}</p>
       </div>
       <button
         type="button"

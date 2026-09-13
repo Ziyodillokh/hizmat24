@@ -39,12 +39,16 @@ Tab bar **4 ta bo'lim** (2026-09-13 dan; ilgari 5 ta edi):
 
 | Tab | Ichida nima bor |
 |---|---|
-| **Bosh** | Premium ustalar tasmasi, banner, **"Santexnika xizmatlari"** (3×2: guruhning birinchi 5 xizmati + "Barcha xizmatlar"), **"Mijozlarimiz fikrlari"** (gorizontal sharh kartalari — NAMUNA, "Demo · namuna fikrlar" belgisi bilan, "Barchasini ko'rish" → `/app/reviews`), pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
+| **Bosh** | Ism (salomlashuvsiz), premium ustalar tasmasi, banner, **"Santexnika xizmatlari"** (gorizontal tasma: guruhning birinchi 5 xizmati + "Barcha xizmatlar", har kartada foto katakchasi), **"Mijozlarimiz fikrlari"** (gorizontal sharh kartalari — NAMUNA; bosh sahifada belgisiz, egasining qarori; "Barchasini ko'rish" → `/app/reviews`, u yerda ogohlantirish bor), pastki o'ng burchakda suzuvchi **AI yordamchi** tugmasi |
 | **Karta** | Shu oyda sarflangan pul, soha va to'lov usuli bo'yicha taqsimot, oxirgi 6 oy, daraja va keshbek |
 | **Buyurtma** | Buyurtmalar ro'yxati va kuzatuv |
 | **Profil** | Shaxsiy ma'lumotlar, manzillar, sevimlilar, rol, usta kabineti, yordam |
 
 **Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan** (egasining maketi).
+Maketdagi 3×2 panjara telefonda sig'madi (status bar spaceri bilan ikki
+bo'limga ~384px qoladi, panjara o'zi 195px olardi) — xizmatlar gorizontal
+tasmaga o'tdi: bitta qator, foto katakchasi uch barobar katta. Sig'ish
+o'lchangan: 360×700 da ham scrollsiz, AI tugmasi sharhlardan yuqorida.
 Santexnika guruhi 7 xizmatga kengaydi: Santexnika ta'miri, Suv isitgich
 xizmatlari, Unitaz va kanalizatsiya, Rakovina va smesitel, Quvurlarni
 o'rnatish (birinchi beshtasi bosh sahifada), Kanalizatsiya tozalash,
@@ -53,8 +57,10 @@ rasmlari yo'q — kartalarda hozircha soha ikonasi; `ServiceTile.imageUrl`
 berilsa rasm chiziladi.
 
 **"Mijozlarimiz fikrlari" — NAMUNA.** Serverda mijozlar sharhlari modeli
-yo'q; `src/mocks/reviews.ts` dagi ismlar va matnlar to'qima va bosh
-sahifada ham, `/app/reviews` da ham shunday deb belgilangan. `/app/reviews`
+yo'q; `src/mocks/reviews.ts` dagi ismlar va matnlar to'qima. Bosh sahifada
+"Demo" belgisi egasining talabi bilan olib tashlandi — ya'ni bosh sahifa
+namuna sharhlarni belgisiz ko'rsatadi; `/app/reviews` sahifasi buni
+ogohlantirish banneri bilan aytadi. Server ulangach mock fayl o'chiriladi. `/app/reviews`
 avval foydalanuvchining o'z baholarini (yagona haqiqiy ma'lumot), keyin
 namunalarni ko'rsatadi.
 

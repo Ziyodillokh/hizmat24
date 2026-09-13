@@ -221,7 +221,7 @@ function Gallery() {
       </GallerySection>
 
       <GallerySection title="9.14 / 9.15 · Header va pastki navigatsiya">
-        <div className="w-full"><Header variant="home" name="Jasur" phone="+998901234567" now={NOW} /></div>
+        <div className="w-full"><Header variant="home" name="Jasur" phone="+998901234567" /></div>
         <div className="w-full"><Header variant="inner" title="Barcha xizmatlar" /></div>
         <div className="w-full"><BottomNav active="home" onSelect={() => undefined} /></div>
       </GallerySection>

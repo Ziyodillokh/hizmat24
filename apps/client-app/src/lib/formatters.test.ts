@@ -16,7 +16,6 @@ import {
   formatWeekday,
   formatWeekdayShort,
   formatTime,
-  greeting,
   maskPhone,
   orEmpty,
 } from './formatters';
@@ -128,20 +127,6 @@ describe('telefon raqami (8.3-band)', () => {
 
   it('kutilmagan uzunlikdagi qiymatni o\'zgartirmaydi', () => {
     expect(maskPhone('12345')).toBe('12345');
-  });
-});
-
-describe('greeting (8.3-band)', () => {
-  it.each([
-    [6, 'Xayrli tong'],
-    [11, 'Xayrli tong'],
-    [12, 'Xayrli kun'],
-    [17, 'Xayrli kun'],
-    [18, 'Xayrli kech'],
-    [23, 'Xayrli kech'],
-    [3, 'Xayrli kech'],
-  ])('soat %s → "%s"', (hour, expected) => {
-    expect(greeting(new Date(2026, 8, 5, hour, 0))).toBe(expected);
   });
 });
 

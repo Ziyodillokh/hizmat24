@@ -25,7 +25,10 @@ import type { LiveOrder } from '../types';
 
 /**
  * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
- * 3×2 panjarada guruhning birinchi BESH xizmati + "Barcha xizmatlar".
+ * gorizontal tasmada guruhning birinchi BESH xizmati + "Barcha xizmatlar".
+ * Namuna sharhlar bosh sahifada belgisiz koʻrsatiladi (egasining qarori);
+ * ularning namuna ekani /app/reviews sahifasida va src/mocks/reviews.ts da
+ * aytilgan.
  * Qolgan guruhlar (Elektrika, Gaz, …) "Barcha xizmatlar" orqali —
  * /app/services. "Mashhur" demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki
  * guruh roʻyxatining boshi.
@@ -168,37 +171,29 @@ export function HomeTab() {
           title="Santexnika xizmatlari"
           onMore={() => navigate(`/app/groups/${HOME_GROUP_ID}`)}
         />
-        <div className="mt-12 grid grid-cols-3 gap-8 [@media(max-height:800px)]:mt-8">
+        {/* Gorizontal tasma — PremiumMastersRail naqshi (-mx-20 px-20). */}
+        <ul className="-mx-20 mt-8 flex gap-8 overflow-x-auto px-20 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [@media(max-height:800px)]:pb-4">
           {HOME_SERVICES.map((category) => (
-            <ServiceTile
-              key={category.id}
-              label={category.name}
-              icon={serviceIcon(category.iconKey ?? 'plumber')}
-              onClick={() => selectService(category.id)}
-            />
+            <li key={category.id} className="shrink-0">
+              <ServiceTile
+                label={category.name}
+                icon={serviceIcon(category.iconKey ?? 'plumber')}
+                onClick={() => selectService(category.id)}
+              />
+            </li>
           ))}
           {/* Neytral: xizmat emas, toʻliq katalogga (barcha guruhlar) yoʻl. */}
-          <ServiceTile
-            label="Barcha xizmatlar"
-            icon={MORE_ICON}
-            tone="neutral"
-            onClick={() => navigate('/app/services')}
-          />
-        </div>
+          <li className="shrink-0">
+            <ServiceTile
+              label="Barcha xizmatlar"
+              icon={MORE_ICON}
+              tone="neutral"
+              onClick={() => navigate('/app/services')}
+            />
+          </li>
+        </ul>
 
         <SectionTitleRow title="Mijozlarimiz fikrlari" onMore={() => navigate('/app/reviews')} />
-        {/*
-          Halollik belgisi BIRINCHI ekranda, iqtiboslardan OLDIN: serverda
-          sharhlar yoʻq, quyidagi kartalar namuna. Sarlavha qatoriga sigʻmaydi
-          (h3 + havola + chip > 320px), shuning uchun alohida 20px qator.
-          Oʻram `flex` — inline-flex span toʻgʻridan-toʻgʻri <main> ichida
-          satr qutisi bilan balandroq boʻlardi. `span`, `button` EMAS.
-        */}
-        <div className="mt-4 flex">
-          <span className="inline-flex h-[20px] items-center rounded-full border border-dashed border-border-strong px-8 text-caption text-text-secondary">
-            Demo · namuna fikrlar
-          </span>
-        </div>
         {/*
           Gorizontal tasma — PremiumMastersRail naqshi (-mx-20). Oʻng padding
           80px: AI tugmasi oʻngdagi 20+52=72px ni egallaydi; 80px oxirgi karta
@@ -223,7 +218,7 @@ export function HomeTab() {
 
       {/*
         AI yordamchi — pastki oʻng burchakdagi suzuvchi tugma (egasining
-        talabi). Ostidagi statik kontent (sarlavhalar, panjara, Demo belgisi)
+        talabi). Ostidagi statik kontent (sarlavhalar, xizmatlar tasmasi)
         har bir telefonda tugmadan yuqorida tugaydi. Tugma ostiga faqat
         gorizontal sharhlar tasmasining IKKINCHI kartasining burchagi tushadi:
         birinchi karta 248px — tugma boshlanadigan 268px dan chapda; tasmada

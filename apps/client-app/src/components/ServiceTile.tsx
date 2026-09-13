@@ -4,16 +4,16 @@ import { cn } from '@/lib/cn';
 import { Icon } from './Icon';
 
 /**
- * Bosh sahifadagi 3×2 panjara kartasi (egasining maketi): oq karta, ichida
+ * Bosh sahifadagi xizmat kartasi — gorizontal tasmada: oq karta, ichida
  * RASM KATAKCHASI va ostida ikki satrgacha yorliq.
  *
- * Katakcha balandligi QATʼIY (kvadrat emas): 3 ustunda kvadrat katakcha
- * 85px boʻlib, 360×730 da ikki boʻlim birinchi ekranga sigʻmasdi.
- * Xizmat fotolari repoda yoʻq — hozircha vektor glif; `imageUrl` berilsa
- * glif oʻrniga foto chiziladi va layout oʻzgarmaydi.
+ * Nega tasma, panjara emas: egasining maketi 3×2 panjara edi, lekin u
+ * telefonda sigʻmadi — status bar spaceri bilan ikki boʻlimga ~384px qoladi,
+ * panjara oʻzi 195px olardi va sahifa scroll boʻlib qolgan edi. Tasma bitta
+ * qator (≈120px), rasm katakchasi esa uch barobar katta — foto uchun joy.
  *
- * Yorliqda `min-h` bor (ServiceGroupTile dan farqli): bu yerda kartalar
- * quti, bir satrli "Barcha xizmatlar" qoʻshnisidan past boʻlmasligi kerak.
+ * Xizmat fotolari repoda hali yoʻq — hozircha vektor glif; `imageUrl`
+ * berilsa glif oʻrniga foto chiziladi va layout oʻzgarmaydi.
  */
 export type ServiceTileTone = 'default' | 'neutral';
 
@@ -40,7 +40,7 @@ export function ServiceTile({
     <button
       type={type}
       className={cn(
-        'flex w-full flex-col items-stretch rounded-md border border-transparent bg-surface-elevated p-8 text-center shadow-e1',
+        'flex w-[124px] shrink-0 flex-col items-stretch rounded-md border border-transparent bg-surface-elevated p-8 text-center shadow-e1',
         "[[data-theme='dark']_&]:border-border",
         'transition-transform duration-press ease-emphasized active:scale-[0.97]',
         className,
@@ -49,8 +49,8 @@ export function ServiceTile({
     >
       <span
         className={cn(
-          'flex h-[56px] w-full items-center justify-center overflow-hidden rounded-sm',
-          '[@media(max-height:800px)]:h-[36px]',
+          'flex h-[80px] w-full items-center justify-center overflow-hidden rounded-sm',
+          '[@media(max-height:800px)]:h-[64px]',
           tone === 'neutral'
             ? 'bg-neutral-surface text-text-secondary'
             : 'bg-primary-surface text-accent-water',
@@ -60,12 +60,7 @@ export function ServiceTile({
         {imageUrl ? (
           <img src={imageUrl} alt="" draggable={false} className="h-full w-full object-cover" />
         ) : (
-          <Icon
-            icon={icon}
-            size={28}
-            weight="duotone"
-            className="[@media(max-height:800px)]:h-[24px] [@media(max-height:800px)]:w-[24px]"
-          />
+          <Icon icon={icon} size={32} weight="duotone" />
         )}
       </span>
       {/* min-h = 2 × body-sm satr (1.1875rem) — har ikki root oʻlchamida aniq. */}

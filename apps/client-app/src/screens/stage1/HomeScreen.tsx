@@ -12,7 +12,7 @@ import { StatusBar } from '@/preview/StatusBar';
 import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import { SERVICE_GROUPS } from '@/mocks/serviceGroups';
-import { ORDERS, ORDER_HISTORY, NOW } from '@/mocks/orders';
+import { ORDERS, ORDER_HISTORY } from '@/mocks/orders';
 import { USER } from '@/mocks/user';
 import { HomeBanner } from './HomeBanner';
 import { ActiveOrderCard } from './ActiveOrderCard';
@@ -82,7 +82,6 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
           onHero
           name={USER.fullName}
           phone={USER.phoneNumber}
-          now={NOW}
         />
         <div className="px-20 pb-12 pt-4">
           <SearchField
