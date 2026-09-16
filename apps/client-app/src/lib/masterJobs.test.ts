@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
   acceptBlockedLine,
+  ADDRESS_HINT,
+  ARRIVE_TOAST,
+  CANCEL_SHEET_HINT,
+  CANCEL_SHEET_TITLE,
+  CANCEL_TOAST,
+  CLIENT_CONTACT_HINT,
+  COMMISSION_HINT,
+  DEPART_TOAST,
+  FINISH_TOAST,
+  getMasterActions,
+  isPrimaryMasterAction,
+  MASTER_ACTION_LABELS,
+  MASTER_CANCEL_REASONS,
+  MASTER_STEPPER_LABELS,
+  masterWaitingCard,
+  PRICE_FIXED_HINT,
   ACCEPT_TOAST,
   adjacentMasterFilter,
   canAcceptOffer,
@@ -255,5 +271,71 @@ describe('matn qoidalari', () => {
     MASTER_FILTERS.forEach((filter) =>
       expect(MASTER_FILTER_LABELS[filter].length).toBeLessThanOrEqual(10),
     );
+  });
+});
+
+describe('getMasterActions', () => {
+  it('barcha holatlar qamrab olinadi va yiqilmaydi', () => {
+    ALL_STATUSES.forEach((status) => expect(() => getMasterActions(status)).not.toThrow());
+  });
+
+  it('mijoz qadamini kutadigan holatlarda holatni suradigan amal yoʻq', () => {
+    [ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION, ORDER_STATUS.COMPLETED_BY_MASTER].forEach((status) => {
+      const actions = getMasterActions(status);
+      expect(actions.some(isPrimaryMasterAction)).toBe(false);
+      expect(masterWaitingCard(status)).not.toBeNull();
+    });
+  });
+
+  it('bekor qilish faqat ASSIGNED va MASTER_EN_ROUTE da', () => {
+    expect(getMasterActions(ORDER_STATUS.ASSIGNED)).toContain('cancel');
+    expect(getMasterActions(ORDER_STATUS.MASTER_EN_ROUTE)).toContain('cancel');
+    ALL_STATUSES.filter(
+      (status) => status !== ORDER_STATUS.ASSIGNED && status !== ORDER_STATUS.MASTER_EN_ROUTE,
+    ).forEach((status) => expect(getMasterActions(status)).not.toContain('cancel'));
+  });
+
+  it('yopilgan ishda amal yoʻq, bekor va xavfsizlikda faqat yordam', () => {
+    expect(getMasterActions(ORDER_STATUS.CLOSED)).toHaveLength(0);
+    expect(getMasterActions(ORDER_STATUS.CANCELLED)).toEqual(['support']);
+    expect(getMasterActions(ORDER_STATUS.SAFETY_FLAGGED)).toEqual(['support']);
+  });
+
+  it('har bir holatda koʻpi bilan bitta asosiy amal', () => {
+    ALL_STATUSES.forEach((status) =>
+      expect(getMasterActions(status).filter(isPrimaryMasterAction).length).toBeLessThanOrEqual(1),
+    );
+  });
+});
+
+describe('M3 matnlari', () => {
+  it('ASCII apostrof yoʻq', () => {
+    const texts = [
+      ...Object.values(MASTER_ACTION_LABELS),
+      ...MASTER_CANCEL_REASONS,
+      ...MASTER_STEPPER_LABELS,
+      CANCEL_SHEET_TITLE,
+      CANCEL_SHEET_HINT,
+      ADDRESS_HINT,
+      PRICE_FIXED_HINT,
+      COMMISSION_HINT,
+      CLIENT_CONTACT_HINT,
+      DEPART_TOAST,
+      ARRIVE_TOAST,
+      CANCEL_TOAST,
+      FINISH_TOAST,
+      masterWaitingCard(ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION)?.description ?? '',
+      masterWaitingCard(ORDER_STATUS.COMPLETED_BY_MASTER)?.description ?? '',
+    ];
+    texts.forEach((text) => expect(text).not.toMatch(/[a-zA-Z]'[a-zA-Z]/));
+  });
+
+  it('stepper beshta qadam — mijoznikidek', () => {
+    expect(MASTER_STEPPER_LABELS).toHaveLength(5);
+  });
+
+  it('bekor sabablari erkin matn emas, tanlov', () => {
+    expect(MASTER_CANCEL_REASONS.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(MASTER_CANCEL_REASONS).size).toBe(MASTER_CANCEL_REASONS.length);
   });
 });

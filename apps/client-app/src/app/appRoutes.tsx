@@ -37,6 +37,8 @@ import { MasterSetupScreen } from './screens/MasterSetup';
 import { MasterSettingsScreen } from './screens/MasterSettings';
 import { MasterApplyScreen } from './screens/MasterApply';
 import { ModeScreen } from './screens/ModeScreen';
+import { MasterFinishScreen } from './screens/master/MasterFinishScreen';
+import { MasterJobScreen } from './screens/master/MasterJobScreen';
 import { MasterJobsTab } from './screens/master/MasterJobsTab';
 import { MasterHistoryTab } from './screens/master/MasterHistoryTab';
 import { MasterEarningsTab } from './screens/master/MasterEarningsTab';
@@ -149,6 +151,8 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   // Usta rejimi — toʻrt tab, oʻz pastki paneli bilan
   { path: 'master', element: <Navigate to="/app/master/jobs" replace />, role: 'master' },
   { path: 'master/jobs', element: <MasterJobsTab />, role: 'master' },
+  { path: 'master/jobs/:orderId', element: <MasterJobScreen />, role: 'master' },
+  { path: 'master/jobs/:orderId/finish', element: <MasterFinishScreen />, role: 'master' },
   { path: 'master/history', element: <MasterHistoryTab />, role: 'master' },
   { path: 'master/earnings', element: <MasterEarningsTab />, role: 'master' },
   { path: 'master/profile', element: <MasterProfileTab />, role: 'master' },

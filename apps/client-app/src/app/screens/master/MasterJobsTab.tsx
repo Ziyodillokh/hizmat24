@@ -19,6 +19,8 @@ import { formatTabCount } from '@/lib/orderListView';
 import {
   ACCEPT_TOAST,
   acceptBlockedLine,
+  ARRIVE_TOAST,
+  DEPART_TOAST,
   adjacentMasterFilter,
   canAcceptOffer,
   countMasterJobs,
@@ -31,8 +33,10 @@ import {
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
   MASTER_SOURCE_LINE,
+  isMyJob,
   masterEmptyStateFor,
   splitMasterJobs,
+  type MasterAction,
   type MasterEmptyCta,
   type MasterJobFilter,
 } from '@/lib/masterJobs';
@@ -74,7 +78,16 @@ export function MasterJobsTab() {
   const navigate = useNavigate();
   const now = useMinuteClock();
   const showToast = useToast();
-  const { orders, setRole, fullName, phoneNumber, masterAcceptOrder, createDemoOrder } = useApp();
+  const {
+    orders,
+    setRole,
+    fullName,
+    phoneNumber,
+    masterAcceptOrder,
+    masterDepart,
+    masterArrive,
+    createDemoOrder,
+  } = useApp();
   const {
     profile,
     isComplete,
@@ -84,8 +97,15 @@ export function MasterJobsTab() {
     closeShift,
   } = useMaster();
 
-  const [filter, setFilter] = useState<MasterJobFilter>('offers');
-  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  // Ekran ochilganda faol ish boʻlsa — oʻsha filtr. Usta bir vaqtda bitta
+  // ish olib boradi, demak ilovani ochish sababi aynan oʻsha ish; takliflar
+  // roʻyxatidan uni qidirib topish keraksiz qadam.
+  const [filter, setFilter] = useState<MasterJobFilter>(() =>
+    orders.some(isMyJob) ? 'active' : 'offers',
+  );
+  // Bitta varaq ikki amalga xizmat qiladi: taklifni qabul qilish va yoʻlga
+  // chiqish. Ikkalasida ham savol bitta — qancha vaqtda yetib borasiz.
+  const [pending, setPending] = useState<{ id: string; mode: 'accept' | 'depart' } | null>(null);
 
   const input = useMemo(
     () => ({ declinedIds: declinedOrderIds, isAvailable: profile.isAvailable }),
@@ -123,10 +143,16 @@ export function MasterJobsTab() {
   // Usta yozuvi HAR SAFAR yangidan yigʻiladi: ism, soha va statistika
   // oʻzgargan boʻlishi mumkin, muzlatilgan nusxa esa eskirgan maʼlumotni
   // mijoz buyurtmasiga yozib qoʻyardi.
-  const acceptOffer = (etaMinutes: number) => {
-    const orderId = pendingOrderId;
-    setPendingOrderId(null);
-    if (!orderId) return;
+  const submitEta = (etaMinutes: number) => {
+    const request = pending;
+    setPending(null);
+    if (!request) return;
+
+    if (request.mode === 'depart') {
+      masterDepart(request.id, etaMinutes);
+      showToast(DEPART_TOAST);
+      return;
+    }
 
     const master = buildSelfMaster({
       fullName,
@@ -136,10 +162,24 @@ export function MasterJobsTab() {
       stats: masterJobStats(orders),
     });
 
-    if (masterAcceptOrder(orderId, { master, etaMinutes })) {
+    if (masterAcceptOrder(request.id, { master, etaMinutes })) {
       setFilter('active');
       showToast(ACCEPT_TOAST);
     }
+  };
+
+  /** Kartadagi asosiy amal — roʻyxatdan chiqmasdan bajariladi. */
+  const runCardAction = (action: MasterAction, orderId: string) => {
+    if (action === 'depart') {
+      setPending({ id: orderId, mode: 'depart' });
+      return;
+    }
+    if (action === 'arrive') {
+      masterArrive(orderId);
+      showToast(ARRIVE_TOAST);
+      return;
+    }
+    if (action === 'finish') navigate(`/app/master/jobs/${orderId}/finish`);
   };
 
   const decline = (orderId: string) => {
@@ -242,9 +282,11 @@ export function MasterJobsTab() {
                     order={order}
                     now={now}
                     variant={filter === 'offers' ? 'offer' : 'active'}
-                    onAccept={canAccept ? () => setPendingOrderId(order.id) : null}
+                    onAccept={canAccept ? () => setPending({ id: order.id, mode: 'accept' }) : null}
                     onDecline={() => decline(order.id)}
                     blockedHint={blockedHint}
+                    onOpen={() => navigate(`/app/master/jobs/${order.id}`)}
+                    onAction={(action) => runCardAction(action, order.id)}
                   />
                 </li>
               ))}
@@ -256,20 +298,16 @@ export function MasterJobsTab() {
       </SwipeSurface>
 
       {/* Yetib borish vaqtini USTA tanlaydi — qattiq yozilgan 15 daqiqa yoʻq. */}
-      <Sheet
-        open={pendingOrderId !== null}
-        title={ETA_SHEET_TITLE}
-        onClose={() => setPendingOrderId(null)}
-      >
+      <Sheet open={pending !== null} title={ETA_SHEET_TITLE} onClose={() => setPending(null)}>
         <p className="text-body-sm text-text-secondary">{ETA_SHEET_HINT}</p>
         <div className="mt-16 flex flex-wrap gap-8">
           {ETA_OPTIONS.map((minutes) => (
-            <SelectableChip key={minutes} selected={false} onSelect={() => acceptOffer(minutes)}>
+            <SelectableChip key={minutes} selected={false} onSelect={() => submitEta(minutes)}>
               {etaOptionLabel(minutes)}
             </SelectableChip>
           ))}
         </div>
-        <Button variant="ghost" className="mt-20" onClick={() => setPendingOrderId(null)}>
+        <Button variant="ghost" className="mt-20" onClick={() => setPending(null)}>
           Yopish
         </Button>
       </Sheet>

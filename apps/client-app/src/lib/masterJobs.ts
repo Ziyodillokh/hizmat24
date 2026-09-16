@@ -288,3 +288,117 @@ export const ACCEPT_TOAST = 'Qabul qildingiz — mijoz ekranida sizning kartangi
  */
 export const MASTER_NEXT_STAGE_LINE =
   'Yoʻlga chiqish, yetib kelish va yakunlash tugmalari keyingi bosqichda ulanadi.';
+
+// ────────────────────────────────────────────────────────── ish amallari ──
+
+/**
+ * Usta bajara oladigan oʻtishlar.
+ *
+ * Roʻyxat holat mashinasining oʻzidan KOʻPAYTIRMAYDI: har bir amal mavjud
+ * beshta avtomatik oʻtishdan bittasini almashtiradi. Ikkita oʻtish ustaga
+ * hech qachon berilmaydi — shaxsni tasdiqlash va baho MIJOZNIKI.
+ */
+export type MasterAction = 'depart' | 'arrive' | 'finish' | 'cancel' | 'client-mode' | 'support';
+
+export const MASTER_ACTION_LABELS: Record<MasterAction, string> = {
+  depart: 'Yoʻlga chiqdim',
+  arrive: 'Yetib keldim',
+  finish: 'Ishni yakunlash',
+  cancel: 'Ishni bekor qilish',
+  'client-mode': 'Mijoz rejimiga oʻtish',
+  support: 'Qoʻllab-quvvatlash',
+};
+
+/** Toʻldirilgan tugma — ekrandagi asosiy amal; qolganlari ikkinchi darajali. */
+export const isPrimaryMasterAction = (action: MasterAction): boolean =>
+  action === 'depart' || action === 'arrive' || action === 'finish';
+
+/**
+ * Holatga mos amallar, tartibi bilan (birinchisi — asosiy).
+ *
+ * `IN_PROGRESS` da bekor qilish YOʻQ: mijoz eshik oldida shaxsni tasdiqlagan
+ * va ish boshlangan; chiqish yoʻli — qoʻllab-quvvatlash.
+ */
+export function getMasterActions(status: OrderStatus): readonly MasterAction[] {
+  switch (status) {
+    case ORDER_STATUS.ASSIGNED:
+      return ['depart', 'cancel'];
+    case ORDER_STATUS.MASTER_EN_ROUTE:
+      return ['arrive', 'cancel'];
+    case ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION:
+      return ['client-mode', 'support'];
+    case ORDER_STATUS.IN_PROGRESS:
+      return ['finish', 'support'];
+    case ORDER_STATUS.CANCELLED:
+    case ORDER_STATUS.SAFETY_FLAGGED:
+      return ['support'];
+    default:
+      return [];
+  }
+}
+
+/** Ish kartasidagi ixcham stepper yorliqlari — usta tilida. */
+export const MASTER_STEPPER_LABELS: readonly string[] = [
+  'Taklif',
+  'Qabul qildim',
+  'Yoʻldaman',
+  'Ish jarayonida',
+  'Yakunladim',
+];
+
+/** Bekor qilish sabablari — erkin matn emas, tanlov. */
+export const MASTER_CANCEL_REASONS: readonly string[] = [
+  'Manzilga yetib bora olmadim',
+  'Kerakli ehtiyot qism yoʻq',
+  'Mijoz javob bermadi',
+  'Ish mening yoʻnalishimda emas',
+  'Boshqa sabab',
+];
+
+export const CANCEL_SHEET_TITLE = 'Ishni bekor qilasizmi?';
+
+export const CANCEL_SHEET_HINT =
+  'Bekor qilsangiz, mijoz buni koʻradi va buyurtma yopiladi. Boshqa ustaga oʻtmaydi — server yoʻq.';
+
+/** Kutish kartalari — tugma oʻrniga sabab (TZ 4.4, 8-blok). */
+export interface MasterWaitingCard {
+  title: string;
+  description: string;
+}
+
+export function masterWaitingCard(status: OrderStatus): MasterWaitingCard | null {
+  if (status === ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION) {
+    return {
+      title: 'Mijozning tasdigʻini kutyapsiz',
+      description:
+        'Mijoz eshik oldida shaxsingizni tasdiqlaydi. Tasdiqlamaguncha bu yerda tugma boʻlmaydi — bu uning xavfsizlik qadami.',
+    };
+  }
+  if (status === ORDER_STATUS.COMPLETED_BY_MASTER) {
+    return {
+      title: 'Mijoz baholaydi',
+      description:
+        'Buyurtma mijoz baho bergach yopiladi. Naqd pulni olganingizga ishonch hosil qiling.',
+    };
+  }
+  return null;
+}
+
+/** Ish kartasidagi doimiy izohlar — ilova nimani BILMASLIGI ochiq aytiladi. */
+export const ADDRESS_HINT = 'Manzil mijoz kiritgan matn. Xarita va masofa yoʻq.';
+
+export const PRICE_FIXED_HINT = 'Narx buyurtma berilganda belgilangan va oʻzgarmaydi.';
+
+export const COMMISSION_HINT =
+  'Platforma komissiyasi foizi hali belgilanmagan — sof daromad koʻrsatilmaydi.';
+
+export const CLIENT_CONTACT_HINT =
+  'Bu qurilmada mijoz ham, usta ham — bitta raqam. Shuning uchun qoʻngʻiroq tugmasi chizilmaydi.';
+
+export const DEPART_TOAST = 'Yoʻlga chiqdingiz — mijoz ekranida holat yangilandi.';
+
+export const ARRIVE_TOAST = 'Yetib keldingiz — mijoz shaxsingizni tasdiqlaydi.';
+
+export const CANCEL_TOAST = 'Ish bekor qilindi — mijoz buni koʻradi.';
+
+export const FINISH_TOAST = 'Ish yakunlandi — mijoz baholashini kutamiz.';

@@ -300,7 +300,19 @@ export function OrderTracking() {
           {order.cancelReason && (
             <p className="mt-8 text-center text-body text-text-secondary">{order.cancelReason}</p>
           )}
-          <p className="mt-4 text-body-sm text-text-secondary">Siz bekor qildingiz</p>
+          {/*
+            Kim bekor qilgani `cancelledBy` dan oʻqiladi. Ilgari bu yerda
+            doim «Siz bekor qildingiz» turardi — usta bekor qilgan buyurtmada
+            bu ekrandagi ochiq yolgʻon boʻlardi.
+          */}
+          <p className="mt-4 text-body-sm text-text-secondary">
+            {order.cancelledBy === 'MASTER' ? 'Usta bekor qildi' : 'Siz bekor qildingiz'}
+          </p>
+          {order.cancelledBy === 'MASTER' && (
+            <p className="mt-4 text-center text-caption text-text-secondary">
+              Hech qanday pul yechilmagan. Xohlasangiz, yangi buyurtma berasiz.
+            </p>
+          )}
         </div>
       )}
 

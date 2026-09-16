@@ -4,21 +4,26 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import {
   simulationStep,
-  simulationTimerKey,
-  waitMsFor,
 } from '@/lib/orderSimulation';
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 
-import { buildAcceptPatch, buildStepPatch } from './masterActions';
+import {
+  buildAcceptPatch,
+  buildArrivePatch,
+  buildDepartPatch,
+  buildFinishPatch,
+  buildMasterCancelPatch,
+  buildStepPatch,
+} from './masterActions';
 import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
+import { useOrderTimers } from './useOrderTimers';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
@@ -106,6 +111,10 @@ interface AppActions {
    * yoki buyurtma bekor qilingan) va hech narsa yozilmadi.
    */
   masterAcceptOrder: (orderId: string, input: { master: Master; etaMinutes: number }) => boolean;
+  masterDepart: (orderId: string, etaMinutes: number) => void;
+  masterArrive: (orderId: string) => void;
+  masterCancelOrder: (orderId: string, reason: string) => void;
+  masterFinish: (orderId: string, workNote: string) => void;
   /**
    * Sinov uchun HAQIQIY buyurtma yaratadi — soxta yozuv emas.
    *
@@ -179,8 +188,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  const timers = useRef(new Map<string, number>());
-
   const patchOrder = useCallback((orderId: string, patch: Partial<LiveOrder>) => {
     setState((prev) => ({
       ...prev,
@@ -189,6 +196,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ),
     }));
   }, []);
+
+  /**
+   * Usta amallarining yagona yoʻli: quruvchi `setState` ICHIDA chaqiriladi.
+   *
+   * Qorovul shu joyda boʻlishi shart — karta chizilgandan keyin taymer yoki
+   * mijoz holatni oʻzgartirgan boʻlishi mumkin. Quruvchi `null` qaytarsa
+   * hech narsa yozilmaydi.
+   */
+  const patchByBuilder = useCallback(
+    (orderId: string, build: (order: LiveOrder) => Partial<LiveOrder> | null) => {
+      setState((prev) => {
+        const order = prev.orders.find((item) => item.id === orderId);
+        if (!order) return prev;
+
+        const patch = build(order);
+        if (!patch) return prev;
+
+        return {
+          ...prev,
+          orders: prev.orders.map((item) => (item.id === orderId ? { ...item, ...patch } : item)),
+        };
+      });
+    },
+    [],
+  );
 
   /** Server tomonidagi keyingi oʻtishni qoʻllaydi. */
   const applyServerStep = useCallback((orderId: string, status: OrderStatus) => {
@@ -211,35 +243,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Har bir aktiv buyurtma uchun keyingi avtomatik oʻtishni rejalashtiramiz.
-  // Effekt faqat QOʻSHMAYDI: smena ochilgan zahoti keraksiz boʻlib qolgan
-  // taymerlar bekor qilinadi, aks holda 3,5 soniyalik eski taymer ustaning
-  // taklifini roʻyxatdan uchirib yuborardi.
-  useEffect(() => {
-    const wanted = new Map<string, { order: LiveOrder; delayMs: number }>();
-    for (const order of state.orders) {
-      const step = simulationStep(order, state.masterTakeover);
-      if (step) wanted.set(simulationTimerKey(order), { order, delayMs: step.delayMs });
-    }
-
-    for (const [key, handle] of [...timers.current]) {
-      if (wanted.has(key)) continue;
-      window.clearTimeout(handle);
-      timers.current.delete(key);
-    }
-
-    const now = new Date();
-    for (const [key, { order, delayMs }] of wanted) {
-      if (timers.current.has(key)) continue;
-
-      const handle = window.setTimeout(() => {
-        timers.current.delete(key);
-        applyServerStep(order.id, order.status);
-      }, waitMsFor(order, delayMs, now));
-
-      timers.current.set(key, handle);
-    }
-  }, [state.orders, state.masterTakeover, applyServerStep]);
+  useOrderTimers(state.orders, state.masterTakeover, applyServerStep);
 
   // Holat oʻzgarganda qurilmaga yoziladi. Qoralama SAQLANMAYDI: u faqat
   // buyurtma berish oqimi davomida yashaydi va yarim toʻldirilgan holda
@@ -265,15 +269,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     state.orders,
     state.notifications,
   ]);
-
-  // Komponent yoʻq qilinganda barcha taymerlar tozalanadi.
-  useEffect(() => {
-    const pending = timers.current;
-    return () => {
-      pending.forEach((handle) => window.clearTimeout(handle));
-      pending.clear();
-    };
-  }, []);
 
   /**
    * Buyurtma yaratishning YAGONA yoʻli.
@@ -424,6 +419,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return accepted;
       },
 
+      masterDepart: (orderId, etaMinutes) =>
+        patchByBuilder(orderId, (order) => buildDepartPatch(order, etaMinutes)),
+
+      masterArrive: (orderId) => patchByBuilder(orderId, buildArrivePatch),
+
+      masterCancelOrder: (orderId, reason) =>
+        patchByBuilder(orderId, (order) => buildMasterCancelPatch(order, reason)),
+
+      masterFinish: (orderId, workNote) =>
+        patchByBuilder(orderId, (order) => buildFinishPatch(order, workNote, new Date())),
+
       setMasterTakeover: (on) =>
         setState((prev) => (prev.masterTakeover === on ? prev : { ...prev, masterTakeover: on })),
 
@@ -436,7 +442,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })),
         })),
     }),
-    [patchOrder, createFromDraft],
+    [patchOrder, patchByBuilder, createFromDraft],
   );
 
   const value = useMemo<AppContextValue>(() => {

@@ -9,9 +9,13 @@ import { cn } from '@/lib/cn';
 import { splitFormattedPrice } from '@/lib/formatters';
 import { addressDetailsLine } from '@/lib/address';
 import {
-  MASTER_NEXT_STAGE_LINE,
+  getMasterActions,
+  isPrimaryMasterAction,
+  MASTER_ACTION_LABELS,
   MASTER_STATUS_CHIPS,
   masterJobFactLine,
+  masterWaitingCard,
+  type MasterAction,
   type MasterFactSource,
 } from '@/lib/masterJobs';
 import { isBlockingConfirmation } from '@/lib/orderStateMachine';
@@ -42,6 +46,10 @@ export interface MasterJobCardProps {
   onDecline?: () => void;
   /** Qabul qilish nega mumkin emasligi — jimgina oʻchirib qoʻyilmaydi. */
   blockedHint?: string | null;
+  /** Faol ishda: kartani bosish ish sahifasini ochadi. */
+  onOpen?: () => void;
+  /** Faol ishdagi asosiy amal (yoʻlga chiqish, yetib kelish, yakunlash). */
+  onAction?: (action: MasterAction) => void;
   className?: string;
 }
 
@@ -52,6 +60,8 @@ export function MasterJobCard({
   onAccept,
   onDecline,
   blockedHint,
+  onOpen,
+  onAction,
   className,
 }: MasterJobCardProps) {
   const { value, currency } = splitFormattedPrice(order.invoice.total);
@@ -59,6 +69,10 @@ export function MasterJobCard({
   const fact = masterJobFactLine(order as MasterFactSource, now);
   const details = addressDetailsLine(order.address);
   const isBlocking = isBlockingConfirmation(order.status);
+  const waiting = masterWaitingCard(order.status);
+  // Kartada FAQAT asosiy amal; bekor qilish va qoʻllab-quvvatlash ish
+  // sahifasida — roʻyxatda uchta tugma qatori qarorni ogʻirlashtiradi.
+  const primaryAction = getMasterActions(order.status).find(isPrimaryMasterAction) ?? null;
 
   return (
     <Card
@@ -151,11 +165,34 @@ export function MasterJobCard({
       )}
 
       {/*
-        Faol ishda tugma YOʻQ: yoʻlga chiqish va yakunlash keyingi bosqichda
-        ulanadi. Oʻlik tugma chizish oʻrniga ekran buni ochiq aytadi.
+        Faol ishda amallar holatdan keladi. Mijoz qadamini kutayotgan ikki
+        holatda tugma YOʻQ — sababi kartada yoziladi.
       */}
       {variant === 'active' && (
-        <p className="mt-12 text-caption text-text-secondary">{MASTER_NEXT_STAGE_LINE}</p>
+        <div className="mt-16 flex flex-col gap-8">
+          {waiting && <p className="text-caption text-text-secondary">{waiting.description}</p>}
+          <div className="flex gap-8">
+            {primaryAction && (
+              <Button
+                variant="primary"
+                className="flex-1 whitespace-nowrap px-12"
+                onClick={() => onAction?.(primaryAction)}
+              >
+                {MASTER_ACTION_LABELS[primaryAction]}
+              </Button>
+            )}
+            {onOpen && (
+              <Button
+                variant={primaryAction ? 'ghost' : 'secondary'}
+                fullWidth={!primaryAction}
+                className="whitespace-nowrap px-12"
+                onClick={onOpen}
+              >
+                Batafsil
+              </Button>
+            )}
+          </div>
+        </div>
       )}
     </Card>
   );

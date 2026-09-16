@@ -118,6 +118,19 @@ export function WorkProofScreen() {
         </Card>
       )}
 
+      {/*
+        Ustaning izohi — usta rejimida «Ishni yakunlash» ekranida yozilgan
+        matn. Yozilmagan boʻlsa blok chizilmaydi: boʻsh karta maʼlumot bor
+        degan taassurot berardi.
+      */}
+      {order.workNote && (
+        <Card className="mt-16 flex flex-col gap-8">
+          <p className="text-overline uppercase text-text-secondary">Usta nima qildi</p>
+          <p className="whitespace-pre-line text-body text-text-primary">{order.workNote}</p>
+          <p className="text-caption text-text-secondary">Matnni usta oʻzi yozgan.</p>
+        </Card>
+      )}
+
       <Card className="mt-16 flex flex-col gap-12">
         <p className="text-h3 text-text-primary">Ish fotosi</p>
         {/*

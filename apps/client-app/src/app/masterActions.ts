@@ -11,7 +11,7 @@
  * obyekt, `master` esa nusxa.
  */
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
-import { ETA_OPTIONS } from '@/lib/masterJobs';
+import { ETA_OPTIONS, WORK_NOTE_MAX } from '@/lib/masterJobs';
 import { MASTERS, masterById } from '@/mocks/masters';
 import type { Master } from '@/mocks/types';
 import type { LiveOrder } from './types';
@@ -88,5 +88,85 @@ export function buildAcceptPatch(
     etaMinutes,
     handledByMaster: true,
     queuePosition: null,
+  };
+}
+
+/**
+ * Usta yoʻlga chiqdi; `null` — buyurtma bu holatda emas.
+ *
+ * ETA qayta tanlanadi: qabul qilishdagi vaqt «hozirdan» emas, «yoʻlga
+ * chiqqandan» hisoblanishi kerak. Mijoz ekranidagi raqam shu paytda
+ * yangilanadi va u tirik odam aytgan vaqt boʻlib qoladi.
+ */
+export function buildDepartPatch(
+  order: Pick<LiveOrder, 'status' | 'handledByMaster'>,
+  etaMinutes: number,
+): Partial<LiveOrder> | null {
+  if (order.status !== ORDER_STATUS.ASSIGNED || !order.handledByMaster) return null;
+  if (!ETA_OPTIONS.includes(etaMinutes)) return null;
+
+  return { status: ORDER_STATUS.MASTER_EN_ROUTE, etaMinutes };
+}
+
+/**
+ * Usta yetib keldi; keyingi qadam MIJOZNIKI — shaxsni tasdiqlash.
+ *
+ * `etaMinutes` tozalanadi: usta eshik oldida turganda «~20 daqiqada yetib
+ * keladi» qatori mijoz ekranida yolgʻon boʻlib qolardi.
+ */
+export function buildArrivePatch(
+  order: Pick<LiveOrder, 'status' | 'handledByMaster'>,
+): Partial<LiveOrder> | null {
+  if (order.status !== ORDER_STATUS.MASTER_EN_ROUTE || !order.handledByMaster) return null;
+
+  return { status: ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION, etaMinutes: null };
+}
+
+/**
+ * Usta ishni bekor qildi — ilovada `cancelledBy: "MASTER"` yoziladigan
+ * YAGONA joy. Mijoz ekrani shu maydonga qarab «Usta bekor qildi» deydi.
+ */
+export function buildMasterCancelPatch(
+  order: Pick<LiveOrder, 'status' | 'handledByMaster'>,
+  reason: string,
+): Partial<LiveOrder> | null {
+  const canCancel =
+    order.status === ORDER_STATUS.ASSIGNED || order.status === ORDER_STATUS.MASTER_EN_ROUTE;
+  if (!canCancel || !order.handledByMaster) return null;
+
+  const text = reason.trim();
+  if (text.length === 0) return null;
+
+  return {
+    status: ORDER_STATUS.CANCELLED,
+    cancelReason: text,
+    cancelledBy: 'MASTER',
+    etaMinutes: null,
+  };
+}
+
+/**
+ * Usta ishni yakunladi; keyingi qadam MIJOZNIKI — baho.
+ *
+ * `completedAt` va `etaMinutes` aynan `buildStepPatch` dagidek yoziladi:
+ * ikki yoʻl bitta natijani berishi shart, aks holda chek ikki xil boʻlardi.
+ *
+ * Izoh ixtiyoriy: yozilmagan boʻlsa `null` — mijoz ekranida «usta izoh
+ * yozmagan» deb chiziladi, boʻsh satr emas.
+ */
+export function buildFinishPatch(
+  order: Pick<LiveOrder, 'status' | 'handledByMaster'>,
+  workNote: string,
+  now: Date,
+): Partial<LiveOrder> | null {
+  if (order.status !== ORDER_STATUS.IN_PROGRESS || !order.handledByMaster) return null;
+
+  const note = workNote.trim().slice(0, WORK_NOTE_MAX);
+
+  return {
+    status: ORDER_STATUS.COMPLETED_BY_MASTER,
+    completedAt: now,
+    etaMinutes: null,
+    workNote: note.length > 0 ? note : null,
   };
 }
