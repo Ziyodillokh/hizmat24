@@ -49,9 +49,13 @@ bosqichni telefonda sinab koʻrish mumkin va orqaga qaytarish bitta oʻzgaruvchi
 
 ### 0.5 Ataylab KEYINGA qoldiriladi
 
-Toʻlov tizimi (Click/Payme), jonli xarita va GPS, ustaning ish fotosi, push bildirishnoma,
-admin panel UI, chat. Ularning har biri `/app/master/limits` roʻyxatida turibdi va u yerdan
-faqat HAQIQATAN ishlaganda olib tashlanadi.
+Toʻlov tizimi (Click/Payme), ustaning ish fotosi, push bildirishnoma, admin panel UI, chat.
+Ularning har biri `/app/master/limits` roʻyxatida turibdi va u yerdan faqat HAQIQATAN
+ishlaganda olib tashlanadi.
+
+**Xarita va jonli kuzatuv** alohida hujjatda: [xarita-va-kuzatuv-tz.md](xarita-va-kuzatuv-tz.md).
+Uning bosqichlari shu yerdagilarga bogʻlangan: K1 (manzil koordinatasi) — B3 bilan birga,
+K2 (ustaning joylashuvi) — B5 dan keyin, K3 (jonli xarita) — K2 dan keyin.
 
 ---
 
@@ -104,7 +108,7 @@ Server ulanganda u **butunlay oʻchadi**: holatni faqat server oʻzgartiradi.
 | Holatlar | 10 ta | 12 ta (`DRAFT`, `RATED` qoʻshimcha) | `DRAFT` ishlatilmaydi (qoralama faqat ilovada); `RATED` → ilovada `CLOSED` deb koʻrsatiladi, oʻgirish `dto.ts` da |
 | Narx | `invoice {base, urgentFee, discountPercent, discount, total}` | `price: Int` | Serverga toʻrtta ustun qoʻshiladi (B3); `total` — yagona haqiqat |
 | Toʻlov usuli | `paymentMethod` | yoʻq | `payment_method` ustuni qoʻshiladi (B3) |
-| Manzil | `{label, entrance, floor, apartment}` | `clientAddress Json` + `lat/lng` NOT NULL | `lat/lng` **nullable** qilinadi (B3): ilovada xarita yoʻq, soxta koordinata yozilmaydi |
+| Manzil | `{label, entrance, floor, apartment}` | `clientAddress Json` + `lat/lng` NOT NULL | `lat/lng` **nullable** qilinadi (B3); koordinata K1 da xaritadan tanlanadi — soxta koordinata hech qachon yozilmaydi |
 | Ish izohi | `workNote` | yoʻq | `work_note VarChar(300)` (B5) |
 | Usta | mock roʻyxat | `Master` jadvali | Usta `User` bilan bogʻlanadi: `masters.user_id` (B4) |
 | Usta profili | tumanlar, ish vaqti, «oʻzim haqimda», sertifikat daʼvosi | yoʻq | `master_profiles` jadvali (B4) |
