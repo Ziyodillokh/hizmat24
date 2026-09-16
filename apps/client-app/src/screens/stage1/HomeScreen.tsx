@@ -1,7 +1,7 @@
 import { ClipboardText } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/Button';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav, CLIENT_TABS } from '@/components/BottomNav';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { OrderMiniCard } from '@/components/OrderMiniCard';
@@ -160,6 +160,7 @@ export function HomeScreen({ variant = 'active-order', activeStatus }: HomeScree
       </main>
 
       <BottomNav
+        items={CLIENT_TABS}
         active="home"
         onSelect={() => undefined}
       />

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { Banner } from '@/components/Banner';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav, CLIENT_TABS } from '@/components/BottomNav';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
@@ -223,7 +223,7 @@ function Gallery() {
       <GallerySection title="9.14 / 9.15 · Header va pastki navigatsiya">
         <div className="w-full"><Header variant="home" name="Jasur" phone="+998901234567" /></div>
         <div className="w-full"><Header variant="inner" title="Barcha xizmatlar" /></div>
-        <div className="w-full"><BottomNav active="home" onSelect={() => undefined} /></div>
+        <div className="w-full"><BottomNav items={CLIENT_TABS} active="home" onSelect={() => undefined} /></div>
       </GallerySection>
 
       <GallerySection title="Spinner">

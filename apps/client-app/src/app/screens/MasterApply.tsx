@@ -57,7 +57,7 @@ export function MasterApplyScreen() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Ariza" onBack={() => navigate('/app/master')} />}
+      header={<Header variant="inner" title="Ariza" onBack={() => navigate('/app/master/profile')} />}
       footer={
         application ? (
           <TelegramFooter copied={copied} onOpen={markApplicationChannelOpened} />

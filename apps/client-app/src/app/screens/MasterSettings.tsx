@@ -7,7 +7,6 @@ import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { Modal } from '@/components/Modal';
-import { Toggle } from '@/components/Toggle';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { EXPERIENCE_LABELS, formatWorkHours } from '@/lib/masterProfile';
 import { useMaster } from '../master-store';
@@ -22,7 +21,7 @@ import { useToast } from '../ToastHost';
  */
 export function MasterSettingsScreen() {
   const navigate = useNavigate();
-  const { profile, isComplete, application, updateProfile, resetMaster } = useMaster();
+  const { profile, isComplete, application, resetMaster } = useMaster();
   const showToast = useToast();
   const [resetOpen, setResetOpen] = useState(false);
 
@@ -60,25 +59,26 @@ export function MasterSettingsScreen() {
 
   return (
     <ScreenShell
-      header={<Header variant="inner" title="Sozlamalar" onBack={() => navigate('/app/master')} />}
+      header={<Header variant="inner" title="Sozlamalar" onBack={() => navigate('/app/master/profile')} />}
     >
-      <Card className="mt-4 flex items-center gap-12">
-        <div className="min-w-0 flex-1">
-          <p className="text-title text-text-primary">Ishga tayyorman</p>
-          <p className="mt-2 text-body-sm text-text-secondary">
-            {profile.isAvailable ? 'Tayyor' : 'Tayyor emas'} — faqat shu qurilmada
-          </p>
-        </div>
-        <Toggle
-          checked={profile.isAvailable}
-          onChange={(isAvailable) => updateProfile({ isAvailable })}
-          label="Ishga tayyorman"
-          className="shrink-0"
-        />
+      {/*
+        «Ishga tayyorman» kaliti bu yerdan OLIB TASHLANDI: u endi «Ishlar»
+        ekranidagi smena tugmasi. Bitta maʼnoga ikkita boshqaruv — ilovadagi
+        eng yomon chalkashlik; kalit ustaning ish ekranida turishi kerak.
+      */}
+      <Card className="mt-4">
+        <p className="text-title text-text-primary">Ishga tayyorlik</p>
+        <p className="mt-4 text-body-sm text-text-secondary">
+          Smena «Ishlar» ekranidagi tugma bilan ochiladi va yopiladi. Hozirgi holat:{' '}
+          {profile.isAvailable ? 'smena ochiq' : 'smena yopiq'}.
+        </p>
+        <Button variant="ghost" className="mt-12" onClick={() => navigate('/app/master/jobs')}>
+          Ishlarga oʻtish
+        </Button>
       </Card>
+
       <Banner variant="info" icon={Info} className="mt-12">
-        Bu kalit hozircha hech kimga hech narsa yubormaydi: ish takliflari serverdan keladi va
-        server ulanmagan. Ulangach, kalit sizni qidiruvda koʻrsatadi yoki yashiradi.
+        Smena faqat shu qurilmada saqlanadi: ish takliflari serverdan keladi va server ulanmagan.
       </Banner>
 
       <MenuGroup section={fields} />
@@ -106,7 +106,7 @@ export function MasterSettingsScreen() {
             onClick={() => {
               resetMaster();
               showToast('Usta profili oʻchirildi');
-              navigate('/app/master', { replace: true });
+              navigate('/app/master/profile', { replace: true });
             }}
           >
             Ha, oʻchirish

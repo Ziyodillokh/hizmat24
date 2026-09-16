@@ -87,7 +87,7 @@ export function MasterListCard({
 
         {/*
           Sertifikat belgisi pastki qatorda: ism yonida tursa, `MarqueeText`
-          butun bo'sh joyni egallagani uchun u ismdan uzoqlashib, qator
+          butun boʻsh joyni egallagani uchun u ismdan uzoqlashib, qator
           chetiga yopishib qolardi.
         */}
         {isCertified ? (

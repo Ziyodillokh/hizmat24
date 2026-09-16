@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useApp } from './store';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { HomeTab } from './screens/HomeTab';
@@ -33,10 +33,16 @@ import { AddressBookScreen } from './screens/AddressBook';
 import { AddressFormScreen } from './screens/AddressForm';
 import { FavoritesScreen } from './screens/Favorites';
 import { ProfileEditScreen } from './screens/ProfileEdit';
-import { MasterHubScreen } from './screens/MasterHub';
 import { MasterSetupScreen } from './screens/MasterSetup';
 import { MasterSettingsScreen } from './screens/MasterSettings';
 import { MasterApplyScreen } from './screens/MasterApply';
+import { ModeScreen } from './screens/ModeScreen';
+import { MasterJobsTab } from './screens/master/MasterJobsTab';
+import { MasterHistoryTab } from './screens/master/MasterHistoryTab';
+import { MasterEarningsTab } from './screens/master/MasterEarningsTab';
+import { MasterProfileTab } from './screens/master/MasterProfileTab';
+import { MasterLimitsScreen } from './screens/master/MasterLimitsScreen';
+import type { UserRole } from './types';
 
 /**
  * `SupportScreen` preview galereyasida ham ishlatiladi va u yerda marshrut
@@ -69,12 +75,18 @@ function SupportRoute() {
  * tartib qoidalari izohda oʻqiladi.
  *
  * TARTIB MUHIM: statik segment dinamikdan OLDIN turadi (`addresses/new` →
- * `addresses/:addressId`, `master` → `master/:masterId`). Router aniqroq marshrutni oʻzi tanlaydi, lekin
+ * `addresses/:addressId`). Router aniqroq marshrutni oʻzi tanlaydi, lekin
  * jadvalni oʻqiydigan odam uchun tartib hujjat.
+ *
+ * `role` — rejim gvardiyasi. Berilgan boʻlsa, marshrut faqat oʻsha rejimda
+ * ochiladi; `/app/mode` esa gvardiyasiz qoladi VA HECH QACHON gvardiya
+ * olmaydi — gvardiya oʻzi tushiradigan sahifani qoʻriqlasa, ikki ekran
+ * bir-birini cheksiz yoʻnaltiradi.
  */
 export interface AppRoute {
   path: string;
   element: ReactNode;
+  role?: UserRole;
 }
 
 export const PROTECTED_ROUTES: AppRoute[] = [
@@ -85,7 +97,7 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'home', element: <HomeTab /> },
   { path: 'groups/:groupId', element: <GroupServicesTab /> },
   { path: 'services', element: <AllServicesTab /> },
-  { path: 'master/:masterId', element: <MasterProfile /> },
+  { path: 'masters/:masterId', element: <MasterProfile /> },
 
   // Buyurtma berish oqimi
   { path: 'new/details', element: <OrderDetailsStep /> },
@@ -131,9 +143,17 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'guarantee', element: <GuaranteeScreen /> },
   { path: 'reviews', element: <ReviewsScreen /> },
 
-  // Usta rejimi (foydalanuvchining oʻzi usta sifatida)
-  { path: 'master', element: <MasterHubScreen /> },
-  { path: 'master/setup', element: <MasterSetupScreen /> },
-  { path: 'master/settings', element: <MasterSettingsScreen /> },
-  { path: 'master/apply', element: <MasterApplyScreen /> },
+  // Rejim tanlash — gvardiyasiz (1.2-jadval)
+  { path: 'mode', element: <ModeScreen /> },
+
+  // Usta rejimi — toʻrt tab, oʻz pastki paneli bilan
+  { path: 'master', element: <Navigate to="/app/master/jobs" replace />, role: 'master' },
+  { path: 'master/jobs', element: <MasterJobsTab />, role: 'master' },
+  { path: 'master/history', element: <MasterHistoryTab />, role: 'master' },
+  { path: 'master/earnings', element: <MasterEarningsTab />, role: 'master' },
+  { path: 'master/profile', element: <MasterProfileTab />, role: 'master' },
+  { path: 'master/limits', element: <MasterLimitsScreen />, role: 'master' },
+  { path: 'master/setup', element: <MasterSetupScreen />, role: 'master' },
+  { path: 'master/settings', element: <MasterSettingsScreen />, role: 'master' },
+  { path: 'master/apply', element: <MasterApplyScreen />, role: 'master' },
 ];

@@ -78,7 +78,7 @@ export function FavoritesScreen() {
                   photoUrl={master.photoUrl}
                   isCertified={master.hasGovCertificate}
                   isNew={master.experienceLevel !== 'EXPERIENCED'}
-                  onOpen={() => navigate(`/app/master/${master.id}`)}
+                  onOpen={() => navigate(`/app/masters/${master.id}`)}
                 />
 
                 <div className="mt-8 flex gap-8">

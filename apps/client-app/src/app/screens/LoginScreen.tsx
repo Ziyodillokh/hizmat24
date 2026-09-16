@@ -91,7 +91,15 @@ export function LoginScreen() {
           Davom etish
         </Button>
 
+        {/*
+          Kirish ekranida IKKITA tugma boʻlmaydi: bitta raqam, bitta OTP,
+          bitta sessiya — rejim keyingi qadamda tanlanadi.
+        */}
         <p className="mt-12 text-center text-body-sm text-text-secondary">
+          Mijoz ham, usta ham shu raqam orqali kiradi — rejimni keyingi qadamda tanlaysiz.
+        </p>
+
+        <p className="mt-8 text-center text-body-sm text-text-secondary">
           Kirish orqali siz{' '}
           <span className="text-primary-pressed underline">foydalanish shartlariga</span> rozilik
           bildirasiz

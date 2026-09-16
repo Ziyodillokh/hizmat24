@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { MODE_ROUTE, modeHome } from '@/lib/appMode';
+import { MASTER_TAB_ROUTES } from './masterTabRoutes';
 import { registerBackButton } from './native';
+import { useApp } from './store';
 
 /**
  * Ildiz ekranlar — bu yerda "orqaga" bosh sahifaga qaytaradi.
@@ -8,6 +11,10 @@ import { registerBackButton } from './native';
  * Market va Mutaxassislar bu roʻyxatdan CHIQARILDI: ular endi tab emas,
  * ichki ekran. Ularda "orqaga" bir qadam orqaga qaytishi kerak, aks holda
  * Mahsulot → Doʻkon → Market zanjiri oʻrniga darhol bosh sahifaga sakrardi.
+ *
+ * Ustaning toʻrtta tabi ham shu yerda: ular ham ildiz ekran. `/app/mode`
+ * esa roʻyxatga QOʻSHILMAYDI — u alohida qoida bilan ishlanadi, chunki
+ * rolsiz sessiyada qaytadigan uy yoʻq.
  */
 export const ROOT_ROUTES = new Set([
   '/app',
@@ -16,6 +23,7 @@ export const ROOT_ROUTES = new Set([
   '/app/orders',
   '/app/notifications',
   '/app/profile',
+  ...Object.values(MASTER_TAB_ROUTES),
 ]);
 
 /**
@@ -32,9 +40,12 @@ export const ROOT_ROUTES = new Set([
 export function useBackButton(): void {
   const navigate = useNavigate();
   const location = useLocation();
+  const { role } = useApp();
 
   useEffect(() => {
     const path = location.pathname;
+    // "Uy" rejimga qarab ayriladi: usta uchun u `/app/master/jobs`.
+    const home = modeHome(role);
 
     return registerBackButton(() => {
       // Bloklovchi ekranlar: hodisa "hal qilindi" deb hisoblanadi, lekin
@@ -66,17 +77,29 @@ export function useBackButton(): void {
         return true;
       }
 
-      if (path === '/app/home' || path === '/app') {
+      /*
+       * Rejim tanlash ekrani ildiz emas: rolsiz sessiyada uning ORQASIDA
+       * hech narsa yoʻq (kirish ayrilishi uni oʻzi chizadi), shuning uchun
+       * orqaga bosish ilovadan chiqaradi. Roli bor foydalanuvchi esa oʻz
+       * uyiga qaytadi.
+       */
+      if (path === MODE_ROUTE) {
+        if (role === null) return false;
+        navigate(home);
+        return true;
+      }
+
+      if (path === home || path === '/app') {
         return false; // ilovadan chiqish
       }
 
       if (ROOT_ROUTES.has(path)) {
-        navigate('/app/home');
+        navigate(home);
         return true;
       }
 
       navigate(-1);
       return true;
     });
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, role]);
 }

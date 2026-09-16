@@ -46,7 +46,7 @@ export function StarRating({ value, size = 'sm', showValue = false, onChange, cl
       icon={Star}
       size={icon}
       // Boʻsh yulduz ham TOʻLDIRILGAN, faqat rangi boshqa (9.11-band).
-      // Phosphor'da toʻldirish `fill-current` utilitasi bilan emas, ogʻirlik
+      // Phosphorʼda toʻldirish `fill-current` utilitasi bilan emas, ogʻirlik
       // orqali beriladi — aks holda glif ikki qatlam boʻlib chiziladi.
       weight="fill"
       className={cn(box, star <= filledCount ? 'text-star' : 'text-star-empty')}

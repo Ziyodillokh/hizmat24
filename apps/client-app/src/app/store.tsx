@@ -57,8 +57,15 @@ interface AppState {
 
 interface AppActions {
   signIn: (phone: string) => void;
-  /** Tanishtiruv yakunlandi va rol tanlandi. */
+  /** Tanishtiruv yakunlandi va rol tanlandi. FAQAT tanishtiruvda chaqiriladi. */
   completeOnboarding: (role: UserRole) => void;
+  /**
+   * Rejimni almashtiradi.
+   *
+   * `completeOnboarding` dan AJRATILDI: rejim almashtirish tanishtiruvni
+   * "koʻrilgan" deb belgilamasligi kerak va aksincha.
+   */
+  setRole: (role: UserRole) => void;
   signOut: () => void;
   /** Boʻsh satr `null` ga aylantiriladi — "ism yoʻq" bitta koʻrinishda. */
   setFullName: (name: string) => void;
@@ -316,6 +323,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setState((prev) => ({ ...prev, isAuthenticated: true, phoneNumber: phone })),
       completeOnboarding: (role) =>
         setState((prev) => ({ ...prev, hasOnboarded: true, role })),
+
+      setRole: (role) => setState((prev) => ({ ...prev, role })),
 
       signOut: () => {
         clearSession();

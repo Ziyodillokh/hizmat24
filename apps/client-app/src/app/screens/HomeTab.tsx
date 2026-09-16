@@ -104,7 +104,7 @@ export function HomeTab() {
           <div className="px-20 pt-4">
             <PremiumMastersRail
               masters={PREMIUM_MASTERS}
-              onSelect={(id) => navigate(`/app/master/${id}`)}
+              onSelect={(id) => navigate(`/app/masters/${id}`)}
             />
           </div>
 

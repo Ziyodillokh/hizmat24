@@ -20,6 +20,12 @@ export interface MenuItem {
   control?: ReactNode;
   /** Buzuvchi amal (chiqish) — qizil tusda chiziladi. */
   danger?: boolean;
+  /**
+   * Uzun yorliq va uzun izohni bitta qatorda talashtirmaydi: izoh yorliq
+   * OSTIGA tushadi. «Mijoz rejimiga oʻtish» + «Xizmat buyurtma qilish» 360px
+   * da yonma-yon sigʻmaydi va yorliq kesilardi.
+   */
+  stacked?: boolean;
 }
 
 export interface MenuSection {
@@ -71,17 +77,35 @@ export function MenuGroup({ section }: { section: MenuSection }) {
                 <Icon icon={item.icon} size={20} weight="duotone" />
               </span>
 
-              <span
-                className={cn(
-                  'min-w-0 flex-1 truncate text-body-lg',
-                  item.danger ? 'text-danger' : 'text-text-primary',
-                )}
-              >
-                {item.label}
-              </span>
+              {item.stacked && item.hint ? (
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={cn(
+                      'block truncate text-body-lg',
+                      item.danger ? 'text-danger' : 'text-text-primary',
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                  <span className="mt-2 block truncate text-caption text-text-secondary">
+                    {item.hint}
+                  </span>
+                </span>
+              ) : (
+                <>
+                  <span
+                    className={cn(
+                      'min-w-0 flex-1 truncate text-body-lg',
+                      item.danger ? 'text-danger' : 'text-text-primary',
+                    )}
+                  >
+                    {item.label}
+                  </span>
 
-              {item.hint && (
-                <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>
+                  {item.hint && (
+                    <span className="shrink-0 text-body-sm text-text-secondary">{item.hint}</span>
+                  )}
+                </>
               )}
               {item.control ??
                 (isInteractive && !item.danger && (

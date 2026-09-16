@@ -6,6 +6,8 @@ import { PageTransition } from './PageTransition';
 import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
 import { PROTECTED_ROUTES } from './appRoutes';
+import { landingRoute, modeRouteFor } from '@/lib/appMode';
+import type { UserRole } from './types';
 import { LoginScreen } from './screens/LoginScreen';
 import { OtpScreen } from './screens/OtpScreen';
 import { syncStatusBar } from './native';
@@ -23,6 +25,23 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/app" replace />;
 }
 
+/**
+ * Rejim gvardiyasi.
+ *
+ * Boshqa rejimdagi foydalanuvchini `/app/mode` ga tushiradi va u yerga IKKI
+ * narsani olib ketadi: nega tushgani (`?kerak=`) va qayerga qaytishi
+ * (`?keyin=`). Shu tufayli rejim almashtirilgan zahoti aynan soʻralgan sahifa
+ * ochiladi — foydalanuvchi yoʻlni qaytadan qidirmaydi.
+ */
+function RequireRole({ role, children }: { role: UserRole; children: React.ReactNode }) {
+  const { role: current } = useApp();
+  const location = useLocation();
+
+  if (current === role) return <>{children}</>;
+
+  return <Navigate to={modeRouteFor(role, `${location.pathname}${location.search}`)} replace />;
+}
+
 /** Yangi ekranga oʻtganda scroll tepaga qaytadi — haqiqiy ilovadagidek. */
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -35,8 +54,11 @@ function ScrollToTop() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, hasOnboarded } = useApp();
+  const { isAuthenticated, hasOnboarded, role } = useApp();
   useBackButton();
+
+  // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
+  const landing = landingRoute({ isAuthenticated, hasOnboarded, role });
 
   return (
     <>
@@ -45,19 +67,12 @@ function AppRoutes() {
         <Routes>
           {/*
             Kirmagan foydalanuvchi — kirish ekrani. Kirgan, lekin tanishtiruvni
-            koʻrmagan boʻlsa — tanishtiruv; aks holda bosh sahifa.
+            koʻrmagan boʻlsa — tanishtiruv; rolsiz boʻlsa — rejim tanlash;
+            aks holda oʻsha rejimning uyi.
           */}
           <Route
             index
-            element={
-              !isAuthenticated ? (
-                <LoginScreen />
-              ) : hasOnboarded ? (
-                <Navigate to="/app/home" replace />
-              ) : (
-                <Navigate to="/app/onboarding" replace />
-              )
-            }
+            element={landing === null ? <LoginScreen /> : <Navigate to={landing} replace />}
           />
           <Route path="auth/otp" element={<OtpScreen />} />
 
@@ -65,7 +80,15 @@ function AppRoutes() {
             <Route
               key={route.path}
               path={route.path}
-              element={<RequireAuth>{route.element}</RequireAuth>}
+              element={
+                <RequireAuth>
+                  {route.role ? (
+                    <RequireRole role={route.role}>{route.element}</RequireRole>
+                  ) : (
+                    route.element
+                  )}
+                </RequireAuth>
+              }
             />
           ))}
 

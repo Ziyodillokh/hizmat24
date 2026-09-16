@@ -21,13 +21,19 @@ import { Icon } from './Icon';
  */
 export type TabKey = 'home' | 'wallet' | 'orders' | 'profile';
 
-interface TabDefinition {
-  key: TabKey;
+/**
+ * Bitta tab tavsifi. Generik: usta rejimining oʻz kalitlari bor va mijozning
+ * `TabKey` i KENGAYTIRILMAYDI — uchta mavjud test aynan toʻrtta mijoz tabini
+ * qulflagan, va bitta soʻz («Buyurtma») ikki rejimda ikki xil maʼnoni
+ * bildirib qolardi.
+ */
+export interface TabDefinition<K extends string> {
+  key: K;
   label: string;
   icon: IconGlyph;
 }
 
-const TABS: readonly TabDefinition[] = [
+export const CLIENT_TABS: readonly TabDefinition<TabKey>[] = [
   { key: 'home', label: 'Bosh', icon: House },
   { key: 'wallet', label: 'Karta', icon: CreditCard },
   { key: 'orders', label: 'Buyurtma', icon: ClipboardText },
@@ -43,7 +49,7 @@ type TabState = 'active' | 'inactive';
  */
 const ICON_CLASSES: Record<TabState, string> = {
   // Toʻldirish endi Phosphor ogʻirligi orqali beriladi (`weight="fill"`) —
-  // u glifning ichki detalini saqlagan holda shaklni toʻldiradi. Lucide'da
+  // u glifning ichki detalini saqlagan holda shaklni toʻldiradi. Lucideʼda
   // bu mumkin emasdi: `fill-*` utilitasi konturni bitta boʻlakka aylantirardi.
   active: 'text-primary-pressed',
   inactive: 'text-text-secondary',
@@ -92,19 +98,27 @@ export function UnreadBadge({ count, className }: UnreadBadgeProps) {
   );
 }
 
-export interface BottomNavProps {
-  active: TabKey;
-  onSelect: (tab: TabKey) => void;
+export interface BottomNavProps<K extends string> {
+  /** Chiziladigan tablar — mijoz uchun `CLIENT_TABS`, usta uchun `MASTER_TABS`. */
+  items: readonly TabDefinition<K>[];
+  active: K;
+  onSelect: (tab: K) => void;
   /** Tab ustidagi oʻqilmagan soni; 0 yoki berilmagan boʻlsa chizilmaydi. */
-  badges?: Partial<Record<TabKey, number>>;
+  badges?: Partial<Record<K, number>>;
   className?: string;
 }
 
-export function BottomNav({ active, onSelect, badges, className }: BottomNavProps) {
+export function BottomNav<K extends string>({
+  items,
+  active,
+  onSelect,
+  badges,
+  className,
+}: BottomNavProps<K>) {
   return (
     <nav className={cn('w-full border-t border-border bg-surface', className)}>
       <ul className="flex h-tab-bar items-stretch">
-        {TABS.map((tab) => {
+        {items.map((tab) => {
           const state: TabState = tab.key === active ? 'active' : 'inactive';
 
           return (

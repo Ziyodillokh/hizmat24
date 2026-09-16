@@ -69,7 +69,7 @@ export function MasterSetupScreen() {
     if (isLast) {
       void tapFeedback();
       showToast('Profil saqlandi', 'success');
-      navigate('/app/master', { replace: true });
+      navigate('/app/master/profile', { replace: true });
       return;
     }
     goTo(SETUP_STEPS[index + 1]);
@@ -77,7 +77,8 @@ export function MasterSetupScreen() {
 
   const back = () => {
     if (index === 0) {
-      navigate('/app/master');
+      // Yangi foydalanuvchida tarix boʻsh boʻlishi mumkin — usta uyi aniq manzil.
+      navigate('/app/master/jobs');
       return;
     }
     goTo(SETUP_STEPS[index - 1]);

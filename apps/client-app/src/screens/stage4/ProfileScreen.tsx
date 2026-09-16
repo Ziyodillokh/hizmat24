@@ -1,7 +1,7 @@
 import { Bell, CaretRight, ClipboardText, Headset, Info, SignOut } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Avatar } from '@/components/Avatar';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav, CLIENT_TABS } from '@/components/BottomNav';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
@@ -71,7 +71,7 @@ export function ProfileScreen({ variant = 'with-name' }: ProfileScreenProps) {
   return (
     <ScreenShell
       header={<Header variant="inner" title="Profil" />}
-      footer={<BottomNav active="profile" onSelect={() => undefined} />}
+      footer={<BottomNav items={CLIENT_TABS} active="profile" onSelect={() => undefined} />}
     >
       <div className="mt-4 flex flex-col items-center">
         <Avatar name={user.fullName} size={80} />

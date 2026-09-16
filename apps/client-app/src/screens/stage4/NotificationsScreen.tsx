@@ -1,5 +1,5 @@
 import { BellSlash } from '@phosphor-icons/react';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav, CLIENT_TABS } from '@/components/BottomNav';
 import { Button } from '@/components/Button';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { EmptyState } from '@/components/EmptyState';
@@ -29,7 +29,7 @@ export function NotificationsScreen({ variant = 'ready' }: NotificationsScreenPr
   return (
     <ScreenShell
       header={<Header variant="inner" title="Bildirishnomalar" />}
-      footer={<BottomNav active="home" onSelect={() => undefined} />}
+      footer={<BottomNav items={CLIENT_TABS} active="home" onSelect={() => undefined} />}
     >
       {variant === 'offline' && <ConnectionBanner state="reconnecting" />}
 

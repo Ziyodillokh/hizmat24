@@ -97,7 +97,7 @@ export function MasterEnRouteScreen() {
         photoUrl={master.photoUrl}
         experience={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
         isCertified={master.hasGovCertificate}
-        onOpen={() => navigate(`/app/master/${master.id}`)}
+        onOpen={() => navigate(`/app/masters/${master.id}`)}
         className="mt-20"
       />
 

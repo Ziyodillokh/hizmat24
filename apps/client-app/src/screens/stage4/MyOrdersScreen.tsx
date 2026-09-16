@@ -1,6 +1,6 @@
 import { ClipboardText, FileMagnifyingGlass } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav, CLIENT_TABS } from '@/components/BottomNav';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
@@ -65,7 +65,7 @@ export function MyOrdersScreen({ variant = 'ready', initialFilter = 'all' }: MyO
   return (
     <ScreenShell
       header={<Header variant="inner" title="Buyurtmalarim" />}
-      footer={<BottomNav active="orders" onSelect={() => undefined} />}
+      footer={<BottomNav items={CLIENT_TABS} active="orders" onSelect={() => undefined} />}
     >
       {variant === 'offline' && <ConnectionBanner state="reconnecting" />}
 

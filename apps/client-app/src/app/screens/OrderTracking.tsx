@@ -210,7 +210,7 @@ export function OrderTracking() {
               photoUrl={order.master.photoUrl}
               experience={order.master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
               isCertified={order.master.hasGovCertificate}
-              onOpen={() => navigate(`/app/master/${order.master?.id}`)}
+              onOpen={() => navigate(`/app/masters/${order.master?.id}`)}
               className="mt-20"
             />
             {order.etaMinutes !== null && (

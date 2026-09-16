@@ -12,6 +12,7 @@ import { NotificationRow } from '@/components/NotificationRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
+import { HOME_ROUTE_FOR, MODE_ROUTE, MODE_SHORT_LABELS } from '@/lib/appMode';
 import { formatPhone, orderDateGroup } from '@/lib/formatters';
 import { ORDER_STATUS, isTerminal } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
@@ -22,7 +23,6 @@ import { useMaster } from '../master-store';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
 import { useWallet } from '../useWallet';
-import { useToast } from '../ToastHost';
 import { useTheme } from '../theme-context';
 
 export function NotificationsTab() {
@@ -114,13 +114,12 @@ export function NotificationsTab() {
 /** 26 · Profil — read-only. */
 export function ProfileTab() {
   const navigate = useNavigate();
-  const { fullName, phoneNumber, orders, role, completeOnboarding, signOut } = useApp();
+  const { fullName, phoneNumber, orders, role, signOut } = useApp();
   const { openCount } = useDisputes();
   const { addresses } = useAddresses();
   const { count: favoriteCount } = useFavorites();
   const { isComplete: isMasterComplete } = useMaster();
   const { level } = useWallet();
-  const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -160,22 +159,14 @@ export function ProfileTab() {
         {
           /*
            * Tanishtiruvda "keyinchalik profil orqali almashtira olasiz" deb
-           * va'da berilgan — bu qator oʻsha va'dani bajaradi. Usiz ilova
-           * bajarilmaydigan va'da bergan boʻlardi.
+           * vaʼda berilgan — bu qator oʻsha vaʼdani bajaradi. Almashtirish
+           * shu yerda BAJARILMAYDI: qaror, sabab va qaytish yoʻli bitta
+           * ekranda — `/app/mode` da — yigʻilgan.
            */
           icon: role === 'master' ? Wrench : UserCircle,
-          label: 'Rol',
-          hint: role === 'master' ? 'Usta' : 'Mijoz',
-          onSelect: () => {
-            const next = role === 'master' ? 'client' : 'master';
-            completeOnboarding(next);
-            if (next === 'master') {
-              // Rejimning oʻz uyi bor — toast oʻrniga kabinet ochiladi.
-              navigate('/app/master');
-              return;
-            }
-            showToast('Mijoz rejimiga oʻtdingiz');
-          },
+          label: 'Rejim',
+          hint: role ? MODE_SHORT_LABELS[role] : undefined,
+          onSelect: () => navigate(MODE_ROUTE),
         },
         {
           icon: theme === 'dark' ? Moon : Sun,
@@ -201,7 +192,7 @@ export function ProfileTab() {
                 icon: Wrench,
                 label: 'Usta kabineti',
                 hint: isMasterComplete ? 'Profil toʻliq' : 'Profil toʻldirilmagan',
-                onSelect: () => navigate('/app/master'),
+                onSelect: () => navigate(HOME_ROUTE_FOR.master),
               },
             ],
           },

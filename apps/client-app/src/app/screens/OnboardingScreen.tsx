@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, HandWaving, Robot, SealCheck, ShieldCheck, UserCircle, Wrench } from '@phosphor-icons/react';
+import { ArrowRight, HandWaving, Robot, SealCheck, ShieldCheck } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
+import { ModeChoiceCards } from '@/components/ModeChoiceCards';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
+import { HOME_ROUTE_FOR } from '@/lib/appMode';
 import { cn } from '@/lib/cn';
 import { useApp } from '../store';
 import type { UserRole } from '../types';
@@ -50,29 +52,7 @@ const SLIDES: Slide[] = [
   },
 ];
 
-interface RoleOption {
-  role: UserRole;
-  icon: IconGlyph;
-  title: string;
-  description: string;
-}
-
-const ROLES: RoleOption[] = [
-  {
-    role: 'client',
-    icon: UserCircle,
-    title: 'Mijozman',
-    description: 'Usta qidirib, xizmat buyurtma qilmoqchiman',
-  },
-  {
-    role: 'master',
-    icon: Wrench,
-    title: 'Ustaman',
-    description: 'Ish qidirib, xizmat koʻrsatmoqchiman',
-  },
-];
-
-/** Uchta afzallik + rol tanlash = toʻrtta bosqich. */
+/** Uchta afzallik + rejim tanlash = toʻrtta bosqich. */
 const TOTAL_STEPS = SLIDES.length + 1;
 
 export function OnboardingScreen() {
@@ -86,11 +66,10 @@ export function OnboardingScreen() {
     completeOnboarding(role);
 
     /*
-     * Usta rejimining endi oʻz uyi bor: kabinet profil sozlashga olib boradi.
-     * Ilgari bu yerda "Usta ilovasi tayyorlanmoqda" toasti turardi va tanlov
-     * hech narsa qilmasdi.
+     * Har bir rejimning oʻz uyi bor va u `HOME_ROUTE_FOR` da yozilgan —
+     * kirish ayrilishi ham, gvardiya ham AYNAN shu jadvaldan oʻqiydi.
      */
-    navigate(role === 'master' ? '/app/master' : '/app/home', { replace: true });
+    navigate(HOME_ROUTE_FOR[role], { replace: true });
   };
 
   return (
@@ -154,40 +133,8 @@ export function OnboardingScreen() {
             </p>
           </div>
 
-          <ul className="mt-24 flex flex-col gap-12">
-            {ROLES.map((option) => (
-              <li key={option.role}>
-                <button
-                  type="button"
-                  onClick={() => finish(option.role)}
-                  className={cn(
-                    'flex w-full items-center gap-12 rounded-lg border border-transparent bg-surface-elevated p-16 text-left shadow-e1',
-                    "[[data-theme='dark']_&]:border-border",
-                    'transition-transform duration-press ease-emphasized active:scale-[0.99]',
-                  )}
-                >
-                  <span
-                    className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-md bg-primary-surface"
-                    aria-hidden
-                  >
-                    <Icon
-                      icon={option.icon}
-                      size={24}
-                      weight="duotone"
-                      className="text-primary-pressed"
-                    />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-title text-text-primary">{option.title}</span>
-                    <span className="mt-2 block text-body-sm text-text-secondary">
-                      {option.description}
-                    </span>
-                  </span>
-                  <Icon icon={ArrowRight} size={16} className="shrink-0 text-text-secondary" />
-                </button>
-              </li>
-            ))}
-          </ul>
+          {/* Kartalar `/app/mode` bilan BITTA manbadan keladi. */}
+          <ModeChoiceCards className="mt-24" value={null} onChoose={finish} />
         </>
       ) : (
         <div className="flex flex-col items-center pt-32">
