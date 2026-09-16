@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { registerOverlay } from '@/lib/overlayStack';
 
 /**
  * Modal — spetsifikatsiya 9.17-bandi.
@@ -17,6 +19,17 @@ export interface ModalProps {
 }
 
 export function Modal({ open, title, onClose, className, children }: ModalProps) {
+  /*
+   * Ochiq varaq apparat «orqaga» tugmasini OʻZIGA oladi: usiz Androidʼda
+   * orqaga bosish varaqni ochiq qoldirib sahifani almashtirardi. Qorovul
+   * `useBackButton` da, navbat esa `overlayStack` da — oxirgi ochilgani
+   * birinchi yopiladi.
+   */
+  useEffect(() => {
+    if (!open || !onClose) return;
+    return registerOverlay(onClose);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (

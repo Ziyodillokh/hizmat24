@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MODE_ROUTE, modeHome } from '@/lib/appMode';
 import { MASTER_TAB_ROUTES } from './masterTabRoutes';
+import { closeTopOverlay } from '@/lib/overlayStack';
 import { registerBackButton } from './native';
 import { useApp } from './store';
 
@@ -48,6 +49,9 @@ export function useBackButton(): void {
     const home = modeHome(role);
 
     return registerBackButton(() => {
+      // Ochiq varaq/oyna avval yopiladi — sahifa almashmaydi.
+      if (closeTopOverlay()) return true;
+
       // Bloklovchi ekranlar: hodisa "hal qilindi" deb hisoblanadi, lekin
       // hech qayerga oʻtilmaydi — foydalanuvchi tanlov qilishi shart.
       if (path.endsWith('/confirm-master') || path.endsWith('/safety')) {
