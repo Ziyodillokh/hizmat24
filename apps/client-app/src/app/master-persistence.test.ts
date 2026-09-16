@@ -15,6 +15,7 @@ function state(extra: Partial<MasterState> = {}): MasterState {
       workFrom: 8,
       workTo: 20,
       isAvailable: true,
+      availableSince: NOW,
       updatedAt: NOW,
     },
     application: {
@@ -22,6 +23,7 @@ function state(extra: Partial<MasterState> = {}): MasterState {
       createdAt: NOW,
       openedChannels: [{ channel: 'telegram', openedAt: NOW }],
     },
+    declinedOrderIds: ['live-104901'],
     ...extra,
   };
 }
@@ -82,6 +84,44 @@ describe('reviveMasterState — buzuq maʼlumot', () => {
     });
     expect(result?.profile.districts).not.toContain('Marsdagi tuman');
     expect(result?.profile.districts).toHaveLength(DISTRICTS_MAX);
+  });
+
+  it('yopiq smenada boshlanish vaqti majburan tozalanadi', () => {
+    const stored = serializeMasterState(state());
+    const result = reviveMasterState({
+      ...stored,
+      profile: { ...stored.profile, isAvailable: false, availableSince: NOW.toISOString() },
+    });
+    expect(result?.profile.availableSince).toBeNull();
+  });
+
+  it('eski yozuvda yangi maydonlar standart qiymat oladi', () => {
+    const stored = serializeMasterState(state());
+    const withoutDeclined = { ...stored };
+    delete (withoutDeclined as Record<string, unknown>).declinedOrderIds;
+    const legacyProfile = { ...stored.profile };
+    delete (legacyProfile as Record<string, unknown>).availableSince;
+
+    const result = reviveMasterState({ ...withoutDeclined, profile: legacyProfile });
+    expect(result?.declinedOrderIds).toEqual([]);
+    expect(result?.profile.availableSince).toBeNull();
+    expect(result?.profile.profession).toBe('Smesitel ustasi');
+  });
+
+  it('rad etilganlar roʻyxati tozalanadi: string boʻlmaganlar va dublikatlar', () => {
+    const stored = serializeMasterState(state());
+    const result = reviveMasterState({
+      ...stored,
+      declinedOrderIds: ['a', 'a', 7, null, 'b'],
+    });
+    expect(result?.declinedOrderIds).toEqual(['a', 'b']);
+  });
+
+  it('rad etilganlar roʻyxati chegaradan oshmaydi', () => {
+    const many = Array.from({ length: 250 }, (_, index) => `o-${index}`);
+    const stored = serializeMasterState(state({ declinedOrderIds: many }));
+    expect(stored.declinedOrderIds).toHaveLength(200);
+    expect(reviveMasterState(stored)?.declinedOrderIds).toHaveLength(200);
   });
 
   it('matnsiz ariza null boʻladi, profil esa qoladi', () => {

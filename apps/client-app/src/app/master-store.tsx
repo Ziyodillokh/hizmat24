@@ -17,6 +17,7 @@ import {
 import type { SupportChannel } from '@/lib/support';
 import {
   clearMasterState,
+  DECLINED_IDS_MAX,
   loadMasterState,
   saveMasterState,
   type MasterState,
@@ -41,6 +42,14 @@ interface MasterContextValue {
   markApplicationChannelOpened: (channel: SupportChannel) => void;
   /** Profil va arizani butunlay oʻchiradi. */
   resetMaster: () => void;
+  /** Usta rad etgan buyurtmalar — ular takliflar roʻyxatiga qaytmaydi. */
+  declinedOrderIds: readonly string[];
+  declineOffer: (orderId: string) => void;
+  undeclineOffer: (orderId: string) => void;
+  /** Smenani ochadi va boshlanish vaqtini yozadi. */
+  openShift: () => void;
+  /** Smenani yopadi; boshlanish vaqti tozalanadi. */
+  closeShift: () => void;
 }
 
 const MasterContext = createContext<MasterContextValue | null>(null);
@@ -51,10 +60,14 @@ export function useMaster(): MasterContextValue {
   return value;
 }
 
-const EMPTY_STATE: MasterState = { profile: EMPTY_MASTER_PROFILE, application: null };
+const EMPTY_STATE: MasterState = {
+  profile: EMPTY_MASTER_PROFILE,
+  application: null,
+  declinedOrderIds: [],
+};
 
 export function MasterProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated, fullName, phoneNumber } = useApp();
+  const { isAuthenticated, fullName, phoneNumber, setMasterTakeover } = useApp();
   const [state, setState] = useState<MasterState>(() => loadMasterState() ?? EMPTY_STATE);
 
   useEffect(() => {
@@ -114,17 +127,90 @@ export function MasterProvider({ children }: { children: ReactNode }) {
 
   const resetMaster = useCallback(() => setState(EMPTY_STATE), []);
 
+  /*
+   * Rad etish buyurtmaga TEGMAYDI: u mijoz dunyosida oʻz holicha qoladi va
+   * taymeri yana ishlay boshlaydi. Saqlanadigan yagona narsa — usta buni
+   * koʻrmoqchi emasligi.
+   */
+  const declineOffer = useCallback((orderId: string) => {
+    setState((prev) =>
+      prev.declinedOrderIds.includes(orderId)
+        ? prev
+        : {
+            ...prev,
+            declinedOrderIds: [orderId, ...prev.declinedOrderIds].slice(0, DECLINED_IDS_MAX),
+          },
+    );
+  }, []);
+
+  const undeclineOffer = useCallback((orderId: string) => {
+    setState((prev) => ({
+      ...prev,
+      declinedOrderIds: prev.declinedOrderIds.filter((id) => id !== orderId),
+    }));
+  }, []);
+
+  const openShift = useCallback(() => {
+    const now = new Date();
+    setState((prev) => ({
+      ...prev,
+      profile: { ...prev.profile, isAvailable: true, availableSince: now, updatedAt: now },
+    }));
+  }, []);
+
+  const closeShift = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      // `availableSince` majburan tozalanadi: yopiq smenaning davomiyligi
+      // degan narsa yoʻq va eskirgan vaqt qolsa ekran yolgʻon gapirardi.
+      profile: {
+        ...prev.profile,
+        isAvailable: false,
+        availableSince: null,
+        updatedAt: new Date(),
+      },
+    }));
+  }, []);
+
+  const isComplete = isMasterProfileComplete(state.profile);
+
+  /*
+   * Taymer qorovuli USTA tomonidan yoqiladi, lekin buyurtmalar mijoz
+   * storeʼida yashaydi. Shuning uchun bitta hosila yuqoriga uzatiladi:
+   * profil toʻliq va smena ochiq boʻlsa, qidiruvdagi buyurtma mock ustaga
+   * berilmaydi — u ustaning kabinetida taklif boʻlib turadi.
+   */
+  useEffect(() => {
+    setMasterTakeover(isComplete && state.profile.isAvailable);
+  }, [isComplete, state.profile.isAvailable, setMasterTakeover]);
+
   const value = useMemo<MasterContextValue>(
     () => ({
       profile: state.profile,
-      isComplete: isMasterProfileComplete(state.profile),
+      isComplete,
       application: state.application,
       updateProfile,
       prepareApplication,
       markApplicationChannelOpened,
       resetMaster,
+      declinedOrderIds: state.declinedOrderIds,
+      declineOffer,
+      undeclineOffer,
+      openShift,
+      closeShift,
     }),
-    [state, updateProfile, prepareApplication, markApplicationChannelOpened, resetMaster],
+    [
+      state,
+      isComplete,
+      updateProfile,
+      prepareApplication,
+      markApplicationChannelOpened,
+      resetMaster,
+      declineOffer,
+      undeclineOffer,
+      openShift,
+      closeShift,
+    ],
   );
 
   return <MasterContext.Provider value={value}>{children}</MasterContext.Provider>;

@@ -68,6 +68,8 @@ function order(status: LiveOrder['status'], options: Partial<LiveOrder> = {}): L
     cancelReason: null,
     cancelledBy: null,
     rating: null,
+    handledByMaster: false,
+    workNote: null,
     ...options,
   };
 }

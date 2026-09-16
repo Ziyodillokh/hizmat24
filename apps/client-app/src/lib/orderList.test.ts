@@ -76,6 +76,8 @@ function makeOrder(overrides: Partial<LiveOrder> = {}): LiveOrder {
     cancelReason: null,
     cancelledBy: null,
     rating: null,
+    handledByMaster: false,
+    workNote: null,
     ...overrides,
   };
 }

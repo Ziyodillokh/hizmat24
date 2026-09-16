@@ -36,6 +36,11 @@ export interface MasterProfile {
    * ekran buni aytadi.
    */
   isAvailable: boolean;
+  /**
+   * Smena qachon ochilgani. `isAvailable === false` boʻlsa DOIM `null` —
+   * yopiq smenaning davomiyligi degan narsa yoʻq.
+   */
+  availableSince: Date | null;
   updatedAt: Date | null;
 }
 
@@ -55,6 +60,7 @@ export const EMPTY_MASTER_PROFILE: MasterProfile = {
   workFrom: 9,
   workTo: 18,
   isAvailable: false,
+  availableSince: null,
   updatedAt: null,
 };
 

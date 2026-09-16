@@ -21,7 +21,17 @@ const STORAGE_KEY = 'hizmat24:master:v1';
 export interface MasterState {
   profile: MasterProfile;
   application: ApplicationRecord | null;
+  /**
+   * Usta rad etgan buyurtmalar.
+   *
+   * Yangi `localStorage` kaliti YOʻQ: alohida slice qoʻshimcha revive va test
+   * yuki berardi, roʻyxat esa aynan usta holatiga tegishli.
+   */
+  declinedOrderIds: string[];
 }
+
+/** Rad etilganlar cheksiz oʻsmasin — eng yangisi saqlanadi. */
+export const DECLINED_IDS_MAX = 200;
 
 interface StoredProfile {
   profession: string | null;
@@ -32,6 +42,7 @@ interface StoredProfile {
   workFrom: number;
   workTo: number;
   isAvailable: boolean;
+  availableSince: string | null;
   updatedAt: string | null;
 }
 
@@ -44,6 +55,7 @@ interface StoredApplication {
 interface StoredMasterState {
   profile: StoredProfile;
   application: StoredApplication | null;
+  declinedOrderIds: string[];
 }
 
 const reviveDate = (value: unknown): Date | null => {
@@ -83,6 +95,8 @@ function reviveProfile(raw: unknown): MasterProfile {
         .slice(0, DISTRICTS_MAX)
     : [];
 
+  const isAvailable = value.isAvailable === true;
+
   return {
     profession,
     experienceLevel,
@@ -91,9 +105,24 @@ function reviveProfile(raw: unknown): MasterProfile {
     districts,
     workFrom: isHour(value.workFrom) ? value.workFrom : EMPTY_MASTER_PROFILE.workFrom,
     workTo: isHour(value.workTo) ? value.workTo : EMPTY_MASTER_PROFILE.workTo,
-    isAvailable: value.isAvailable === true,
+    isAvailable,
+    // Yopiq smenada boshlanish vaqti MAʼNOSIZ: buzuq yozuvda u qolib ketsa,
+    // ekran «0 daqiqadan beri smenadasiz» deb yolgʻon gapirardi.
+    availableSince: isAvailable ? reviveDate(value.availableSince) : null,
     updatedAt: reviveDate(value.updatedAt),
   };
+}
+
+/**
+ * SOF: rad etilganlar roʻyxati.
+ *
+ * Satr boʻlmagan element tashlanadi, dublikat olib tashlanadi, uzunlik
+ * chegaralanadi — bitta buzuq element butun roʻyxatni oʻldirmaydi.
+ */
+function reviveDeclinedIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const unique = new Set(raw.filter((item): item is string => typeof item === 'string'));
+  return [...unique].slice(0, DECLINED_IDS_MAX);
 }
 
 function reviveApplication(raw: unknown): ApplicationRecord | null {
@@ -122,6 +151,7 @@ export function reviveMasterState(parsed: unknown): MasterState | null {
   return {
     profile: reviveProfile(value.profile),
     application: reviveApplication(value.application),
+    declinedOrderIds: reviveDeclinedIds(value.declinedOrderIds),
   };
 }
 
@@ -130,6 +160,9 @@ export function serializeMasterState(state: MasterState): StoredMasterState {
   return {
     profile: {
       ...state.profile,
+      availableSince: state.profile.availableSince
+        ? state.profile.availableSince.toISOString()
+        : null,
       updatedAt: state.profile.updatedAt ? state.profile.updatedAt.toISOString() : null,
     },
     application: state.application
@@ -142,6 +175,7 @@ export function serializeMasterState(state: MasterState): StoredMasterState {
           })),
         }
       : null,
+    declinedOrderIds: [...state.declinedOrderIds].slice(0, DECLINED_IDS_MAX),
   };
 }
 

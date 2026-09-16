@@ -17,6 +17,12 @@ import { Stepper } from '@/components/Stepper';
 import { Textarea } from '@/components/Textarea';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { canCancel, canOpenEnRoute, ORDER_STATUS } from '@/lib/orderStateMachine';
+import {
+  demoActionLabel,
+  etaSourceLine,
+  HANDLED_BY_MASTER_LINE,
+  TAKEOVER_SEARCHING_LINE,
+} from '@/lib/orderSimulation';
 import { formatApproxDuration, formatDateTime, formatPrice } from '@/lib/formatters';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_SHORT_LABELS } from '@/lib/wallet';
@@ -70,7 +76,21 @@ function Summary({ order }: { order: LiveOrder }) {
  * amal kabi koʻrinardi — foydalanuvchi ularni ilovaning bir qismi deb
  * oʻylashi mumkin edi.
  */
-function DemoAction({ label, onClick }: { label: string; onClick: () => void }) {
+function DemoAction({
+  order,
+  masterTakeover,
+  onClick,
+}: {
+  order: Pick<LiveOrder, 'status' | 'handledByMaster'>;
+  masterTakeover: boolean;
+  onClick: () => void;
+}) {
+  // Yorliq ham, tugmaning OʻZI ham `orderSimulation` qorovulidan oʻtadi:
+  // buyurtmani shu qurilmadagi usta yuritayotgan boʻlsa, mijozdagi demo
+  // tugmasi uning ishini oʻgʻirlab, holatni orqasidan surib yuborardi.
+  const label = demoActionLabel(order, masterTakeover);
+  if (!label) return null;
+
   return (
     <button
       type="button"
@@ -86,7 +106,7 @@ export function OrderTracking() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const location = useLocation();
-  const { findOrder, cancelOrder, advanceOrder } = useApp();
+  const { findOrder, cancelOrder, advanceOrder, masterTakeover } = useApp();
   const now = useMinuteClock();
   const showToast = useToast();
   // Buyurtmalar tabidan kelinsa "orqaga" oʻsha tabga; aks holda bosh sahifa.
@@ -180,7 +200,12 @@ export function OrderTracking() {
         <div className="mt-32 flex flex-col items-center">
           <RadarBlock icon={MagnifyingGlass} />
           <h2 className="mt-24 text-h2 text-text-primary">Usta qidirilmoqda…</h2>
-          <DemoAction label="ustani darhol topish" onClick={() => advanceOrder(order.id)} />
+          {masterTakeover && !order.handledByMaster && (
+            <p className="mt-8 px-20 text-center text-body-sm text-text-secondary">
+              {TAKEOVER_SEARCHING_LINE}
+            </p>
+          )}
+          <DemoAction order={order} masterTakeover={masterTakeover} onClick={() => advanceOrder(order.id)} />
         </div>
       )}
 
@@ -194,7 +219,7 @@ export function OrderTracking() {
           <p className="mt-4 text-caption text-text-secondary">
             Navbat va kutish vaqti — demo maʼlumot.
           </p>
-          <DemoAction label="navbatdan chiqarish" onClick={() => advanceOrder(order.id)} />
+          <DemoAction order={order} masterTakeover={masterTakeover} onClick={() => advanceOrder(order.id)} />
         </div>
       )}
 
@@ -218,6 +243,9 @@ export function OrderTracking() {
                 <p className="text-h3 text-text-primary">
                   {formatApproxDuration(order.etaMinutes)}da yetib keladi
                 </p>
+                {/* Vaqt qayerdan keldi — demo taymeridanmi yoki ustaning
+                    oʻzidanmi; ikkalasi bir xil koʻrinsa raqam yolgʻon boʻlardi. */}
+                <p className="mt-4 text-caption text-text-secondary">{etaSourceLine(order)}</p>
                 {canOpenEnRoute(order.status) && <ProgressBar indeterminate className="mt-12" />}
               </div>
             )}
@@ -230,7 +258,7 @@ export function OrderTracking() {
                 Manzil va aloqa
               </button>
             )}
-            <DemoAction label="keyingi bosqich" onClick={() => advanceOrder(order.id)} />
+            <DemoAction order={order} masterTakeover={masterTakeover} onClick={() => advanceOrder(order.id)} />
           </>
         )}
 
@@ -247,9 +275,9 @@ export function OrderTracking() {
             className="mt-20"
           />
           <Banner variant="info" icon={Wrench} className="mt-16">
-            Usta ishni boshladi
+            {order.handledByMaster ? HANDLED_BY_MASTER_LINE : 'Usta ishni boshladi'}
           </Banner>
-          <DemoAction label="ishni yakunlash" onClick={() => advanceOrder(order.id)} />
+          <DemoAction order={order} masterTakeover={masterTakeover} onClick={() => advanceOrder(order.id)} />
           <p className="mt-8 text-caption text-text-secondary">
             Ish yakunlangach usta isbot yuboradi va baholash ochiladi.
           </p>

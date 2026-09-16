@@ -33,11 +33,26 @@ export interface StatusChipProps {
    * roʻyxat rang-barang boʻlib ketadi.
    */
   inline?: boolean;
+  /**
+   * Usta rejimi uchun: AYNI holat, boshqa gap. Mijozning «Usta topildi»
+   * jumlasi ustaning oʻziga hech narsa aytmaydi, ton esa ikkala tomonda
+   * bir xil qoladi (`MASTER_STATUS_CHIPS` tonni `STATUS_CHIPS` dan oladi).
+   */
+  label?: string;
+  tone?: ChipTone;
   className?: string;
 }
 
-export function StatusChip({ status, inline = false, className }: StatusChipProps) {
-  const { label, tone } = STATUS_CHIPS[status];
+export function StatusChip({
+  status,
+  inline = false,
+  label: labelOverride,
+  tone: toneOverride,
+  className,
+}: StatusChipProps) {
+  const fallback = STATUS_CHIPS[status];
+  const label = labelOverride ?? fallback.label;
+  const tone = toneOverride ?? fallback.tone;
   const classes = TONE_CLASSES[tone];
 
   if (inline) {

@@ -71,6 +71,19 @@ export interface LiveOrder {
   cancelReason: string | null;
   cancelledBy: 'CLIENT' | 'MASTER' | 'SYSTEM' | null;
   rating: OrderRating | null;
+  /**
+   * Buyurtmani shu qurilmadagi usta rejimi yuritadimi.
+   *
+   * `true` boʻlgach hech qanday `SERVER_STEPS` taymeri rejalashtirilmaydi va
+   * mijoz ekranidagi uzuq chegarali «Demo ·» chip chizilmaydi: bitta
+   * buyurtmani ikki aktyor surmaydi.
+   */
+  handledByMaster: boolean;
+  /**
+   * Usta yakunlashda yozgan izoh. Mijoz uni `/app/order/:id/proof` da koʻradi.
+   * Boʻsh izoh `null` — «izoh yoʻq» bitta koʻrinishda.
+   */
+  workNote: string | null;
 }
 
 export const EMPTY_DRAFT: OrderDraft = {

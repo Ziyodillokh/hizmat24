@@ -52,6 +52,8 @@ function order(extra: Partial<LiveOrder> = {}): LiveOrder {
     cancelReason: null,
     cancelledBy: null,
     rating: null,
+    handledByMaster: false,
+    workNote: null,
     ...extra,
   };
 }

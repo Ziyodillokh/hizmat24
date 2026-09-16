@@ -98,7 +98,7 @@ export function MasterSetupScreen() {
             ) : (
               <p className="text-center text-caption text-text-secondary">
                 {isLast
-                  ? 'Profil shu qurilmada saqlanadi. Keyin ariza matnini tayyorlaysiz.'
+                  ? 'Profil shu qurilmada saqlanadi. Toʻliq profil bilan «Ishlar» boʻlimida smenani ochib, takliflarni qabul qila olasiz.'
                   : 'Kiritganingiz darhol saqlanadi — keyin davom ettirishingiz mumkin.'}
               </p>
             )}

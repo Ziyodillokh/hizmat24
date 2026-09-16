@@ -1,6 +1,7 @@
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import { buildInvoice, type OrderInvoice } from '@/lib/pricing';
 import { normalizeRating } from '@/lib/rating';
+import { WORK_NOTE_MAX } from '@/lib/masterJobs';
 import type { LiveOrder, PaymentMethod, UserRole } from './types';
 
 /**
@@ -111,7 +112,20 @@ function reviveOrder(raw: unknown): LiveOrder | null {
           isUrgent: false,
           discountPercent: 0,
         }),
+    // 2-bosqichdan (usta rejimi) oldingi buyurtmani TAYMER yuritgan —
+    // `false` tarixni aynan shunday saqlaydi.
+    handledByMaster: order.handledByMaster === true,
+    // Izoh matni foydalanuvchi qoʻlidan chiqqan: kesiladi, lekin yozuvni
+    // oʻldirmaydi. Boʻsh izoh `null` — «izoh yoʻq» bitta koʻrinishda.
+    workNote: reviveWorkNote(order.workNote),
   };
+}
+
+/** SOF: saqlangan izohni chegaraga soladi; yaroqsiz qiymat `null`. */
+function reviveWorkNote(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const note = raw.trim().slice(0, WORK_NOTE_MAX);
+  return note.length > 0 ? note : null;
 }
 
 /**

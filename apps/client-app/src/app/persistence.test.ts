@@ -131,6 +131,41 @@ describe('reviveSession — 3-bosqich migratsiyasi hamon ishlaydi', () => {
     expect(() => order.rating?.tags.join(' · ')).not.toThrow();
   });
 
+  it('eski buyurtma yangi maydonlarning standart qiymatini oladi', () => {
+    const [order] = reviveSession({ orders: [LEGACY_ORDER] })?.orders ?? [];
+    expect(order.handledByMaster).toBe(false);
+    expect(order.workNote).toBeNull();
+  });
+
+  it('usta yuritgani va izohi tiklanadi', () => {
+    const [order] = reviveSession({
+      orders: [{ ...LEGACY_ORDER, handledByMaster: true, workNote: '  Sifon almashtirildi  ' }],
+    })?.orders ?? [];
+    expect(order.handledByMaster).toBe(true);
+    expect(order.workNote).toBe('Sifon almashtirildi');
+  });
+
+  it('juda uzun izoh kesiladi, boʻshi `null` boʻladi', () => {
+    const [long] = reviveSession({
+      orders: [{ ...LEGACY_ORDER, workNote: 'a'.repeat(600) }],
+    })?.orders ?? [];
+    expect(long.workNote).toHaveLength(300);
+
+    const [empty] = reviveSession({
+      orders: [{ ...LEGACY_ORDER, workNote: '   ' }],
+    })?.orders ?? [];
+    expect(empty.workNote).toBeNull();
+  });
+
+  it('yaroqsiz turdagi yangi maydon butun yozuvni oʻldirmaydi', () => {
+    const [order] = reviveSession({
+      orders: [{ ...LEGACY_ORDER, handledByMaster: 'ha', workNote: 42 }],
+    })?.orders ?? [];
+    expect(order.id).toBe('live-1');
+    expect(order.handledByMaster).toBe(false);
+    expect(order.workNote).toBeNull();
+  });
+
   it('buzuq buyurtma tushib qoladi, butuni saqlanadi', () => {
     const session = reviveSession({
       orders: [{ id: 'yaroqsiz' }, LEGACY_ORDER, null],

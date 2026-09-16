@@ -9,11 +9,16 @@ import {
   type ReactNode,
 } from 'react';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
-import { MASTERS, masterById } from '@/mocks/masters';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
+import {
+  simulationStep,
+  simulationTimerKey,
+  waitMsFor,
+} from '@/lib/orderSimulation';
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
-import { buildInvoice } from '@/lib/pricing';
+
+import { buildAcceptPatch, buildStepPatch } from './masterActions';
+import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
@@ -26,15 +31,6 @@ import { clearSession, loadSession, saveSession } from './persistence';
  * (usta topildi → yoʻlga chiqdi → yetib keldi) TAYMER bilan taqlid qilinadi.
  * Mijoz oʻzi boshqaradigan oʻtishlar esa haqiqiy tugmalar orqali boʻladi.
  */
-
-/** Har bir avtomatik oʻtish uchun kutish vaqti (ms) — demo tezligida. */
-const SERVER_STEPS: Partial<Record<OrderStatus, { next: OrderStatus; delayMs: number }>> = {
-  [ORDER_STATUS.SEARCHING]: { next: ORDER_STATUS.ASSIGNED, delayMs: 3500 },
-  [ORDER_STATUS.SEARCHING_QUEUED]: { next: ORDER_STATUS.ASSIGNED, delayMs: 6000 },
-  [ORDER_STATUS.ASSIGNED]: { next: ORDER_STATUS.MASTER_EN_ROUTE, delayMs: 5000 },
-  [ORDER_STATUS.MASTER_EN_ROUTE]: { next: ORDER_STATUS.ARRIVED_PENDING_CONFIRMATION, delayMs: 6000 },
-  [ORDER_STATUS.IN_PROGRESS]: { next: ORDER_STATUS.COMPLETED_BY_MASTER, delayMs: 7000 },
-};
 
 interface AppState {
   isAuthenticated: boolean;
@@ -53,6 +49,14 @@ interface AppState {
   draft: OrderDraft;
   orders: LiveOrder[];
   notifications: AppNotification[];
+  /**
+   * Shu qurilmada usta rejimi ish qabul qilishga tayyormi.
+   *
+   * `MasterProvider` dan YUQORIGA koʻtarilgan: qidiruvdagi buyurtmaning
+   * taymeri shu bayroqqa qarab toʻxtaydi, taymer esa shu yerda yashaydi.
+   * Saqlanmaydi — manbai usta profili va u oʻz kalitida saqlanadi.
+   */
+  masterTakeover: boolean;
 }
 
 interface AppActions {
@@ -97,6 +101,19 @@ interface AppActions {
   rateOrder: (orderId: string, rating: RatingInput) => void;
   /** Demo: keyingi server oʻtishini kutmasdan darhol bajarish. */
   advanceOrder: (orderId: string) => void;
+  /**
+   * Usta taklifni qabul qiladi. `false` — taklif eskirgan (taymer ulgurgan
+   * yoki buyurtma bekor qilingan) va hech narsa yozilmadi.
+   */
+  masterAcceptOrder: (orderId: string, input: { master: Master; etaMinutes: number }) => boolean;
+  /**
+   * Sinov uchun HAQIQIY buyurtma yaratadi — soxta yozuv emas.
+   *
+   * `createOrder` quvurining oʻzidan oʻtadi, shuning uchun natija ikkala
+   * rejimda ham koʻrinadi va hamyon uni boshqa buyurtmalar kabi sanaydi.
+   */
+  createDemoOrder: () => string | null;
+  setMasterTakeover: (on: boolean) => void;
   markNotificationsRead: () => void;
 }
 
@@ -114,84 +131,11 @@ export function useApp(): AppContextValue {
   return value;
 }
 
-let orderCounter = 104_900;
-
-/**
- * Hisoblagichni saqlangan buyurtmalardan tiklaydi.
- *
- * Usiz ilova har qayta ochilganda 104_900 dan boshlanardi, tiklangan
- * buyurtmalar esa eski raqamlarini saqlab qolardi — natijada IKKI xil
- * buyurtma bir xil `id` oladi. Keyin `patchOrder` ikkalasini birdan
- * oʻzgartiradi, hamyon esa bitta toʻlovni ikki marta sanaydi.
- */
-function restoreCounter(orders: readonly LiveOrder[]): void {
-  for (const order of orders) {
-    const digits = Number.parseInt(order.shortId.replace(/\D/g, ''), 10);
-    if (Number.isFinite(digits) && digits > orderCounter) orderCounter = digits;
-  }
-}
-
 const TERMINAL: readonly OrderStatus[] = [
   ORDER_STATUS.CLOSED,
   ORDER_STATUS.CANCELLED,
   ORDER_STATUS.SAFETY_FLAGGED,
 ];
-
-/**
- * Keyingi avtomatik oʻtishgacha kutish vaqti.
- *
- * Rejalashtirilgan buyurtmada usta qidiruvi belgilangan vaqtda boshlanadi.
- * Busiz kelasi haftaga yozilgan buyurtmada ham 3,5 soniyadan keyin "Usta
- * topildi" chiqardi — bu ekranda koʻrinadigan yolgʻon. Faqat BIRINCHI qadam
- * suriladi, keyingilari odatdagi tezlikda ketadi.
- *
- * 7 kun = 604 800 000 ms; `setTimeout` chegarasi 2 147 483 647 ms.
- */
-function waitMsFor(order: LiveOrder, delayMs: number): number {
-  const isSearching =
-    order.status === ORDER_STATUS.SEARCHING || order.status === ORDER_STATUS.SEARCHING_QUEUED;
-  if (!isSearching || !order.scheduledAt) return delayMs;
-
-  return Math.max(0, order.scheduledAt.getTime() - Date.now()) + delayMs;
-}
-
-/**
- * Buyurtmaga usta tayinlaydi.
- *
- * Foydalanuvchi sevimli roʻyxatidan usta tanlagan boʻlsa AYNAN shu usta
- * tayinlanadi. Ilgari funksiya argumentsiz edi va har bir buyurtmaga bitta
- * odam — Akmal Rahimov — tayinlanardi; bosh sahifadagi "Buyurtma berish"
- * tugmasi boshqa ustaning kartasida turgan boʻlsa ham. Tanlovni hisobga
- * olish shu yolgʻonni yoʻq qiladi.
- *
- * Topilmagan `id` zaxira ustaga tushadi: qurilmadagi yozuv eskirgan boʻlsa
- * buyurtma ustasiz qolmasligi kerak.
- */
-const assignMaster = (preferredMasterId: string | null): Master => ({
-  ...(masterById(preferredMasterId ?? undefined) ?? MASTERS.akmal),
-});
-
-/**
- * Server oʻtishining buyurtmaga tushadigan oʻzgarishi.
- *
- * `applyServerStep` (taymer) va `advanceOrder` (demo tugmasi) AYNAN bir xil
- * ishni bajaradi. Ilgari mantiq ikki joyda takrorlangan edi va tanlangan
- * ustani faqat bittasiga qoʻshish jimgina nomuvofiqlik berardi.
- */
-function buildStepPatch(order: LiveOrder, next: OrderStatus): Partial<LiveOrder> {
-  const patch: Partial<LiveOrder> = { status: next };
-
-  if (next === ORDER_STATUS.ASSIGNED) {
-    patch.master = assignMaster(order.preferredMasterId);
-    patch.etaMinutes = 15;
-  }
-  if (next === ORDER_STATUS.COMPLETED_BY_MASTER) {
-    patch.completedAt = new Date();
-    patch.etaMinutes = null;
-  }
-
-  return patch;
-}
 
 export function AppProvider({ children }: { children: ReactNode }) {
   // Boshlangʻich holat qurilmadan tiklanadi — ilova qayta ochilganda
@@ -209,6 +153,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         draft: EMPTY_DRAFT,
         orders: [],
         notifications: NOTIFICATIONS,
+        masterTakeover: false,
       };
     }
 
@@ -227,6 +172,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       notifications: NOTIFICATIONS.map((item) =>
         readIds.has(item.id) ? { ...item, readAt: item.readAt ?? new Date() } : item,
       ),
+      // `MasterProvider` birinchi effektida haqiqiy qiymatni yozadi. Boshida
+      // `false`: smena ochiqligini BILMASDAN taymerni toʻxtatib qoʻyish
+      // mijozni qidiruv ekranida abadiy ushlab turardi.
+      masterTakeover: false,
     };
   });
 
@@ -242,46 +191,55 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** Server tomonidagi keyingi oʻtishni qoʻllaydi. */
-  const applyServerStep = useCallback(
-    (orderId: string, status: OrderStatus) => {
-      const step = SERVER_STEPS[status];
-      if (!step) return;
+  const applyServerStep = useCallback((orderId: string, status: OrderStatus) => {
+    // Buyurtma `setState` ichidan oʻqiladi: taymer ishga tushganda tanlangan
+    // usta allaqachon yozuvda turgan boʻlishi shart. Qorovul ham shu yerda —
+    // kutayotgan eski `setTimeout` usta buyurtmani qabul qilgandan KEYIN ham
+    // oʻq uzishi mumkin.
+    setState((prev) => {
+      const order = prev.orders.find((item) => item.id === orderId);
+      if (!order || order.status !== status) return prev;
 
-      // Buyurtma `setState` ichidan oʻqiladi: taymer ishga tushganda
-      // tanlangan usta allaqachon yozuvda turgan boʻlishi shart.
-      setState((prev) => {
-        const order = prev.orders.find((item) => item.id === orderId);
-        if (!order || order.status !== status) return prev;
+      const step = simulationStep(order, prev.masterTakeover);
+      if (!step) return prev;
 
-        const patch = buildStepPatch(order, step.next);
-        return {
-          ...prev,
-          orders: prev.orders.map((item) => (item.id === orderId ? { ...item, ...patch } : item)),
-        };
-      });
-    },
-    [],
-  );
+      const patch = buildStepPatch(order, step.next, new Date());
+      return {
+        ...prev,
+        orders: prev.orders.map((item) => (item.id === orderId ? { ...item, ...patch } : item)),
+      };
+    });
+  }, []);
 
   // Har bir aktiv buyurtma uchun keyingi avtomatik oʻtishni rejalashtiramiz.
+  // Effekt faqat QOʻSHMAYDI: smena ochilgan zahoti keraksiz boʻlib qolgan
+  // taymerlar bekor qilinadi, aks holda 3,5 soniyalik eski taymer ustaning
+  // taklifini roʻyxatdan uchirib yuborardi.
   useEffect(() => {
-    const active = state.orders.filter((order) => SERVER_STEPS[order.status]);
+    const wanted = new Map<string, { order: LiveOrder; delayMs: number }>();
+    for (const order of state.orders) {
+      const step = simulationStep(order, state.masterTakeover);
+      if (step) wanted.set(simulationTimerKey(order), { order, delayMs: step.delayMs });
+    }
 
-    for (const order of active) {
-      const key = `${order.id}:${order.status}`;
+    for (const [key, handle] of [...timers.current]) {
+      if (wanted.has(key)) continue;
+      window.clearTimeout(handle);
+      timers.current.delete(key);
+    }
+
+    const now = new Date();
+    for (const [key, { order, delayMs }] of wanted) {
       if (timers.current.has(key)) continue;
-
-      const step = SERVER_STEPS[order.status];
-      if (!step) continue;
 
       const handle = window.setTimeout(() => {
         timers.current.delete(key);
         applyServerStep(order.id, order.status);
-      }, waitMsFor(order, step.delayMs));
+      }, waitMsFor(order, delayMs, now));
 
       timers.current.set(key, handle);
     }
-  }, [state.orders, applyServerStep]);
+  }, [state.orders, state.masterTakeover, applyServerStep]);
 
   // Holat oʻzgarganda qurilmaga yoziladi. Qoralama SAQLANMAYDI: u faqat
   // buyurtma berish oqimi davomida yashaydi va yarim toʻldirilgan holda
@@ -316,6 +274,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
       pending.clear();
     };
   }, []);
+
+  /**
+   * Buyurtma yaratishning YAGONA yoʻli.
+   *
+   * `draftOverride` — sinov buyurtmasi uchun tayyor qoralama; `null` boʻlsa
+   * foydalanuvchi toʻldirgan qoralama olinadi.
+   */
+  const createFromDraft = useCallback(
+    (draftOverride: OrderDraft | null, discountPercent: number): string | null => {
+      let createdId: string | null = null;
+
+      setState((prev) => {
+        const order = buildNewOrder(draftOverride ?? prev.draft, discountPercent, new Date());
+        if (!order) return prev;
+
+        createdId = order.id;
+        return { ...prev, orders: [order, ...prev.orders], draft: EMPTY_DRAFT };
+      });
+
+      return createdId;
+    },
+    [],
+  );
 
   const actions = useMemo<AppActions>(
     () => ({
@@ -368,58 +349,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       resetDraft: () => setState((prev) => ({ ...prev, draft: EMPTY_DRAFT })),
 
-      createOrder: (discountPercent) => {
-        let createdId: string | null = null;
+      createOrder: (discountPercent) => createFromDraft(null, discountPercent),
 
-        setState((prev) => {
-          const category = ALL_CATEGORIES.find((item) => item.id === prev.draft.categoryId);
-          // Toʻlov usuli ham majburiy: usulsiz buyurtma hamyonda yorliqsiz
-          // qator berardi.
-          if (!category || !prev.draft.address || !prev.draft.paymentMethod) return prev;
-
-          orderCounter += 1;
-          createdId = `live-${orderCounter}`;
-          // Rejalashtirilgan buyurtmada navbat maʼnosiz — navbat "hozir"
-          // tushunchasi.
-          const shouldQueue =
-            !prev.draft.isUrgent && prev.draft.scheduledAt === null && orderCounter % 3 === 0;
-
-          const order: LiveOrder = {
-            id: createdId,
-            shortId: `HZ-${orderCounter}`,
-            categoryId: category.id,
-            categoryName: category.name,
-            categoryIconKey: category.iconKey,
-            description: prev.draft.description,
-            invoice: buildInvoice({
-              base: category.basePrice,
-              isUrgent: prev.draft.isUrgent,
-              discountPercent,
-            }),
-            paymentMethod: prev.draft.paymentMethod,
-            preferredMasterId: prev.draft.preferredMasterId,
-            scheduledAt: prev.draft.scheduledAt,
-            isUrgent: prev.draft.isUrgent,
-            address: prev.draft.address,
-            // Har uchinchi oddiy buyurtma navbatdan boshlanadi — haqiqiy
-            // tizimda ustalar band boʻlganda shunday boʻladi. Shoshilinch
-            // buyurtma navbatni chetlab oʻtadi (TZ 3.4).
-            status: shouldQueue ? ORDER_STATUS.SEARCHING_QUEUED : ORDER_STATUS.SEARCHING,
-            master: null,
-            etaMinutes: null,
-            queuePosition: shouldQueue ? 3 : null,
-            createdAt: new Date(),
-            completedAt: null,
-            cancelReason: null,
-            cancelledBy: null,
-            rating: null,
-          };
-
-          return { ...prev, orders: [order, ...prev.orders], draft: EMPTY_DRAFT };
-        });
-
-        return createdId;
-      },
+      createDemoOrder: () => createFromDraft(DEMO_DRAFT, 0),
 
       cancelOrder: (orderId, reason) =>
         patchOrder(orderId, {
@@ -448,15 +380,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
           },
         }),
 
+      // Qorovul `simulationStep` ichida: usta yuritayotgan buyurtmada demo
+      // tugmasi holatni uning orqasidan surib yuborardi.
       advanceOrder: (orderId) =>
         setState((prev) => {
           const order = prev.orders.find((item) => item.id === orderId);
           if (!order) return prev;
 
-          const step = SERVER_STEPS[order.status];
+          const step = simulationStep(order, prev.masterTakeover);
           if (!step) return prev;
 
-          const patch = buildStepPatch(order, step.next);
+          const patch = buildStepPatch(order, step.next, new Date());
 
           return {
             ...prev,
@@ -465,6 +399,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
             ),
           };
         }),
+
+      masterAcceptOrder: (orderId, input) => {
+        let accepted = false;
+
+        setState((prev) => {
+          const order = prev.orders.find((item) => item.id === orderId);
+          if (!order) return prev;
+
+          // Holat `setState` ICHIDA qayta tekshiriladi (quruvchining oʻzida):
+          // taklif kartasi chizilgandan keyin taymer ulgurgan boʻlishi mumkin.
+          const patch = buildAcceptPatch(order, input.master, input.etaMinutes);
+          if (!patch) return prev;
+
+          accepted = true;
+          return {
+            ...prev,
+            orders: prev.orders.map((item) =>
+              item.id === orderId ? { ...item, ...patch } : item,
+            ),
+          };
+        });
+
+        return accepted;
+      },
+
+      setMasterTakeover: (on) =>
+        setState((prev) => (prev.masterTakeover === on ? prev : { ...prev, masterTakeover: on })),
 
       markNotificationsRead: () =>
         setState((prev) => ({
@@ -475,7 +436,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })),
         })),
     }),
-    [patchOrder],
+    [patchOrder, createFromDraft],
   );
 
   const value = useMemo<AppContextValue>(() => {
