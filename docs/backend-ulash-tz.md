@@ -183,6 +183,10 @@ telefondan oʻsha akkaunt bilan kirilsa oʻsha buyurtma koʻrinadi; internetsiz 
 
 ### B4 — Usta hisobi va profili
 
+> **Shart:** arizani kimdir tasdiqlashi kerak — [admin-panel-tz.md](admin-panel-tz.md) dagi
+> A1 va A2 bosqichlari shu bosqichdan OLDIN bajariladi. Vaqtinchalik `psql` bilan
+> tasdiqlash faqat ishlab chiqish paytida.
+
 **Maqsad:** usta oʻz telefonidan kira oladi va profili serverda yashaydi.
 
 **Server:**
