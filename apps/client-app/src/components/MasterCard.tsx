@@ -3,6 +3,7 @@ import { cn } from '@/lib/cn';
 import { Avatar } from './Avatar';
 import { Badge } from './Badge';
 import { Card } from './Card';
+import { NO_RATING_LABEL } from '@/lib/masterIdentity';
 import { StarRating } from './StarRating';
 
 /**
@@ -73,7 +74,13 @@ export function MasterCard({
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-12">
-          <StarRating value={rating} size="sm" showValue />
+          {/* Bajarilgan ishi yoʻq ustada yulduz chizilmaydi: «0,0» — «yomon
+              ishlaydi» degani, «hali baholanmagan» degani emas. */}
+          {completedOrders === 0 ? (
+            <span className="text-body-sm text-text-secondary">{NO_RATING_LABEL}</span>
+          ) : (
+            <StarRating value={rating} size="sm" showValue />
+          )}
           {/* Reyting yonida "N ta baho" yozilmaydi (14.1-band, 6-punkt). */}
           {!compact && (
             <span className="text-body-sm text-text-secondary">{completedOrders} ta buyurtma bajargan</span>

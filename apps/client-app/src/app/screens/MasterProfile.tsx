@@ -6,6 +6,7 @@ import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { StarRating } from '@/components/StarRating';
+import { NO_RATING_LABEL } from '@/lib/masterIdentity';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { isMasterPhoneVisible } from '@/lib/orderStateMachine';
@@ -128,7 +129,11 @@ export function MasterProfile() {
       */}
       <div className="mt-20 grid grid-cols-2 gap-12">
         <div className="rounded-lg border border-border bg-surface-elevated px-16 py-12">
-          <StarRating value={master.ratingAvg} size="sm" showValue />
+          {master.completedOrdersCount === 0 ? (
+            <p className="text-body-sm text-text-secondary">{NO_RATING_LABEL}</p>
+          ) : (
+            <StarRating value={master.ratingAvg} size="sm" showValue />
+          )}
           <p className="mt-4 text-body-sm text-text-secondary">Reyting</p>
         </div>
         <div className="rounded-lg border border-border bg-surface-elevated px-16 py-12">

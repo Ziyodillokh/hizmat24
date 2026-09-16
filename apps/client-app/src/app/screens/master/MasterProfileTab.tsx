@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Sun,
 } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
 import { Banner } from '@/components/Banner';
@@ -24,7 +24,8 @@ import { Modal } from '@/components/Modal';
 import { Toggle } from '@/components/Toggle';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { MODE_ROUTE } from '@/lib/appMode';
-import { formatDateTime, formatPhone } from '@/lib/formatters';
+import { masterJobStats } from '@/lib/masterIdentity';
+import { EMPTY_VALUE, formatDateTime, formatPhone, formatRating } from '@/lib/formatters';
 import {
   completedStepCount,
   firstIncompleteStep,
@@ -50,8 +51,9 @@ import { useTheme } from '../../theme-context';
 export function MasterProfileTab() {
   const navigate = useNavigate();
   const now = useMinuteClock();
-  const { fullName, phoneNumber, signOut } = useApp();
+  const { fullName, phoneNumber, signOut, orders } = useApp();
   const { profile, isComplete, application } = useMaster();
+  const stats = useMemo(() => masterJobStats(orders), [orders]);
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -149,6 +151,19 @@ export function MasterProfileTab() {
           <InfoChip tone="warning" className="mt-8">
             Tekshirilmagan
           </InfoChip>
+
+          {/*
+            Statistika faqat SHU qurilmadagi yopilgan ishlardan. Baho yoʻq
+            boʻlsa «0,0» emas, chiziq: nol baho — bu «yomon ishlaydi» degani,
+            «hali baholanmagan» degani emas.
+          */}
+          <p className="tabular mt-8 text-body-sm text-text-secondary">
+            Yakunlangan: {stats.completedCount} · Baho:{' '}
+            {stats.ratingAvg === null ? EMPTY_VALUE : formatRating(stats.ratingAvg)}
+          </p>
+          <p className="mt-2 text-caption text-text-secondary">
+            Faqat shu qurilmadagi ishlardan hisoblandi.
+          </p>
         </div>
       </Card>
 
