@@ -1,66 +1,65 @@
-import { useState } from 'react';
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, HandWaving, Robot, SealCheck, ShieldCheck } from '@phosphor-icons/react';
-import type { Icon as IconGlyph } from '@phosphor-icons/react';
+import { BrandMark } from '@/components/BrandMark';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { ModeChoiceCards } from '@/components/ModeChoiceCards';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { HOME_ROUTE_FOR } from '@/lib/appMode';
 import { cn } from '@/lib/cn';
+import {
+  NEXT_LABEL,
+  ONBOARDING_SLIDES,
+  ONBOARDING_STEPS,
+  ROLE_STEP_HINT,
+  ROLE_STEP_TITLE,
+  SKIP_LABEL,
+  type OnboardingSlide,
+} from '@/lib/onboarding';
+import { useSwipe } from '../useSwipe';
 import { useApp } from '../store';
 import type { UserRole } from '../types';
+import workImage from '@/assets/services/santexnika-tamiri.webp';
+import mastersImage from '@/assets/services/quvurlar.webp';
+import aiImage from '@/assets/brand/ai-robot.webp';
 
 /**
- * Tanishtiruv oqimi: uchta afzallik ekrani va yakunda rol tanlash.
+ * Tanishtiruv oqimi: uchta vaʼda va yakunda rejim tanlash.
  *
- * Oqim BIR MARTA koʻrsatiladi — tugagach `hasOnboarded` saqlanadi. Har
- * kirishda takrorlansa, u foydalanuvchini ilovaga kirishdan toʻsuvchi
- * toʻsiqqa aylanadi.
+ * Oqim BIR MARTA koʻrsatiladi — tugagach `hasOnboarded` saqlanadi.
  *
- * Har bosqichda "Oʻtkazib yuborish" bor: tanishtiruv majburiy emas va uni
- * yopib boʻlmaydigan qilish — ilovaga kirishni sekinlashtiradi.
+ * Ilgari slaydlar rangpar doira ichidagi ikonadan iborat edi va ekranning
+ * pastki yarmi boʻsh qolardi — ilova tugallanmagandek koʻrinardi. Endi
+ * yuqorida haqiqiy foto, pastda matn va amal: ekranning har qismi ish bajaradi.
+ * Rasm — ilovadagi AYNAN oʻsha xizmat fotolari, maxsus illyustratsiya emas.
  */
-interface Slide {
-  icon: IconGlyph;
-  title: string;
-  description: string;
-}
+const SLIDE_IMAGES: Record<OnboardingSlide['imageKey'], string> = {
+  work: workImage,
+  masters: mastersImage,
+  ai: aiImage,
+};
 
-/*
- * Ilovaning birinchi uchta jumlasi — eng qimmat vaʼdalar. Har biri bugun
- * ISHLAYDIGAN narsani aytadi va chegarasini oʻzi bilan olib yuradi.
- */
-const SLIDES: Slide[] = [
-  {
-    icon: ShieldCheck,
-    title: 'Pul ish bajarilgach beriladi',
-    description:
-      'Hozir buyurtma naqd toʻlanadi — pul ilova orqali oʻtmaydi va ishni koʻrmaguningizcha sizda qoladi. Ixtiyoriy kafolatli toʻlov Click va Payme ulangach qoʻshiladi.',
-  },
-  {
-    icon: SealCheck,
-    title: 'Ustani oʻzingiz tekshirasiz',
-    description:
-      'Sertifikat belgisi, reyting va bajarilgan buyurtmalar soni har bir usta kartasida koʻrsatiladi. Usta eshik oldida kelganda suratini solishtirasiz — mos kelmasa buyurtma toʻxtatiladi.',
-  },
-  {
-    icon: Robot,
-    title: 'AI yordamchi doim yoningizda',
-    description:
-      'Narx, jadval va kafolat boʻyicha savol bering. Javoblar hozircha tayyor matnlardan keladi — bu haqiqiy AI emas.',
-  },
-];
-
-/** Uchta afzallik + rejim tanlash = toʻrtta bosqich. */
-const TOTAL_STEPS = SLIDES.length + 1;
+/** AI maskoti kvadrat va kichik — u kesilmasligi, markazda turishi kerak. */
+const CONTAIN_KEYS: readonly OnboardingSlide['imageKey'][] = ['ai'];
 
 export function OnboardingScreen() {
   const navigate = useNavigate();
   const { completeOnboarding } = useApp();
   const [step, setStep] = useState(0);
+  const surfaceRef = useRef<HTMLDivElement>(null);
 
-  const isRoleStep = step === SLIDES.length;
+  const isRoleStep = step === ONBOARDING_SLIDES.length;
+  const slide = ONBOARDING_SLIDES[step];
+
+  const go = (next: number) => setStep(Math.min(Math.max(next, 0), ONBOARDING_SLIDES.length));
+
+  // Surish — telefonda tanishtiruvning tabiiy jesti. Chekkada hech narsa
+  // qilinmaydi: oxirgi slayddan keyingi qadam TANLOV, uni surib oʻtib
+  // boʻlmaydi.
+  useSwipe(surfaceRef, {
+    onSwipe: (direction) => go(direction === 'left' ? step + 1 : step - 1),
+  });
 
   const finish = (role: UserRole) => {
     completeOnboarding(role);
@@ -74,92 +73,126 @@ export function OnboardingScreen() {
 
   return (
     <ScreenShell
+      className="flex flex-col"
       footer={
         isRoleStep ? undefined : (
           <StickyFooter>
-            <Button
-              variant="primary"
-              onClick={() => setStep((value) => value + 1)}
-              trailingIcon={ArrowRight}
-            >
-              Davom etish
+            <Button variant="primary" onClick={() => go(step + 1)} trailingIcon={ArrowRight}>
+              {NEXT_LABEL}
             </Button>
-
-            <div className="mt-12 flex items-center justify-between gap-12">
-              <button
-                type="button"
-                onClick={() => setStep(SLIDES.length)}
-                className="text-body-sm text-text-secondary"
-              >
-                Oʻtkazib yuborish
-              </button>
-              <button
-                type="button"
-                onClick={() => finish('master')}
-                className="text-body-sm font-semibold text-primary-pressed"
-              >
-                Usta boʻlish →
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => go(ONBOARDING_SLIDES.length)}
+              className="mt-12 min-h-touch w-full text-body-sm text-text-secondary"
+            >
+              {SKIP_LABEL}
+            </button>
           </StickyFooter>
         )
       }
     >
-      {/* Bosqich koʻrsatkichi: joriy bosqich choʻzilgan chiziq bilan belgilanadi. */}
-      <div className="flex items-center justify-center gap-8 pt-16" aria-hidden>
-        {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-          <span
-            key={index}
-            className={cn(
-              'h-8 rounded-full transition-all duration-state ease-std',
-              index === step ? 'w-24 bg-primary' : 'w-8 bg-border-strong',
-            )}
-          />
-        ))}
-      </div>
-
-      {isRoleStep ? (
-        <>
-          <div className="flex flex-col items-center pt-32">
-            <span
-              className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary-surface"
-              aria-hidden
-            >
-              <Icon icon={HandWaving} size={48} weight="duotone" className="text-primary-pressed" />
-            </span>
-            <h1 className="mt-20 text-center text-h1 text-text-primary">Bugun kimsiz?</h1>
-            <p className="mt-8 text-center text-body text-text-secondary">
-              Xavotir olmang — keyinchalik profil orqali istalgan vaqt almashtira olasiz
-            </p>
-          </div>
-
-          {/* Kartalar `/app/mode` bilan BITTA manbadan keladi. */}
-          <ModeChoiceCards className="mt-24" value={null} onChoose={finish} />
-        </>
-      ) : (
-        <div className="flex flex-col items-center pt-32">
-          <span
-            className="flex h-[112px] w-[112px] items-center justify-center rounded-full bg-primary-surface"
-            aria-hidden
-          >
-            <Icon
-              icon={SLIDES[step].icon}
-              size={64}
-              weight="duotone"
-              className="text-primary-pressed"
+      <div ref={surfaceRef} className="flex flex-1 flex-col touch-pan-y">
+        {/*
+          Rasm sahifa chetigacha chiqadi (`-mx-20`) va pastki burchaklari
+          yumaloq: ekranning tepasi bitta yaxlit blok boʻlib koʻrinadi.
+        */}
+        {/*
+          Rasm QOLGAN joyni oʻzi egallaydi (`flex-1`): qatʼiy balandlikda
+          412×915 ekranda matn bilan tugma orasida boʻshliq qolardi. Rejim
+          tanlashda esa chegara bor — kartalar pastga surilib ketmasin.
+        */}
+        <div
+          className={cn(
+            // `basis-0`: rasm faqat QOLGAN joyni oladi. `basis-auto` da u oʻz
+            // tabiiy balandligini ham qoʻshib hisoblaydi va ekran bir necha
+            // piksel surilib qolardi.
+            'relative -mx-20 flex-1 basis-0 overflow-hidden rounded-b-lg bg-primary-surface',
+            // Past ekranlarda rasm birinchi boʻlib qisqaradi — matn hech
+            // qachon kesilmaydi va ekran surilmaydi.
+            isRoleStep ? 'min-h-[160px] max-h-[300px]' : 'min-h-[140px]',
+          )}
+        >
+          {isRoleStep ? (
+            <div className="hero-field flex h-full flex-col items-center justify-center gap-12 px-20">
+              <BrandMark className="h-[64px] w-[64px]" />
+              <p className="text-title text-on-primary-deep">Hizmat24</p>
+            </div>
+          ) : (
+            <img
+              src={SLIDE_IMAGES[slide.imageKey]}
+              alt=""
+              draggable={false}
+              className={cn(
+                'h-full w-full',
+                CONTAIN_KEYS.includes(slide.imageKey) ? 'object-contain p-32' : 'object-cover',
+              )}
             />
-          </span>
+          )}
 
-          <h1 className="mt-24 text-balance text-center text-h1 text-text-primary">
-            {SLIDES[step].title}
-          </h1>
-          <p className="mt-12 text-center text-body-lg text-text-secondary">
-            {SLIDES[step].description}
-          </p>
+          {/* Orqaga — birinchi slayddan keyin; sahifada boshqa chiqish yoʻli yoʻq. */}
+          {step > 0 && !isRoleStep && (
+            <button
+              type="button"
+              onClick={() => go(step - 1)}
+              aria-label="Orqaga"
+              className="absolute left-20 top-16 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-surface-elevated/[0.92] shadow-e2"
+            >
+              <Icon icon={ArrowLeft} size={20} className="text-text-primary" />
+            </button>
+          )}
         </div>
-      )}
 
-      <div className="h-24" aria-hidden />
+        {/* Bosqich koʻrsatkichi: joriy bosqich choʻzilgan chiziq bilan. */}
+        <div
+          className="flex shrink-0 items-center justify-center gap-8 pt-20 [@media(max-height:700px)]:pt-12"
+          aria-hidden
+        >
+          {Array.from({ length: ONBOARDING_STEPS }, (_, index) => (
+            <span
+              key={index}
+              className={cn(
+                'h-8 rounded-full transition-all duration-state ease-std',
+                index === step ? 'w-24 bg-primary' : 'w-8 bg-border-strong',
+              )}
+            />
+          ))}
+        </div>
+
+        {isRoleStep ? (
+          <div className="shrink-0 pt-20 [@media(max-height:700px)]:pt-12">
+            <h1 className="text-center text-h1 text-text-primary [@media(max-height:700px)]:text-h2">
+              {ROLE_STEP_TITLE}
+            </h1>
+            <p className="mt-8 text-center text-body text-text-secondary">{ROLE_STEP_HINT}</p>
+            {/* Kartalar `/app/mode` bilan BITTA manbadan keladi. */}
+            <ModeChoiceCards
+              className="mt-24 [@media(max-height:700px)]:mt-16"
+              value={null}
+              onChoose={finish}
+            />
+          </div>
+        ) : (
+          <div className="shrink-0 pt-20 [@media(max-height:700px)]:pt-12">
+            <h1 className="text-balance text-center text-h1 text-text-primary [@media(max-height:700px)]:text-h2">
+              {slide.title}
+            </h1>
+            <p className="mt-12 text-center text-body-lg text-text-secondary [@media(max-height:700px)]:mt-8 [@media(max-height:700px)]:text-body">
+              {slide.description}
+            </p>
+            {/*
+              Chegara — vaʼdaning ostida va undan kichikroq: ilova nimani
+              qila olmasligini birinchi ekrandayoq aytadi.
+            */}
+            {slide.caveat && (
+              <p className="mt-16 text-center text-caption text-text-secondary [@media(max-height:700px)]:mt-8">
+                {slide.caveat}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="h-20 shrink-0" aria-hidden />
+      </div>
     </ScreenShell>
   );
 }
