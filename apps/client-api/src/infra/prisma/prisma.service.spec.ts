@@ -13,7 +13,7 @@ describe('PrismaService', () => {
     expect(connect).toHaveBeenCalled();
   });
 
-  it("modul to'xtaganda ulanishni yopadi (graceful shutdown)", async () => {
+  it("modul toʻxtaganda ulanishni yopadi (graceful shutdown)", async () => {
     const service = new PrismaService();
     const disconnect = jest.spyOn(service, '$disconnect').mockResolvedValue(undefined);
 

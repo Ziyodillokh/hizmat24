@@ -5,19 +5,19 @@ describe('extractCurrentUser', () => {
   const buildContext = (user?: unknown) =>
     ({ switchToHttp: () => ({ getRequest: () => ({ user }) }) }) as ExecutionContext;
 
-  it("maydon ko'rsatilmasa butun foydalanuvchi obyektini qaytaradi", () => {
+  it("maydon koʻrsatilmasa butun foydalanuvchi obyektini qaytaradi", () => {
     const user = { id: 'user-1', phoneNumber: '+998901234567' };
 
     expect(extractCurrentUser(undefined, buildContext(user))).toEqual(user);
   });
 
-  it("so'ralgan maydonni qaytaradi", () => {
+  it("soʻralgan maydonni qaytaradi", () => {
     expect(
       extractCurrentUser('id', buildContext({ id: 'user-1', phoneNumber: '+998901234567' })),
     ).toBe('user-1');
   });
 
-  it("guard foydalanuvchini joylashtirmagan bo'lsa undefined qaytaradi", () => {
+  it("guard foydalanuvchini joylashtirmagan boʻlsa undefined qaytaradi", () => {
     expect(extractCurrentUser('id', buildContext(undefined))).toBeUndefined();
   });
 

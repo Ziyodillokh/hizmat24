@@ -60,7 +60,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
     } catch (error) {
       this.logger.error(
         { err: error, orderId: order.id },
-        "Qidiruv navbatiga yozib bo'lmadi — buyurtma keyingi sweep'da tiklanadi",
+        "Qidiruv navbatiga yozib boʻlmadi — buyurtma keyingi sweepʼda tiklanadi",
       );
     }
 
@@ -71,7 +71,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
 
   /**
    * Idempotentlik (biznes-qoida 5.6): bir xil `Idempotency-Key` bilan takroriy
-   * so'rov kelsa, unique constraint ishga tushadi va mavjud buyurtma qaytariladi.
+   * soʻrov kelsa, unique constraint ishga tushadi va mavjud buyurtma qaytariladi.
    */
   private async createOrder(command: CreateOrderCommand, price: number) {
     try {

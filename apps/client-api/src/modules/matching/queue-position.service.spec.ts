@@ -31,18 +31,18 @@ describe('QueuePositionService.scoreFor', () => {
 });
 
 describe('QueuePositionService.estimateWaitMinutes', () => {
-  it("navbatda bo'lmagan buyurtma uchun null qaytaradi", () => {
+  it("navbatda boʻlmagan buyurtma uchun null qaytaradi", () => {
     expect(QueuePositionService.estimateWaitMinutes(0, 5)).toBeNull();
   });
 
-  it("ustalar soni ko'p bo'lsa kutish vaqti qisqaradi", () => {
+  it("ustalar soni koʻp boʻlsa kutish vaqti qisqaradi", () => {
     const withFewMasters = QueuePositionService.estimateWaitMinutes(4, 1);
     const withManyMasters = QueuePositionService.estimateWaitMinutes(4, 4);
 
     expect(withManyMasters!).toBeLessThan(withFewMasters!);
   });
 
-  it("ustalar bo'lmasa ham nolga bo'lish xatosiga tushmaydi", () => {
+  it("ustalar boʻlmasa ham nolga boʻlish xatosiga tushmaydi", () => {
     expect(QueuePositionService.estimateWaitMinutes(2, 0)).toBe(90);
   });
 });
@@ -68,7 +68,7 @@ describe('QueuePositionService (Redis Sorted Set)', () => {
     service = new QueuePositionService(redis as never);
   });
 
-  it("buyurtmani ustuvorlik score i bilan navbatga qo'shadi", async () => {
+  it("buyurtmani ustuvorlik score i bilan navbatga qoʻshadi", async () => {
     // Arrange
     const createdAt = new Date('2026-01-01T00:00:00Z');
 
@@ -84,7 +84,7 @@ describe('QueuePositionService (Redis Sorted Set)', () => {
     expect(position).toBe(3);
   });
 
-  it("navbatda bo'lmagan buyurtma uchun 0 qaytaradi", async () => {
+  it("navbatda boʻlmagan buyurtma uchun 0 qaytaradi", async () => {
     redis.zrank.mockResolvedValue(null);
 
     expect(await service.positionOf('order-1')).toBe(0);
@@ -102,7 +102,7 @@ describe('QueuePositionService (Redis Sorted Set)', () => {
     expect(redis.zrange).toHaveBeenCalledWith('orders:queue', 0, 4);
   });
 
-  it("nol so'ralganda ham manfiy indeks yuzaga kelmaydi", async () => {
+  it("nol soʻralganda ham manfiy indeks yuzaga kelmaydi", async () => {
     await service.peek(0);
 
     expect(redis.zrange).toHaveBeenCalledWith('orders:queue', 0, 0);

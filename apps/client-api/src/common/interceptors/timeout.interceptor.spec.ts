@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs/operators';
 import { TimeoutInterceptor } from './timeout.interceptor';
 
 describe('TimeoutInterceptor', () => {
-  it("vaqtida tugagan so'rovni o'zgartirmaydi", async () => {
+  it("vaqtida tugagan soʻrovni oʻzgartirmaydi", async () => {
     const interceptor = new TimeoutInterceptor(100);
     const next = { handle: () => of('ok') };
 
@@ -22,7 +22,7 @@ describe('TimeoutInterceptor', () => {
     ).rejects.toBeInstanceOf(RequestTimeoutException);
   });
 
-  it("boshqa xatolarni o'zgartirmasdan uzatadi", async () => {
+  it("boshqa xatolarni oʻzgartirmasdan uzatadi", async () => {
     const interceptor = new TimeoutInterceptor(100);
     const original = new Error('domain xatosi');
     const next = { handle: () => throwError(() => original) };

@@ -13,8 +13,8 @@ export class ServiceGroupsController {
   @ApiOperation({
     summary: 'Xizmat guruhlari va ular ichidagi xizmatlar',
     description:
-      "Bosh sahifadagi plitkalar va guruh ekrani uchun bitta so'rov. " +
-      "Bo'sh guruhlar qaytarilmaydi.",
+      "Bosh sahifadagi plitkalar va guruh ekrani uchun bitta soʻrov. " +
+      "Boʻsh guruhlar qaytarilmaydi.",
   })
   list(): Promise<ServiceGroupView[]> {
     return this.groups.listActive();

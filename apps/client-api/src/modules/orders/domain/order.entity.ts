@@ -26,7 +26,7 @@ export interface OrderProps {
 }
 
 /**
- * Order agregati. Holat o'tishlari FAQAT shu yerda tekshiriladi —
+ * Order agregati. Holat oʻtishlari FAQAT shu yerda tekshiriladi —
  * controller yoki service qatlamida `if (status === ...)` orqali tekshiruv yozilmaydi (9.3).
  */
 export class OrderEntity {
@@ -80,7 +80,7 @@ export class OrderEntity {
   }
 
   /**
-   * Yangi holatga o'tish. Grafda ruxsat etilmagan bo'lsa —
+   * Yangi holatga oʻtish. Grafda ruxsat etilmagan bo'lsa —
    * `InvalidStateTransitionException`.
    */
   transitionTo(next: OrderStatus): OrderEntity {
@@ -93,8 +93,8 @@ export class OrderEntity {
     if (!CLIENT_CANCELLABLE_STATUSES.includes(this.props.status)) {
       throw new DomainException(
         'CANCEL_NOT_ALLOWED',
-        "Ish boshlangandan keyin buyurtmani ilova orqali bekor qilib bo'lmaydi — " +
-          "iltimos, qo'llab-quvvatlash xizmatiga murojaat qiling",
+        "Ish boshlangandan keyin buyurtmani ilova orqali bekor qilib boʻlmaydi — " +
+          "iltimos, qoʻllab-quvvatlash xizmatiga murojaat qiling",
         HttpStatus.FORBIDDEN,
         { status: this.props.status },
       );
@@ -113,7 +113,7 @@ export class OrderEntity {
   }
 
   /**
-   * "Bu men chaqirgan usta emas" — ish HECH QANDAY holatda in_progress'ga o'tmaydi (3.7).
+   * "Bu men chaqirgan usta emas" — ish HECH QANDAY holatda in_progress'ga oʻtmaydi (3.7).
    * SAFETY_FLAGGED terminal holat, undan chiqish yo'li yo'q.
    */
   flagSafety(): OrderEntity {

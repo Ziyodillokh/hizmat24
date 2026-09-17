@@ -20,7 +20,7 @@ export interface StatusChangeContext {
   reason?: string | null;
   auditAction?: AuditAction;
   metadata?: Prisma.InputJsonValue;
-  /** Holat bilan birga yoziladigan qo'shimcha maydonlar (masterId, etaMinutes, ...). */
+  /** Holat bilan birga yoziladigan qoʻshimcha maydonlar (masterId, etaMinutes, ...). */
   data?: Prisma.OrderUncheckedUpdateInput;
 }
 
@@ -60,7 +60,7 @@ export class OrdersRepository {
    * Holatni atomar o'zgartiradi (nofunksional talab 7.3).
    *
    * `where` shartiga joriy holat ham kiritiladi — shu sababli ikkita parallel
-   * so'rovdan faqat bittasi muvaffaqiyatli bo'ladi (optimistik bloklash).
+   * so'rovdan faqat bittasi muvaffaqiyatli boʻladi (optimistik bloklash).
    */
   async applyTransition(
     entity: OrderEntity,
@@ -72,9 +72,9 @@ export class OrdersRepository {
     // Domain qatlami o'tishning ruxsat etilganini tekshiradi.
     entity.transitionTo(next);
 
-    // Holat + tarix + audit — bo'linmas to'plam. Chaqiruvchi o'z tranzaksiyasini
+    // Holat + tarix + audit — bo'linmas toʻplam. Chaqiruvchi o'z tranzaksiyasini
     // bermasa, o'zimiznikini ochamiz: aks holda oradagi uzilish holati
-    // o'zgargan, lekin tarixsiz/auditsiz buyurtma qoldirardi.
+    // oʻzgargan, lekin tarixsiz/auditsiz buyurtma qoldirardi.
     const result = tx
       ? await this.writeTransition(tx, entity, previous, next, context)
       : await this.prisma.$transaction((client) =>
@@ -106,7 +106,7 @@ export class OrdersRepository {
     if (updated.count === 0) {
       throw new ConflictException(
         'ORDER_STATE_CHANGED',
-        "Buyurtma holati boshqa jarayon tomonidan o'zgartirildi, qaytadan urinib ko'ring",
+        "Buyurtma holati boshqa jarayon tomonidan oʻzgartirildi, qaytadan urinib koʻring",
         { expected: previous, target: next },
       );
     }

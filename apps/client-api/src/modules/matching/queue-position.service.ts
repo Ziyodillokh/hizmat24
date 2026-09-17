@@ -9,7 +9,7 @@ import { REDIS_CLIENT } from '@client/infra/redis/redis.module';
 
 /**
  * Navbat pozitsiyasi Redis Sorted Set orqali hisoblanadi (9.5).
- * Tartib: avval `is_urgent=true`, keyin `created_at` bo'yicha (TZ 3.4).
+ * Tartib: avval `is_urgent=true`, keyin `created_at` boʻyicha (TZ 3.4).
  */
 @Injectable()
 export class QueuePositionService {
@@ -52,7 +52,7 @@ export class QueuePositionService {
   }
 
   /**
-   * Taxminiy kutish vaqti (daqiqa). Kategoriyadagi faol ustalar soni qancha ko'p bo'lsa,
+   * Taxminiy kutish vaqti (daqiqa). Kategoriyadagi faol ustalar soni qancha koʻp bo'lsa,
    * navbat shuncha tez harakatlanadi.
    */
   static estimateWaitMinutes(position: number, activeMastersInCategory: number): number | null {

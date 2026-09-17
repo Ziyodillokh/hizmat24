@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 import { REDIS_CLIENT } from '@client/infra/redis/redis.module';
 import type { AppEnv } from '@client/infra/config/env.validation';
 
-/** Admin panel katalogni o'zgartirganda shu kanalga xabar yuboradi (TZ 3.2). */
+/** Admin panel katalogni oʻzgartirganda shu kanalga xabar yuboradi (TZ 3.2). */
 export const CATALOG_INVALIDATION_CHANNEL = 'service-categories:invalidate';
 
 export const CATALOG_CACHE_KEYS = {
@@ -15,11 +15,11 @@ export const CATALOG_CACHE_KEYS = {
 const CACHE_TTL_SECONDS = 300;
 
 /**
- * Katalog cache'ining yagona egasi.
+ * Katalog cacheʼining yagona egasi.
  *
  * Guruhlar va kategoriyalar bitta manbadan (admin panel) o'zgaradi, shuning
  * uchun bitta pub/sub obunachi ikkala kalitni ham tozalaydi — har bir servis
- * o'zining alohida ulanishini ochib o'tirmaydi.
+ * o'zining alohida ulanishini ochib oʻtirmaydi.
  */
 @Injectable()
 export class CatalogCacheService implements OnModuleInit, OnModuleDestroy {
@@ -52,7 +52,7 @@ export class CatalogCacheService implements OnModuleInit, OnModuleDestroy {
     await this.subscriber?.quit();
   }
 
-  /** Cache'dan o'qiydi; bo'lmasa `loader` ni chaqirib, natijani yozib qo'yadi. */
+  /** Cacheʼdan o'qiydi; bo'lmasa `loader` ni chaqirib, natijani yozib qoʻyadi. */
   async readThrough<T>(key: string, loader: () => Promise<T>): Promise<T> {
     const cached = await this.redis.get(key);
     if (cached) return JSON.parse(cached) as T;
@@ -64,6 +64,6 @@ export class CatalogCacheService implements OnModuleInit, OnModuleDestroy {
 
   async invalidateAll(): Promise<void> {
     await this.redis.del(CATALOG_CACHE_KEYS.categories, CATALOG_CACHE_KEYS.groups);
-    this.logger.log("Katalog cache'i tozalandi");
+    this.logger.log("Katalog cacheʼi tozalandi");
   }
 }

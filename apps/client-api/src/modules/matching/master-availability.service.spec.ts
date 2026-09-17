@@ -12,7 +12,7 @@ describe('MasterAvailabilityService', () => {
     service = new MasterAvailabilityService({ master: { findMany, updateMany } } as never);
   });
 
-  it("aktiv buyurtmasiz band ustalarni bo'shatadi", async () => {
+  it("aktiv buyurtmasiz band ustalarni boʻshatadi", async () => {
     // Arrange
     findMany.mockResolvedValue([{ id: 'master-1' }, { id: 'master-2' }]);
 
@@ -27,7 +27,7 @@ describe('MasterAvailabilityService', () => {
     });
   });
 
-  it("faqat aktiv buyurtmasi yo'q ustalarni qidiradi", async () => {
+  it("faqat aktiv buyurtmasi yoʻq ustalarni qidiradi", async () => {
     await service.reconcile();
 
     expect(findMany).toHaveBeenCalledWith({
@@ -50,7 +50,7 @@ describe('MasterAvailabilityService', () => {
     });
   });
 
-  it("tuzatiladigan narsa bo'lmasa yozuv qilmaydi", async () => {
+  it("tuzatiladigan narsa boʻlmasa yozuv qilmaydi", async () => {
     const freed = await service.reconcile();
 
     expect(freed).toEqual([]);

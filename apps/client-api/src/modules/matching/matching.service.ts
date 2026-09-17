@@ -27,11 +27,11 @@ type OrderWithCategory = Prisma.OrderGetPayload<{ include: { category: true } }>
 
 /**
  * Tayinlash tranzaksiyasini ROLLBACK qilish uchun ichki signal: buyurtma
- * tanlangandan keyin, lekin tayinlanishdan oldin boshqa holatga o'tib ketgan.
+ * tanlangandan keyin, lekin tayinlanishdan oldin boshqa holatga oʻtib ketgan.
  */
 class StaleOrderError extends Error {
   constructor(readonly orderId: string) {
-    super(`Buyurtma ${orderId} tayinlash paytida holatini o'zgartirdi`);
+    super(`Buyurtma ${orderId} tayinlash paytida holatini oʻzgartirdi`);
     this.name = 'StaleOrderError';
   }
 }
@@ -62,7 +62,7 @@ export class MatchingService {
     @InjectQueue(QUEUE_MATCHING) private readonly matchingQueue: Queue,
   ) {}
 
-  /** Qidiruvni navbatga qo'yish (buyurtma yaratilgandan keyin darhol chaqiriladi). */
+  /** Qidiruvni navbatga qoʻyish (buyurtma yaratilgandan keyin darhol chaqiriladi). */
   async requestMatching(orderId: string, excludeMasterIds: string[] = []): Promise<void> {
     await this.matchingQueue.add(
       JOB_MATCH_ORDER,
@@ -116,7 +116,7 @@ export class MatchingService {
 
   /**
    * Tayinlash — bitta tranzaksiyada: usta bloklanadi, "band" holatiga o'tadi va
-   * buyurtma `ASSIGNED` bo'ladi (nofunksional talab 7.3).
+   * buyurtma `ASSIGNED` boʻladi (nofunksional talab 7.3).
    */
   private async tryAssign(
     order: OrderWithCategory,
@@ -127,7 +127,7 @@ export class MatchingService {
     } catch (error) {
       if (error instanceof StaleOrderError) {
         // Tranzaksiya orqaga qaytdi — usta ham bo'sh holicha qoldi.
-        this.logger.debug({ orderId: order.id }, "Buyurtma tayinlash paytida holatini o'zgartirdi");
+        this.logger.debug({ orderId: order.id }, "Buyurtma tayinlash paytida holatini oʻzgartirdi");
         return null;
       }
       throw error;
@@ -162,7 +162,7 @@ export class MatchingService {
       // DIQQAT: bu yerda `return null` qilib bo'lmaydi — Prisma callback normal
       // tugaganda tranzaksiyani COMMIT qiladi va yuqoridagi "usta BUSY" yozuvi
       // saqlanib qolardi. Buyurtma oradan chiqib ketgan bo'lsa (masalan mijoz
-      // parallel ravishda bekor qilgan), ustani bo'shatish uchun ROLLBACK kerak.
+      // parallel ravishda bekor qilgan), ustani boʻshatish uchun ROLLBACK kerak.
       if (!entity || !MATCHABLE_STATUSES.includes(entity.status)) {
         throw new StaleOrderError(order.id);
       }
@@ -249,7 +249,7 @@ export class MatchingService {
 
   /**
    * Usta belgilangan vaqtda "Qabul qilaman" bosmadi — ustani bo'shatib,
-   * buyurtmani keyingi mos ustaga yo'naltiramiz (TZ 3.4).
+   * buyurtmani keyingi mos ustaga yoʻnaltiramiz (TZ 3.4).
    */
   async handleAckTimeout(orderId: string): Promise<void> {
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
@@ -296,7 +296,7 @@ export class MatchingService {
   /**
    * Navbatni tekshirish (TZ 3.4) — mijoz ilovasini qayta ochish talab qilinmaydi.
    *
-   * Manba sifatida Redis emas, DB ishlatiladi: agar BullMQ ga job qo'shish
+   * Manba sifatida Redis emas, DB ishlatiladi: agar BullMQ ga job qoʻshish
    * muvaffaqiyatsiz bo'lsa (Redis uzilishi va h.k.), buyurtma DB da qolgani
    * uchun shu sweep uni baribir topadi va tiklaydi.
    */
@@ -317,7 +317,7 @@ export class MatchingService {
   }
 
   /**
-   * Javob taymeri yo'qolgan tayinlashlarni tiklaydi.
+   * Javob taymeri yoʻqolgan tayinlashlarni tiklaydi.
    *
    * `scheduleAckTimeout` — BullMQ ga yozish, ya'ni DB dan tashqaridagi amal.
    * U muvaffaqiyatsiz bo'lsa, buyurtma `ASSIGNED` holatida abadiy qolib ketardi:
@@ -337,7 +337,7 @@ export class MatchingService {
     });
 
     for (const order of stale) {
-      this.logger.warn({ orderId: order.id }, "Javob taymeri yo'qolgan tayinlash tiklanmoqda");
+      this.logger.warn({ orderId: order.id }, "Javob taymeri yoʻqolgan tayinlash tiklanmoqda");
       await this.handleAckTimeout(order.id);
     }
   }

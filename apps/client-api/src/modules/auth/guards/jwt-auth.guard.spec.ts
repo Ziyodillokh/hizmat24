@@ -3,7 +3,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 describe('JwtAuthGuard', () => {
   const buildContext = () => ({ getHandler: () => undefined, getClass: () => undefined }) as never;
 
-  it("@Public() belgilangan endpointni o'tkazadi", () => {
+  it("@Public() belgilangan endpointni oʻtkazadi", () => {
     // Arrange
     const reflector = { getAllAndOverride: jest.fn().mockReturnValue(true) };
     const guard = new JwtAuthGuard(reflector as never);

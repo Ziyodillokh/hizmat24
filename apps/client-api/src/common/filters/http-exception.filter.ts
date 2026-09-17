@@ -79,7 +79,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       default:
         return {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: { code: 'DATABASE_ERROR', message: "Ma'lumotlar bazasi xatosi" },
+          body: { code: 'DATABASE_ERROR', message: "Maʼlumotlar bazasi xatosi" },
         };
     }
   }

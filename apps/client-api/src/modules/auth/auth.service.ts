@@ -31,7 +31,7 @@ export interface AuthTokens {
 export interface RequestOtpResult {
   sent: boolean;
   retryAfterSeconds: number;
-  /** Faqat development/test muhitida to'ldiriladi. */
+  /** Faqat development/test muhitida toʻldiriladi. */
   debugCode?: string;
 }
 
@@ -74,7 +74,7 @@ export class AuthService {
       if (elapsedMs < OTP_RESEND_COOLDOWN_MS) {
         throw new DomainException(
           'OTP_COOLDOWN',
-          "Yangi kod so'rash uchun biroz kuting",
+          "Yangi kod soʻrash uchun biroz kuting",
           HttpStatus.TOO_MANY_REQUESTS,
           { retryAfterSeconds: Math.ceil((OTP_RESEND_COOLDOWN_MS - elapsedMs) / 1000) },
         );
@@ -111,13 +111,13 @@ export class AuthService {
     if (!request) {
       throw new DomainException(
         'OTP_INVALID',
-        "Kod noto'g'ri yoki muddati tugagan",
+        "Kod notoʻgʻri yoki muddati tugagan",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     // Urinishni ATOMAR "band qilish": tekshirish va oshirish bitta so'rovda.
-    // Aks holda parallel so'rovlar bir xil `attempts` qiymatini o'qib,
+    // Aks holda parallel soʻrovlar bir xil `attempts` qiymatini o'qib,
     // urinishlar chegarasini chetlab o'tib ketardi.
     const attemptClaimed = await this.prisma.otpRequest.updateMany({
       where: { id: request.id, consumedAt: null, attempts: { lt: OTP_MAX_VERIFY_ATTEMPTS } },
@@ -127,16 +127,16 @@ export class AuthService {
     if (attemptClaimed.count === 0) {
       throw new DomainException(
         'OTP_ATTEMPTS_EXCEEDED',
-        "Urinishlar soni tugadi, yangi kod so'rang",
+        "Urinishlar soni tugadi, yangi kod soʻrang",
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 
     if (!this.matchesOtpHash(request.codeHash, this.hashOtp(phoneNumber, otpCode))) {
-      throw new DomainException('OTP_INVALID', "Kod noto'g'ri", HttpStatus.UNAUTHORIZED);
+      throw new DomainException('OTP_INVALID', "Kod notoʻgʻri", HttpStatus.UNAUTHORIZED);
     }
 
-    // Kodni bir martalik qilish ham atomar: parallel ikkita to'g'ri so'rovdan
+    // Kodni bir martalik qilish ham atomar: parallel ikkita to'gʻri so'rovdan
     // faqat bittasi sessiya oladi.
     const consumed = await this.prisma.otpRequest.updateMany({
       where: { id: request.id, consumedAt: null },
@@ -197,9 +197,9 @@ export class AuthService {
 
     this.assertUserActive(stored.user);
 
-    // Tokenni ATOMAR bekor qilamiz. Ikkita parallel so'rovdan faqat bittasi
+    // Tokenni ATOMAR bekor qilamiz. Ikkita parallel soʻrovdan faqat bittasi
     // yutadi; yutqazgani qayta ishlatish hisoblanadi va butun oila yopiladi.
-    // Bu bo'lmasa, o'g'irlangan token bilan parallel sessiya sezilmay qolardi.
+    // Bu bo'lmasa, o'gʻirlangan token bilan parallel sessiya sezilmay qolardi.
     const claimed = await this.prisma.refreshToken.updateMany({
       where: { id: stored.id, revokedAt: null },
       data: { revokedAt: new Date() },
@@ -246,7 +246,7 @@ export class AuthService {
     if (user.status === UserStatus.BLOCKED) {
       throw new DomainException(
         'USER_BLOCKED',
-        "Hisobingiz bloklangan, qo'llab-quvvatlash xizmatiga murojaat qiling",
+        "Hisobingiz bloklangan, qoʻllab-quvvatlash xizmatiga murojaat qiling",
         HttpStatus.FORBIDDEN,
       );
     }
@@ -293,7 +293,7 @@ export class AuthService {
     return randomInt(0, max).toString().padStart(OTP_LENGTH, '0');
   }
 
-  /** Sessiya oilasini to'liq bekor qilish (token o'g'irlanganda). */
+  /** Sessiya oilasini toʻliq bekor qilish (token o'g'irlanganda). */
   private async revokeFamily(userId: string, familyId: string): Promise<void> {
     await this.prisma.refreshToken.updateMany({
       where: { familyId, revokedAt: null },
@@ -309,7 +309,7 @@ export class AuthService {
   /**
    * OTP hashi uchun JWT siridan ALOHIDA sir ishlatiladi: bitta sir sizib
    * chiqqanda ham token soxtalashtirish, ham 6 xonali kodni offline
-   * brute-force qilish imkoni paydo bo'lmasin.
+   * brute-force qilish imkoni paydo boʻlmasin.
    */
   private hashOtp(phoneNumber: string, code: string): string {
     return createHmac('sha256', this.config.get('OTP_HASH_SECRET', { infer: true }))

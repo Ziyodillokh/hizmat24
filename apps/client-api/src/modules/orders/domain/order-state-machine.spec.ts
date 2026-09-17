@@ -8,7 +8,7 @@ import {
 } from './order-state-machine';
 
 describe('order state machine', () => {
-  it("barcha holatlar uchun o'tish qoidasi aniqlangan", () => {
+  it("barcha holatlar uchun oʻtish qoidasi aniqlangan", () => {
     // Arrange
     const allStatuses = Object.values(OrderStatus);
 
@@ -29,11 +29,11 @@ describe('order state machine', () => {
     [OrderStatus.IN_PROGRESS, OrderStatus.COMPLETED_BY_MASTER],
     [OrderStatus.COMPLETED_BY_MASTER, OrderStatus.RATED],
     [OrderStatus.RATED, OrderStatus.CLOSED],
-  ])("%s → %s o'tishiga ruxsat beradi", (from, to) => {
+  ])("%s → %s oʻtishiga ruxsat beradi", (from, to) => {
     expect(canTransition(from, to)).toBe(true);
   });
 
-  it("in_progress dan to'g'ridan-to'g'ri closed ga o'tishni taqiqlaydi", () => {
+  it("in_progress dan toʻgʻridan-toʻgʻri closed ga oʻtishni taqiqlaydi", () => {
     expect(canTransition(OrderStatus.IN_PROGRESS, OrderStatus.CLOSED)).toBe(false);
     expect(() => assertTransition(OrderStatus.IN_PROGRESS, OrderStatus.CLOSED)).toThrow(
       InvalidStateTransitionException,
@@ -45,7 +45,7 @@ describe('order state machine', () => {
     expect(canTransition(OrderStatus.COMPLETED_BY_MASTER, OrderStatus.CANCELLED)).toBe(false);
   });
 
-  it("safety_flagged terminal holat — undan chiquvchi yo'l yo'q", () => {
+  it("safety_flagged terminal holat — undan chiquvchi yoʻl yoʻq", () => {
     expect(allowedNextStatuses(OrderStatus.SAFETY_FLAGGED)).toHaveLength(0);
     expect(canTransition(OrderStatus.SAFETY_FLAGGED, OrderStatus.IN_PROGRESS)).toBe(false);
   });
@@ -57,7 +57,7 @@ describe('order state machine', () => {
     },
   );
 
-  it("arrived_pending_confirmation dan faqat in_progress yoki safety_flagged ga o'tadi", () => {
+  it("arrived_pending_confirmation dan faqat in_progress yoki safety_flagged ga oʻtadi", () => {
     expect([...allowedNextStatuses(OrderStatus.ARRIVED_PENDING_CONFIRMATION)].sort()).toEqual(
       [OrderStatus.IN_PROGRESS, OrderStatus.SAFETY_FLAGGED].sort(),
     );
@@ -67,11 +67,11 @@ describe('order state machine', () => {
     expect(canTransition(OrderStatus.ASSIGNED, OrderStatus.SEARCHING)).toBe(true);
   });
 
-  it("o'tish jadvali o'zgartirib bo'lmaydigan (frozen) qilib e'lon qilingan", () => {
+  it("oʻtish jadvali oʻzgartirib boʻlmaydigan (frozen) qilib eʼlon qilingan", () => {
     expect(Object.isFrozen(ORDER_TRANSITIONS)).toBe(true);
   });
 
-  it("ruxsat etilmagan o'tishda xato tafsilotlarini qaytaradi", () => {
+  it("ruxsat etilmagan oʻtishda xato tafsilotlarini qaytaradi", () => {
     // Act & Assert
     try {
       assertTransition(OrderStatus.CLOSED, OrderStatus.SEARCHING);

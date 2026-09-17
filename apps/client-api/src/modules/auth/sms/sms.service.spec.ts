@@ -8,7 +8,7 @@ describe('SmsService', () => {
     jest.restoreAllMocks();
   });
 
-  it("console provayderida tashqi so'rov yubormaydi", async () => {
+  it("console provayderida tashqi soʻrov yubormaydi", async () => {
     // Arrange
     const fetchSpy = jest.spyOn(global, 'fetch');
     const service = buildService({ SMS_PROVIDER: 'console' });
@@ -41,7 +41,7 @@ describe('SmsService', () => {
     expect(body.message).toContain('123456');
   });
 
-  it("provayder sozlanmagan bo'lsa aniq xato beradi", async () => {
+  it("provayder sozlanmagan boʻlsa aniq xato beradi", async () => {
     const service = buildService({ SMS_PROVIDER: 'eskiz' });
 
     await expect(service.sendOtp('+998901234567', '123456')).rejects.toThrow('sozlanmagan');

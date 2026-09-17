@@ -55,18 +55,18 @@ describe('HealthController', () => {
     expect(indicatorDown).toHaveBeenCalledWith({ message: 'unavailable' });
   });
 
-  it("to'g'ri token bilan Prometheus metrikalarini qaytaradi", async () => {
+  it("toʻgʻri token bilan Prometheus metrikalarini qaytaradi", async () => {
     const metrics = await controller.metrics('metrics-secret-token');
 
     expect(typeof metrics).toBe('string');
     expect(metrics).toContain('hizmat24_client_api_');
   });
 
-  it("tokensiz metrikalarni bermaydi (ichki holat oshkor bo'lmasin)", () => {
+  it("tokensiz metrikalarni bermaydi (ichki holat oshkor boʻlmasin)", () => {
     expect(() => controller.metrics()).toThrow('ruxsat');
   });
 
-  it("noto'g'ri token bilan metrikalarni bermaydi", () => {
+  it("notoʻgʻri token bilan metrikalarni bermaydi", () => {
     expect(() => controller.metrics('boshqa-token-uzunroq')).toThrow('ruxsat');
   });
 });

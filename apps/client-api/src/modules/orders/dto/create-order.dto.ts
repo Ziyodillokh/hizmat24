@@ -30,7 +30,7 @@ export class CreateOrderDto {
     maxLength: ORDER_DESCRIPTION_MAX_LENGTH,
   })
   @IsString()
-  @IsNotEmpty({ message: "Muammo tavsifi bo'sh bo'lishi mumkin emas" })
+  @IsNotEmpty({ message: "Muammo tavsifi boʻsh boʻlishi mumkin emas" })
   @Length(ORDER_DESCRIPTION_MIN_LENGTH, ORDER_DESCRIPTION_MAX_LENGTH)
   description: string;
 

@@ -7,7 +7,7 @@ export interface ServiceCategoryView {
   id: string;
   name: string;
   description: string | null;
-  /** Guruhga biriktirilmagan bo'lsa null. */
+  /** Guruhga biriktirilmagan boʻlsa null. */
   groupId: string | null;
   /** So'mda, butun son. Admin panel orqali boshqariladi — kodda hardcode yo'q. */
   basePrice: number;

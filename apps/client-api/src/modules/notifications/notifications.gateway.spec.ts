@@ -31,7 +31,7 @@ describe('NotificationsGateway (TZ 3.5)', () => {
     );
   });
 
-  it("yaroqli token bilan foydalanuvchi xonasiga qo'shadi", async () => {
+  it("yaroqli token bilan foydalanuvchi xonasiga qoʻshadi", async () => {
     // Arrange
     const socket = buildSocket('valid-token');
 
@@ -95,7 +95,7 @@ describe('NotificationsGateway (TZ 3.5)', () => {
     expect(emit).toHaveBeenCalledWith('MASTER_ASSIGNED', { orderId: 'order-1' });
   });
 
-  it("server hali tayyor bo'lmasa xato bermaydi", () => {
+  it("server hali tayyor boʻlmasa xato bermaydi", () => {
     expect(() => gateway.emitToUser('user-1', 'event', {})).not.toThrow();
   });
 

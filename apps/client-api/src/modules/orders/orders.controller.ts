@@ -82,7 +82,7 @@ export class OrdersController {
   }
 
   @Get(':orderId')
-  @ApiOperation({ summary: "Buyurtma holati va tayinlangan usta ma'lumotlari" })
+  @ApiOperation({ summary: "Buyurtma holati va tayinlangan usta maʼlumotlari" })
   getOrder(
     @CurrentUser('id') clientId: string,
     @Param('orderId', new ParseUUIDPipe({ version: '4' })) orderId: string,
@@ -124,8 +124,8 @@ export class OrdersController {
   @ApiOperation({
     summary: 'Kelgan ustani tasdiqlash yoki xavfsizlik signalini yuborish',
     description:
-      "confirmed=false bo'lsa buyurtma SAFETY_FLAGGED holatiga o'tadi va admin/support " +
-      "navbatiga yuqori ustuvorlikdagi signal yoziladi. Ish IN_PROGRESS ga o'tmaydi.",
+      "confirmed=false boʻlsa buyurtma SAFETY_FLAGGED holatiga oʻtadi va admin/support " +
+      "navbatiga yuqori ustuvorlikdagi signal yoziladi. Ish IN_PROGRESS ga oʻtmaydi.",
   })
   confirmMaster(
     @CurrentUser('id') clientId: string,

@@ -9,7 +9,7 @@ export class ConfirmMasterDto {
   @IsBoolean()
   confirmed: boolean;
 
-  @ApiPropertyOptional({ description: "confirmed=false bo'lganda ixtiyoriy izoh" })
+  @ApiPropertyOptional({ description: "confirmed=false boʻlganda ixtiyoriy izoh" })
   @IsOptional()
   @IsString()
   @Length(1, 1000)

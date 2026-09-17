@@ -28,7 +28,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
     expect(paramsOf()[4]).toBe(true);
   });
 
-  it("oddiy ish uchun tajriba filtri qo'llanmaydi", async () => {
+  it("oddiy ish uchun tajriba filtri qoʻllanmaydi", async () => {
     await service.findCandidates(tx as never, {
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
@@ -64,7 +64,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
     expect(paramsOf()[0] as string).toContain('FOR UPDATE OF m SKIP LOCKED');
   });
 
-  it("standart radius va kategoriya bo'yicha qidiradi", async () => {
+  it("standart radius va kategoriya boʻyicha qidiradi", async () => {
     await service.findCandidates(tx as never, {
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
@@ -76,7 +76,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
     expect(paramsOf()[5]).toBe(MATCHING_RADIUS_KM);
   });
 
-  it("chetlatilgan ustalar bo'lmasa NULL uzatadi (SQL sharti o'chadi)", async () => {
+  it("chetlatilgan ustalar boʻlmasa NULL uzatadi (SQL sharti oʻchadi)", async () => {
     await service.findCandidates(tx as never, {
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
@@ -87,7 +87,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
     expect(paramsOf()[6]).toBeNull();
   });
 
-  it("javob bermagan ustani keyingi urinishda chetlab o'tadi", async () => {
+  it("javob bermagan ustani keyingi urinishda chetlab oʻtadi", async () => {
     await service.findCandidates(tx as never, {
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { MasterStatus, OrderStatus } from '@prisma/client';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 
-/** Ustani "band" qiladigan holatlar — boshqa hamma holatda usta bo'sh bo'lishi kerak. */
+/** Ustani "band" qiladigan holatlar — boshqa hamma holatda usta bo'sh boʻlishi kerak. */
 const ACTIVE_ORDER_STATUSES: readonly OrderStatus[] = [
   OrderStatus.ASSIGNED,
   OrderStatus.MASTER_EN_ROUTE,
@@ -17,11 +17,11 @@ export class MasterAvailabilityService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * O'zini-o'zi tuzatuvchi invariant: usta `BUSY` bo'lishi mumkin FAQAT unga
+   * O'zini-o'zi tuzatuvchi invariant: usta `BUSY` boʻlishi mumkin FAQAT unga
    * aktiv buyurtma biriktirilgan bo'lsa.
    *
    * Bu bir nechta holatni bir yo'la yopadi:
-   *  - mijoz ishni baholamay ketsa, usta abadiy band bo'lib qolmaydi;
+   *  - mijoz ishni baholamay ketsa, usta abadiy band boʻlib qolmaydi;
    *  - usta ilovasi buyurtmani yakunlagach (bu jarayondan tashqarida) usta bo'shaydi;
    *  - har qanday sababdan "yetim" qolgan BUSY yozuv tiklanadi.
    *
@@ -45,7 +45,7 @@ export class MasterAvailabilityService {
       data: { status: MasterStatus.AVAILABLE },
     });
 
-    this.logger.log({ masterIds: ids }, "Aktiv buyurtmasiz band ustalar bo'shatildi");
+    this.logger.log({ masterIds: ids }, "Aktiv buyurtmasiz band ustalar boʻshatildi");
 
     return ids;
   }

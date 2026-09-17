@@ -45,7 +45,7 @@ export class GetOrderHandler implements IQueryHandler<GetOrderQuery, OrderView> 
     if (!order) throw new OrderNotFoundException(query.orderId);
     if (order.clientId !== query.clientId) throw new ForbiddenResourceException();
 
-    // Biznes-qoida 5.2: javobda faqat bitta `master` obyekti — nomzodlar ro'yxati emas.
+    // Biznes-qoida 5.2: javobda faqat bitta `master` obyekti — nomzodlar roʻyxati emas.
     return presentOrder(order);
   }
 }
@@ -94,7 +94,7 @@ export class GetOrderReceiptHandler implements IQueryHandler<GetOrderReceiptQuer
     if (!receiptable.includes(order.status)) {
       throw new DomainException(
         'RECEIPT_NOT_AVAILABLE',
-        "Chek faqat ish yakunlangandan keyin mavjud bo'ladi",
+        "Chek faqat ish yakunlangandan keyin mavjud boʻladi",
         HttpStatus.CONFLICT,
         { status: order.status },
       );

@@ -39,7 +39,7 @@ describe('OrdersController (HTTP qobiq)', () => {
     );
   });
 
-  it("idempotency kaliti bo'sh bo'lsa null uzatadi", async () => {
+  it("idempotency kaliti boʻsh boʻlsa null uzatadi", async () => {
     await controller.createOrder(
       'client-1',
       { categoryId: 'category-1', description: 'Kran oqmoqda', clientAddress: address },
@@ -49,35 +49,35 @@ describe('OrdersController (HTTP qobiq)', () => {
     expect((commandExecute.mock.calls[0][0] as CreateOrderCommand).idempotencyKey).toBeNull();
   });
 
-  it("autentifikatsiya qilingan foydalanuvchi id sini so'rovdan olmaydi (body dan emas)", async () => {
+  it("autentifikatsiya qilingan foydalanuvchi id sini soʻrovdan olmaydi (body dan emas)", async () => {
     await controller.getOrder('client-1', 'order-1');
 
     expect(queryExecute).toHaveBeenCalledWith(new GetOrderQuery('order-1', 'client-1'));
   });
 
-  it("ETA so'rovini query bus ga yuboradi", async () => {
+  it("ETA soʻrovini query bus ga yuboradi", async () => {
     await controller.getEta('client-1', 'order-1');
 
     expect(queryExecute).toHaveBeenCalledWith(new GetOrderEtaQuery('order-1', 'client-1'));
   });
 
-  it("chek so'rovini query bus ga yuboradi", async () => {
+  it("chek soʻrovini query bus ga yuboradi", async () => {
     await controller.getReceipt('client-1', 'order-1');
 
     expect(queryExecute).toHaveBeenCalledWith(new GetOrderReceiptQuery('order-1', 'client-1'));
   });
 
-  it("tarixni sahifalash parametrlari bilan so'raydi", async () => {
+  it("tarixni sahifalash parametrlari bilan soʻraydi", async () => {
     await controller.listHistory('client-1', { page: 2, limit: 50 });
 
     expect(queryExecute).toHaveBeenCalledWith(new ListOrderHistoryQuery('client-1', 2, 50));
   });
 
   it('bekor qilish sababini command ga uzatadi', async () => {
-    await controller.cancelOrder('client-1', 'order-1', { reason: "fikrim o'zgardi" });
+    await controller.cancelOrder('client-1', 'order-1', { reason: "fikrim oʻzgardi" });
 
     expect(commandExecute).toHaveBeenCalledWith(
-      new CancelOrderCommand('order-1', 'client-1', "fikrim o'zgardi"),
+      new CancelOrderCommand('order-1', 'client-1', "fikrim oʻzgardi"),
     );
   });
 

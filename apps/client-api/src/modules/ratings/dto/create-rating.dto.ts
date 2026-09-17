@@ -6,8 +6,8 @@ export class CreateRatingDto {
   @ApiProperty({ minimum: 1, maximum: 5 })
   @Type(() => Number)
   @IsInt()
-  @Min(1, { message: "Baho 1 dan kam bo'lishi mumkin emas" })
-  @Max(5, { message: "Baho 5 dan ko'p bo'lishi mumkin emas" })
+  @Min(1, { message: "Baho 1 dan kam boʻlishi mumkin emas" })
+  @Max(5, { message: "Baho 5 dan koʻp boʻlishi mumkin emas" })
   stars: number;
 
   @ApiPropertyOptional()

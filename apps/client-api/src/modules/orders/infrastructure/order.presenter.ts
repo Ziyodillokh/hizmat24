@@ -11,7 +11,7 @@ export interface MasterView {
   hasGovCertificate: boolean;
   ratingAvg: number;
   completedOrdersCount: number;
-  /** Faqat ASSIGNED…IN_PROGRESS holatlarida to'ldiriladi (6.2), aks holda null. */
+  /** Faqat ASSIGNED…IN_PROGRESS holatlarida toʻldiriladi (6.2), aks holda null. */
   phoneNumber: string | null;
 }
 

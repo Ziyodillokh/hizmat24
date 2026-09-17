@@ -6,13 +6,13 @@ import type { AppEnv } from './infra/config/env.validation';
 
 /**
  * HTTP qatlamining global sozlamalari. main.ts va e2e testlar bir xil
- * konfiguratsiyadan foydalanadi — test va production o'rtasida farq bo'lmasin.
+ * konfiguratsiyadan foydalanadi — test va production oʻrtasida farq bo'lmasin.
  */
 export async function configureApp(app: NestFastifyApplication): Promise<void> {
   await app.register(helmet, { contentSecurityPolicy: false });
 
   // Har qanday Origin'ni credentials bilan qaytarish — klassik CORS xatosi.
-  // Ruxsat faqat aniq ro'yxatdagi manzillarga beriladi; mobil ilova uchun
+  // Ruxsat faqat aniq roʻyxatdagi manzillarga beriladi; mobil ilova uchun
   // ro'yxat bo'sh qoladi va CORS umuman yoqilmaydi.
   const allowedOrigins = app
     .get(ConfigService<AppEnv, true>)
@@ -28,7 +28,7 @@ export async function configureApp(app: NestFastifyApplication): Promise<void> {
   app.enableShutdownHooks();
 
   // Health va metrics — infra uchun: load balancer va Prometheus ular
-  // `/api/v1/...` ostida bo'lishini kutmaydi.
+  // `/api/v1/...` ostida boʻlishini kutmaydi.
   app.setGlobalPrefix('api', {
     exclude: [
       { path: 'health/live', method: RequestMethod.GET },

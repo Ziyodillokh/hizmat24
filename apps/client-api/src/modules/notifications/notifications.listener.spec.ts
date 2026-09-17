@@ -28,7 +28,7 @@ describe('NotificationsListener (TZ 3.5, 4)', () => {
     );
   });
 
-  it("navbat pozitsiyasi va kutish vaqtini xabarda ko'rsatadi", async () => {
+  it("navbat pozitsiyasi va kutish vaqtini xabarda koʻrsatadi", async () => {
     await listener.onQueued(new OrderQueuedEvent('order-1', 'client-1', 3, 45));
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -39,7 +39,7 @@ describe('NotificationsListener (TZ 3.5, 4)', () => {
     );
   });
 
-  it("kutish vaqti noma'lum bo'lsa faqat pozitsiyani xabar qiladi", async () => {
+  it("kutish vaqti nomaʼlum boʻlsa faqat pozitsiyani xabar qiladi", async () => {
     await listener.onQueued(new OrderQueuedEvent('order-1', 'client-1', 3, null));
 
     expect(dispatch.mock.calls[0][0].body).toContain('3');
@@ -58,7 +58,7 @@ describe('NotificationsListener (TZ 3.5, 4)', () => {
     expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: expectedType }));
   });
 
-  it("mijozga ahamiyatsiz holat o'zgarishlarida xabar yubormaydi", async () => {
+  it("mijozga ahamiyatsiz holat oʻzgarishlarida xabar yubormaydi", async () => {
     await listener.onStatusChanged(
       new OrderStatusChangedEvent(
         'order-1',
@@ -73,13 +73,13 @@ describe('NotificationsListener (TZ 3.5, 4)', () => {
 
   it('bekor qilinganda sababni yuboradi', async () => {
     await listener.onCancelled(
-      new OrderCancelledEvent('order-1', 'client-1', 'master-1', 'CLIENT', "fikrim o'zgardi"),
+      new OrderCancelledEvent('order-1', 'client-1', 'master-1', 'CLIENT', "fikrim oʻzgardi"),
     );
 
     expect(dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: NotificationType.ORDER_CANCELLED,
-        body: "fikrim o'zgardi",
+        body: "fikrim oʻzgardi",
       }),
     );
   });
@@ -99,7 +99,7 @@ describe('NotificationsListener (TZ 3.5, 4)', () => {
     );
   });
 
-  it("eskalatsiyada mijozga operator ko'rib chiqishini bildiradi", async () => {
+  it("eskalatsiyada mijozga operator koʻrib chiqishini bildiradi", async () => {
     await listener.onEscalated(new MatchingEscalatedEvent('order-1', 'client-1', 5));
 
     expect(dispatch).toHaveBeenCalledWith(

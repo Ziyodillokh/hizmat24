@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 /**
- * Boot vaqtida barcha muhit o'zgaruvchilari tekshiriladi (9.7).
- * Noto'g'ri/yetishmayotgan env bo'lsa — ilova umuman ko'tarilmaydi.
+ * Boot vaqtida barcha muhit oʻzgaruvchilari tekshiriladi (9.7).
+ * Noto'g'ri/yetishmayotgan env boʻlsa — ilova umuman ko'tarilmaydi.
  */
 /**
  * Muhit o'zgaruvchilari — har doim matn. `z.coerce.boolean()` bu yerda YARAMAYDI:
- * u `Boolean("false")` ni hisoblaydi va natija `true` bo'lib chiqadi, ya'ni
+ * u `Boolean("false")` ni hisoblaydi va natija `true` bo'lib chiqadi, yaʼni
  * `FCM_ENABLED=false` yoki `OTP_DEBUG_RETURN_CODE=false` teskari ishlab ketardi.
  */
 const booleanFromEnv = (defaultValue: boolean) =>
@@ -28,21 +28,21 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
   REDIS_DB: z.coerce.number().int().min(0).default(0),
 
-  JWT_ACCESS_SECRET: z.string().min(32, "JWT_ACCESS_SECRET kamida 32 belgidan iborat bo'lsin"),
+  JWT_ACCESS_SECRET: z.string().min(32, "JWT_ACCESS_SECRET kamida 32 belgidan iborat boʻlsin"),
   JWT_ACCESS_TTL: z.string().default('15m'),
   /** Refresh tokenlar JWT emas — tasodifiy, SHA-256 bilan hashlanadi. */
   JWT_REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(30),
 
   /** OTP hashi uchun JWT siridan alohida kalit. */
-  OTP_HASH_SECRET: z.string().min(32, "OTP_HASH_SECRET kamida 32 belgidan iborat bo'lsin"),
+  OTP_HASH_SECRET: z.string().min(32, "OTP_HASH_SECRET kamida 32 belgidan iborat boʻlsin"),
 
   /**
-   * Vergul bilan ajratilgan ruxsat etilgan Origin'lar. Bo'sh bo'lsa — CORS o'chirilgan
+   * Vergul bilan ajratilgan ruxsat etilgan Origin'lar. Boʻsh bo'lsa — CORS o'chirilgan
    * (mobil ilova uchun kerak emas). `*` bilan credentials birga ishlatilmaydi.
    */
   CORS_ORIGINS: z.string().default(''),
 
-  /** Prometheus `/metrics` endpointini himoyalovchi token. Bo'sh bo'lsa — endpoint yopiq. */
+  /** Prometheus `/metrics` endpointini himoyalovchi token. Boʻsh bo'lsa — endpoint yopiq. */
   METRICS_TOKEN: z.string().optional(),
 
   SMS_PROVIDER: z.enum(['console', 'eskiz', 'playmobile']).default('console'),
@@ -71,7 +71,7 @@ export function validateEnv(config: Record<string, unknown>): AppEnv {
     const issues = parsed.error.issues
       .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
-    throw new Error(`Muhit o'zgaruvchilari validatsiyadan o'tmadi:\n${issues}`);
+    throw new Error(`Muhit oʻzgaruvchilari validatsiyadan oʻtmadi:\n${issues}`);
   }
 
   if (parsed.data.NODE_ENV === 'production' && parsed.data.OTP_DEBUG_RETURN_CODE) {
@@ -97,7 +97,7 @@ export function validateEnv(config: Record<string, unknown>): AppEnv {
       (key) => !parsed.data[key],
     );
     if (missing.length > 0) {
-      throw new Error(`FCM yoqilgan, lekin quyidagilar yo'q: ${missing.join(', ')}`);
+      throw new Error(`FCM yoqilgan, lekin quyidagilar yoʻq: ${missing.join(', ')}`);
     }
   }
 

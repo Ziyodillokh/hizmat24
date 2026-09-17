@@ -52,7 +52,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     transaction = prisma.$transaction;
   });
 
-  it("joriy holatni shartga qo'shib atomar yangilaydi (poyga holatidan himoya)", async () => {
+  it("joriy holatni shartga qoʻshib atomar yangilaydi (poyga holatidan himoya)", async () => {
     // Act
     await repository.applyTransition(buildEntity(), OrderStatus.ASSIGNED, {
       actorType: ActorType.SYSTEM,
@@ -65,7 +65,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     });
   });
 
-  it("holat oradan o'zgargan bo'lsa 409 bilan to'xtaydi", async () => {
+  it("holat oradan oʻzgargan boʻlsa 409 bilan toʻxtaydi", async () => {
     updateMany.mockResolvedValue({ count: 0 });
 
     await expect(
@@ -75,7 +75,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     ).rejects.toThrow(ConflictException);
   });
 
-  it("ruxsat etilmagan o'tishda DB ga umuman murojaat qilmaydi", async () => {
+  it("ruxsat etilmagan oʻtishda DB ga umuman murojaat qilmaydi", async () => {
     await expect(
       repository.applyTransition(
         buildEntity({ status: OrderStatus.IN_PROGRESS }),
@@ -84,12 +84,12 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
           actorType: ActorType.SYSTEM,
         },
       ),
-    ).rejects.toThrow("o'tkazish mumkin emas");
+    ).rejects.toThrow("oʻtkazish mumkin emas");
 
     expect(updateMany).not.toHaveBeenCalled();
   });
 
-  it("har bir o'tish uchun tarix va audit yozuvi qoldiradi", async () => {
+  it("har bir oʻtish uchun tarix va audit yozuvi qoldiradi", async () => {
     await repository.applyTransition(buildEntity(), OrderStatus.ASSIGNED, {
       actorType: ActorType.CLIENT,
       actorId: 'client-1',
@@ -110,7 +110,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     );
   });
 
-  it("holat o'zgarishini yagona manba sifatida event orqali tarqatadi (9.6)", async () => {
+  it("holat oʻzgarishini yagona manba sifatida event orqali tarqatadi (9.6)", async () => {
     await repository.applyTransition(buildEntity(), OrderStatus.ASSIGNED, {
       actorType: ActorType.SYSTEM,
     });
@@ -124,7 +124,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     );
   });
 
-  it("chaqiruvchi tranzaksiya bermasa o'zi ochadi (holat + tarix + audit bo'linmas)", async () => {
+  it("chaqiruvchi tranzaksiya bermasa oʻzi ochadi (holat + tarix + audit boʻlinmas)", async () => {
     await repository.applyTransition(buildEntity(), OrderStatus.ASSIGNED, {
       actorType: ActorType.SYSTEM,
     });
@@ -132,7 +132,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     expect(transaction).toHaveBeenCalled();
   });
 
-  it("chaqiruvchi tranzaksiya bergan bo'lsa yangisini ochmaydi", async () => {
+  it("chaqiruvchi tranzaksiya bergan boʻlsa yangisini ochmaydi", async () => {
     await repository.applyTransition(
       buildEntity(),
       OrderStatus.ASSIGNED,
@@ -146,7 +146,7 @@ describe('OrdersRepository.applyTransition (nofunksional talab 7.3)', () => {
     expect(transaction).not.toHaveBeenCalled();
   });
 
-  it("qo'shimcha maydonlarni holat bilan bitta so'rovda yozadi", async () => {
+  it("qoʻshimcha maydonlarni holat bilan bitta soʻrovda yozadi", async () => {
     await repository.applyTransition(buildEntity(), OrderStatus.ASSIGNED, {
       actorType: ActorType.SYSTEM,
       data: { masterId: 'master-1', etaMinutes: 12 },

@@ -23,9 +23,9 @@ export class NotificationsController {
 
   @Get()
   @ApiOperation({
-    summary: "Bildirishnomalar ro'yxati",
+    summary: "Bildirishnomalar roʻyxati",
     description:
-      "Push yetkazilmagan bo'lsa ham (foydalanuvchi offline edi) xabar shu yerda ko'rinadi (TZ 4).",
+      "Push yetkazilmagan boʻlsa ham (foydalanuvchi offline edi) xabar shu yerda koʻrinadi (TZ 4).",
   })
   list(@CurrentUser('id') userId: string, @Query() pagination: PaginationQueryDto) {
     return this.notifications.list(userId, pagination.page, pagination.limit);
@@ -33,7 +33,7 @@ export class NotificationsController {
 
   @Post(':notificationId/read')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: "Bildirishnomani o'qilgan deb belgilash" })
+  @ApiOperation({ summary: "Bildirishnomani oʻqilgan deb belgilash" })
   async markRead(
     @CurrentUser('id') userId: string,
     @Param('notificationId', new ParseUUIDPipe({ version: '4' })) notificationId: string,
@@ -43,14 +43,14 @@ export class NotificationsController {
 
   @Post('read-all')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: "Barchasini o'qilgan deb belgilash" })
+  @ApiOperation({ summary: "Barchasini oʻqilgan deb belgilash" })
   async markAllRead(@CurrentUser('id') userId: string): Promise<void> {
     await this.notifications.markAllAsRead(userId);
   }
 
   @Post('device-tokens')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: "Push uchun qurilma tokenini ro'yxatdan o'tkazish" })
+  @ApiOperation({ summary: "Push uchun qurilma tokenini roʻyxatdan oʻtkazish" })
   async registerDevice(
     @CurrentUser('id') userId: string,
     @Body() dto: RegisterDeviceDto,

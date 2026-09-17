@@ -24,7 +24,7 @@ const buildOrder = (overrides: Partial<OrderProps> = {}): OrderEntity =>
 
 describe('OrderEntity', () => {
   describe('assertOwnedBy', () => {
-    it("egasi bo'lmagan foydalanuvchini rad etadi", () => {
+    it("egasi boʻlmagan foydalanuvchini rad etadi", () => {
       const order = buildOrder();
 
       expect(() => order.assertOwnedBy('boshqa-client')).toThrow(ForbiddenResourceException);
@@ -38,7 +38,7 @@ describe('OrderEntity', () => {
   });
 
   describe('transitionTo', () => {
-    it("yangi obyekt qaytaradi, asl obyektni o'zgartirmaydi (immutability)", () => {
+    it("yangi obyekt qaytaradi, asl obyektni oʻzgartirmaydi (immutability)", () => {
       // Arrange
       const order = buildOrder();
 
@@ -51,7 +51,7 @@ describe('OrderEntity', () => {
       expect(next.status).toBe(OrderStatus.SEARCHING_QUEUED);
     });
 
-    it("ruxsat etilmagan o'tishda xato tashlaydi", () => {
+    it("ruxsat etilmagan oʻtishda xato tashlaydi", () => {
       const order = buildOrder({ status: OrderStatus.IN_PROGRESS });
 
       expect(() => order.transitionTo(OrderStatus.CLOSED)).toThrow(InvalidStateTransitionException);
@@ -85,7 +85,7 @@ describe('OrderEntity', () => {
       }
     });
 
-    it("yakunlangan buyurtmani bekor qilishga yo'l qo'ymaydi", () => {
+    it("yakunlangan buyurtmani bekor qilishga yoʻl qoʻymaydi", () => {
       const order = buildOrder({ status: OrderStatus.COMPLETED_BY_MASTER });
 
       expect(() => order.cancelByClient()).toThrow(DomainException);
@@ -99,7 +99,7 @@ describe('OrderEntity', () => {
       expect(order.confirmMaster().status).toBe(OrderStatus.IN_PROGRESS);
     });
 
-    it("tasdiqlanmaganda safety_flagged ga o'tadi va u terminal bo'ladi", () => {
+    it("tasdiqlanmaganda safety_flagged ga oʻtadi va u terminal boʻladi", () => {
       // Arrange
       const order = buildOrder({ status: OrderStatus.ARRIVED_PENDING_CONFIRMATION });
 
@@ -132,7 +132,7 @@ describe('OrderEntity', () => {
   });
 
   describe('releaseForReassignment', () => {
-    it("ustani bo'shatib qidiruvga qaytaradi", () => {
+    it("ustani boʻshatib qidiruvga qaytaradi", () => {
       // Arrange
       const order = buildOrder({ status: OrderStatus.ASSIGNED, masterId: 'master-1' });
 
@@ -151,7 +151,7 @@ describe('OrderEntity', () => {
       OrderStatus.MASTER_EN_ROUTE,
       OrderStatus.ARRIVED_PENDING_CONFIRMATION,
       OrderStatus.IN_PROGRESS,
-    ])("%s holatida raqam ko'rinadi", (status) => {
+    ])("%s holatida raqam koʻrinadi", (status) => {
       expect(buildOrder({ status }).isMasterPhoneVisible).toBe(true);
     });
 

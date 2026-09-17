@@ -12,12 +12,12 @@ export class DomainException extends HttpException {
   }
 }
 
-/** Order agregatida ruxsat etilmagan holat o'tishi (9.4). */
+/** Order agregatida ruxsat etilmagan holat oʻtishi (9.4). */
 export class InvalidStateTransitionException extends DomainException {
   constructor(from: OrderStatus, to: OrderStatus) {
     super(
       'INVALID_STATE_TRANSITION',
-      `Buyurtma holatini "${from}" dan "${to}" ga o'tkazish mumkin emas`,
+      `Buyurtma holatini "${from}" dan "${to}" ga oʻtkazish mumkin emas`,
       HttpStatus.CONFLICT,
       { from, to },
     );
@@ -31,7 +31,7 @@ export class OrderNotFoundException extends DomainException {
 }
 
 export class ForbiddenResourceException extends DomainException {
-  constructor(message = "Bu resursga ruxsatingiz yo'q") {
+  constructor(message = "Bu resursga ruxsatingiz yoʻq") {
     super('FORBIDDEN_RESOURCE', message, HttpStatus.FORBIDDEN);
   }
 }

@@ -86,7 +86,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       expect(savedHash).toHaveLength(64);
     });
 
-    it("1 daqiqa ichida takroriy so'rovni 429 bilan rad etadi (6.3)", async () => {
+    it("1 daqiqa ichida takroriy soʻrovni 429 bilan rad etadi (6.3)", async () => {
       // Arrange
       otpFindFirst.mockResolvedValue({ id: 'otp-1', createdAt: new Date() });
 
@@ -96,7 +96,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("kutish vaqti o'tgach yangi kod yuborishga ruxsat beradi", async () => {
+    it("kutish vaqti oʻtgach yangi kod yuborishga ruxsat beradi", async () => {
       otpFindFirst.mockResolvedValue({
         id: 'otp-1',
         createdAt: new Date(Date.now() - OTP_RESEND_COOLDOWN_MS - 1000),
@@ -116,7 +116,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       ),
     });
 
-    it("to'g'ri kod bilan tokenlar va foydalanuvchini qaytaradi", async () => {
+    it("toʻgʻri kod bilan tokenlar va foydalanuvchini qaytaradi", async () => {
       // Arrange
       otpFindFirst.mockResolvedValue(validRequest('123456'));
 
@@ -140,7 +140,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("urinishni tekshirish va oshirish bitta atomar so'rovda bajariladi", async () => {
+    it("urinishni tekshirish va oshirish bitta atomar soʻrovda bajariladi", async () => {
       // Arrange
       otpFindFirst.mockResolvedValue(validRequest('123456'));
 
@@ -157,7 +157,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("urinishlar tugagach yangi kod so'rashni talab qiladi", async () => {
+    it("urinishlar tugagach yangi kod soʻrashni talab qiladi", async () => {
       // Arrange: atomar `updateMany` hech qanday qatorni yangilamadi
       otpFindFirst.mockResolvedValue(validRequest('123456'));
       otpUpdateMany.mockResolvedValue({ count: 0 });
@@ -168,7 +168,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("parallel so'rov kodni oldinroq ishlatib yuborgan bo'lsa sessiya bermaydi", async () => {
+    it("parallel soʻrov kodni oldinroq ishlatib yuborgan boʻlsa sessiya bermaydi", async () => {
       // Arrange: urinish band qilindi, lekin consume bosqichida qator qolmadi
       otpFindFirst.mockResolvedValue(validRequest('123456'));
       otpUpdateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
@@ -252,7 +252,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("parallel so'rov tokenni oldin band qilgan bo'lsa qayta ishlatish deb hisoblaydi", async () => {
+    it("parallel soʻrov tokenni oldin band qilgan boʻlsa qayta ishlatish deb hisoblaydi", async () => {
       // Arrange: TOCTOU poygasida yutqazgan so'rov
       refreshFindUnique.mockResolvedValue({
         id: 'refresh-1',
@@ -274,7 +274,7 @@ describe('AuthService (TZ 3.1, 6.3)', () => {
       });
     });
 
-    it("noma'lum tokenni rad etadi", async () => {
+    it("nomaʼlum tokenni rad etadi", async () => {
       await expect(service.refresh('unknown')).rejects.toMatchObject({
         code: 'REFRESH_INVALID',
       });

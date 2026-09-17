@@ -26,7 +26,7 @@ describe('FcmProvider', () => {
     jest.clearAllMocks();
   });
 
-  it("FCM o'chirilgan bo'lsa ishga tushmaydi va push yubormaydi", async () => {
+  it("FCM oʻchirilgan boʻlsa ishga tushmaydi va push yubormaydi", async () => {
     const provider = new FcmProvider({ get: () => false } as never);
 
     provider.onModuleInit();
@@ -37,7 +37,7 @@ describe('FcmProvider', () => {
     ).resolves.toEqual([]);
   });
 
-  it("token ro'yxati bo'sh bo'lsa so'rov yubormaydi", async () => {
+  it("token roʻyxati boʻsh boʻlsa soʻrov yubormaydi", async () => {
     const provider = new FcmProvider(enabledConfig() as never);
     provider.onModuleInit();
 
@@ -92,7 +92,7 @@ describe('FcmProvider', () => {
     expect(invalid).toEqual(['bad']);
   });
 
-  it("FCM xatosi bildirishnoma oqimini to'xtatmaydi", async () => {
+  it("FCM xatosi bildirishnoma oqimini toʻxtatmaydi", async () => {
     sendEachForMulticast.mockRejectedValue(new Error('FCM down'));
     const provider = new FcmProvider(enabledConfig() as never);
     provider.onModuleInit();

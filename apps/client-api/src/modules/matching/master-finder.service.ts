@@ -15,7 +15,7 @@ export interface FindCandidatesInput {
   lng: number;
   radiusKm?: number;
   limit?: number;
-  /** Bu ustalar chetlab o'tiladi (masalan, shu buyurtmani allaqachon rad etganlar). */
+  /** Bu ustalar chetlab oʻtiladi (masalan, shu buyurtmani allaqachon rad etganlar). */
   excludeMasterIds?: string[];
 }
 
@@ -52,7 +52,7 @@ export class MasterFinderService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Mos ustalarni masofa bo'yicha tartiblab qaytaradi va ularni tranzaksiya
+   * Mos ustalarni masofa boʻyicha tartiblab qaytaradi va ularni tranzaksiya
    * davomida bloklaydi (`FOR UPDATE ... SKIP LOCKED`) — shu sababli ikkita
    * parallel buyurtma bitta ustaga tushmaydi (TZ 9.5, 7.3).
    *

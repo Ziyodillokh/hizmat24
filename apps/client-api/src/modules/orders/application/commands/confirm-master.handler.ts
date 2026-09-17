@@ -19,8 +19,8 @@ export interface ConfirmMasterResult {
 /**
  * Usta tasdiqlash — xavfsizlik nuqtai nazaridan eng nozik endpoint (TZ 3.7).
  *
- * `confirmed === false` bo'lganda ish HECH QANDAY holatda `IN_PROGRESS`'ga o'tmaydi:
- * `SAFETY_FLAGGED` — terminal holat, state-machine'da undan chiquvchi yo'l yo'q.
+ * `confirmed === false` boʻlganda ish HECH QANDAY holatda `IN_PROGRESS`'ga o'tmaydi:
+ * `SAFETY_FLAGGED` — terminal holat, state-machineʼda undan chiquvchi yo'l yo'q.
  */
 @CommandHandler(ConfirmMasterCommand)
 export class ConfirmMasterHandler implements ICommandHandler<
@@ -94,7 +94,7 @@ export class ConfirmMasterHandler implements ICommandHandler<
         },
       });
 
-      // O'chirilmaydigan audit yozuvi: kim, qachon, qaysi buyurtma (TZ 3.7 izohi, 6.4).
+      // Oʻchirilmaydigan audit yozuvi: kim, qachon, qaysi buyurtma (TZ 3.7 izohi, 6.4).
       await this.audit.record(
         {
           action: AuditAction.SAFETY_FLAG_RAISED,
@@ -125,7 +125,10 @@ export class ConfirmMasterHandler implements ICommandHandler<
 
     return {
       order: presentOrder(order),
-      message: "Operatorimiz hoziroq siz bilan bog'lanadi",
+      // Vaʼda emas, HOLAT: signal Redis kanaliga yoziladi, lekin uni
+      // eshitadigan admin panel hali yoʻq (A4 bosqichi). «Operatorimiz
+      // bogʻlanadi» — bugun bajarilmaydigan gap.
+      message: "Buyurtma toʻxtatildi. Qoʻllab-quvvatlash raqamiga qoʻngʻiroq qiling",
       safetyAlertId: safetyAlert.id,
     };
   }

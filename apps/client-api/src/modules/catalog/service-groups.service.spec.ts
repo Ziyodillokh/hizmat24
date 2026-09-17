@@ -10,7 +10,7 @@ const GROUP = {
   categories: [
     {
       id: 'category-1',
-      name: "Rozetka o'rnatish",
+      name: "Rozetka oʻrnatish",
       description: null,
       basePrice: 80_000,
       complexityLevel: 'SIMPLE',
@@ -47,7 +47,7 @@ describe('ServiceGroupsService', () => {
         categories: [
           {
             id: 'category-1',
-            name: "Rozetka o'rnatish",
+            name: "Rozetka oʻrnatish",
             description: null,
             basePrice: 80_000,
             currency: 'UZS',
@@ -63,7 +63,7 @@ describe('ServiceGroupsService', () => {
     expect(Object.keys(group.categories[0])).not.toContain('complexityLevel');
   });
 
-  it("bo'sh guruhlarni qaytarmaydi", async () => {
+  it("boʻsh guruhlarni qaytarmaydi", async () => {
     await service.listActive();
 
     expect(findMany).toHaveBeenCalledWith(

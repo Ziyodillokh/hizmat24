@@ -14,7 +14,7 @@ import { AuthService } from '@client/modules/auth/auth.service';
 export const clientRoom = (userId: string): string => `client:${userId}`;
 
 /**
- * Real-vaqt kanal (TZ 3.5). Mijoz polling qilmaydi — barcha holat o'zgarishlari
+ * Real-vaqt kanal (TZ 3.5). Mijoz polling qilmaydi — barcha holat oʻzgarishlari
  * shu yerdan yetkaziladi, offline holat uchun parallel ravishda FCM push ketadi.
  */
 @WebSocketGateway({ namespace: '/ws/client' })
@@ -64,7 +64,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     const header = socket.handshake.headers.authorization;
     const token = fromAuth ?? (header?.startsWith('Bearer ') ? header.slice(7) : undefined);
 
-    if (!token) throw new UnauthorizedException("Token yo'q");
+    if (!token) throw new UnauthorizedException("Token yoʻq");
     return token;
   }
 }

@@ -69,7 +69,7 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     handler = new ConfirmMasterHandler(prisma as never, orders as never, audit as never, events);
   });
 
-  it("tasdiqlanganda buyurtmani IN_PROGRESS ga o'tkazadi", async () => {
+  it("tasdiqlanganda buyurtmani IN_PROGRESS ga oʻtkazadi", async () => {
     // Arrange
     orders.findEntity.mockResolvedValue(buildEntity());
     const command = new ConfirmMasterCommand('order-1', 'client-1', true, null, '1.1.1.1', 'app');
@@ -86,7 +86,7 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     expect(result.safetyAlertId).toBeNull();
   });
 
-  it("tasdiqlanmaganda ish IN_PROGRESS ga O'TMAYDI, SAFETY_FLAGGED bo'ladi", async () => {
+  it("tasdiqlanmaganda ish IN_PROGRESS ga OʻTMAYDI, SAFETY_FLAGGED boʻladi", async () => {
     // Arrange
     orders.findEntity.mockResolvedValue(buildEntity());
     const command = new ConfirmMasterCommand(
@@ -106,10 +106,10 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     expect(targetStatuses).toContain(OrderStatus.SAFETY_FLAGGED);
     expect(targetStatuses).not.toContain(OrderStatus.IN_PROGRESS);
     expect(result.safetyAlertId).toBe('alert-1');
-    expect(result.message).toContain("bog'lanadi");
+    expect(result.message).toContain("Qoʻllab-quvvatlash");
   });
 
-  it("xavfsizlik signalida o'chirilmaydigan audit yozuvi yaratadi (IP va User-Agent bilan)", async () => {
+  it("xavfsizlik signalida oʻchirilmaydigan audit yozuvi yaratadi (IP va User-Agent bilan)", async () => {
     // Arrange
     orders.findEntity.mockResolvedValue(buildEntity());
 
@@ -142,7 +142,7 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     );
   });
 
-  it("boshqa mijozning buyurtmasini tasdiqlashga yo'l qo'ymaydi (6.1)", async () => {
+  it("boshqa mijozning buyurtmasini tasdiqlashga yoʻl qoʻymaydi (6.1)", async () => {
     orders.findEntity.mockResolvedValue(buildEntity());
 
     await expect(
@@ -150,7 +150,7 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     ).rejects.toThrow('Bu buyurtma sizga tegishli emas');
   });
 
-  it("mavjud bo'lmagan buyurtma uchun 404 qaytaradi", async () => {
+  it("mavjud boʻlmagan buyurtma uchun 404 qaytaradi", async () => {
     orders.findEntity.mockResolvedValue(null);
 
     await expect(
@@ -158,11 +158,11 @@ describe('ConfirmMasterHandler (TZ 3.7)', () => {
     ).rejects.toThrow(OrderNotFoundException);
   });
 
-  it("noto'g'ri holatda tasdiqlashni rad etadi (masalan hali yetib kelmagan)", async () => {
+  it("notoʻgʻri holatda tasdiqlashni rad etadi (masalan hali yetib kelmagan)", async () => {
     orders.findEntity.mockResolvedValue(buildEntity({ status: OrderStatus.MASTER_EN_ROUTE }));
 
     await expect(
       handler.execute(new ConfirmMasterCommand('order-1', 'client-1', true, null, null, null)),
-    ).rejects.toThrow("o'tkazish mumkin emas");
+    ).rejects.toThrow("oʻtkazish mumkin emas");
   });
 });

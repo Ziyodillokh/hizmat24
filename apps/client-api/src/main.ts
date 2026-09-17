@@ -23,7 +23,7 @@ async function bootstrap(): Promise<void> {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Hizmat24 — Mijoz ilovasi API')
       .setDescription(
-        "Santexnik/elektrik xizmatlari platformasi. Barcha narxlar so'mda (UZS), " +
+        "Santexnik/elektrik xizmatlari platformasi. Barcha narxlar soʻmda (UZS), " +
           'vaqtlar Asia/Tashkent zonasida qaytariladi.',
       )
       .setVersion('1.0')

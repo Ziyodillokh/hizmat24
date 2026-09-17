@@ -94,7 +94,7 @@ describe('CancelOrderHandler (TZ 3.6)', () => {
 
     await expect(
       handler.execute(new CancelOrderCommand('order-1', 'client-1', 'sabab')),
-    ).rejects.toThrow("qo'llab-quvvatlash xizmatiga");
+    ).rejects.toThrow("qoʻllab-quvvatlash xizmatiga");
   });
 
   it('tayinlangan ustani "bo\'sh" holatiga qaytaradi va navbatni tekshirishni ishga tushiradi', async () => {
@@ -117,7 +117,7 @@ describe('CancelOrderHandler (TZ 3.6)', () => {
     );
   });
 
-  it("usta tayinlanmagan bo'lsa usta holatiga tegmaydi", async () => {
+  it("usta tayinlanmagan boʻlsa usta holatiga tegmaydi", async () => {
     orders.findEntity.mockResolvedValue(buildEntity());
 
     await handler.execute(new CancelOrderCommand('order-1', 'client-1', 'sabab'));
@@ -138,7 +138,7 @@ describe('CancelOrderHandler (TZ 3.6)', () => {
     );
   });
 
-  it("boshqa mijozning buyurtmasini bekor qilishga yo'l qo'ymaydi (6.1)", async () => {
+  it("boshqa mijozning buyurtmasini bekor qilishga yoʻl qoʻymaydi (6.1)", async () => {
     orders.findEntity.mockResolvedValue(buildEntity());
 
     await expect(

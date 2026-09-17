@@ -2,7 +2,7 @@ import { OrderStatus } from '@prisma/client';
 
 export { OrderStatus };
 
-/** Yakuniy (terminal) holatlar — bu yerdan hech qayerga o'tilmaydi. */
+/** Yakuniy (terminal) holatlar — bu yerdan hech qayerga oʻtilmaydi. */
 export const TERMINAL_STATUSES: readonly OrderStatus[] = [
   OrderStatus.CLOSED,
   OrderStatus.CANCELLED,
@@ -20,7 +20,7 @@ export const CLIENT_CANCELLABLE_STATUSES: readonly OrderStatus[] = [
   OrderStatus.MASTER_EN_ROUTE,
 ];
 
-/** Usta telefon raqami mijozga ko'rinadigan holatlar (xavfsizlik talabi 6.2). */
+/** Usta telefon raqami mijozga koʻrinadigan holatlar (xavfsizlik talabi 6.2). */
 export const MASTER_PHONE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   OrderStatus.ASSIGNED,
   OrderStatus.MASTER_EN_ROUTE,

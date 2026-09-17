@@ -26,10 +26,10 @@ describe('HttpExceptionFilter (umumiy talab 1.2)', () => {
     expect(type).toHaveBeenCalledWith('application/json; charset=utf-8');
   });
 
-  it("domain xatosini kod va xabar bilan konvertga o'raydi", () => {
+  it("domain xatosini kod va xabar bilan konvertga oʻraydi", () => {
     // Act
     filter.catch(
-      new DomainException('CANCEL_NOT_ALLOWED', "Bekor qilib bo'lmaydi", HttpStatus.FORBIDDEN),
+      new DomainException('CANCEL_NOT_ALLOWED', "Bekor qilib boʻlmaydi", HttpStatus.FORBIDDEN),
       host as never,
     );
 
@@ -38,11 +38,11 @@ describe('HttpExceptionFilter (umumiy talab 1.2)', () => {
     expect(send).toHaveBeenCalledWith({
       success: false,
       data: null,
-      error: { code: 'CANCEL_NOT_ALLOWED', message: "Bekor qilib bo'lmaydi", details: undefined },
+      error: { code: 'CANCEL_NOT_ALLOWED', message: "Bekor qilib boʻlmaydi", details: undefined },
     });
   });
 
-  it("validatsiya xatolarining ro'yxatini bitta xabarga birlashtiradi", () => {
+  it("validatsiya xatolarining roʻyxatini bitta xabarga birlashtiradi", () => {
     filter.catch(
       new NotFoundException({ message: ['maydon-1 xato', 'maydon-2 xato'] }),
       host as never,
@@ -51,7 +51,7 @@ describe('HttpExceptionFilter (umumiy talab 1.2)', () => {
     expect(send.mock.calls[0][0].error.message).toBe('maydon-1 xato; maydon-2 xato');
   });
 
-  it("Prisma unique constraint xatosini 409 ga o'giradi", () => {
+  it("Prisma unique constraint xatosini 409 ga oʻgiradi", () => {
     filter.catch(
       new Prisma.PrismaClientKnownRequestError('duplicate', {
         code: 'P2002',
@@ -77,7 +77,7 @@ describe('HttpExceptionFilter (umumiy talab 1.2)', () => {
   });
 
   it('kutilmagan xatoda ichki tafsilotlarni oshkor qilmaydi', () => {
-    filter.catch(new Error("DB parolini topib bo'lmadi: secret123"), host as never);
+    filter.catch(new Error("DB parolini topib boʻlmadi: secret123"), host as never);
 
     expect(status).toHaveBeenCalledWith(500);
     expect(JSON.stringify(send.mock.calls[0][0])).not.toContain('secret123');

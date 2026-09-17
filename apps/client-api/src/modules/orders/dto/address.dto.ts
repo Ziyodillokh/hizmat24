@@ -33,7 +33,7 @@ export class AddressDto {
   @Length(1, 20)
   apartment?: string;
 
-  @ApiPropertyOptional({ example: "Domofon ishlamaydi, qo'ng'iroq qiling" })
+  @ApiPropertyOptional({ example: "Domofon ishlamaydi, qoʻngʻiroq qiling" })
   @IsOptional()
   @IsString()
   @Length(1, 300)

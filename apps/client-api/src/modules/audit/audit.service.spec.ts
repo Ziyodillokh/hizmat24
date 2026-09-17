@@ -29,13 +29,13 @@ describe('AuditService (TZ 6.4)', () => {
     });
   });
 
-  it("metadata bo'lmasa JSON null yozadi", async () => {
+  it("metadata boʻlmasa JSON null yozadi", async () => {
     await service.record({ action: AuditAction.ORDER_CANCELLED, actorType: ActorType.SYSTEM });
 
     expect(create.mock.calls[0][0].data.metadata).toBe(Prisma.JsonNull);
   });
 
-  it("tranzaksiya klienti berilsa o'sha klientdan foydalanadi", async () => {
+  it("tranzaksiya klienti berilsa oʻsha klientdan foydalanadi", async () => {
     // Arrange
     const txCreate = jest.fn().mockResolvedValue({});
 
@@ -49,7 +49,7 @@ describe('AuditService (TZ 6.4)', () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it("faqat create amali mavjud — yozuvni o'zgartirish/o'chirish API si yo'q", () => {
+  it("faqat create amali mavjud — yozuvni oʻzgartirish/oʻchirish API si yoʻq", () => {
     const methods = Object.getOwnPropertyNames(AuditService.prototype);
 
     expect(methods).toEqual(['constructor', 'record']);

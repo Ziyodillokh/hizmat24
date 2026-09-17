@@ -14,7 +14,7 @@ export interface GroupedCategoryView {
 export interface ServiceGroupView {
   id: string;
   name: string;
-  /** Ilova ikonani shu kalit bo'yicha tanlaydi — URL emas, vektor kalit. */
+  /** Ilova ikonani shu kalit boʻyicha tanlaydi — URL emas, vektor kalit. */
   iconKey: string;
   categories: GroupedCategoryView[];
 }
@@ -30,7 +30,7 @@ export class ServiceGroupsService {
    * Guruhlar va ular ichidagi xizmatlar — bosh sahifa plitkalari va
    * kategoriya ekrani uchun bitta so'rovda.
    *
-   * Bo'sh guruhlar qaytarilmaydi: mijoz ochganda hech narsa yo'q ekranga
+   * Bo'sh guruhlar qaytarilmaydi: mijoz ochganda hech narsa yoʻq ekranga
    * tushmasin.
    */
   listActive(): Promise<ServiceGroupView[]> {

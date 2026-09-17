@@ -51,7 +51,7 @@ describe('NotificationsService (TZ 4, 9.6)', () => {
     body: 'Buyurtmangizga usta tayinlandi',
   };
 
-  it("xabarni avval DB ga yozadi (offline foydalanuvchi keyin ko'radi)", async () => {
+  it("xabarni avval DB ga yozadi (offline foydalanuvchi keyin koʻradi)", async () => {
     await service.dispatch(dispatchInput);
 
     expect(notificationCreate).toHaveBeenCalledWith(
@@ -75,7 +75,7 @@ describe('NotificationsService (TZ 4, 9.6)', () => {
     );
   });
 
-  it("qurilma tokeni bo'lmasa push yubormaydi", async () => {
+  it("qurilma tokeni boʻlmasa push yubormaydi", async () => {
     deviceFindMany.mockResolvedValue([]);
 
     await service.dispatch(dispatchInput);

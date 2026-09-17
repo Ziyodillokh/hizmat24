@@ -34,7 +34,7 @@ const buildOrder = (overrides: Record<string, unknown> = {}) =>
     createdAt: new Date('2026-09-05T12:00:00.000Z'),
     updatedAt: new Date('2026-09-05T12:00:00.000Z'),
     master: null,
-    category: { id: 'category-1', name: "Kran ta'mirlash", basePrice: 100_000 },
+    category: { id: 'category-1', name: "Kran taʼmirlash", basePrice: 100_000 },
     rating: null,
     ...overrides,
   }) as never;
@@ -55,7 +55,7 @@ describe('GetOrderHandler', () => {
     expect(result.currency).toBe('UZS');
   });
 
-  it("javobda faqat bitta master maydoni bo'ladi (biznes-qoida 5.2)", async () => {
+  it("javobda faqat bitta master maydoni boʻladi (biznes-qoida 5.2)", async () => {
     const result = await handler.execute(new GetOrderQuery('order-1', 'client-1'));
 
     expect(Object.keys(result)).not.toContain('masters');
@@ -88,14 +88,14 @@ describe('GetOrderEtaHandler', () => {
     handler = new GetOrderEtaHandler(orders as never, queuePosition as never);
   });
 
-  it("usta yo'lda bo'lganda ETA qaytaradi", async () => {
+  it("usta yoʻlda boʻlganda ETA qaytaradi", async () => {
     const result = await handler.execute(new GetOrderEtaQuery('order-1', 'client-1'));
 
     expect(result.etaMinutes).toBe(15);
     expect(queuePosition.positionOf).not.toHaveBeenCalled();
   });
 
-  it("navbatda bo'lganda Redis dan joriy pozitsiyani oladi", async () => {
+  it("navbatda boʻlganda Redis dan joriy pozitsiyani oladi", async () => {
     orders.findById.mockResolvedValue(
       buildOrder({ status: OrderStatus.SEARCHING_QUEUED, queuePosition: 5, etaMinutes: null }),
     );
@@ -152,7 +152,7 @@ describe('GetOrderReceiptHandler (TZ 3.9)', () => {
     const result = await handler.execute(new GetOrderReceiptQuery('order-1', 'client-1'));
 
     expect(result).toMatchObject({
-      serviceName: "Kran ta'mirlash",
+      serviceName: "Kran taʼmirlash",
       price: 100_000,
       currency: 'UZS',
       masterName: 'Akmal Rahimov',
@@ -188,7 +188,7 @@ describe('GetOrderReceiptHandler (TZ 3.9)', () => {
 });
 
 describe('ListOrderHistoryHandler', () => {
-  it("sahifalash meta ma'lumotlarini hisoblaydi", async () => {
+  it("sahifalash meta maʼlumotlarini hisoblaydi", async () => {
     // Arrange
     const orders = {
       listHistory: jest.fn().mockResolvedValue({ items: [buildOrder()], total: 25 }),
@@ -203,7 +203,7 @@ describe('ListOrderHistoryHandler', () => {
     expect(result.items).toHaveLength(1);
   });
 
-  it("bo'sh tarixda ham kamida 1 sahifa qaytaradi", async () => {
+  it("boʻsh tarixda ham kamida 1 sahifa qaytaradi", async () => {
     const orders = { listHistory: jest.fn().mockResolvedValue({ items: [], total: 0 }) };
     const handler = new ListOrderHistoryHandler(orders as never);
 

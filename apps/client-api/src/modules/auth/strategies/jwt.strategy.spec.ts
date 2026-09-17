@@ -18,7 +18,7 @@ describe('JwtStrategy', () => {
     expect(result).toEqual({ id: 'user-1', phoneNumber: '+998901234567' });
   });
 
-  it("bloklangan yoki o'chirilgan foydalanuvchini har bir so'rovda rad etadi", async () => {
+  it("bloklangan yoki oʻchirilgan foydalanuvchini har bir soʻrovda rad etadi", async () => {
     const auth = { findActiveUser: jest.fn().mockResolvedValue(null) };
     const strategy = new JwtStrategy(config, auth as never);
 

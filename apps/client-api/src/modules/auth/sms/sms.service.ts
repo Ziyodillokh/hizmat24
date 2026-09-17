@@ -5,7 +5,7 @@ import { maskPhoneNumber } from '@client/common/utils/phone.util';
 
 /**
  * SMS provayderi. v1'da `console` (development) va HTTP-based provayderlar
- * uchun yagona interfeys. Provayder kaliti env orqali beriladi — hardcode yo'q.
+ * uchun yagona interfeys. Provayder kaliti env orqali beriladi — hardcode yoʻq.
  */
 @Injectable()
 export class SmsService {
@@ -33,7 +33,7 @@ export class SmsService {
     const token = this.config.get('SMS_API_TOKEN', { infer: true });
 
     if (!url || !token) {
-      throw new Error("SMS provayderi sozlanmagan: SMS_API_URL yoki SMS_API_TOKEN yo'q");
+      throw new Error("SMS provayderi sozlanmagan: SMS_API_URL yoki SMS_API_TOKEN yoʻq");
     }
 
     const response = await fetch(url, {

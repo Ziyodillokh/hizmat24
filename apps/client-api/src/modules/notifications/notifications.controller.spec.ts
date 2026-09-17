@@ -19,25 +19,25 @@ describe('NotificationsController', () => {
     controller = new NotificationsController(notifications as never);
   });
 
-  it("faqat o'z bildirishnomalarini so'raydi", async () => {
+  it("faqat oʻz bildirishnomalarini soʻraydi", async () => {
     await controller.list('user-1', { page: 1, limit: 20 });
 
     expect(notifications.list).toHaveBeenCalledWith('user-1', 1, 20);
   });
 
-  it("o'qilgan deb belgilashda foydalanuvchi id sini ham uzatadi (6.1)", async () => {
+  it("oʻqilgan deb belgilashda foydalanuvchi id sini ham uzatadi (6.1)", async () => {
     await controller.markRead('user-1', 'notification-1');
 
     expect(notifications.markAsRead).toHaveBeenCalledWith('user-1', 'notification-1');
   });
 
-  it("barchasini o'qilgan deb belgilaydi", async () => {
+  it("barchasini oʻqilgan deb belgilaydi", async () => {
     await controller.markAllRead('user-1');
 
     expect(notifications.markAllAsRead).toHaveBeenCalledWith('user-1');
   });
 
-  it("qurilma tokenini ro'yxatdan o'tkazadi", async () => {
+  it("qurilma tokenini roʻyxatdan oʻtkazadi", async () => {
     await controller.registerDevice('user-1', { token: 'device-token', platform: 'android' });
 
     expect(notifications.registerDeviceToken).toHaveBeenCalledWith(

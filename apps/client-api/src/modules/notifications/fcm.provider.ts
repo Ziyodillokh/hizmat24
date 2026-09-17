@@ -19,7 +19,7 @@ export class FcmProvider implements OnModuleInit {
 
   onModuleInit(): void {
     if (!this.config.get('FCM_ENABLED', { infer: true })) {
-      this.logger.warn("FCM o'chirilgan — push xabarlar yuborilmaydi");
+      this.logger.warn("FCM oʻchirilgan — push xabarlar yuborilmaydi");
       return;
     }
 
@@ -32,7 +32,7 @@ export class FcmProvider implements OnModuleInit {
     });
   }
 
-  /** Yaroqsiz tokenlar ro'yxatini qaytaradi — chaqiruvchi ularni o'chiradi. */
+  /** Yaroqsiz tokenlar roʻyxatini qaytaradi — chaqiruvchi ularni o'chiradi. */
   async sendToTokens(tokens: string[], message: PushMessage): Promise<string[]> {
     if (!this.app || tokens.length === 0) return [];
 

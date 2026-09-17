@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  /** Har bir so'rovda foydalanuvchi holati tekshiriladi — bloklangan bo'lsa kirish yopiladi. */
+  /** Har bir soʻrovda foydalanuvchi holati tekshiriladi — bloklangan bo'lsa kirish yopiladi. */
   async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
     const user = await this.auth.findActiveUser(payload.sub);
 

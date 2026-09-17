@@ -35,7 +35,7 @@ export class MatchingProcessor extends WorkerHost {
         return;
       }
       default:
-        this.logger.warn({ jobName: job.name }, "Noma'lum job turi");
+        this.logger.warn({ jobName: job.name }, "Nomaʼlum job turi");
     }
   }
 }

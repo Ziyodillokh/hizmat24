@@ -71,7 +71,7 @@ describe('RatingsService (TZ 3.8)', () => {
     expect(statuses).toEqual([OrderStatus.RATED, OrderStatus.CLOSED]);
   });
 
-  it("ish yakunlanmagan bo'lsa baholashni rad etadi", async () => {
+  it("ish yakunlanmagan boʻlsa baholashni rad etadi", async () => {
     orders.findEntity.mockResolvedValue(buildEntity({ status: OrderStatus.IN_PROGRESS }));
 
     await expect(service.rateOrder('order-1', 'client-1', 5, null)).rejects.toThrow(
@@ -94,13 +94,13 @@ describe('RatingsService (TZ 3.8)', () => {
     });
   });
 
-  it("boshqa mijozning buyurtmasini baholashga yo'l qo'ymaydi (6.1)", async () => {
+  it("boshqa mijozning buyurtmasini baholashga yoʻl qoʻymaydi (6.1)", async () => {
     await expect(service.rateOrder('order-1', 'begona', 5, null)).rejects.toThrow(
       'Bu buyurtma sizga tegishli emas',
     );
   });
 
-  it("reyting o'rtachasini background job orqali qayta hisoblaydi (bloklamaydi)", async () => {
+  it("reyting oʻrtachasini background job orqali qayta hisoblaydi (bloklamaydi)", async () => {
     await service.rateOrder('order-1', 'client-1', 4, 'rahmat');
 
     expect(queueAdd).toHaveBeenCalledWith(
@@ -121,7 +121,7 @@ describe('RatingsService (TZ 3.8)', () => {
     expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.RATED, expect.anything());
   });
 
-  it("ustaning bo'sh/band holatiga bevosita tegmaydi (invariant egasi — reconcile)", async () => {
+  it("ustaning boʻsh/band holatiga bevosita tegmaydi (invariant egasi — reconcile)", async () => {
     // Kech baholash allaqachon yangi ish olgan ustani "bo'sh" qilib qo'ymasligi kerak
     await service.rateOrder('order-1', 'client-1', 5, null);
 
@@ -129,7 +129,7 @@ describe('RatingsService (TZ 3.8)', () => {
   });
 
   describe('recalculateMasterRating', () => {
-    it("o'rtacha reytingni ikki xonagacha yaxlitlab saqlaydi", async () => {
+    it("oʻrtacha reytingni ikki xonagacha yaxlitlab saqlaydi", async () => {
       // Arrange
       ratingAggregate.mockResolvedValue({ _avg: { stars: 4.333333 }, _count: { _all: 3 } });
 
@@ -143,7 +143,7 @@ describe('RatingsService (TZ 3.8)', () => {
       });
     });
 
-    it("baho bo'lmasa 0 yozadi", async () => {
+    it("baho boʻlmasa 0 yozadi", async () => {
       ratingAggregate.mockResolvedValue({ _avg: { stars: null }, _count: { _all: 0 } });
 
       await service.recalculateMasterRating('master-1');

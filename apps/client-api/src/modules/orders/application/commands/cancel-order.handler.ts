@@ -28,7 +28,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand, O
     if (!entity) throw new OrderNotFoundException(command.orderId);
 
     entity.assertOwnedBy(command.clientId);
-    // Domain qatlami IN_PROGRESS'dan keyingi bekor qilishni 403 bilan rad etadi (5.5).
+    // Domain qatlami IN_PROGRESSʼdan keyingi bekor qilishni 403 bilan rad etadi (5.5).
     entity.cancelByClient();
 
     const freedMasterId = entity.masterId;

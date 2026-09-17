@@ -16,7 +16,7 @@ export interface MasterProfileView {
 
 /**
  * Read-model (TZ 2.4): mijoz ilovasi ustani yaratmaydi/tahrirlamaydi.
- * Faqat o'ziga tayinlangan usta profilini o'qiy oladi.
+ * Faqat oʻziga tayinlangan usta profilini o'qiy oladi.
  */
 @Injectable()
 export class MastersService {
@@ -31,7 +31,7 @@ export class MastersService {
 
     if (!relatedOrder) {
       throw new ForbiddenResourceException(
-        "Bu usta profilini ko'rish uchun u bilan bog'liq buyurtmangiz bo'lishi kerak",
+        "Bu usta profilini koʻrish uchun u bilan bogʻliq buyurtmangiz boʻlishi kerak",
       );
     }
 

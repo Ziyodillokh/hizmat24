@@ -35,7 +35,7 @@ describe('estimateEtaMinutes', () => {
     expect(estimateEtaMinutes(0.05, 20)).toBe(1);
   });
 
-  it("tezlik musbat bo'lmasa xato tashlaydi", () => {
+  it("tezlik musbat boʻlmasa xato tashlaydi", () => {
     expect(() => estimateEtaMinutes(10, 0)).toThrow();
   });
 });

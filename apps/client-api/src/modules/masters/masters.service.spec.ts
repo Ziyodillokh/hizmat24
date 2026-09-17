@@ -28,7 +28,7 @@ describe('MastersService (TZ 2.4, 6.2)', () => {
     } as never);
   });
 
-  it("aktiv buyurtma davomida telefon raqamini ko'rsatadi", async () => {
+  it("aktiv buyurtma davomida telefon raqamini koʻrsatadi", async () => {
     const profile = await service.findProfileForClient('master-1', 'client-1');
 
     expect(profile.phoneNumber).toBe('+998901112233');
@@ -43,7 +43,7 @@ describe('MastersService (TZ 2.4, 6.2)', () => {
     expect(profile.phoneNumber).toBeNull();
   });
 
-  it("usta bilan bog'liq buyurtmasi yo'q mijozga profilni bermaydi", async () => {
+  it("usta bilan bogʻliq buyurtmasi yoʻq mijozga profilni bermaydi", async () => {
     orderFindFirst.mockResolvedValue(null);
 
     await expect(service.findProfileForClient('master-1', 'begona')).rejects.toThrow(

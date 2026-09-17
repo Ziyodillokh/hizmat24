@@ -117,7 +117,7 @@ describe('MatchingService (TZ 3.4)', () => {
       expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.ASSIGNED, expect.anything());
     });
 
-    it("tayinlangandan keyin 3 daqiqalik javob taymerini qo'yadi", async () => {
+    it("tayinlangandan keyin 3 daqiqalik javob taymerini qoʻyadi", async () => {
       finder.findCandidates.mockResolvedValue([{ id: 'master-1', distance_km: 3 }]);
 
       await service.matchOrder('order-1');
@@ -142,7 +142,7 @@ describe('MatchingService (TZ 3.4)', () => {
       );
     });
 
-    it("bo'sh usta bo'lmaganda navbatga qo'yadi va pozitsiyani xabar qiladi", async () => {
+    it("boʻsh usta boʻlmaganda navbatga qoʻyadi va pozitsiyani xabar qiladi", async () => {
       // Act
       const outcome = await service.matchOrder('order-1');
 
@@ -155,7 +155,7 @@ describe('MatchingService (TZ 3.4)', () => {
       );
     });
 
-    it("navbatdagi pozitsiya o'zgarmasa takroriy xabar yubormaydi", async () => {
+    it("navbatdagi pozitsiya oʻzgarmasa takroriy xabar yubormaydi", async () => {
       // Arrange: buyurtma allaqachon navbatda va o'sha pozitsiyada
       orderFindUnique.mockResolvedValue(
         buildOrderRow({ status: OrderStatus.SEARCHING_QUEUED, queuePosition: 2 }),
@@ -189,7 +189,7 @@ describe('MatchingService (TZ 3.4)', () => {
       );
     });
 
-    it("usta band bo'lib qolgan bo'lsa (poyga holati) tayinlamaydi", async () => {
+    it("usta band boʻlib qolgan boʻlsa (poyga holati) tayinlamaydi", async () => {
       finder.findCandidates.mockResolvedValue([{ id: 'master-1', distance_km: 3 }]);
       masterUpdateMany.mockResolvedValue({ count: 0 });
 
@@ -198,7 +198,7 @@ describe('MatchingService (TZ 3.4)', () => {
       expect(outcome.kind).toBe('queued');
     });
 
-    it("urinishlar chegarasi tugaganda admin panelga eskalatsiya qiladi (cheksiz tsikl yo'q)", async () => {
+    it("urinishlar chegarasi tugaganda admin panelga eskalatsiya qiladi (cheksiz tsikl yoʻq)", async () => {
       // Arrange
       orderFindUnique.mockResolvedValue(
         buildOrderRow({ assignmentAttempts: MAX_ASSIGNMENT_ATTEMPTS }),
@@ -230,7 +230,7 @@ describe('MatchingService (TZ 3.4)', () => {
   });
 
   describe('handleAckTimeout', () => {
-    it("javob bermagan ustani bo'shatib qidiruvni qaytadan boshlaydi", async () => {
+    it("javob bermagan ustani boʻshatib qidiruvni qaytadan boshlaydi", async () => {
       // Arrange
       orderFindUnique.mockResolvedValue(
         buildOrderRow({ status: OrderStatus.ASSIGNED, masterId: 'master-1' }),
@@ -258,7 +258,7 @@ describe('MatchingService (TZ 3.4)', () => {
       );
     });
 
-    it("usta allaqachon javob bergan bo'lsa hech narsa qilmaydi", async () => {
+    it("usta allaqachon javob bergan boʻlsa hech narsa qilmaydi", async () => {
       orderFindUnique.mockResolvedValue(
         buildOrderRow({
           status: OrderStatus.ASSIGNED,
@@ -272,7 +272,7 @@ describe('MatchingService (TZ 3.4)', () => {
       expect(masterUpdateMany).not.toHaveBeenCalled();
     });
 
-    it("buyurtma allaqachon boshqa holatga o'tgan bo'lsa aralashmaydi", async () => {
+    it("buyurtma allaqachon boshqa holatga oʻtgan boʻlsa aralashmaydi", async () => {
       orderFindUnique.mockResolvedValue(buildOrderRow({ status: OrderStatus.MASTER_EN_ROUTE }));
 
       await service.handleAckTimeout('order-1');
@@ -300,14 +300,14 @@ describe('MatchingService (TZ 3.4)', () => {
       expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.ASSIGNED, expect.anything());
     });
 
-    it("shoshilinch buyurtmalarni navbat boshiga qo'yib so'raydi (TZ 3.4)", async () => {
+    it("shoshilinch buyurtmalarni navbat boshiga qoʻyib soʻraydi (TZ 3.4)", async () => {
       await service.sweepQueue();
 
       const pendingQuery = orderFindMany.mock.calls[1][0] as { orderBy: unknown };
       expect(pendingQuery.orderBy).toEqual([{ isUrgent: 'desc' }, { createdAt: 'asc' }]);
     });
 
-    it("javob taymeri yo'qolgan tayinlashlarni tiklaydi", async () => {
+    it("javob taymeri yoʻqolgan tayinlashlarni tiklaydi", async () => {
       // Arrange: eskirgan ASSIGNED buyurtma (BullMQ delayed job tushib qolgan)
       orderFindMany.mockResolvedValueOnce([{ id: 'stale-order' }]).mockResolvedValueOnce([]);
       orderFindUnique.mockResolvedValue(

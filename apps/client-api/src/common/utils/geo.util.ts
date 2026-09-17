@@ -18,7 +18,7 @@ export function haversineKm(from: GeoPoint, to: GeoPoint): number {
 /** Masofa asosidagi taxminiy yetib borish vaqti (daqiqa). */
 export function estimateEtaMinutes(distanceKm: number, averageSpeedKmh: number): number {
   if (averageSpeedKmh <= 0) {
-    throw new Error("averageSpeedKmh musbat bo'lishi kerak");
+    throw new Error("averageSpeedKmh musbat boʻlishi kerak");
   }
   return Math.max(1, Math.round((distanceKm / averageSpeedKmh) * 60));
 }

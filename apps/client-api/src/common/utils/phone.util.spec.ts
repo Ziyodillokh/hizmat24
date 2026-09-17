@@ -10,13 +10,13 @@ describe('normalizePhoneNumber', () => {
     expect(normalizePhoneNumber(input)).toBe(expected);
   });
 
-  it("tanib bo'lmaydigan qiymatni o'zgartirmasdan qaytaradi", () => {
+  it("tanib boʻlmaydigan qiymatni oʻzgartirmasdan qaytaradi", () => {
     expect(normalizePhoneNumber('abc')).toBe('abc');
   });
 });
 
 describe('isValidUzPhoneNumber', () => {
-  it("to'g'ri O'zbekiston raqamini qabul qiladi", () => {
+  it("toʻgʻri Oʻzbekiston raqamini qabul qiladi", () => {
     expect(isValidUzPhoneNumber('+998901234567')).toBe(true);
   });
 
@@ -26,11 +26,11 @@ describe('isValidUzPhoneNumber', () => {
 });
 
 describe('maskPhoneNumber', () => {
-  it("raqamning o'rta qismini yashiradi", () => {
+  it("raqamning oʻrta qismini yashiradi", () => {
     expect(maskPhoneNumber('+998901234567')).toBe('+99890***4567');
   });
 
-  it("qisqa qiymatni to'liq yashiradi", () => {
+  it("qisqa qiymatni toʻliq yashiradi", () => {
     expect(maskPhoneNumber('1234')).toBe('***');
   });
 });

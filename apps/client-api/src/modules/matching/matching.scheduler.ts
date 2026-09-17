@@ -11,7 +11,7 @@ import { MatchingService } from './matching.service';
 
 /**
  * Navbatdan avtomatik tayinlash (TZ 3.4, nofunksional talab 7.2).
- * Ikki manba: 10 soniyalik davriy sweep + usta bo'shaganda darhol ishlaydigan listener.
+ * Ikki manba: 10 soniyalik davriy sweep + usta boʻshaganda darhol ishlaydigan listener.
  */
 @Injectable()
 export class MatchingScheduler {
@@ -33,7 +33,7 @@ export class MatchingScheduler {
       // shunda bo'shatilgan ustalar shu tsiklning o'zida ish olishi mumkin.
       const freed = await this.availability.reconcile();
       if (freed.length > 0) {
-        this.logger.log({ freed: freed.length }, "Band ustalar bo'shatildi");
+        this.logger.log({ freed: freed.length }, "Band ustalar boʻshatildi");
       }
 
       await this.matching.sweepQueue();
@@ -46,7 +46,7 @@ export class MatchingScheduler {
 
   @OnEvent(MASTER_EVENTS.BECAME_AVAILABLE, { async: true })
   async onMasterAvailable(event: MasterBecameAvailableEvent): Promise<void> {
-    this.logger.debug({ masterId: event.masterId }, "Usta bo'shadi — navbat tekshirilmoqda");
+    this.logger.debug({ masterId: event.masterId }, "Usta boʻshadi — navbat tekshirilmoqda");
     await this.matching.sweepQueue();
   }
 }

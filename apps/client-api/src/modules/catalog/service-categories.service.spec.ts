@@ -50,7 +50,7 @@ describe('ServiceCategoriesService (TZ 3.2)', () => {
     expect(Object.keys(category)).not.toContain('complexity_level');
   });
 
-  it("faqat is_active=true kategoriyalarni so'raydi", async () => {
+  it("faqat is_active=true kategoriyalarni soʻraydi", async () => {
     await service.listActive();
 
     expect(findMany).toHaveBeenCalledWith({

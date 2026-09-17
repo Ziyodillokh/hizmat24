@@ -39,7 +39,7 @@ import { RedisModule } from './infra/redis/redis.module';
             config.get('NODE_ENV', { infer: true }) === 'development'
               ? { target: 'pino-pretty', options: { singleLine: true } }
               : undefined,
-          // Maxfiy ma'lumotlar loglarga tushmasligi kerak (6-bo'lim).
+          // Maxfiy maʼlumotlar loglarga tushmasligi kerak (6-bo'lim).
           redact: [
             'req.headers.authorization',
             'req.headers.cookie',
@@ -55,7 +55,7 @@ import { RedisModule } from './infra/redis/redis.module';
       useFactory: (config: ConfigService<AppEnv, true>) => ({
         // Bitta global throttler. OTP va buyurtma yaratish uchun qattiqroq
         // limitlar route darajasida `@Throttle` bilan override qilinadi (6.3) —
-        // bu yerda qo'shimcha nomlangan throttler e'lon qilinsa, u BARCHA
+        // bu yerda qoʻshimcha nomlangan throttler e'lon qilinsa, u BARCHA
         // endpointlarga ham qo'llanib ketardi.
         throttlers: [
           {

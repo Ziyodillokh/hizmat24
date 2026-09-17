@@ -11,7 +11,7 @@ export class RequestOtpDto {
   @ApiProperty({ example: '+998901234567' })
   @Transform(phoneTransform)
   @IsString()
-  @Matches(/^\+998\d{9}$/, { message: "Telefon raqami +998XXXXXXXXX formatida bo'lsin" })
+  @Matches(/^\+998\d{9}$/, { message: "Telefon raqami +998XXXXXXXXX formatida boʻlsin" })
   phoneNumber: string;
 }
 
@@ -19,13 +19,13 @@ export class VerifyOtpDto {
   @ApiProperty({ example: '+998901234567' })
   @Transform(phoneTransform)
   @IsString()
-  @Matches(/^\+998\d{9}$/, { message: "Telefon raqami +998XXXXXXXXX formatida bo'lsin" })
+  @Matches(/^\+998\d{9}$/, { message: "Telefon raqami +998XXXXXXXXX formatida boʻlsin" })
   phoneNumber: string;
 
   @ApiProperty({ example: '123456', minLength: OTP_LENGTH, maxLength: OTP_LENGTH })
   @IsString()
   @Length(OTP_LENGTH, OTP_LENGTH)
-  @Matches(/^\d+$/, { message: "Kod faqat raqamlardan iborat bo'lsin" })
+  @Matches(/^\d+$/, { message: "Kod faqat raqamlardan iborat boʻlsin" })
   otpCode: string;
 }
 

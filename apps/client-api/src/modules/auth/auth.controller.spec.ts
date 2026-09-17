@@ -19,7 +19,7 @@ describe('AuthController', () => {
     controller = new AuthController(auth as never);
   });
 
-  it("OTP so'rovini servisga uzatadi", async () => {
+  it("OTP soʻrovini servisga uzatadi", async () => {
     await controller.requestOtp({ phoneNumber: '+998901234567' });
 
     expect(auth.requestOtp).toHaveBeenCalledWith('+998901234567');

@@ -1,7 +1,7 @@
 import { MastersController } from './masters.controller';
 
 describe('MastersController', () => {
-  it("usta profilini faqat so'rovchi mijoz kontekstida oladi", async () => {
+  it("usta profilini faqat soʻrovchi mijoz kontekstida oladi", async () => {
     // Arrange
     const findProfileForClient = jest.fn().mockResolvedValue({ id: 'master-1' });
     const controller = new MastersController({ findProfileForClient } as never);

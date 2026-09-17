@@ -2,7 +2,7 @@ import { firstValueFrom, of } from 'rxjs';
 import { ResponseInterceptor } from './response.interceptor';
 
 describe('ResponseInterceptor (umumiy talab 1.2)', () => {
-  it("javobni { success, data, error } konvertiga o'raydi", async () => {
+  it("javobni { success, data, error } konvertiga oʻraydi", async () => {
     // Arrange
     const interceptor = new ResponseInterceptor<{ id: string }>();
     const next = { handle: () => of({ id: 'order-1' }) };

@@ -12,7 +12,7 @@ describe('MatchingScheduler (TZ 3.4, 7.2)', () => {
     scheduler = new MatchingScheduler({ sweepQueue } as never, { reconcile } as never);
   });
 
-  it("har tsiklda ustalarning bo'sh/band invariantini tiklaydi", async () => {
+  it("har tsiklda ustalarning boʻsh/band invariantini tiklaydi", async () => {
     reconcile.mockResolvedValue(['master-1']);
 
     await scheduler.sweep();
@@ -54,7 +54,7 @@ describe('MatchingScheduler (TZ 3.4, 7.2)', () => {
     expect(sweepQueue).toHaveBeenCalledTimes(2);
   });
 
-  it("usta bo'shaganda navbatni darhol tekshiradi", async () => {
+  it("usta boʻshaganda navbatni darhol tekshiradi", async () => {
     await scheduler.onMasterAvailable(new MasterBecameAvailableEvent('master-1'));
 
     expect(sweepQueue).toHaveBeenCalled();

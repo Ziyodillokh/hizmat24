@@ -41,7 +41,7 @@ export class NotificationsService {
 
   /**
    * Yagona yetkazish nuqtasi (TZ 9.6): DB yozuvi + WebSocket + FCM push.
-   * Controller qatlamidan hech qachon to'g'ridan-to'g'ri chaqirilmaydi —
+   * Controller qatlamidan hech qachon toʻg'ridan-to'gʻri chaqirilmaydi —
    * faqat domain event listener orqali.
    */
   async dispatch(input: DispatchInput): Promise<void> {

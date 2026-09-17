@@ -38,7 +38,7 @@ export class RatingsService {
   ) {}
 
   /**
-   * Baholash (TZ 3.8). Bitta buyurtmaga bitta baho — takroriy so'rov 409 qaytaradi.
+   * Baholash (TZ 3.8). Bitta buyurtmaga bitta baho — takroriy soʻrov 409 qaytaradi.
    * Baholashdan keyin buyurtma RATED → CLOSED holatiga o'tadi.
    */
   async rateOrder(
@@ -92,7 +92,7 @@ export class RatingsService {
           tx,
         );
 
-        // Usta holatiga bu yerda TEGILMAYDI: bo'sh/band invarianti bitta joyda —
+        // Usta holatiga bu yerda TEGILMAYDI: boʻsh/band invarianti bitta joyda —
         // `MasterAvailabilityService.reconcile()` da boshqariladi. Aks holda
         // mijoz kech baholaganda, allaqachon yangi ish olgan usta noto'g'ri
         // "bo'sh" deb belgilanib qolardi.
@@ -114,7 +114,7 @@ export class RatingsService {
         throw error;
       });
 
-    // Reyting o'rtachasi background job orqali qayta hisoblanadi (TZ 3.8).
+    // Reyting oʻrtachasi background job orqali qayta hisoblanadi (TZ 3.8).
     await this.ratingsQueue.add(
       JOB_RECALCULATE_MASTER_RATING,
       { masterId },

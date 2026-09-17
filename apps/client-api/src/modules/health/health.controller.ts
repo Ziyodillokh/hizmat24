@@ -55,7 +55,7 @@ export class HealthController {
   }
 
   /**
-   * Metrikalar ichki monitoring uchun. `METRICS_TOKEN` berilmagan bo'lsa endpoint
+   * Metrikalar ichki monitoring uchun. `METRICS_TOKEN` berilmagan boʻlsa endpoint
    * yopiq — anonim so'rov orqali ichki holat oshkor bo'lmasin.
    */
   @Public()
@@ -66,7 +66,7 @@ export class HealthController {
     const expected = this.config.get('METRICS_TOKEN', { infer: true });
 
     if (!expected || !this.matchesToken(expected, token)) {
-      throw new ForbiddenException("Metrikalarga ruxsat yo'q");
+      throw new ForbiddenException("Metrikalarga ruxsat yoʻq");
     }
 
     return register.metrics();

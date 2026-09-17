@@ -11,7 +11,7 @@ export class ServiceCategoriesController {
   @Public()
   @Get()
   @ApiOperation({
-    summary: "Faol xizmat turlarining tekis ro'yxati (narxlar so'mda)",
+    summary: "Faol xizmat turlarining tekis roʻyxati (narxlar soʻmda)",
     description: 'Qidiruv va "Barchasi" ekrani uchun. Guruhlangan ko\'rinish — /service-groups.',
   })
   list(): Promise<ServiceCategoryView[]> {

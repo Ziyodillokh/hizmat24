@@ -4,10 +4,10 @@ import { InvalidStateTransitionException } from '@client/common/exceptions/domai
 /**
  * Buyurtma holatlar grafi (TZ 9.4).
  *
- * TZ 9.4 jadvaliga nisbatan bitta qo'shimcha o'tish bor: ASSIGNED → SEARCHING.
+ * TZ 9.4 jadvaliga nisbatan bitta qoʻshimcha o'tish bor: ASSIGNED → SEARCHING.
  * Sababi — TZ 3.4 "avtomatik qayta ishga tushirish" bandi: usta 3 daqiqa ichida
  * javob bermasa, buyurtma 1-bandga (ya'ni qidiruvga) qaytadi. Mos usta topilmasa,
- * u yerdan SEARCHING_QUEUED'ga o'tadi — bu 9.4 jadvalidagi yo'l.
+ * u yerdan SEARCHING_QUEUEDʼga o'tadi — bu 9.4 jadvalidagi yo'l.
  */
 export const ORDER_TRANSITIONS: Readonly<Record<OrderStatus, readonly OrderStatus[]>> =
   Object.freeze({

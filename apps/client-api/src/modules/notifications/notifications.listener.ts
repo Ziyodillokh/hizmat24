@@ -14,8 +14,8 @@ import { NotificationsService } from './notifications.service';
 
 /**
  * Domain event → bildirishnoma (TZ 3.5, 4).
- * Modullar orasida to'g'ridan-to'g'ri bog'liqlik yo'q: notifications moduli
- * orders/matching modullarini import qilmaydi, faqat event'larga obuna bo'ladi.
+ * Modullar orasida toʻg'ridan-to'gʻri bog'liqlik yo'q: notifications moduli
+ * orders/matching modullarini import qilmaydi, faqat eventʼlarga obuna bo'ladi.
  */
 @Injectable()
 export class NotificationsListener {
@@ -42,8 +42,8 @@ export class NotificationsListener {
       title: 'Siz navbatdasiz',
       body:
         event.estimatedWaitMinutes === null
-          ? `Navbatdagi o'rningiz: ${event.queuePosition}`
-          : `Navbatdagi o'rningiz: ${event.queuePosition}. Taxminiy kutish: ${event.estimatedWaitMinutes} daqiqa`,
+          ? `Navbatdagi oʻrningiz: ${event.queuePosition}`
+          : `Navbatdagi oʻrningiz: ${event.queuePosition}. Taxminiy kutish: ${event.estimatedWaitMinutes} daqiqa`,
       payload: {
         queuePosition: event.queuePosition,
         estimatedWaitMinutes: event.estimatedWaitMinutes,
@@ -62,13 +62,13 @@ export class NotificationsListener {
     > = {
       [OrderStatus.MASTER_EN_ROUTE]: {
         type: NotificationType.MASTER_EN_ROUTE,
-        title: "Usta yo'lga chiqdi",
-        body: "Usta sizga qarab yo'lga chiqdi",
+        title: "Usta yoʻlga chiqdi",
+        body: "Usta sizga qarab yoʻlga chiqdi",
       },
       [OrderStatus.ARRIVED_PENDING_CONFIRMATION]: {
         type: NotificationType.MASTER_ARRIVED,
         title: 'Usta yetib keldi',
-        body: "Iltimos, kelgan ustani ilovadagi ma'lumot bilan solishtiring va tasdiqlang",
+        body: "Iltimos, kelgan ustani ilovadagi maʼlumot bilan solishtiring va tasdiqlang",
       },
       [OrderStatus.IN_PROGRESS]: {
         type: NotificationType.ORDER_IN_PROGRESS,
@@ -107,7 +107,7 @@ export class NotificationsListener {
     });
   }
 
-  /** Kritik: kechiktirib bo'lmaydi (TZ 4-jadval). */
+  /** Kritik: kechiktirib boʻlmaydi (TZ 4-jadval). */
   @OnEvent(ORDER_EVENTS.SAFETY_FLAGGED, { async: true })
   async onSafetyFlagged(event: OrderSafetyFlaggedEvent): Promise<void> {
     await this.notifications.publishSafetyAlert({
@@ -122,7 +122,10 @@ export class NotificationsListener {
       orderId: event.orderId,
       type: NotificationType.SAFETY_ALERT_RECEIVED,
       title: 'Signalingiz qabul qilindi',
-      body: "Operatorimiz hoziroq siz bilan bog'lanadi",
+      // Vaʼda emas, HOLAT: signal Redis kanaliga yoziladi, lekin uni
+      // eshitadigan admin panel hali yoʻq (A4 bosqichi). «Operatorimiz
+      // bogʻlanadi» — bugun bajarilmaydigan gap.
+      body: "Buyurtma toʻxtatildi. Qoʻllab-quvvatlash raqamiga qoʻngʻiroq qiling",
       payload: { safetyAlertId: event.safetyAlertId },
     });
   }
@@ -134,7 +137,7 @@ export class NotificationsListener {
       orderId: event.orderId,
       type: NotificationType.MATCHING_ESCALATED,
       title: 'Usta qidirilmoqda',
-      body: "Hozircha bo'sh usta yo'q — operatorimiz buyurtmangizni qo'lda ko'rib chiqadi",
+      body: "Hozircha boʻsh usta yoʻq — operatorimiz buyurtmangizni qoʻlda koʻrib chiqadi",
       payload: { attempts: event.attempts },
     });
   }

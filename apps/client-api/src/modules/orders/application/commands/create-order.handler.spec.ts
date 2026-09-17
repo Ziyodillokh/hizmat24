@@ -11,7 +11,7 @@ const persistedOrder = {
   clientId: 'client-1',
   categoryId: 'category-1',
   status: OrderStatus.SEARCHING,
-  description: "Kran oqmoqda va suv to'planyapti",
+  description: "Kran oqmoqda va suv toʻplanyapti",
   attachmentUrls: [],
   isUrgent: false,
   price: 100_000,
@@ -24,7 +24,7 @@ const persistedOrder = {
   updatedAt: new Date(),
   completedAt: null,
   master: null,
-  category: { id: 'category-1', name: "Kran ta'mirlash", basePrice: 100_000 },
+  category: { id: 'category-1', name: "Kran taʼmirlash", basePrice: 100_000 },
   rating: null,
 };
 
@@ -32,7 +32,7 @@ const buildCommand = (idempotencyKey: string | null = null): CreateOrderCommand 
   new CreateOrderCommand(
     'client-1',
     'category-1',
-    "Kran oqmoqda va suv to'planyapti",
+    "Kran oqmoqda va suv toʻplanyapti",
     [],
     false,
     address,
@@ -87,20 +87,20 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
     expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.CREATED, expect.anything());
   });
 
-  it("faol bo'lmagan kategoriyani rad etadi", async () => {
+  it("faol boʻlmagan kategoriyani rad etadi", async () => {
     categoryFind.mockResolvedValue({ id: 'category-1', basePrice: 1, isActive: false });
 
     await expect(handler.execute(buildCommand())).rejects.toThrow('faol emas');
     expect(orderCreate).not.toHaveBeenCalled();
   });
 
-  it("mavjud bo'lmagan kategoriyani rad etadi", async () => {
+  it("mavjud boʻlmagan kategoriyani rad etadi", async () => {
     categoryFind.mockResolvedValue(null);
 
     await expect(handler.execute(buildCommand())).rejects.toThrow('mavjud emas');
   });
 
-  it("bir xil idempotency key bilan takroriy so'rovda yangi buyurtma yaratmaydi (5.6)", async () => {
+  it("bir xil idempotency key bilan takroriy soʻrovda yangi buyurtma yaratmaydi (5.6)", async () => {
     // Arrange
     orders.findByIdempotencyKey.mockResolvedValue(persistedOrder);
 
@@ -113,7 +113,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
     expect(matching.requestMatching).not.toHaveBeenCalled();
   });
 
-  it("parallel takroriy so'rovda unique constraint xatosini mavjud buyurtma bilan hal qiladi", async () => {
+  it("parallel takroriy soʻrovda unique constraint xatosini mavjud buyurtma bilan hal qiladi", async () => {
     // Arrange: birinchi tekshiruvda topilmaydi, DB unique constraint ishga tushadi
     orders.findByIdempotencyKey.mockResolvedValueOnce(null).mockResolvedValueOnce(persistedOrder);
     orderCreate.mockRejectedValue(
@@ -130,7 +130,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
     expect(result.id).toBe('order-1');
   });
 
-  it("javobda valyuta har doim UZS bo'ladi", async () => {
+  it("javobda valyuta har doim UZS boʻladi", async () => {
     const result = await handler.execute(buildCommand());
 
     expect(result.currency).toBe('UZS');

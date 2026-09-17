@@ -30,7 +30,7 @@ const master: Master = {
 
 const category: ServiceCategory = {
   id: 'category-1',
-  name: "Kran ta'mirlash",
+  name: "Kran taʼmirlash",
   description: null,
   groupId: null,
   basePrice: 100_000,
@@ -87,7 +87,7 @@ describe('presentOrder', () => {
     expect(view.price).toBe(100_000);
   });
 
-  it("bitta master obyektini qaytaradi, nomzodlar ro'yxatini emas (biznes-qoida 5.2)", () => {
+  it("bitta master obyektini qaytaradi, nomzodlar roʻyxatini emas (biznes-qoida 5.2)", () => {
     const view = presentOrder(buildOrder(OrderStatus.ASSIGNED));
 
     expect(Array.isArray(view.master)).toBe(false);
@@ -99,7 +99,7 @@ describe('presentOrder', () => {
     OrderStatus.MASTER_EN_ROUTE,
     OrderStatus.ARRIVED_PENDING_CONFIRMATION,
     OrderStatus.IN_PROGRESS,
-  ])("%s holatida usta telefonini ko'rsatadi (6.2)", (status) => {
+  ])("%s holatida usta telefonini koʻrsatadi (6.2)", (status) => {
     expect(presentOrder(buildOrder(status)).master?.phoneNumber).toBe('+998901112233');
   });
 
@@ -120,7 +120,7 @@ describe('presentOrder', () => {
     );
   });
 
-  it("reytingni Decimal dan number ga o'giradi", () => {
+  it("reytingni Decimal dan number ga oʻgiradi", () => {
     expect(presentOrder(buildOrder(OrderStatus.ASSIGNED)).master?.ratingAvg).toBe(4.75);
   });
 });

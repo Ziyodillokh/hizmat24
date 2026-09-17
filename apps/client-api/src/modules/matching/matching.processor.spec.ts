@@ -21,7 +21,7 @@ describe('MatchingProcessor', () => {
     expect(matchOrder).toHaveBeenCalledWith('order-1', ['master-1']);
   });
 
-  it("chetlatilgan ustalar berilmasa bo'sh ro'yxat uzatadi", async () => {
+  it("chetlatilgan ustalar berilmasa boʻsh roʻyxat uzatadi", async () => {
     await processor.process({ name: JOB_MATCH_ORDER, data: { orderId: 'order-1' } } as never);
 
     expect(matchOrder).toHaveBeenCalledWith('order-1', []);
@@ -36,7 +36,7 @@ describe('MatchingProcessor', () => {
     expect(handleAckTimeout).toHaveBeenCalledWith('order-1');
   });
 
-  it("noma'lum job turida hech narsa qilmaydi", async () => {
+  it("nomaʼlum job turida hech narsa qilmaydi", async () => {
     await processor.process({ name: 'unknown', data: {} } as never);
 
     expect(matchOrder).not.toHaveBeenCalled();

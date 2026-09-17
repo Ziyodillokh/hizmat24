@@ -7,7 +7,7 @@ const BASE_ENV = {
 };
 
 describe('validateEnv (TZ 9.7)', () => {
-  it("to'g'ri sozlamalarni standart qiymatlar bilan to'ldiradi", () => {
+  it("toʻgʻri sozlamalarni standart qiymatlar bilan toʻldiradi", () => {
     const env = validateEnv(BASE_ENV);
 
     expect(env.PORT).toBe(3000);
@@ -15,7 +15,7 @@ describe('validateEnv (TZ 9.7)', () => {
     expect(env.SMS_PROVIDER).toBe('console');
   });
 
-  it("DATABASE_URL bo'lmasa ilovani ko'tarmaydi", () => {
+  it("DATABASE_URL boʻlmasa ilovani koʻtarmaydi", () => {
     expect(() => validateEnv({ ...BASE_ENV, DATABASE_URL: undefined })).toThrow(/DATABASE_URL/);
   });
 
@@ -36,11 +36,11 @@ describe('validateEnv (TZ 9.7)', () => {
     ).toThrow(/production/);
   });
 
-  it("FCM yoqilgan bo'lsa kalitlar borligini talab qiladi", () => {
+  it("FCM yoqilgan boʻlsa kalitlar borligini talab qiladi", () => {
     expect(() => validateEnv({ ...BASE_ENV, FCM_ENABLED: 'true' })).toThrow(/FCM_PROJECT_ID/);
   });
 
-  it("FCM to'liq sozlanganda muvaffaqiyatli o'tadi", () => {
+  it("FCM toʻliq sozlanganda muvaffaqiyatli oʻtadi", () => {
     const env = validateEnv({
       ...BASE_ENV,
       FCM_ENABLED: 'true',
@@ -52,7 +52,7 @@ describe('validateEnv (TZ 9.7)', () => {
     expect(env.FCM_ENABLED).toBe(true);
   });
 
-  it("noto'g'ri LOG_LEVEL ni rad etadi", () => {
+  it("notoʻgʻri LOG_LEVEL ni rad etadi", () => {
     expect(() => validateEnv({ ...BASE_ENV, LOG_LEVEL: 'verbose' })).toThrow(/LOG_LEVEL/);
   });
 
@@ -86,7 +86,7 @@ describe('validateEnv (TZ 9.7)', () => {
     expect(env.FCM_ENABLED).toBe(expected);
   });
 
-  it("boolean maydonga tushunarsiz qiymat berilsa ilovani ko'tarmaydi", () => {
+  it("boolean maydonga tushunarsiz qiymat berilsa ilovani koʻtarmaydi", () => {
     expect(() => validateEnv({ ...BASE_ENV, FCM_ENABLED: 'yes' })).toThrow(/FCM_ENABLED/);
   });
 
@@ -96,7 +96,7 @@ describe('validateEnv (TZ 9.7)', () => {
     );
   });
 
-  it("production da OTP siri JWT siri bilan bir xil bo'lishiga yo'l qo'ymaydi", () => {
+  it("production da OTP siri JWT siri bilan bir xil boʻlishiga yoʻl qoʻymaydi", () => {
     expect(() =>
       validateEnv({
         ...BASE_ENV,
