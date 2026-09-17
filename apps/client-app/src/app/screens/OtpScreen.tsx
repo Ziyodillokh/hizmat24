@@ -8,6 +8,9 @@ import { OtpInput } from '@/components/OtpInput';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { maskPhoneDigits } from '@/lib/phone';
+import { ApiError } from '@/api/client';
+import { requestOtp, verifyOtp } from '@/api/auth';
+import { isApiEnabled } from '@/api/client';
 import { useApp } from '../store';
 
 /**
@@ -28,11 +31,19 @@ const RESEND_SECONDS = 60;
 export function OtpScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn } = useApp();
+  const { signIn, signInWithSession } = useApp();
 
   const [code, setCode] = useState('');
   const [isWrong, setIsWrong] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [isSending, setIsSending] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  /**
+   * Serverdan kelgan sinov kodi. U FAQAT ishlab chiqish sozlamasida
+   * qaytadi; production serverida bu maydon hech qachon toʻlmaydi va
+   * ekranda ham hech narsa koʻrinmaydi.
+   */
+  const [debugCode, setDebugCode] = useState<string | null>(null);
 
   // Raqam kirish ekranidan keladi; toʻgʻridan-toʻgʻri ochilsa zaxira qiymat.
   const phone = (location.state as { phone?: string } | null)?.phone ?? '+998901234567';
@@ -44,24 +55,75 @@ export function OtpScreen() {
     return () => window.clearTimeout(timer);
   }, [secondsLeft]);
 
+  /*
+   * Kod ekran ochilganda soʻraladi: raqam kiritish ekrani faqat raqamni
+   * yigʻadi va SMS yuborilgani haqida hech narsa vaʼda qilmaydi.
+   */
+  const askForCode = useCallback(async () => {
+    if (!isApiEnabled()) return;
+    setIsSending(true);
+    try {
+      const result = await requestOtp(phone);
+      setSecondsLeft(result.retryAfterSeconds);
+      setDebugCode(result.debugCode);
+      setErrorText(null);
+    } catch (error) {
+      setErrorText(
+        error instanceof ApiError && error.kind === 'server'
+          ? error.message
+          : 'SMS soʻrovi yuborilmadi — ulanishni tekshiring.',
+      );
+    } finally {
+      setIsSending(false);
+    }
+  }, [phone]);
+
+  useEffect(() => {
+    void askForCode();
+  }, [askForCode]);
+
   const submit = useCallback(
-    (value: string) => {
-      if (value !== DEMO_OTP) {
-        setIsWrong(true);
+    async (value: string) => {
+      // Mock rejim: server ulanmagan boʻlsa eski demo kod ishlaydi.
+      if (!isApiEnabled()) {
+        if (value !== DEMO_OTP) {
+          setIsWrong(true);
+          setErrorText('Kod notoʻgʻri. Qaytadan kiriting.');
+          return;
+        }
+        signIn(phone);
+        navigate('/app/onboarding', { replace: true });
         return;
       }
-      signIn(phone);
-      navigate('/app/onboarding', { replace: true });
+
+      setIsSending(true);
+      try {
+        const session = await verifyOtp(phone, value);
+        signInWithSession(session);
+        navigate('/app/onboarding', { replace: true });
+      } catch (error) {
+        setIsWrong(true);
+        // Serverning oʻz matni koʻrsatiladi: «kod eskirgan», «urinishlar
+        // tugadi» — bularning har biri boshqa harakat talab qiladi.
+        setErrorText(
+          error instanceof ApiError && error.kind === 'server'
+            ? error.message
+            : 'Ulanish yoʻq. Qaytadan urinib koʻring.',
+        );
+      } finally {
+        setIsSending(false);
+      }
     },
-    [navigate, phone, signIn],
+    [navigate, phone, signIn, signInWithSession],
   );
 
   const handleChange = (value: string) => {
     setCode(value);
     setIsWrong(false);
+    setErrorText(null);
     // Kod toʻlgach avtomatik yuboriladi — tugmani bosish shart emas, lekin
     // tugma ham qoladi: avtomatik yuborish sodir boʻlganini hamma ham sezmaydi.
-    if (value.length === OTP_LENGTH) submit(value);
+    if (value.length === OTP_LENGTH) void submit(value);
   };
 
   return (
@@ -76,7 +138,11 @@ export function OtpScreen() {
           <Icon icon={DeviceMobile} size={40} weight="duotone" className="text-primary-pressed" />
         </span>
 
-        <h1 className="mt-16 text-h2 text-text-primary">SMS kod yuborildi</h1>
+        {/* Sarlavha holatni aytadi: soʻrov ketayotganda «yuborildi» deyish
+            — foydalanuvchi kutayotgan daqiqadagi kichik yolgʻon. */}
+        <h1 className="mt-16 text-h2 text-text-primary">
+          {isSending && code.length === 0 ? 'SMS kod yuborilmoqda' : 'SMS kod yuborildi'}
+        </h1>
         <p className="mt-4 text-body text-text-secondary">{maskPhoneDigits(digits)} ga</p>
       </div>
 
@@ -88,16 +154,14 @@ export function OtpScreen() {
         className="mt-24"
       />
 
-      {isWrong && (
-        <p className="mt-12 text-center text-body-sm text-danger">
-          Kod notoʻgʻri. Qaytadan kiriting.
-        </p>
-      )}
+      {errorText && <p className="mt-12 text-center text-body-sm text-danger">{errorText}</p>}
 
       <Button
         variant="primary"
-        disabled={code.length !== OTP_LENGTH}
-        onClick={() => submit(code)}
+        disabled={code.length !== OTP_LENGTH || isSending}
+        loading={isSending}
+        loadingLabel="Tekshirilmoqda"
+        onClick={() => void submit(code)}
         leadingIcon={Check}
         className="mt-20"
       >
@@ -114,9 +178,11 @@ export function OtpScreen() {
           <button
             type="button"
             onClick={() => {
-              setSecondsLeft(RESEND_SECONDS);
               setCode('');
               setIsWrong(false);
+              setErrorText(null);
+              setSecondsLeft(RESEND_SECONDS);
+              void askForCode();
             }}
             className="text-body-sm font-semibold text-primary-pressed"
           >
@@ -129,17 +195,20 @@ export function OtpScreen() {
         Demo eslatmasi ataylab alohida blokda: backend ulanmagunicha SMS
         kelmaydi, shuning uchun kodni qayerdan olishni aytish kerak.
       */}
-      <div
-        className={cn(
-          'mt-24 flex items-start gap-8 rounded-md bg-warning-surface px-12 py-12',
-        )}
-      >
-        <Icon icon={Lightbulb} size={16} weight="duotone" className="mt-2 shrink-0 text-warning" />
-        <p className="text-body-sm text-warning">
-          Demo rejimi — tasdiqlash kodi:{' '}
-          <span className="tabular font-semibold">{DEMO_OTP}</span>
-        </p>
-      </div>
+      {/*
+        Kod qayerdan olinishi AYTILADI: mock rejimda doimiy demo kod, server
+        ulangan ishlab chiqish rejimida esa serverning oʻzi qaytargan kod.
+        Production serverida `debugCode` kelmaydi va bu blok chizilmaydi.
+      */}
+      {(!isApiEnabled() || debugCode) && (
+        <div className={cn('mt-24 flex items-start gap-8 rounded-md bg-warning-surface px-12 py-12')}>
+          <Icon icon={Lightbulb} size={16} weight="duotone" className="mt-2 shrink-0 text-warning" />
+          <p className="text-body-sm text-warning">
+            {isApiEnabled() ? 'Sinov rejimi — server qaytargan kod: ' : 'Demo rejimi — tasdiqlash kodi: '}
+            <span className="tabular font-semibold">{debugCode ?? DEMO_OTP}</span>
+          </p>
+        </div>
+      )}
 
       <div className="h-24" aria-hidden />
     </ScreenShell>

@@ -5,6 +5,7 @@ import { AppLaunch } from './AppLaunch';
 import { PageTransition } from './PageTransition';
 import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
+import { useSessionRestore } from './useSessionRestore';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -56,6 +57,9 @@ function ScrollToTop() {
 function AppRoutes() {
   const { isAuthenticated, hasOnboarded, role } = useApp();
   useBackButton();
+  // Saqlangan `refresh` tokendan yangi `access` olinadi. Natija B3 da kerak
+  // boʻladi (buyurtmalar serverdan kelganda) — hozir faqat tiklanadi.
+  useSessionRestore();
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });

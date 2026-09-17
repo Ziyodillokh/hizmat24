@@ -27,6 +27,10 @@ import { useOrderTimers } from './useOrderTimers';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
+import type { AuthSession } from '@/api/auth';
+import { logout } from '@/api/auth';
+import { setAccessToken } from '@/api/session';
+import { clearAuth, loadAuth, saveAuth } from './auth-persistence';
 import { clearSession, loadSession, saveSession } from './persistence';
 
 /**
@@ -66,6 +70,8 @@ interface AppState {
 
 interface AppActions {
   signIn: (phone: string) => void;
+  /** Serverdan kelgan sessiya: tokenlar saqlanadi, ism serverdan olinadi. */
+  signInWithSession: (session: AuthSession) => void;
   /** Tanishtiruv yakunlandi va rol tanlandi. FAQAT tanishtiruvda chaqiriladi. */
   completeOnboarding: (role: UserRole) => void;
   /**
@@ -297,13 +303,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
     () => ({
       signIn: (phone) =>
         setState((prev) => ({ ...prev, isAuthenticated: true, phoneNumber: phone })),
+
+      /*
+       * Server yoʻli. `refresh` tokeni ALOHIDA kalitda saqlanadi: sessiya
+       * kaliti mock rejimga ham tegishli, bu esa faqat serverga.
+       *
+       * Ism serverdan keladi va qurilmadagisidan USTUN: boshqa telefonda
+       * oʻzgartirilgan boʻlishi mumkin. Server ism bermasa, qurilmadagisi
+       * saqlanib qoladi — foydalanuvchi uni qaytadan yozmasin.
+       */
+      signInWithSession: (session) => {
+        saveAuth({
+          refreshToken: session.refreshToken,
+          userId: session.user.id,
+          phoneNumber: session.user.phoneNumber,
+        });
+        setAccessToken(session.accessToken);
+        setState((prev) => ({
+          ...prev,
+          isAuthenticated: true,
+          phoneNumber: session.user.phoneNumber,
+          fullName: session.user.fullName ?? prev.fullName,
+        }));
+      },
       completeOnboarding: (role) =>
         setState((prev) => ({ ...prev, hasOnboarded: true, role })),
 
       setRole: (role) => setState((prev) => ({ ...prev, role })),
 
       signOut: () => {
+        // Serverdagi refresh token ham bekor qilinadi; javob kutilmaydi —
+        // chiqish har qanday holatda darhol sodir boʻlishi kerak.
+        const stored = loadAuth();
+        if (stored) void logout(stored.refreshToken);
+
         clearSession();
+        clearAuth();
+        setAccessToken(null);
         setState((prev) => ({
           ...prev,
           isAuthenticated: false,
