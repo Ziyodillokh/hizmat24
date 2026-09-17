@@ -9,6 +9,7 @@ import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
 import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { NotificationRow } from '@/components/NotificationRow';
+import { ServerStatusRow } from '@/components/ServerStatusRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
@@ -22,6 +23,7 @@ import { useFavorites } from '../favorites-store';
 import { useMaster } from '../master-store';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
+import { useServerStatus } from '../useServerStatus';
 import { useWallet } from '../useWallet';
 import { useTheme } from '../theme-context';
 
@@ -122,6 +124,7 @@ export function ProfileTab() {
   const { level } = useWallet();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const serverStatus = useServerStatus();
 
   /*
    * Koʻrsatkichlar haqiqiy holatdan hisoblanadi — toʻqilgan raqam emas.
@@ -333,6 +336,9 @@ export function ProfileTab() {
           </Button>
         </div>
       </Modal>
+
+      {/* Ilova hozir qayerdan maʼlumot olayotgani — ekranning eng pastida. */}
+      <ServerStatusRow state={serverStatus} className="mt-20" />
 
       <div className="h-bottom-reserve" aria-hidden />
     </ScreenShell>
