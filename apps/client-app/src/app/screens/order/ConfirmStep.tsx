@@ -20,9 +20,9 @@ import { isScheduleStale, timingLabel } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_LABELS } from '@/lib/wallet';
 import { masterById } from '@/mocks/masters';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useAddresses } from '../../address-store';
 import { tapFeedback } from '../../native';
+import { useCatalog } from '../../catalog-store';
 import { useApp } from '../../store';
 import { useToast } from '../../ToastHost';
 import { useWallet } from '../../useWallet';
@@ -38,7 +38,8 @@ export function ConfirmStep() {
   const showToast = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
   const preferred = masterById(draft.preferredMasterId ?? undefined);
   const isStale = isScheduleStale(draft.scheduledAt, now);
 

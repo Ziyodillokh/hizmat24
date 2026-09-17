@@ -10,9 +10,9 @@ import { StepSection } from '@/components/order/StepSection';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { ORDER_STEP_ROUTES, preselectedAddressId, resolveNextRoute } from '@/lib/orderFlow';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useAddresses } from '../../address-store';
 import { tapFeedback } from '../../native';
+import { useCatalog } from '../../catalog-store';
 import { useApp } from '../../store';
 import { useReturnTo } from '../../useReturnTo';
 import { AddressRow, kindChipFor } from '../AddressBook';
@@ -28,7 +28,8 @@ export function SavedAddressStep() {
     preselectedAddressId(addresses, draft.address),
   );
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
   if (!category) return <Navigate to={ORDER_STEP_ROUTES.services} replace />;
   if (addresses.length === 0) {
     return <Navigate to={ORDER_STEP_ROUTES.addressNew} replace state={{ returnTo }} />;

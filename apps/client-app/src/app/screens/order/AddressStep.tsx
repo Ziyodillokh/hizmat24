@@ -19,8 +19,8 @@ import {
   buildAddress, canSaveAddress, EMPTY_ADDRESS_FORM, isSameAddress, toAddressForm,
   type AddressFormInput,
 } from '@/lib/savedAddress';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
 import { useAddresses } from '../../address-store';
+import { useCatalog } from '../../catalog-store';
 import { useApp } from '../../store';
 import { useToast } from '../../ToastHost';
 import { useReturnTo } from '../../useReturnTo';
@@ -49,7 +49,8 @@ export function AddressStep() {
   });
   const [shouldSave, setShouldSave] = useState(false);
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
   if (!category) return <Navigate to={ORDER_STEP_ROUTES.services} replace />;
 
   const patch = (partial: Partial<AddressFormInput>) => setForm((prev) => ({ ...prev, ...partial }));

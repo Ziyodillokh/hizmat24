@@ -9,6 +9,11 @@ export interface GroupedCategoryView {
   description: string | null;
   basePrice: number;
   currency: Currency;
+  /**
+   * Kategoriyaning OʻZ ikona kaliti; boʻsh boʻlsa ilova guruhnikiga tushadi.
+   * Ilova xizmat fotosini ham shu kalit boʻyicha topadi.
+   */
+  iconKey: string | null;
 }
 
 export interface ServiceGroupView {
@@ -56,6 +61,7 @@ export class ServiceGroupsService {
           description: category.description,
           basePrice: category.basePrice,
           currency: CURRENCY,
+          iconKey: category.iconKey,
         })),
       }));
     });

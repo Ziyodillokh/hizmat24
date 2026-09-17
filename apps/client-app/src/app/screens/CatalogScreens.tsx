@@ -8,8 +8,9 @@ import { SelectableChip } from '@/components/SelectableChip';
 import { ServicePhotoCard } from '@/components/ServicePhotoCard';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { serviceIcon } from '@/lib/serviceIcons';
-import { ALL_CATEGORIES, SERVICE_GROUPS, type FlatServiceCategory } from '@/mocks/serviceGroups';
+import type { FlatServiceCategory } from '@/mocks/serviceGroups';
 import { SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { useCatalog } from '../catalog-store';
 import { useSelectService } from '../useSelectService';
 
 /** "Barchasi" chipining kaliti — hech bir guruh id si bilan toʻqnashmaydi. */
@@ -32,7 +33,7 @@ function ServiceGrid({
             description={category.description}
             price={category.basePrice}
             icon={serviceIcon(category.iconKey)}
-            imageUrl={SERVICE_IMAGES[category.id]}
+            imageUrl={SERVICE_IMAGES[category.iconKey]}
             onSelect={() => onSelect(category.id)}
           />
         </li>
@@ -47,8 +48,9 @@ export function GroupServicesTab() {
   const { groupId } = useParams<{ groupId: string }>();
   const select = useSelectService();
 
-  const group = SERVICE_GROUPS.find((item) => item.id === groupId) ?? SERVICE_GROUPS[0];
-  const items = ALL_CATEGORIES.filter((item) => item.groupId === group.id);
+  const { groups, categories } = useCatalog();
+  const group = groups.find((item) => item.id === groupId) ?? groups[0];
+  const items = categories.filter((item) => item.groupId === group?.id);
 
   return (
     <ScreenShell header={<Header variant="inner" title={group.name} onBack={() => navigate(-1)} />}>
@@ -72,6 +74,7 @@ export function GroupServicesTab() {
 export function AllServicesTab() {
   const navigate = useNavigate();
   const select = useSelectService();
+  const { groups, categories } = useCatalog();
   const [query, setQuery] = useState('');
   const [groupId, setGroupId] = useState(ALL_GROUPS);
 
@@ -79,22 +82,22 @@ export function AllServicesTab() {
 
   const results = useMemo(() => {
     if (!needle) return null;
-    return ALL_CATEGORIES.filter(
+    return categories.filter(
       (item) =>
         item.name.toLowerCase().includes(needle) ||
         (item.description ?? '').toLowerCase().includes(needle),
     );
-  }, [needle]);
+  }, [categories, needle]);
 
   const sections = useMemo(
     () =>
-      SERVICE_GROUPS.filter((group) => groupId === ALL_GROUPS || group.id === groupId).map(
-        (group) => ({
+      groups
+        .filter((group) => groupId === ALL_GROUPS || group.id === groupId)
+        .map((group) => ({
           group,
-          items: ALL_CATEGORIES.filter((item) => item.groupId === group.id),
-        }),
-      ),
-    [groupId],
+          items: categories.filter((item) => item.groupId === group.id),
+        })),
+    [categories, groupId, groups],
   );
 
   return (
@@ -111,7 +114,7 @@ export function AllServicesTab() {
           chalgʻitadi va natija qaysi biriga tegishli ekani noaniq qoladi.
           Bitta guruh boʻlsa (hozir faqat santexnika) chiplar umuman
           chizilmaydi — tanlaydigan narsa yoʻq. */}
-      {!results && SERVICE_GROUPS.length > 1 && (
+      {!results && groups.length > 1 && (
         <div className="-mx-20 mt-12 flex gap-8 overflow-x-auto px-20 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <SelectableChip
             selected={groupId === ALL_GROUPS}
@@ -120,7 +123,7 @@ export function AllServicesTab() {
           >
             Barchasi
           </SelectableChip>
-          {SERVICE_GROUPS.map((group) => (
+          {groups.map((group) => (
             <SelectableChip
               key={group.id}
               selected={groupId === group.id}

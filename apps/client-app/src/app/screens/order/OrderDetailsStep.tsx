@@ -13,7 +13,7 @@ import {
   ORDER_STEP_ROUTES, resolveNextRoute,
 } from '@/lib/orderFlow';
 import { masterById } from '@/mocks/masters';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
+import { useCatalog } from '../../catalog-store';
 import { useApp } from '../../store';
 import { useReturnTo } from '../../useReturnTo';
 import { MissingStepGuard } from './MissingStepGuard';
@@ -25,7 +25,8 @@ export function OrderDetailsStep() {
   const returnTo = useReturnTo();
   const [description, setDescription] = useState(draft.description);
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
   const preferred = masterById(draft.preferredMasterId ?? undefined);
   const hint = descriptionHint(description);
   const isTyping = description.trim().length > 0;

@@ -19,7 +19,7 @@ import { timingLabel } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { CASHBACK_BLOCK, METHOD_LABELS } from '@/lib/wallet';
 import { isMethodAvailable } from '@/lib/walletCard';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
+import { useCatalog } from '../catalog-store';
 import { useApp } from '../store';
 import { MissingStepGuard } from './order/MissingStepGuard';
 import { useWallet } from '../useWallet';
@@ -90,7 +90,8 @@ export function PaymentStep() {
   // faqat hech qachon yoqilmaydigan tugma berardi.
   const [method, setMethod] = useState<PaymentMethod>(draft.paymentMethod ?? 'cash');
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
 
   const invoice = useMemo(
     () =>

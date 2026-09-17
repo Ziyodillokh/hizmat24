@@ -32,6 +32,7 @@ const category: ServiceCategory = {
   id: 'category-1',
   name: "Kran taʼmirlash",
   description: null,
+  iconKey: 'tap',
   groupId: null,
   basePrice: 100_000,
   complexityLevel: ComplexityLevel.SIMPLE,

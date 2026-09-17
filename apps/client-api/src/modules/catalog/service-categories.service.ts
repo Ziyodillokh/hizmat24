@@ -12,6 +12,8 @@ export interface ServiceCategoryView {
   /** So'mda, butun son. Admin panel orqali boshqariladi — kodda hardcode yo'q. */
   basePrice: number;
   currency: Currency;
+  /** Ikona va xizmat fotosi kaliti; boʻsh boʻlsa ilova guruhnikiga tushadi. */
+  iconKey: string | null;
 }
 
 @Injectable()
@@ -37,6 +39,7 @@ export class ServiceCategoriesService {
         groupId: category.groupId,
         basePrice: category.basePrice,
         currency: CURRENCY,
+        iconKey: category.iconKey,
       }));
     });
   }

@@ -11,12 +11,12 @@ import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
 import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { findGroup } from '@/mocks/serviceGroups';
 import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
 import { ALL_SERVICES_IMAGE, SERVICE_IMAGES } from '@/mocks/serviceImages';
 import { MASTER_LIST } from '@/mocks/masters';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import aiRobot from '@/assets/brand/ai-robot.webp';
+import { useCatalog } from '../catalog-store';
 import { useApp } from '../store';
 import { useSelectService } from '../useSelectService';
 
@@ -31,9 +31,7 @@ import { useSelectService } from '../useSelectService';
  * tozalash, isitish) "Barcha xizmatlar" orqali — /app/services. "Mashhur"
  * demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki roʻyxatning boshi.
  */
-const HOME_GROUP_ID = 'g-plumbing';
 const HOME_SERVICE_COUNT = 5;
-const HOME_SERVICES = (findGroup(HOME_GROUP_ID)?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
@@ -68,6 +66,14 @@ function SectionTitleRow({ title, onMore }: { title: string; onMore: () => void 
 export function HomeTab() {
   const navigate = useNavigate();
   const { activeOrder, fullName, phoneNumber, unreadCount } = useApp();
+  const { groups } = useCatalog();
+
+  /*
+   * Bosh sahifadagi panjara — BIRINCHI guruhning dastlabki beshta xizmati.
+   * Guruh `id` si qattiq yozilmaydi: server ulanganda u UUID boʻlib keladi
+   * va qattiq yozilgan `g-plumbing` panjarani boʻshatib qoʻyardi.
+   */
+  const homeServices = (groups[0]?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
   const now = useMinuteClock();
   const selectService = useSelectService();
 
@@ -137,18 +143,19 @@ export function HomeTab() {
           </section>
         )}
 
+        {/* Sarlavha guruh nomidan: katalog serverdan kelganda ham mos qoladi. */}
         <SectionTitleRow
-          title="Santexnika xizmatlari"
-          onMore={() => navigate(`/app/groups/${HOME_GROUP_ID}`)}
+          title={groups[0] ? `${groups[0].name} xizmatlari` : 'Xizmatlar'}
+          onMore={() => navigate(groups[0] ? `/app/groups/${groups[0].id}` : '/app/services')}
         />
         {/* 3×2 panjara (egasining maketi). Ixcham rejimda qatorlar orasi 4px. */}
         <div className="mt-8 grid grid-cols-3 gap-8 [@media(max-height:800px)]:gap-y-4">
-          {HOME_SERVICES.map((category) => (
+          {homeServices.map((category) => (
             <ServiceTile
               key={category.id}
               label={category.name}
               icon={serviceIcon(category.iconKey ?? 'plumber')}
-              imageUrl={SERVICE_IMAGES[category.id]}
+              imageUrl={category.iconKey ? SERVICE_IMAGES[category.iconKey] : undefined}
               onClick={() => selectService(category.id)}
             />
           ))}

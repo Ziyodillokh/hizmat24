@@ -132,6 +132,9 @@ model ServiceCategory {
   id              String          @id @default(uuid()) @db.Uuid
   name            String          @unique @db.VarChar(120)
   description     String?         @db.VarChar(500)
+  /// Ilova ikonani va xizmat fotosini SHU kalit boʻyicha tanlaydi
+  /// (`tap`, `toilet`, `pipes`…). Boʻsh boʻlsa guruhning kaliti ishlatiladi.
+  iconKey         String?         @map("icon_key") @db.VarChar(60)
   /// Guruhsiz xizmatlar ham bo'lishi mumkin — shuning uchun nullable.
   groupId         String?         @map("group_id") @db.Uuid
   /// So'mda, butun son. Admin panel orqali tahrirlanadi — hech qachon hardcode qilinmaydi.

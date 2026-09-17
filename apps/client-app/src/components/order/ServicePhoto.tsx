@@ -6,12 +6,17 @@ import { SERVICE_IMAGES } from '@/mocks/serviceImages';
 /**
  * Xizmat rasmi — butun ilova uchun BITTA qoida.
  *
- * Rasm faqat `SERVICE_IMAGES` da bor kategoriya uchun (c-repair, c-water-heater,
- * c-toilet, c-tap, c-pipes); qolganlari soha ikonasi bilan chiziladi. Boshqa
+ * Rasm faqat `SERVICE_IMAGES` da kaliti bor kategoriya uchun (tap, toilet,
+ * pipes, water-heater, plumbing-repair); qolganlari ikona bilan. Boshqa
  * kategoriyaning rasmi hech qachon "qarzga" olinmaydi — rasm illyustrativ
  * boʻlsa ham notoʻgʻri xizmatni koʻrsatish yolgʻon.
  */
 export interface ServicePhotoProps {
+  /**
+   * Kategoriya `id` si — chaqiruvchilar uni uzatadi va u shu komponentning
+   * shartnomasida qoladi: server ulangach rasm shu `id` boʻyicha emas,
+   * `iconKey` boʻyicha topiladi, lekin chaqiruv joylari oʻzgarmaydi.
+   */
   serviceId: string;
   iconKey: string;
   /** Rasmsiz kategoriya ikonasi: 84×56 uchun 32, 64×48 uchun 24. */
@@ -20,8 +25,8 @@ export interface ServicePhotoProps {
   className: string;
 }
 
-export function ServicePhoto({ serviceId, iconKey, iconSize = 32, className }: ServicePhotoProps) {
-  const src = SERVICE_IMAGES[serviceId];
+export function ServicePhoto({ iconKey, iconSize = 32, className }: ServicePhotoProps) {
+  const src = SERVICE_IMAGES[iconKey];
 
   return (
     <span

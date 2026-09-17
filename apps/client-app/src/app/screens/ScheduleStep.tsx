@@ -24,7 +24,7 @@ import {
   type ScheduleMode,
 } from '@/lib/schedule';
 import { useMinuteClock } from '@/lib/useMinuteClock';
-import { ALL_CATEGORIES } from '@/mocks/serviceGroups';
+import { useCatalog } from '../catalog-store';
 import { useApp } from '../store';
 import { useReturnTo } from '../useReturnTo';
 import { MissingStepGuard } from './order/MissingStepGuard';
@@ -82,7 +82,8 @@ export function ScheduleStep() {
     }
   }, [days, now, selectedDayKey, selectedHour]);
 
-  const category = ALL_CATEGORIES.find((item) => item.id === draft.categoryId);
+  const { findCategory } = useCatalog();
+  const category = findCategory(draft.categoryId);
 
   const missing = firstMissingStep(draft, ['category', 'address']);
   if (!category || missing) {

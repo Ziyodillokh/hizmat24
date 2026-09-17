@@ -14,6 +14,7 @@ import { OtpScreen } from './screens/OtpScreen';
 import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
+import { CatalogProvider } from './catalog-store';
 import { AiProvider } from './ai-store';
 import { DisputeProvider } from './dispute-store';
 import { AddressProvider } from './address-store';
@@ -113,6 +114,7 @@ export function AppRouter() {
   return (
     <ThemeProvider>
       <AppProvider>
+        <CatalogProvider>
         <AiProvider>
           <DisputeProvider>
             <AddressProvider>
@@ -124,6 +126,7 @@ export function AppRouter() {
             </AddressProvider>
           </DisputeProvider>
         </AiProvider>
+        </CatalogProvider>
       </AppProvider>
     </ThemeProvider>
   );

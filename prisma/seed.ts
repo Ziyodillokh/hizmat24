@@ -1,66 +1,72 @@
 /**
- * Boshlang'ich ma'lumotlar: xizmat guruhlari, xizmat turlari va sinov ustalari.
- * Narxlar bu yerda faqat DEMO uchun — production'da admin panel orqali kiritiladi.
+ * Boshlangʻich maʼlumotlar: xizmat guruhlari, xizmat turlari va sinov ustalari.
+ *
+ * Katalog ILOVA bilan bir xil: platforma hozircha faqat santexnika
+ * (egasining qarori, 2026-09-13). Nom, narx va `iconKey` ilovadagi
+ * `src/mocks/serviceGroups.ts` bilan mos — aks holda server ulanganda
+ * bosh sahifadagi rasmlar ham, ikonalar ham yoʻqolardi.
+ *
+ * Narxlar bu yerda faqat DEMO uchun — productionʼda admin panel orqali kiritiladi.
  */
 import { ComplexityLevel, MasterExperienceLevel, MasterStatus, PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
 
 const prisma = new PrismaClient();
 
 /** `iconKey` — ilova ikonani shu kalit bo'yicha tanlaydi (vektor, temaga moslashadi). */
 const CATALOG = [
   {
-    name: 'Elektrika',
-    iconKey: 'electrician',
-    categories: [
-      { name: "Rozetka o'rnatish", basePrice: 80_000, complexityLevel: ComplexityLevel.SIMPLE },
-      { name: "Lyustra o'rnatish", basePrice: 120_000, complexityLevel: ComplexityLevel.SIMPLE },
-      { name: 'Avtomat almashtirish', basePrice: 150_000, complexityLevel: ComplexityLevel.SIMPLE },
-      {
-        name: "To'liq elektr simlarini almashtirish",
-        basePrice: 1_500_000,
-        complexityLevel: ComplexityLevel.COMPLEX,
-      },
-    ],
-  },
-  {
     name: 'Santexnika',
     iconKey: 'plumber',
     categories: [
-      { name: "Kran ta'mirlash", basePrice: 100_000, complexityLevel: ComplexityLevel.SIMPLE },
-      { name: "Unitaz o'rnatish", basePrice: 250_000, complexityLevel: ComplexityLevel.SIMPLE },
+      {
+        name: 'Santexnika taʼmiri',
+        iconKey: 'plumbing-repair',
+        description: 'Oqish, shovqin, buzilgan jihoz',
+        basePrice: 120_000,
+        complexityLevel: ComplexityLevel.SIMPLE,
+      },
+      {
+        name: 'Suv isitgich xizmatlari',
+        iconKey: 'water-heater',
+        description: 'Oʻrnatish va taʼmirlash',
+        basePrice: 300_000,
+        complexityLevel: ComplexityLevel.COMPLEX,
+      },
+      {
+        name: 'Unitaz va kanalizatsiya',
+        iconKey: 'toilet',
+        description: 'Oʻrnatish, almashtirish, tiqilish',
+        basePrice: 250_000,
+        complexityLevel: ComplexityLevel.SIMPLE,
+      },
+      {
+        name: 'Rakovina va smesitel',
+        iconKey: 'tap',
+        description: 'Kran, sifon, oqish',
+        basePrice: 100_000,
+        complexityLevel: ComplexityLevel.SIMPLE,
+      },
+      {
+        name: 'Quvurlarni oʻrnatish',
+        iconKey: 'pipes',
+        description: 'Suv va isitish quvurlari',
+        basePrice: 400_000,
+        complexityLevel: ComplexityLevel.COMPLEX,
+      },
       {
         name: 'Kanalizatsiya tozalash',
+        iconKey: 'drain',
+        description: 'Tiqilib qolgan quvur',
         basePrice: 200_000,
         complexityLevel: ComplexityLevel.SIMPLE,
       },
       {
         name: 'Isitish tizimini ulash',
+        iconKey: 'heating',
+        description: null,
         basePrice: 900_000,
         complexityLevel: ComplexityLevel.COMPLEX,
-      },
-    ],
-  },
-  {
-    name: 'Gaz',
-    iconKey: 'gas',
-    categories: [
-      { name: 'Gaz plitasi ulash', basePrice: 350_000, complexityLevel: ComplexityLevel.COMPLEX },
-      { name: 'Gaz kolonkasi ulash', basePrice: 500_000, complexityLevel: ComplexityLevel.COMPLEX },
-    ],
-  },
-  {
-    name: 'Texnika',
-    iconKey: 'appliance',
-    categories: [
-      {
-        name: 'Kir yuvish mashinasini ulash',
-        basePrice: 150_000,
-        complexityLevel: ComplexityLevel.SIMPLE,
-      },
-      {
-        name: "Konditsioner o'rnatish",
-        basePrice: 400_000,
-        complexityLevel: ComplexityLevel.SIMPLE,
       },
     ],
   },
@@ -110,6 +116,8 @@ async function seedCatalog() {
           update: {
             basePrice: category.basePrice,
             complexityLevel: category.complexityLevel,
+            iconKey: category.iconKey,
+            description: category.description,
             groupId: savedGroup.id,
             sortOrder: categoryIndex,
           },
@@ -119,7 +127,53 @@ async function seedCatalog() {
     }
   }
 
+  /*
+   * Katalogda QOLMAGAN yozuvlar oʻchirilmaydi — ular eski buyurtmalarga
+   * bogʻlangan (`onDelete: Restrict`). Ular faqat `isActive: false` boʻladi:
+   * mijoz ularni koʻrmaydi, tarix esa butun qoladi.
+   */
+  const keptCategoryNames = CATALOG.flatMap((group) => group.categories.map((c) => c.name));
+  const keptGroupNames = CATALOG.map((group) => group.name);
+
+  const [hiddenCategories, hiddenGroups] = await Promise.all([
+    prisma.serviceCategory.updateMany({
+      where: { name: { notIn: keptCategoryNames }, isActive: true },
+      data: { isActive: false },
+    }),
+    prisma.serviceGroup.updateMany({
+      where: { name: { notIn: keptGroupNames }, isActive: true },
+      data: { isActive: false },
+    }),
+  ]);
+
+  if (hiddenCategories.count > 0 || hiddenGroups.count > 0) {
+    console.log(
+      `Katalogdan chiqarildi: ${hiddenGroups.count} guruh, ${hiddenCategories.count} xizmat (oʻchirilmadi, faqat yashirildi)`,
+    );
+  }
+
   return categories;
+}
+
+/**
+ * Katalog keshini tozalaydi.
+ *
+ * Seed bazani oʻzgartiradi, API esa katalogni Redisʼdan oʻqiydi — kesh
+ * tozalanmasa server eski katalogni koʻrsatib turaveradi. Admin panel
+ * uchun ham AYNAN shu kanal ishlatiladi (`CatalogCacheService`).
+ */
+async function invalidateCatalogCache(): Promise<void> {
+  const url = process.env.REDIS_URL;
+  const host = process.env.REDIS_HOST ?? 'localhost';
+  const port = Number(process.env.REDIS_PORT ?? 6379);
+
+  const redis = url ? new Redis(url) : new Redis({ host, port });
+  try {
+    await redis.del('service-categories:active', 'service-groups:active');
+    await redis.publish('service-categories:invalidate', 'seed');
+  } finally {
+    redis.disconnect();
+  }
 }
 
 async function main(): Promise<void> {
@@ -144,6 +198,8 @@ async function main(): Promise<void> {
       skipDuplicates: true,
     });
   }
+
+  await invalidateCatalogCache();
 
   console.log(
     `Seed tayyor: ${CATALOG.length} guruh, ${categories.length} xizmat, ${MASTERS.length} usta`,
