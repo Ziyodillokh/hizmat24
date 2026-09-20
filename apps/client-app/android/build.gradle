@@ -22,8 +22,8 @@ apply from: "variables.gradle"
  *
  * Loyiha ~/Desktop ichida, Desktop esa iCloud Drive bilan sinxronlanadi.
  * iCloud `build/` papkasidagi fayllarni ham sinxronlaydi va konflikt yuz
- * berganda "splash 2.png" ko'rinishidagi dublikatlar yaratadi. Android
- * resurs fayl nomlarida bo'shliqqa ruxsat bermaydi, natijada
+ * berganda "splash 2.png" koʻrinishidagi dublikatlar yaratadi. Android
+ * resurs fayl nomlarida boʻshliqqa ruxsat bermaydi, natijada
  * `parseDebugLocalResources` vazifasi yiqiladi.
  *
  * ~/Library/Caches iCloud tomonidan sinxronlanmaydi — muammo takrorlanmaydi.
