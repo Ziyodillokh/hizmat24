@@ -134,6 +134,17 @@ uchun e2e test (Testcontainers) yoziladi.
 
 ### A1 — Kirish, qobiq va rollar
 
+> **Bajarildi** · backend `5820bff`, frontend `1d32ba5`
+>
+> Rejadan chetlanishlar:
+> - parol argon2/bcrypt emas, `node:crypto` scrypt bilan hashlanadi —
+>   ikkovi ham nativ qurishni talab qiladi va Docker imijida
+>   build-toolchain saqlashga majbur qilardi
+> - `GET /admin/catalog/categories` reja tashqarisida qoʻshildi: boʻlim
+>   ruxsatini isbotlash uchun haqiqiy endpoint kerak edi (A6 unga
+>   tahrirlashni qoʻshadi)
+> - panel react-router 7 da; mijoz ilovasi 6 da qoladi
+
 **Maqsad:** admin kira oladi, panel skeleti turadi, ruxsatlar ishlaydi.
 
 **Backend:** `admin` moduli; `AdminUser`/`AdminSession` migratsiyasi; `POST /admin/auth/login`
