@@ -60,6 +60,18 @@ const envSchema = z.object({
 
   THROTTLE_TTL_SECONDS: z.coerce.number().int().positive().default(60),
   THROTTLE_LIMIT: z.coerce.number().int().positive().default(120),
+
+  /**
+   * Admin sessiya tokenini hashlash kaliti. Mijoz sirlaridan ALOHIDA:
+   * mijoz kaliti sizib chiqsa, admin paneli u bilan ochilmasligi kerak.
+   */
+  ADMIN_TOKEN_SECRET: z.string().min(32, 'ADMIN_TOKEN_SECRET kamida 32 belgidan iborat boʻlsin'),
+  /** Faolsizlik boʻyicha avtomatik chiqish (daqiqa). */
+  ADMIN_SESSION_IDLE_MINUTES: z.coerce.number().int().positive().default(30),
+  /** Autentifikator ilovasida koʻrinadigan nom. */
+  ADMIN_TOTP_ISSUER: z.string().default('Hizmat24'),
+  /** Admin paneli manzili — CORS shu yerdan ochiladi. Boʻsh boʻlsa panel ulanmaydi. */
+  ADMIN_WEB_ORIGIN: z.string().default(''),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;
@@ -90,6 +102,24 @@ export function validateEnv(config: Record<string, unknown>): AppEnv {
     parsed.data.JWT_ACCESS_SECRET === parsed.data.OTP_HASH_SECRET
   ) {
     throw new Error('OTP_HASH_SECRET JWT_ACCESS_SECRET dan farq qilishi kerak');
+  }
+
+  /*
+   * Uchala sir bir-biridan farq qilishi SHART. Bitta sir uchala joyda
+   * ishlatilsa, mijoz tokenini hashlash kalitini bilgan odam admin
+   * sessiyasini ham yasay olardi — "bir kalit, butun tizim" holati.
+   */
+  if (parsed.data.NODE_ENV === 'production') {
+    const secrets = [
+      parsed.data.JWT_ACCESS_SECRET,
+      parsed.data.OTP_HASH_SECRET,
+      parsed.data.ADMIN_TOKEN_SECRET,
+    ];
+    if (new Set(secrets).size !== secrets.length) {
+      throw new Error(
+        'ADMIN_TOKEN_SECRET, JWT_ACCESS_SECRET va OTP_HASH_SECRET uchalasi ham farq qilishi kerak',
+      );
+    }
   }
 
   if (parsed.data.FCM_ENABLED) {

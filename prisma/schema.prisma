@@ -88,6 +88,19 @@ enum AuditAction {
   MASTER_ACK_TIMEOUT
   MATCHING_ESCALATED
   ORDER_CANCELLED
+  ADMIN_LOGIN_SUCCEEDED
+  ADMIN_LOGIN_FAILED
+  ADMIN_LOCKED
+  ADMIN_LOGGED_OUT
+}
+
+/// Admin panel rollari. Har biri OLDINGIsining ruxsatlarini oʻz ichiga
+/// olmaydi — bular alohida vazifalar, ierarxiya emas: moderator ustalarni
+/// tekshiradi, operator buyurtmalarni kuzatadi, superadmin hammasini.
+enum AdminRole {
+  SUPERADMIN
+  OPERATOR
+  MODERATOR
 }
 
 enum ActorType {
@@ -203,48 +216,48 @@ model MasterServiceCategory {
 }
 
 model Order {
-  id String @id @default(uuid()) @db.Uuid
+  id              String         @id @default(uuid()) @db.Uuid
   /// Mijoz koʻradigan qisqa raqam ("HZ-104901"). DB ketma-ketligi beradi —
   /// ilova yuborgan raqam hech qachon ishlatilmaydi.
-  shortId        String      @unique @default(dbgenerated("('HZ-'::text || lpad((nextval('orders_short_id_seq'::regclass))::text, 6, '0'::text))")) @map("short_id") @db.VarChar(20)
-  clientId       String      @map("client_id") @db.Uuid
-  masterId       String?     @map("master_id") @db.Uuid
-  categoryId     String      @map("category_id") @db.Uuid
-  description    String      @db.Text
+  shortId         String         @unique @default(dbgenerated("('HZ-'::text || lpad((nextval('orders_short_id_seq'::regclass))::text, 6, '0'::text))")) @map("short_id") @db.VarChar(20)
+  clientId        String         @map("client_id") @db.Uuid
+  masterId        String?        @map("master_id") @db.Uuid
+  categoryId      String         @map("category_id") @db.Uuid
+  description     String         @db.Text
   /// Surat/video havolalari (S3-compatible storage)
-  attachmentUrls String[]    @map("attachment_urls")
-  isUrgent       Boolean     @default(false) @map("is_urgent")
+  attachmentUrls  String[]       @map("attachment_urls")
+  isUrgent        Boolean        @default(false) @map("is_urgent")
   /// Buyurtma yaratilgan paytdagi TOʻLANADIGAN summa (so'mda) — kategoriya narxi
   /// keyin o'zgarsa ham o'zgarmaydi. Har doim `priceBase + priceUrgentFee - discountAmount`.
-  price          Int
+  price           Int
   /// Hisob-faktura tafsiloti — chek va hamyon shundan quriladi (TZ 2-bo'lim).
   /// Katalogdagi asosiy narx; mijoz butun oqim davomida shuni koʻrgan.
-  priceBase      Int         @map("price_base")
+  priceBase       Int            @map("price_base")
   /// Shoshilinchlik qoʻshimchasi — QATʼIY summa, foiz emas.
-  priceUrgentFee Int         @default(0) @map("price_urgent_fee")
+  priceUrgentFee  Int            @default(0) @map("price_urgent_fee")
   /// Daraja chegirmasi foizi (2 · 4 · 6) va uning soʻmdagi qiymati.
-  discountPercent Int        @default(0) @map("discount_percent")
-  discountAmount  Int        @default(0) @map("discount_amount")
+  discountPercent Int            @default(0) @map("discount_percent")
+  discountAmount  Int            @default(0) @map("discount_amount")
   /// Mijoz tanlagan toʻlov usuli. Eski buyurtmalarda yoʻq — ular yaratilganda
   /// bu maydon umuman mavjud emas edi, shuning uchun nullable (taxmin yozilmaydi).
-  paymentMethod  PaymentMethod? @map("payment_method")
-  status         OrderStatus @default(SEARCHING)
+  paymentMethod   PaymentMethod? @map("payment_method")
+  status          OrderStatus    @default(SEARCHING)
 
   /// Rejalashtirilgan vaqt. `null` — "imkon qadar tez". Kelajakdagi vaqt boʻlsa
   /// usta qidiruvi SHU VAQTGACHA boshlanmaydi (aks holda ekrandagi
   /// «Rejalashtirilgan» yozuvi yolgʻon boʻlardi).
-  scheduledAt    DateTime?   @map("scheduled_at") @db.Timestamptz(3)
+  scheduledAt DateTime? @map("scheduled_at") @db.Timestamptz(3)
 
   /// Mijoz soʻragan usta — SOʻROV, kafolat emas. Usta hisobi oʻchirilsa
   /// soʻrov yoʻqoladi, buyurtma esa qoladi.
-  preferredMasterId String?  @map("preferred_master_id") @db.Uuid
+  preferredMasterId String? @map("preferred_master_id") @db.Uuid
 
   /// Ustaning yakunlashdagi izohi (B5 da usta ilovasi toʻldiradi).
-  workNote       String?     @map("work_note") @db.VarChar(300)
+  workNote String? @map("work_note") @db.VarChar(300)
 
   /// Buyurtmani usta rejimi yuritadimi — ilova taymer simulyatsiyasini shu
   /// bayroqqa qarab oʻchiradi.
-  handledByMaster Boolean    @default(false) @map("handled_by_master")
+  handledByMaster Boolean @default(false) @map("handled_by_master")
 
   queuePosition Int? @map("queue_position")
   etaMinutes    Int? @map("eta_minutes")
@@ -278,11 +291,11 @@ model Order {
   client          User                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
   master          Master?              @relation("OrderAssignedMaster", fields: [masterId], references: [id], onDelete: Restrict)
   preferredMaster Master?              @relation("OrderPreferredMaster", fields: [preferredMasterId], references: [id], onDelete: SetNull)
-  category      ServiceCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  rating        Rating?
-  notifications Notification[]
-  safetyAlerts  SafetyAlert[]
-  statusHistory OrderStatusHistory[]
+  category        ServiceCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  rating          Rating?
+  notifications   Notification[]
+  safetyAlerts    SafetyAlert[]
+  statusHistory   OrderStatusHistory[]
 
   @@unique([clientId, idempotencyKey], name: "order_client_idempotency")
   @@index([status, isUrgent, createdAt])
@@ -423,4 +436,54 @@ model RefreshToken {
   @@index([userId])
   @@index([familyId])
   @@map("refresh_tokens")
+}
+
+/// Admin paneli foydalanuvchisi — mijoz `User` dan BUTUNLAY alohida jadval.
+///
+/// Sabab: mijoz telefon+SMS bilan kiradi, admin esa email+parol+TOTP bilan.
+/// Bitta jadvalga qoʻshilsa, mijozning telefoni bilan admin huquqiga
+/// yetib borish yoʻli ochilardi. Ikki jadval — ikki mustaqil kirish yoʻli.
+model AdminUser {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique @db.VarChar(160)
+  fullName       String    @map("full_name") @db.VarChar(120)
+  /// `scrypt$N$r$p$salt$hash` — node:crypto, tashqi kutubxonasiz.
+  passwordHash   String    @map("password_hash") @db.VarChar(255)
+  role           AdminRole
+  /// TOTP siri base32 da. `null` — hali sozlanmagan (birinchi kirishda majbur).
+  totpSecret     String?   @map("totp_secret") @db.VarChar(64)
+  totpEnabledAt  DateTime? @map("totp_enabled_at") @db.Timestamptz(3)
+  isActive       Boolean   @default(true) @map("is_active")
+  /// Ketma-ket muvaffaqiyatsiz urinishlar; muvaffaqiyatli kirishda nolga tushadi.
+  failedAttempts Int       @default(0) @map("failed_attempts")
+  lockedUntil    DateTime? @map("locked_until") @db.Timestamptz(3)
+  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  sessions AdminSession[]
+
+  @@map("admin_users")
+}
+
+/// Admin sessiyasi. Token JWT emas — tasodifiy satr, SHA-256 bilan hashlanadi.
+///
+/// Mijozdagi `RefreshToken` dan farqi: admin sessiyasi FAOLSIZLIK boʻyicha
+/// oʻladi (`lastSeenAt` + TTL), muddati boʻyicha emas. Ochiq qoldirilgan
+/// admin paneli yarim soatdan keyin oʻzi yopiladi.
+model AdminSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  adminId    String    @map("admin_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(128)
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(3)
+  ipAddress  String?   @map("ip_address") @db.VarChar(64)
+  userAgent  String?   @map("user_agent") @db.VarChar(300)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([lastSeenAt])
+  @@map("admin_sessions")
 }

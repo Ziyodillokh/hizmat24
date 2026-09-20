@@ -14,10 +14,15 @@ export async function configureApp(app: NestFastifyApplication): Promise<void> {
   // Har qanday Origin'ni credentials bilan qaytarish — klassik CORS xatosi.
   // Ruxsat faqat aniq roʻyxatdagi manzillarga beriladi; mobil ilova uchun
   // ro'yxat bo'sh qoladi va CORS umuman yoqilmaydi.
-  const allowedOrigins = app
-    .get(ConfigService<AppEnv, true>)
-    .get('CORS_ORIGINS', { infer: true })
-    .split(',')
+  const config = app.get(ConfigService<AppEnv, true>);
+
+  // Admin paneli brauzerdan ishlaydi, shuning uchun uning manzili ham shu
+  // roʻyxatga tushadi — alohida ADMIN_WEB_ORIGIN dan, chunki mobil ilova
+  // uchun CORS_ORIGINS boʻsh qoladi va panel bu yerda unutilib ketardi.
+  const allowedOrigins = [
+    ...config.get('CORS_ORIGINS', { infer: true }).split(','),
+    config.get('ADMIN_WEB_ORIGIN', { infer: true }),
+  ]
     .map((origin) => origin.trim())
     .filter(Boolean);
 

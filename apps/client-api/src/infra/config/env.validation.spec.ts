@@ -4,6 +4,7 @@ const BASE_ENV = {
   DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
   JWT_ACCESS_SECRET: 'a'.repeat(32),
   OTP_HASH_SECRET: 'o'.repeat(32),
+  ADMIN_TOKEN_SECRET: 'd'.repeat(32),
 };
 
 describe('validateEnv (TZ 9.7)', () => {
@@ -109,5 +110,38 @@ describe('validateEnv (TZ 9.7)', () => {
 
   it('production da console SMS provayderini taqiqlaydi (kod logga ochiq tushadi)', () => {
     expect(() => validateEnv({ ...BASE_ENV, NODE_ENV: 'production' })).toThrow(/SMS_PROVIDER/);
+  });
+
+  it('ADMIN_TOKEN_SECRET boʻlmasa ilovani koʻtarmaydi', () => {
+    expect(() => validateEnv({ ...BASE_ENV, ADMIN_TOKEN_SECRET: undefined })).toThrow(
+      /ADMIN_TOKEN_SECRET/,
+    );
+  });
+
+  it('qisqa ADMIN_TOKEN_SECRET ni rad etadi', () => {
+    expect(() => validateEnv({ ...BASE_ENV, ADMIN_TOKEN_SECRET: 'qisqa' })).toThrow(
+      /ADMIN_TOKEN_SECRET/,
+    );
+  });
+
+  it('production da admin siri mijoz sirlari bilan bir xil boʻlishiga yoʻl qoʻymaydi', () => {
+    expect(() =>
+      validateEnv({
+        ...BASE_ENV,
+        NODE_ENV: 'production',
+        SMS_PROVIDER: 'eskiz',
+        ADMIN_TOKEN_SECRET: BASE_ENV.JWT_ACCESS_SECRET,
+      }),
+    ).toThrow(/farq qilishi kerak/);
+  });
+
+  it('development da sirlar bir xil boʻlsa ham koʻtariladi — bu faqat production qoidasi', () => {
+    expect(() =>
+      validateEnv({ ...BASE_ENV, ADMIN_TOKEN_SECRET: BASE_ENV.JWT_ACCESS_SECRET }),
+    ).not.toThrow();
+  });
+
+  it('admin sessiyasining standart muddati — 30 daqiqa', () => {
+    expect(validateEnv(BASE_ENV).ADMIN_SESSION_IDLE_MINUTES).toBe(30);
   });
 });
