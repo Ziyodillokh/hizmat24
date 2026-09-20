@@ -9,7 +9,17 @@ import {
 } from './application/queries/get-order.query';
 import { OrdersController } from './orders.controller';
 
+import type { CreateOrderDto } from './dto/create-order.dto';
+
 const address = { label: 'Chilonzor 9-kvartal', lat: 41.3, lng: 69.2 };
+
+const buildDto = (overrides: Partial<CreateOrderDto> = {}): CreateOrderDto => ({
+  categoryId: 'category-1',
+  description: 'Kran oqmoqda',
+  clientAddress: address,
+  paymentMethod: 'cash',
+  ...overrides,
+});
 
 describe('OrdersController (HTTP qobiq)', () => {
   let controller: OrdersController;
@@ -27,24 +37,54 @@ describe('OrdersController (HTTP qobiq)', () => {
 
   it('buyurtma yaratishda idempotency kalitini command ga uzatadi', async () => {
     // Act
-    await controller.createOrder(
-      'client-1',
-      { categoryId: 'category-1', description: 'Kran oqmoqda', clientAddress: address },
-      ' key-1 ',
-    );
+    await controller.createOrder('client-1', buildDto(), ' key-1 ');
 
     // Assert
     expect(commandExecute).toHaveBeenCalledWith(
-      new CreateOrderCommand('client-1', 'category-1', 'Kran oqmoqda', [], false, address, 'key-1'),
+      new CreateOrderCommand(
+        'client-1',
+        'category-1',
+        'Kran oqmoqda',
+        [],
+        false,
+        address,
+        'key-1',
+        'cash',
+        null,
+        null,
+      ),
     );
   });
 
-  it("idempotency kaliti boʻsh boʻlsa null uzatadi", async () => {
+  it('rejalashtirilgan vaqt va soʻralgan ustani command ga uzatadi', async () => {
+    // Act
     await controller.createOrder(
       'client-1',
-      { categoryId: 'category-1', description: 'Kran oqmoqda', clientAddress: address },
-      '   ',
+      buildDto({
+        scheduledAt: '2026-09-21T09:00:00+05:00',
+        preferredMasterId: '11111111-1111-4111-8111-111111111111',
+      }),
     );
+
+    // Assert
+    const command = commandExecute.mock.calls[0][0] as CreateOrderCommand;
+    expect(command.scheduledAt).toEqual(new Date('2026-09-21T09:00:00+05:00'));
+    expect(command.preferredMasterId).toBe('11111111-1111-4111-8111-111111111111');
+  });
+
+  it('ilova yuborgan narxni umuman oʻqimaydi (TZ 4.1)', async () => {
+    // Arrange: DTO da `price` maydoni yoʻq, lekin body bilan kelishi mumkin.
+    await controller.createOrder(
+      'client-1',
+      buildDto({ price: 1 } as unknown as Partial<CreateOrderDto>),
+    );
+
+    // Assert
+    expect(JSON.stringify(commandExecute.mock.calls[0][0])).not.toContain('"price"');
+  });
+
+  it("idempotency kaliti boʻsh boʻlsa null uzatadi", async () => {
+    await controller.createOrder('client-1', buildDto(), '   ');
 
     expect((commandExecute.mock.calls[0][0] as CreateOrderCommand).idempotencyKey).toBeNull();
   });

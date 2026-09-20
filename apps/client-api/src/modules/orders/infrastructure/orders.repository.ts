@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ActorType, AuditAction, OrderStatus, Prisma } from '@prisma/client';
 import { ORDER_EVENTS, OrderStatusChangedEvent } from '@shared/index';
+import {
+  ORDER_SNAPSHOT_CHANGED,
+  OrderSnapshotChangedEvent,
+} from '../domain/events/order-snapshot-changed.event';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { AuditService } from '@client/modules/audit/audit.service';
 import { ConflictException } from '@client/common/exceptions/domain.exception';
@@ -10,7 +14,9 @@ import type { OrderWithRelations } from './order.presenter';
 
 export const ORDER_RELATIONS = {
   master: true,
-  category: true,
+  // Guruh ham olinadi: kategoriyaning oʻz ikonasi boʻlmasa ilova guruhning
+  // kalitiga tushadi, aks holda ekranda ikonasiz karta qolardi.
+  category: { include: { group: true } },
   rating: true,
 } satisfies Prisma.OrderInclude;
 
@@ -86,6 +92,13 @@ export class OrdersRepository {
     this.events.emit(
       ORDER_EVENTS.STATUS_CHANGED,
       new OrderStatusChangedEvent(entity.id, result.clientId, previous, next),
+    );
+
+    // Jonli yangilanish uchun toʻliq surat (TZ 3.5): WS shu yagona nuqtadan
+    // oziqlanadi va presenter mantigʻi takrorlanmaydi.
+    this.events.emit(
+      ORDER_SNAPSHOT_CHANGED,
+      new OrderSnapshotChangedEvent(entity.id, result.clientId, result),
     );
 
     return result;

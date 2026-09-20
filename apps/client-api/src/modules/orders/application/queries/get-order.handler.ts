@@ -10,7 +10,12 @@ import {
 import { toClientZone } from '@client/common/utils/datetime.util';
 import { QueuePositionService } from '@client/modules/matching/queue-position.service';
 import { OrdersRepository } from '../../infrastructure/orders.repository';
-import { presentOrder, type OrderView } from '../../infrastructure/order.presenter';
+import {
+  presentInvoice,
+  presentOrder,
+  type OrderView,
+} from '../../infrastructure/order.presenter';
+import type { OrderInvoice } from '../../domain/pricing';
 import {
   GetOrderEtaQuery,
   GetOrderQuery,
@@ -28,9 +33,16 @@ export interface OrderEtaView {
 
 export interface ReceiptView {
   orderId: string;
+  /** Chekda koʻrinadigan qisqa raqam — mijoz support bilan shu raqamni aytadi. */
+  shortId: string;
   serviceName: string;
   price: number;
   currency: Currency;
+  /**
+   * Narx tafsiloti chekka ham qoʻshiladi: ilova uni oʻzi qayta hisoblasa,
+   * pulning ikkinchi haqiqat manbai paydo boʻlardi (TZ 4.1).
+   */
+  invoice: OrderInvoice;
   masterName: string | null;
   rating: number | null;
   completedAt: string | null;
@@ -102,9 +114,11 @@ export class GetOrderReceiptHandler implements IQueryHandler<GetOrderReceiptQuer
 
     return {
       orderId: order.id,
+      shortId: order.shortId,
       serviceName: order.category?.name ?? '',
       price: order.price,
       currency: CURRENCY,
+      invoice: presentInvoice(order),
       masterName: order.master?.fullName ?? null,
       rating: order.rating?.stars ?? null,
       completedAt: toClientZone(order.completedAt),

@@ -49,6 +49,14 @@ enum OrderStatus {
   SAFETY_FLAGGED
 }
 
+/// Toʻlov usuli. Qiymatlar ilovadagi `PaymentMethod` bilan bir xil maʼnoda:
+/// `cash` — naqd, `card` — bank kartasi, `escrow` — kafolatli toʻlov.
+enum PaymentMethod {
+  CASH
+  CARD
+  ESCROW
+}
+
 enum CancelledBy {
   CLIENT
   MASTER
@@ -173,9 +181,10 @@ model Master {
   createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt            DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  orders     Order[]
-  ratings    Rating[]
-  categories MasterServiceCategory[]
+  orders          Order[]                 @relation("OrderAssignedMaster")
+  preferredOrders Order[]                 @relation("OrderPreferredMaster")
+  ratings         Rating[]
+  categories      MasterServiceCategory[]
 
   @@index([status, isActive])
   @@map("masters")
@@ -194,7 +203,10 @@ model MasterServiceCategory {
 }
 
 model Order {
-  id             String      @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
+  /// Mijoz koʻradigan qisqa raqam ("HZ-104901"). DB ketma-ketligi beradi —
+  /// ilova yuborgan raqam hech qachon ishlatilmaydi.
+  shortId        String      @unique @default(dbgenerated("('HZ-'::text || lpad((nextval('orders_short_id_seq'::regclass))::text, 6, '0'::text))")) @map("short_id") @db.VarChar(20)
   clientId       String      @map("client_id") @db.Uuid
   masterId       String?     @map("master_id") @db.Uuid
   categoryId     String      @map("category_id") @db.Uuid
@@ -202,17 +214,46 @@ model Order {
   /// Surat/video havolalari (S3-compatible storage)
   attachmentUrls String[]    @map("attachment_urls")
   isUrgent       Boolean     @default(false) @map("is_urgent")
-  /// Buyurtma yaratilgan paytdagi narx (so'mda) — kategoriya narxi keyin o'zgarsa ham o'zgarmaydi
+  /// Buyurtma yaratilgan paytdagi TOʻLANADIGAN summa (so'mda) — kategoriya narxi
+  /// keyin o'zgarsa ham o'zgarmaydi. Har doim `priceBase + priceUrgentFee - discountAmount`.
   price          Int
+  /// Hisob-faktura tafsiloti — chek va hamyon shundan quriladi (TZ 2-bo'lim).
+  /// Katalogdagi asosiy narx; mijoz butun oqim davomida shuni koʻrgan.
+  priceBase      Int         @map("price_base")
+  /// Shoshilinchlik qoʻshimchasi — QATʼIY summa, foiz emas.
+  priceUrgentFee Int         @default(0) @map("price_urgent_fee")
+  /// Daraja chegirmasi foizi (2 · 4 · 6) va uning soʻmdagi qiymati.
+  discountPercent Int        @default(0) @map("discount_percent")
+  discountAmount  Int        @default(0) @map("discount_amount")
+  /// Mijoz tanlagan toʻlov usuli. Eski buyurtmalarda yoʻq — ular yaratilganda
+  /// bu maydon umuman mavjud emas edi, shuning uchun nullable (taxmin yozilmaydi).
+  paymentMethod  PaymentMethod? @map("payment_method")
   status         OrderStatus @default(SEARCHING)
+
+  /// Rejalashtirilgan vaqt. `null` — "imkon qadar tez". Kelajakdagi vaqt boʻlsa
+  /// usta qidiruvi SHU VAQTGACHA boshlanmaydi (aks holda ekrandagi
+  /// «Rejalashtirilgan» yozuvi yolgʻon boʻlardi).
+  scheduledAt    DateTime?   @map("scheduled_at") @db.Timestamptz(3)
+
+  /// Mijoz soʻragan usta — SOʻROV, kafolat emas. Usta hisobi oʻchirilsa
+  /// soʻrov yoʻqoladi, buyurtma esa qoladi.
+  preferredMasterId String?  @map("preferred_master_id") @db.Uuid
+
+  /// Ustaning yakunlashdagi izohi (B5 da usta ilovasi toʻldiradi).
+  workNote       String?     @map("work_note") @db.VarChar(300)
+
+  /// Buyurtmani usta rejimi yuritadimi — ilova taymer simulyatsiyasini shu
+  /// bayroqqa qarab oʻchiradi.
+  handledByMaster Boolean    @default(false) @map("handled_by_master")
 
   queuePosition Int? @map("queue_position")
   etaMinutes    Int? @map("eta_minutes")
 
   /// { label, lat, lng, entrance?, floor?, apartment?, comment? }
-  clientAddress Json  @map("client_address")
-  addressLat    Float @map("address_lat")
-  addressLng    Float @map("address_lng")
+  /// Koordinata NULLABLE: ilovada xarita yoʻq, soxta koordinata yozilmaydi (K1 bosqichigacha).
+  clientAddress Json   @map("client_address")
+  addressLat    Float? @map("address_lat")
+  addressLng    Float? @map("address_lng")
 
   cancelReason String?      @map("cancel_reason") @db.VarChar(500)
   cancelledBy  CancelledBy? @map("cancelled_by")
@@ -234,8 +275,9 @@ model Order {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  client        User                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
-  master        Master?              @relation(fields: [masterId], references: [id], onDelete: Restrict)
+  client          User                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  master          Master?              @relation("OrderAssignedMaster", fields: [masterId], references: [id], onDelete: Restrict)
+  preferredMaster Master?              @relation("OrderPreferredMaster", fields: [preferredMasterId], references: [id], onDelete: SetNull)
   category      ServiceCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   rating        Rating?
   notifications Notification[]
@@ -246,6 +288,8 @@ model Order {
   @@index([status, isUrgent, createdAt])
   @@index([clientId, createdAt])
   @@index([masterId])
+  @@index([preferredMasterId])
+  @@index([scheduledAt])
   @@map("orders")
 }
 

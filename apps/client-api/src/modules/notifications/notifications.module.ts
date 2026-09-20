@@ -11,6 +11,8 @@ import { NotificationsService } from './notifications.service';
   imports: [JwtModule.register({}), AuthModule],
   controllers: [NotificationsController],
   providers: [NotificationsService, NotificationsGateway, NotificationsListener, FcmProvider],
-  exports: [NotificationsService],
+  // Gateway ham eksport qilinadi: buyurtma moduli ekranni sinxronlash uchun
+  // unga toʻgʻridan-toʻgʻri suratlar yuboradi (bu bildirishnoma emas).
+  exports: [NotificationsService, NotificationsGateway],
 })
 export class NotificationsModule {}

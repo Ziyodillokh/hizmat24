@@ -57,6 +57,7 @@ export class OrdersController {
     @Body() dto: CreateOrderDto,
     @Headers('idempotency-key') idempotencyKey?: string,
   ): Promise<OrderView> {
+    // Narx ataylab oʻqilmaydi: uni faqat server hisoblaydi (TZ 4.1).
     return this.commandBus.execute(
       new CreateOrderCommand(
         clientId,
@@ -65,7 +66,10 @@ export class OrdersController {
         dto.attachmentUrls ?? [],
         dto.isUrgent ?? false,
         dto.clientAddress,
-        idempotencyKey?.trim() || null,
+        idempotencyKey?.trim() || dto.idempotencyKey?.trim() || null,
+        dto.paymentMethod,
+        dto.scheduledAt ? new Date(dto.scheduledAt) : null,
+        dto.preferredMasterId ?? null,
       ),
     );
   }

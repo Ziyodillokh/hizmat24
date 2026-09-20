@@ -23,6 +23,21 @@ export const MATCHING_RADIUS_KM = 15;
 /** Bitta qidiruvda ko'rib chiqiladigan nomzodlar soni. */
 export const MATCHING_CANDIDATE_LIMIT = 20;
 
+/**
+ * Shoshilinch buyurtma qoʻshimchasi (soʻm) — QATʼIY summa, FOIZ EMAS.
+ *
+ * Shoshilinchlik ustani navbatdan tashqari yuborish xarajati va u ish
+ * qiymatiga bogʻliq emas. Foiz qilinsa, 1 500 000 soʻmlik ish uchun qoʻshimcha
+ * 300 000 soʻm boʻlib chiqardi — bu talon-toroj boʻlib oʻqiladi.
+ */
+export const URGENT_FEE_UZS = 20_000;
+
+/** Soʻmda eng kichik amaliy birlik — chegirma shu qadamga yaxlitlanadi. */
+export const MONEY_STEP_UZS = 100;
+
+/** Buyurtma izohi (ustaning yakunlash izohi) uchun chegara. */
+export const WORK_NOTE_MAX_LENGTH = 300;
+
 /** Buyurtma tavsifi uchun chegaralar. */
 export const ORDER_DESCRIPTION_MIN_LENGTH = 10;
 export const ORDER_DESCRIPTION_MAX_LENGTH = 2000;
@@ -61,3 +76,11 @@ export const AVERAGE_ORDER_DURATION_MINUTES = 45;
  * shoshilinch buyurtmalarni oldinga chiqaradi, lekin ular ichida FIFO tartibini saqlaydi.
  */
 export const URGENT_SCORE_BOOST_MS = 10 * 365 * 24 * 60 * 60 * 1000;
+
+/**
+ * Mijozga jonli yuboriladigan buyurtma suratining WS hodisasi.
+ *
+ * Nomi ilova va server uchun BITTA joyda turadi: ikki tomonda alohida satr
+ * yozilsa, birini oʻzgartirib ikkinchisini unutish muqarrar.
+ */
+export const WS_EVENT_ORDER_UPDATED = 'order.updated';

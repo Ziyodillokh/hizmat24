@@ -19,12 +19,17 @@ import {
 const buildOrder = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'order-1',
+    shortId: 'HZ-104901',
     clientId: 'client-1',
     status: OrderStatus.ASSIGNED,
     description: 'test',
     attachmentUrls: [],
     isUrgent: false,
     price: 100_000,
+    priceBase: 100_000,
+    priceUrgentFee: 0,
+    discountPercent: 0,
+    discountAmount: 0,
     queuePosition: null,
     etaMinutes: 15,
     clientAddress: {},
@@ -159,6 +164,33 @@ describe('GetOrderReceiptHandler (TZ 3.9)', () => {
       rating: 5,
     });
     expect(result.completedAt).toBe('2026-09-05T17:00:00.000+05:00');
+  });
+
+  it("chekda narx tafsiloti va qisqa raqam boʻladi (ilova qayta hisoblamaydi)", async () => {
+    // Arrange: shoshilinch, chegirmali buyurtma — tafsilot bazada muzlatilgan
+    orders.findById.mockResolvedValue(
+      buildOrder({
+        status: OrderStatus.CLOSED,
+        price: 117_600,
+        priceBase: 100_000,
+        priceUrgentFee: 20_000,
+        discountPercent: 2,
+        discountAmount: 2_400,
+      }),
+    );
+
+    // Act
+    const result = await handler.execute(new GetOrderReceiptQuery('order-1', 'client-1'));
+
+    // Assert
+    expect(result.shortId).toBe('HZ-104901');
+    expect(result.invoice).toEqual({
+      base: 100_000,
+      urgentFee: 20_000,
+      discountPercent: 2,
+      discount: 2_400,
+      total: 117_600,
+    });
   });
 
   it.each([OrderStatus.SEARCHING, OrderStatus.IN_PROGRESS, OrderStatus.CANCELLED])(

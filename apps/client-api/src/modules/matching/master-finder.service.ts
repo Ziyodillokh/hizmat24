@@ -5,14 +5,16 @@ import { PrismaService } from '@client/infra/prisma/prisma.service';
 
 export interface MasterCandidate {
   id: string;
-  distance_km: number;
+  /** Koordinatasiz buyurtmada masofa nomaʼlum — `null`, nol emas. */
+  distance_km: number | null;
 }
 
 export interface FindCandidatesInput {
   categoryId: string;
   complexityLevel: ComplexityLevel;
-  lat: number;
-  lng: number;
+  /** Manzil koordinatasi; ilovada xarita yoʻq boʻlgani uchun `null` boʻlishi mumkin. */
+  lat: number | null;
+  lng: number | null;
   radiusKm?: number;
   limit?: number;
   /** Bu ustalar chetlab oʻtiladi (masalan, shu buyurtmani allaqachon rad etganlar). */
@@ -47,6 +49,29 @@ const FIND_CANDIDATES_SQL = `
   LIMIT $7::int
   FOR UPDATE OF m SKIP LOCKED`;
 
+/**
+ * Koordinatasiz buyurtma uchun ikkinchi yoʻl.
+ *
+ * Manzil koordinatasi boʻlmasa masofani hisoblab boʻlmaydi — soxta nuqta
+ * qoʻyish taqiqlanadi (TZ 2-bo'lim). Shu sababli radius filtri UMUMAN
+ * qoʻllanmaydi va nomzodlar reyting boʻyicha tartiblanadi; masofa `NULL`
+ * qaytadi, ya'ni ETA ham hisoblanmaydi va ekranda taxminiy raqam chiqmaydi.
+ *
+ * $1 categoryId, $2 requireExperienced, $3 excludedMasterIds, $4 limit
+ */
+const FIND_CANDIDATES_WITHOUT_LOCATION_SQL = `
+  SELECT m.id, NULL::float8 AS distance_km
+  FROM masters m
+  JOIN master_service_categories msc ON msc.master_id = m.id
+  WHERE msc.category_id = $1::uuid
+    AND m.is_active = true
+    AND m.status = 'AVAILABLE'
+    AND ($2::boolean = false OR m.experience_level = 'EXPERIENCED')
+    AND ($3::uuid[] IS NULL OR m.id <> ALL($3::uuid[]))
+  ORDER BY m.rating_avg DESC, m.completed_orders_count DESC
+  LIMIT $4::int
+  FOR UPDATE OF m SKIP LOCKED`;
+
 @Injectable()
 export class MasterFinderService {
   constructor(private readonly prisma: PrismaService) {}
@@ -64,15 +89,27 @@ export class MasterFinderService {
     input: FindCandidatesInput,
   ): Promise<MasterCandidate[]> {
     const excluded = input.excludeMasterIds ?? [];
+    const excludedParam = excluded.length > 0 ? excluded : null;
+    const requireExperienced = input.complexityLevel === ComplexityLevel.COMPLEX;
+
+    if (input.lat === null || input.lng === null) {
+      return tx.$queryRawUnsafe<MasterCandidate[]>(
+        FIND_CANDIDATES_WITHOUT_LOCATION_SQL,
+        input.categoryId,
+        requireExperienced,
+        excludedParam,
+        input.limit ?? MATCHING_CANDIDATE_LIMIT,
+      );
+    }
 
     return tx.$queryRawUnsafe<MasterCandidate[]>(
       FIND_CANDIDATES_SQL,
       input.categoryId,
       input.lat,
       input.lng,
-      input.complexityLevel === ComplexityLevel.COMPLEX,
+      requireExperienced,
       input.radiusKm ?? MATCHING_RADIUS_KM,
-      excluded.length > 0 ? excluded : null,
+      excludedParam,
       input.limit ?? MATCHING_CANDIDATE_LIMIT,
     );
   }

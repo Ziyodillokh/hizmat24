@@ -19,6 +19,7 @@ const buildOrderRow = (overrides: Record<string, unknown> = {}) => ({
   isUrgent: false,
   addressLat: 41.3,
   addressLng: 69.2,
+  scheduledAt: null,
   assignmentAttempts: 0,
   masterAckedAt: null,
   createdAt: new Date('2026-01-01T00:00:00Z'),
@@ -281,6 +282,64 @@ describe('MatchingService (TZ 3.4)', () => {
     });
   });
 
+  describe('rejalashtirilgan buyurtma', () => {
+    it('vaqti kelmagan buyurtmaga usta tayinlamaydi (ekrandagi reja yolgʻon boʻlmaydi)', async () => {
+      // Arrange
+      orderFindUnique.mockResolvedValue(
+        buildOrderRow({ scheduledAt: new Date(Date.now() + 60 * 60 * 1000) }),
+      );
+
+      // Act
+      const outcome = await service.matchOrder('order-1');
+
+      // Assert
+      expect(outcome.kind).toBe('skipped');
+      expect(finder.findCandidates).not.toHaveBeenCalled();
+    });
+
+    it("vaqti oʻtgan rejalashtirilgan buyurtma oddiy tartibda qidiriladi", async () => {
+      orderFindUnique.mockResolvedValue(
+        buildOrderRow({ scheduledAt: new Date(Date.now() - 60 * 1000) }),
+      );
+      finder.findCandidates.mockResolvedValue([{ id: 'master-1', distance_km: 2 }]);
+
+      const outcome = await service.matchOrder('order-1');
+
+      expect(outcome.kind).toBe('assigned');
+    });
+
+    it('qidiruvni kechiktirib navbatga qoʻyadi', async () => {
+      await service.requestMatching('order-1', [], 90_000);
+
+      expect(queueAdd.mock.calls[0][2]).toMatchObject({ delay: 90_000 });
+    });
+
+    it("kechikish boʻlmasa `delay` yuborilmaydi", async () => {
+      await service.requestMatching('order-1');
+
+      expect((queueAdd.mock.calls[0][2] as { delay?: number }).delay).toBeUndefined();
+    });
+  });
+
+  describe('koordinatasiz buyurtma', () => {
+    it('masofa nomaʼlum boʻlsa ETA yozilmaydi (taxminiy daqiqa koʻrsatilmaydi)', async () => {
+      // Arrange
+      orderFindUnique.mockResolvedValue(buildOrderRow({ addressLat: null, addressLng: null }));
+      finder.findCandidates.mockResolvedValue([{ id: 'master-1', distance_km: null }]);
+
+      // Act
+      await service.matchOrder('order-1');
+
+      // Assert
+      const [, , context] = orders.applyTransition.mock.calls[0] as [
+        unknown,
+        unknown,
+        { data: { etaMinutes: number | null } },
+      ];
+      expect(context.data.etaMinutes).toBeNull();
+    });
+  });
+
   describe('sweepQueue', () => {
     it('qidiruv kutayotgan buyurtmalarni DB dan oladi (Redis dan emas)', async () => {
       // Arrange: BullMQ jobi yo'qolgan bo'lsa ham buyurtma DB da qoladi
@@ -293,11 +352,27 @@ describe('MatchingService (TZ 3.4)', () => {
       // Assert
       expect(orderFindMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { status: { in: expect.arrayContaining([OrderStatus.SEARCHING]) } },
+          where: expect.objectContaining({
+            status: { in: expect.arrayContaining([OrderStatus.SEARCHING]) },
+          }),
           orderBy: [{ isUrgent: 'desc' }, { createdAt: 'asc' }],
         }),
       );
       expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.ASSIGNED, expect.anything());
+    });
+
+    it("vaqti kelmagan rejalashtirilgan buyurtmalarni umuman soʻramaydi", async () => {
+      // Act
+      await service.sweepQueue();
+
+      // Assert: SQL darajasida filtr — sweep ularni koʻrmaydi ham
+      const pendingQuery = orderFindMany.mock.calls[1][0] as {
+        where: { OR: Array<Record<string, unknown>> };
+      };
+      expect(pendingQuery.where.OR).toEqual([
+        { scheduledAt: null },
+        { scheduledAt: { lte: expect.any(Date) } },
+      ]);
     });
 
     it("shoshilinch buyurtmalarni navbat boshiga qoʻyib soʻraydi (TZ 3.4)", async () => {

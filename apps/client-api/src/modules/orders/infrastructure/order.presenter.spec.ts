@@ -1,5 +1,6 @@
 import {
   ComplexityLevel,
+  PaymentMethod,
   MasterExperienceLevel,
   MasterStatus,
   OrderStatus,
@@ -42,15 +43,28 @@ const category: ServiceCategory = {
   updatedAt: new Date(),
 };
 
-const buildOrder = (status: OrderStatus): OrderWithRelations => ({
+const buildOrder = (
+  status: OrderStatus,
+  overrides: Partial<OrderWithRelations> = {},
+): OrderWithRelations => ({
   id: 'order-1',
+  shortId: 'HZ-104901',
   clientId: 'client-1',
   masterId: 'master-1',
   categoryId: 'category-1',
   description: 'Kran oqmoqda',
   attachmentUrls: [],
-  isUrgent: false,
-  price: 100_000,
+  isUrgent: true,
+  price: 114_000,
+  priceBase: 100_000,
+  priceUrgentFee: 20_000,
+  discountPercent: 6,
+  discountAmount: 6_000,
+  paymentMethod: PaymentMethod.ESCROW,
+  scheduledAt: null,
+  preferredMasterId: null,
+  workNote: null,
+  handledByMaster: false,
   status,
   queuePosition: null,
   etaMinutes: 12,
@@ -74,6 +88,7 @@ const buildOrder = (status: OrderStatus): OrderWithRelations => ({
   master,
   category,
   rating: null,
+  ...overrides,
 });
 
 describe('presentOrder', () => {
@@ -85,7 +100,71 @@ describe('presentOrder', () => {
     const view = presentOrder(buildOrder(OrderStatus.ASSIGNED));
 
     expect(Number.isInteger(view.price)).toBe(true);
-    expect(view.price).toBe(100_000);
+    expect(view.price).toBe(114_000);
+  });
+
+  it('hisob-faktura tafsilotini saqlangan qiymatlardan yigʻadi (qayta hisoblamaydi)', () => {
+    const view = presentOrder(buildOrder(OrderStatus.ASSIGNED));
+
+    expect(view.invoice).toEqual({
+      base: 100_000,
+      urgentFee: 20_000,
+      discountPercent: 6,
+      discount: 6_000,
+      total: 114_000,
+    });
+    expect(view.invoice.total).toBe(view.price);
+  });
+
+  it('qisqa raqam va toʻlov usulini ilova kutgan shaklda qaytaradi', () => {
+    const view = presentOrder(buildOrder(OrderStatus.ASSIGNED));
+
+    expect(view.shortId).toBe('HZ-104901');
+    expect(view.paymentMethod).toBe('escrow');
+  });
+
+  it("toʻlov usuli yoʻq eski buyurtmada taxmin yozmaydi", () => {
+    const view = presentOrder(buildOrder(OrderStatus.CLOSED, { paymentMethod: null }));
+
+    expect(view.paymentMethod).toBeNull();
+  });
+
+  it('rejalashtirilgan vaqtni mijoz zonasida qaytaradi', () => {
+    const view = presentOrder(
+      buildOrder(OrderStatus.SEARCHING, { scheduledAt: new Date('2026-09-21T04:00:00.000Z') }),
+    );
+
+    expect(view.scheduledAt).toBe('2026-09-21T09:00:00.000+05:00');
+  });
+
+  it('kategoriya ikonasi boʻlmasa guruhnikiga tushadi', () => {
+    const withoutIcon = presentOrder(
+      buildOrder(OrderStatus.ASSIGNED, {
+        category: { ...category, iconKey: null, group: { iconKey: 'plumbing' } as never },
+      }),
+    );
+
+    expect(withoutIcon.category?.iconKey).toBe('plumbing');
+  });
+
+  it('ikona kaliti umuman boʻlmasa null qaytaradi (soxta kalit oʻylab topilmaydi)', () => {
+    const view = presentOrder(
+      buildOrder(OrderStatus.ASSIGNED, { category: { ...category, iconKey: null } }),
+    );
+
+    expect(view.category?.iconKey).toBeNull();
+  });
+
+  it('ustaning izohi va usta rejimi bayrogʻini qaytaradi', () => {
+    const view = presentOrder(
+      buildOrder(OrderStatus.COMPLETED_BY_MASTER, {
+        workNote: "Kran prokladkasi almashtirildi",
+        handledByMaster: true,
+      }),
+    );
+
+    expect(view.workNote).toBe("Kran prokladkasi almashtirildi");
+    expect(view.handledByMaster).toBe(true);
   });
 
   it("bitta master obyektini qaytaradi, nomzodlar roʻyxatini emas (biznes-qoida 5.2)", () => {

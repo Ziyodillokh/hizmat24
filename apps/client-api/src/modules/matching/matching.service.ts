@@ -20,7 +20,7 @@ import { AuditService } from '@client/modules/audit/audit.service';
 import { OrdersRepository } from '@client/modules/orders/infrastructure/orders.repository';
 import { MATCHABLE_STATUSES } from '@client/modules/orders/domain/order-status.enum';
 import { estimateEtaMinutes } from '@client/common/utils/geo.util';
-import { MasterFinderService } from './master-finder.service';
+import { MasterFinderService, type MasterCandidate } from './master-finder.service';
 import { QueuePositionService } from './queue-position.service';
 
 type OrderWithCategory = Prisma.OrderGetPayload<{ include: { category: true } }>;
@@ -29,6 +29,27 @@ type OrderWithCategory = Prisma.OrderGetPayload<{ include: { category: true } }>
  * Tayinlash tranzaksiyasini ROLLBACK qilish uchun ichki signal: buyurtma
  * tanlangandan keyin, lekin tayinlanishdan oldin boshqa holatga oʻtib ketgan.
  */
+/** Rejalashtirilgan vaqt hali kelmaganmi? */
+const isScheduledForLater = (scheduledAt: Date | null): boolean =>
+  scheduledAt !== null && scheduledAt.getTime() > Date.now();
+
+/**
+ * Nomzodlar ichidan tanlash: mijoz soʻragan usta bor boʻlsa — u birinchi.
+ *
+ * Bu KAFOLAT emas, SOʻROV: soʻralgan usta band boʻlsa yoki nomzodlar
+ * roʻyxatiga tushmasa, buyurtma kutib qolmaydi va odatdagi tartibda eng
+ * yaqin/eng reytingli ustaga ketadi. Ilova ham aynan shunday deydi.
+ *
+ * Soʻrovni umuman eʼtiborsiz qoldirib boʻlmaydi: ekranda "usta soʻraldi"
+ * yozilib, server boshqa ustani yuborsa — bu koʻrinadigan yolgʻon boʻlardi.
+ */
+const pickCandidate = (
+  candidates: MasterCandidate[],
+  preferredMasterId: string | null,
+): MasterCandidate | undefined =>
+  (preferredMasterId ? candidates.find((c) => c.id === preferredMasterId) : undefined) ??
+  candidates[0];
+
 class StaleOrderError extends Error {
   constructor(readonly orderId: string) {
     super(`Buyurtma ${orderId} tayinlash paytida holatini oʻzgartirdi`);
@@ -62,13 +83,23 @@ export class MatchingService {
     @InjectQueue(QUEUE_MATCHING) private readonly matchingQueue: Queue,
   ) {}
 
-  /** Qidiruvni navbatga qoʻyish (buyurtma yaratilgandan keyin darhol chaqiriladi). */
-  async requestMatching(orderId: string, excludeMasterIds: string[] = []): Promise<void> {
+  /**
+   * Qidiruvni navbatga qoʻyish (buyurtma yaratilgandan keyin darhol chaqiriladi).
+   *
+   * `delayMs` — rejalashtirilgan buyurtma uchun: ekranda «Rejalashtirilgan: …»
+   * yozilib turganda hozir usta tayinlansa, bu koʻrinadigan yolgʻon boʻlardi.
+   */
+  async requestMatching(
+    orderId: string,
+    excludeMasterIds: string[] = [],
+    delayMs = 0,
+  ): Promise<void> {
     await this.matchingQueue.add(
       JOB_MATCH_ORDER,
       { orderId, excludeMasterIds },
       {
         jobId: `${JOB_MATCH_ORDER}:${orderId}:${Date.now()}`,
+        delay: delayMs > 0 ? delayMs : undefined,
         removeOnComplete: 500,
         removeOnFail: 1000,
         attempts: 3,
@@ -85,6 +116,12 @@ export class MatchingService {
     });
 
     if (!order || !MATCHABLE_STATUSES.includes(order.status)) {
+      return { kind: 'skipped' };
+    }
+
+    // Ikkinchi qorovul: kechiktirilgan job vaqtidan oldin ishga tushsa ham
+    // (masalan, usta boʻshaganda chaqirilgan sweep orqali) reja buzilmaydi.
+    if (isScheduledForLater(order.scheduledAt)) {
       return { kind: 'skipped' };
     }
 
@@ -147,7 +184,7 @@ export class MatchingService {
         excludeMasterIds,
       });
 
-      const candidate = candidates[0];
+      const candidate = pickCandidate(candidates, order.preferredMasterId);
       if (!candidate) return null;
 
       const claimed = await tx.master.updateMany({
@@ -180,7 +217,12 @@ export class MatchingService {
             assignedAt: new Date(),
             masterAckedAt: null,
             assignmentAttempts: { increment: 1 },
-            etaMinutes: estimateEtaMinutes(candidate.distance_km, AVERAGE_CITY_SPEED_KMH),
+            // Masofa nomaʼlum boʻlsa ETA ham yozilmaydi: taxminiy daqiqa
+            // ekranda haqiqat sifatida koʻrinardi.
+            etaMinutes:
+              candidate.distance_km === null
+                ? null
+                : estimateEtaMinutes(candidate.distance_km, AVERAGE_CITY_SPEED_KMH),
           },
         },
         tx,
@@ -304,7 +346,11 @@ export class MatchingService {
     await this.recoverStaleAssignments(limit);
 
     const pending = await this.prisma.order.findMany({
-      where: { status: { in: [...MATCHABLE_STATUSES] } },
+      where: {
+        status: { in: [...MATCHABLE_STATUSES] },
+        // Rejalashtirilgan buyurtma oʻz vaqti kelmaguncha sweepʼga tushmaydi.
+        OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }],
+      },
       // TZ 3.4 dagi navbat tartibi: avval shoshilinch, keyin yaratilgan vaqt.
       orderBy: [{ isUrgent: 'desc' }, { createdAt: 'asc' }],
       take: limit,

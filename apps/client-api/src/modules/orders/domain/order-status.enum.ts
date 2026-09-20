@@ -33,3 +33,16 @@ export const MATCHABLE_STATUSES: readonly OrderStatus[] = [
   OrderStatus.SEARCHING,
   OrderStatus.SEARCHING_QUEUED,
 ];
+
+/**
+ * Mijoz darajasi uchun sanaladigan holatlar.
+ *
+ * `RATED` ham kiradi: u yakunlangan, lekin hali yopilmagan buyurtma emas —
+ * baholashdan keyin buyurtma darhol `CLOSED` ga oʻtadi va ilova ikkalasini
+ * ham "yakunlangan" deb koʻrsatadi. Faqat `CLOSED` sanalsa, baholash bilan
+ * yopilish orasidagi buyurtma darajadan tushib qolardi.
+ */
+export const LEVEL_COUNTED_STATUSES: readonly OrderStatus[] = [
+  OrderStatus.RATED,
+  OrderStatus.CLOSED,
+];

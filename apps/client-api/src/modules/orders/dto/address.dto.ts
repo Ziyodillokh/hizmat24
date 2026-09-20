@@ -7,13 +7,20 @@ export class AddressDto {
   @Length(5, 300)
   label: string;
 
-  @ApiProperty({ example: 41.311081 })
+  /**
+   * Koordinata IXTIYORIY: ilovada hali xarita yoʻq (K1 bosqichigacha) va
+   * soxta koordinata yozish taqiqlanadi. Koordinatasiz buyurtma ham usta
+   * topadi — faqat masofa boʻyicha emas, reyting boʻyicha.
+   */
+  @ApiPropertyOptional({ example: 41.311081 })
+  @IsOptional()
   @IsLatitude()
-  lat: number;
+  lat?: number;
 
-  @ApiProperty({ example: 69.240562 })
+  @ApiPropertyOptional({ example: 69.240562 })
+  @IsOptional()
   @IsLongitude()
-  lng: number;
+  lng?: number;
 
   @ApiPropertyOptional({ example: '2' })
   @IsOptional()
