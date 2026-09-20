@@ -13,7 +13,7 @@ import Redis from 'ioredis';
 
 const prisma = new PrismaClient();
 
-/** `iconKey` — ilova ikonani shu kalit bo'yicha tanlaydi (vektor, temaga moslashadi). */
+/** `iconKey` — ilova ikonani shu kalit boʻyicha tanlaydi (vektor, temaga moslashadi). */
 const CATALOG = [
   {
     name: 'Santexnika',
@@ -82,7 +82,7 @@ const MASTERS = [
     lastLng: 69.240562,
   },
   {
-    fullName: "Bekzod To'raev",
+    fullName: 'Bekzod Toʻraev',
     phoneNumber: '+998901112234',
     experienceLevel: MasterExperienceLevel.NEW,
     hasGovCertificate: false,

@@ -5,6 +5,7 @@ import { AppLaunch } from './AppLaunch';
 import { PageTransition } from './PageTransition';
 import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
+import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
@@ -60,7 +61,10 @@ function AppRoutes() {
   useBackButton();
   // Saqlangan `refresh` tokendan yangi `access` olinadi. Natija B3 da kerak
   // boʻladi (buyurtmalar serverdan kelganda) — hozir faqat tiklanadi.
-  useSessionRestore();
+  const isSessionReady = useSessionRestore();
+  // Sessiya tiklangach buyurtmalar serverdan oʻqiladi va jonli yangilanish
+  // ulanadi. Mock rejimda ikkalasi ham hech narsa qilmaydi.
+  useServerSync(isSessionReady === true);
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });

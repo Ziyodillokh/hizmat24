@@ -69,13 +69,27 @@ export const verifyOtp = async (phoneNumber: string, otpCode: string): Promise<A
     }),
   );
 
-export const refreshSession = async (refreshToken: string): Promise<AuthSession> =>
-  toAuthSession(
-    await apiRequest<RawAuthResponse>('/api/v1/auth/refresh', {
-      method: 'POST',
-      body: { refreshToken },
-    }),
+/**
+ * Yangilangan tokenlar juftligi.
+ *
+ * `refresh` javobida foydalanuvchi maydoni YOʻQ — server faqat tokenlarni
+ * qaytaradi. Ilova uni `AuthSession` deb oʻqishga urinsa, javob shaklidan
+ * xato chiqib, saqlangan token oʻchib ketardi va foydalanuvchi har
+ * ochilishda qaytadan SMS soʻrardi.
+ */
+export interface RefreshedTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const refreshSession = async (refreshToken: string): Promise<RefreshedTokens> => {
+  const raw = await apiRequest<{ accessToken: string; refreshToken: string }>(
+    '/api/v1/auth/refresh',
+    { method: 'POST', body: { refreshToken } },
   );
+
+  return { accessToken: raw.accessToken, refreshToken: raw.refreshToken };
+};
 
 /** Serverdagi refresh tokenni bekor qiladi; xato boʻlsa ham chiqish davom etadi. */
 export async function logout(refreshToken: string): Promise<void> {

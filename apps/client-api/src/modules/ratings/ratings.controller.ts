@@ -18,6 +18,6 @@ export class RatingsController {
     @Param('orderId', new ParseUUIDPipe({ version: '4' })) orderId: string,
     @Body() dto: CreateRatingDto,
   ): Promise<RatingView> {
-    return this.ratings.rateOrder(orderId, clientId, dto.stars, dto.comment ?? null);
+    return this.ratings.rateOrder(orderId, clientId, dto.stars, dto.comment ?? null, dto.tags ?? []);
   }
 }

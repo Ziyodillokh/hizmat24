@@ -316,6 +316,8 @@ model Rating {
   masterId  String   @map("master_id") @db.Uuid
   stars     Int
   comment   String?  @db.Text
+  /// Tanlangan teglar — koʻrsatiladigan matnning oʻzi (ilova ularni chekda chizadi).
+  tags      String[] @default([])
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)

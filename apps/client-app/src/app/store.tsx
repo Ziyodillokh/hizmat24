@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -14,18 +15,15 @@ import {
 import { NOTIFICATIONS } from '@/mocks/notifications';
 import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 
-import {
-  buildAcceptPatch,
-  buildArrivePatch,
-  buildDepartPatch,
-  buildFinishPatch,
-  buildMasterCancelPatch,
-  buildStepPatch,
-} from './masterActions';
+import { buildStepPatch } from './masterActions';
+import { isApiEnabled } from '@/api/client';
 import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
+import { buildLocalMasterActions } from './localMasterActions';
+import { buildServerOrderActions } from './serverOrderActions';
 import { useOrderTimers } from './useOrderTimers';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
+import { buildDraftActions } from './draftActions';
 import { EMPTY_DRAFT, type LiveOrder, type OrderDraft, type UserRole } from './types';
 import type { AuthSession } from '@/api/auth';
 import { logout } from '@/api/auth';
@@ -34,11 +32,12 @@ import { clearAuth, loadAuth, saveAuth } from './auth-persistence';
 import { clearSession, loadSession, saveSession } from './persistence';
 
 /**
- * Prototip holati.
+ * Ilova holati — IKKI rejimda bir xil shakl.
  *
- * Backend hali ulanmagan, shuning uchun server tomonidagi oʻtishlar
- * (usta topildi → yoʻlga chiqdi → yetib keldi) TAYMER bilan taqlid qilinadi.
- * Mijoz oʻzi boshqaradigan oʻtishlar esa haqiqiy tugmalar orqali boʻladi.
+ * `VITE_API_URL` berilgan boʻlsa amallar serverga boradi va holatni server
+ * hal qiladi. Berilmagan boʻlsa (mock rejim) server oʻtishlari — usta
+ * topildi → yoʻlga chiqdi → yetib keldi — TAYMER bilan taqlid qilinadi.
+ * Ekranlar ikkisini ajratmaydi: har bir amal `Promise` qaytaradi.
  */
 
 interface AppState {
@@ -94,22 +93,23 @@ interface AppActions {
   setDraftPayment: (method: PaymentMethod) => void;
   resetDraft: () => void;
   /**
-   * Qoralamadan buyurtma yaratadi va uning id sini qaytaradi.
+   * Buyurtma yaratadi va uning `id` sini qaytaradi.
    *
-   * Chegirma foizi TASHQARIDAN keladi: daraja mock toʻlovlar va jonli
-   * buyurtmalar birgalikda hisoblanadi, store esa faqat jonli buyurtmalarni
-   * koʻradi. Foiz shu yerda hisoblansa, Bonuslar sahifasi "Kumush · 4%" deb
-   * turganda chekda "Bronza · 2%" chiqardi.
+   * Server rejimida soʻrov yuboriladi va NARXNI server hisoblaydi —
+   * `discountPercent` eʼtiborsiz qoladi. Mock rejimda hammasi shu
+   * qurilmada va foiz TASHQARIDAN keladi: daraja mock toʻlovlar bilan
+   * birga hisoblanadi, store esa faqat jonli buyurtmalarni koʻradi.
+   * Ikkala yoʻl ham `Promise` qaytaradi — ekran ularni ajratmaydi.
    */
-  createOrder: (discountPercent: number) => string | null;
-  cancelOrder: (orderId: string, reason: string) => void;
-  confirmMaster: (orderId: string) => void;
-  rejectMaster: (orderId: string, note: string) => void;
+  createOrder: (discountPercent: number) => Promise<string | null>;
+  cancelOrder: (orderId: string, reason: string) => Promise<void>;
+  confirmMaster: (orderId: string) => Promise<void>;
+  rejectMaster: (orderId: string, note: string) => Promise<void>;
   /**
    * Baho obyekt sifatida uzatiladi: pozitsion argumentlarda `comment` va
    * `tags` ni almashtirib yuborish oson boʻlardi.
    */
-  rateOrder: (orderId: string, rating: RatingInput) => void;
+  rateOrder: (orderId: string, rating: RatingInput) => Promise<void>;
   /** Demo: keyingi server oʻtishini kutmasdan darhol bajarish. */
   advanceOrder: (orderId: string) => void;
   /**
@@ -130,6 +130,10 @@ interface AppActions {
   createDemoOrder: () => string | null;
   setMasterTakeover: (on: boolean) => void;
   markNotificationsRead: () => void;
+  /** Serverdan kelgan roʻyxat bilan almashtiradi (faqat server rejimida). */
+  replaceOrders: (orders: LiveOrder[]) => void;
+  /** Bitta buyurtmani qoʻshadi yoki almashtiradi — WebSocket hodisasi uchun. */
+  upsertOrder: (order: LiveOrder) => void;
 }
 
 interface AppContextValue extends AppState, AppActions {
@@ -194,6 +198,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   });
 
+  // Qoralama refʼda ham saqlanadi: server amali uni `setState` ichidan
+  // emas, chaqiruv paytida oʻqiydi va eskirgan nusxa yuborilmaydi.
+  const draftRef = useRef(state.draft);
+  draftRef.current = state.draft;
+
+  /**
+   * Bitta buyurtmani roʻyxatga qoʻshadi yoki almashtiradi.
+   *
+   * Server javobi ham, WebSocket hodisasi ham shu yoʻldan oʻtadi: buyurtma
+   * ikki marta qoʻshilmaydi va eski nusxa qolib ketmaydi.
+   */
+  const upsertOrder = useCallback((order: LiveOrder) => {
+    setState((prev) => {
+      const exists = prev.orders.some((item) => item.id === order.id);
+      return {
+        ...prev,
+        orders: exists
+          ? prev.orders.map((item) => (item.id === order.id ? order : item))
+          : [order, ...prev.orders],
+      };
+    });
+  }, []);
+
+  /**
+   * Server rejimidagi amallar; mock rejimda `null` — pastdagi har bir amal
+   * shu bayroqqa qarab yoʻl tanlaydi.
+   */
+  const server = useMemo(
+    () =>
+      isApiEnabled()
+        ? buildServerOrderActions({
+            upsertOrder,
+            resetDraft: () => setState((prev) => ({ ...prev, draft: EMPTY_DRAFT })),
+            readDraft: () => draftRef.current,
+          })
+        : null,
+    [upsertOrder],
+  );
+
+  /** Roʻyxatni serverdan kelgani bilan almashtiradi. */
+  const replaceOrders = useCallback(
+    (orders: LiveOrder[]) => setState((prev) => ({ ...prev, orders })),
+    [],
+  );
+
+  const draftActions = useMemo(() => buildDraftActions(setState), []);
+
+  // Usta amallari hozircha shu qurilmada (B5 da serverga koʻchadi).
+  const masterActions = useMemo(() => buildLocalMasterActions(setState), []);
+
   const patchOrder = useCallback((orderId: string, patch: Partial<LiveOrder>) => {
     setState((prev) => ({
       ...prev,
@@ -202,31 +256,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ),
     }));
   }, []);
-
-  /**
-   * Usta amallarining yagona yoʻli: quruvchi `setState` ICHIDA chaqiriladi.
-   *
-   * Qorovul shu joyda boʻlishi shart — karta chizilgandan keyin taymer yoki
-   * mijoz holatni oʻzgartirgan boʻlishi mumkin. Quruvchi `null` qaytarsa
-   * hech narsa yozilmaydi.
-   */
-  const patchByBuilder = useCallback(
-    (orderId: string, build: (order: LiveOrder) => Partial<LiveOrder> | null) => {
-      setState((prev) => {
-        const order = prev.orders.find((item) => item.id === orderId);
-        if (!order) return prev;
-
-        const patch = build(order);
-        if (!patch) return prev;
-
-        return {
-          ...prev,
-          orders: prev.orders.map((item) => (item.id === orderId ? { ...item, ...patch } : item)),
-        };
-      });
-    },
-    [],
-  );
 
   /** Server tomonidagi keyingi oʻtishni qoʻllaydi. */
   const applyServerStep = useCallback((orderId: string, status: OrderStatus) => {
@@ -238,7 +267,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const order = prev.orders.find((item) => item.id === orderId);
       if (!order || order.status !== status) return prev;
 
-      const step = simulationStep(order, prev.masterTakeover);
+      const step = simulationStep(order, prev.masterTakeover, isApiEnabled());
       if (!step) return prev;
 
       const patch = buildStepPatch(order, step.next, new Date());
@@ -355,53 +384,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setFullName: (name) =>
         setState((prev) => ({ ...prev, fullName: name.trim() || null })),
 
-      setDraftCategory: (categoryId) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, categoryId } })),
+      ...draftActions,
 
-      setDraftDetails: (description) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, description } })),
-
-      setDraftSchedule: (scheduledAt, isUrgent) =>
-        setState((prev) => ({
-          ...prev,
-          // Invariant SHU YERDA saqlanadi: rejalashtirilgan buyurtma
-          // shoshilinch boʻlmaydi.
-          draft: { ...prev.draft, scheduledAt, isUrgent: scheduledAt === null && isUrgent },
-        })),
-
-      setDraftPayment: (paymentMethod) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, paymentMethod } })),
-
-      setDraftAddress: (address) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, address } })),
-
-      setDraftMaster: (preferredMasterId) =>
-        setState((prev) => ({ ...prev, draft: { ...prev.draft, preferredMasterId } })),
-
-      resetDraft: () => setState((prev) => ({ ...prev, draft: EMPTY_DRAFT })),
-
-      createOrder: (discountPercent) => createFromDraft(null, discountPercent),
+      createOrder: async (discountPercent) =>
+        server ? server.createOrder() : createFromDraft(null, discountPercent),
 
       createDemoOrder: () => createFromDraft(DEMO_DRAFT, 0),
 
-      cancelOrder: (orderId, reason) =>
+      cancelOrder: async (orderId, reason) => {
+        if (server) return server.cancelOrder(orderId, reason);
         patchOrder(orderId, {
           status: ORDER_STATUS.CANCELLED,
           cancelReason: reason,
           cancelledBy: 'CLIENT',
           etaMinutes: null,
-        }),
+        });
+      },
 
-      confirmMaster: (orderId) => patchOrder(orderId, { status: ORDER_STATUS.IN_PROGRESS }),
+      confirmMaster: async (orderId) => {
+        if (server) return server.confirmMaster(orderId);
+        patchOrder(orderId, { status: ORDER_STATUS.IN_PROGRESS });
+      },
 
-      rejectMaster: (orderId, note) =>
+      rejectMaster: async (orderId, note) => {
+        if (server) return server.rejectMaster(orderId, note);
         patchOrder(orderId, {
           status: ORDER_STATUS.SAFETY_FLAGGED,
           cancelReason: note || null,
           etaMinutes: null,
-        }),
+        });
+      },
 
-      rateOrder: (orderId, rating) =>
+      rateOrder: async (orderId, rating) => {
+        if (server) return server.rateOrder(orderId, rating);
         patchOrder(orderId, {
           status: ORDER_STATUS.CLOSED,
           rating: {
@@ -409,7 +424,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             comment: rating.comment.trim() || null,
             tags: [...rating.tags],
           },
-        }),
+        });
+      },
 
       // Qorovul `simulationStep` ichida: usta yuritayotgan buyurtmada demo
       // tugmasi holatni uning orqasidan surib yuborardi.
@@ -418,7 +434,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const order = prev.orders.find((item) => item.id === orderId);
           if (!order) return prev;
 
-          const step = simulationStep(order, prev.masterTakeover);
+          const step = simulationStep(order, prev.masterTakeover, isApiEnabled());
           if (!step) return prev;
 
           const patch = buildStepPatch(order, step.next, new Date());
@@ -431,40 +447,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           };
         }),
 
-      masterAcceptOrder: (orderId, input) => {
-        let accepted = false;
+      ...masterActions,
 
-        setState((prev) => {
-          const order = prev.orders.find((item) => item.id === orderId);
-          if (!order) return prev;
-
-          // Holat `setState` ICHIDA qayta tekshiriladi (quruvchining oʻzida):
-          // taklif kartasi chizilgandan keyin taymer ulgurgan boʻlishi mumkin.
-          const patch = buildAcceptPatch(order, input.master, input.etaMinutes);
-          if (!patch) return prev;
-
-          accepted = true;
-          return {
-            ...prev,
-            orders: prev.orders.map((item) =>
-              item.id === orderId ? { ...item, ...patch } : item,
-            ),
-          };
-        });
-
-        return accepted;
-      },
-
-      masterDepart: (orderId, etaMinutes) =>
-        patchByBuilder(orderId, (order) => buildDepartPatch(order, etaMinutes)),
-
-      masterArrive: (orderId) => patchByBuilder(orderId, buildArrivePatch),
-
-      masterCancelOrder: (orderId, reason) =>
-        patchByBuilder(orderId, (order) => buildMasterCancelPatch(order, reason)),
-
-      masterFinish: (orderId, workNote) =>
-        patchByBuilder(orderId, (order) => buildFinishPatch(order, workNote, new Date())),
+      replaceOrders,
+      upsertOrder,
 
       setMasterTakeover: (on) =>
         setState((prev) => (prev.masterTakeover === on ? prev : { ...prev, masterTakeover: on })),
@@ -478,7 +464,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })),
         })),
     }),
-    [patchOrder, patchByBuilder, createFromDraft],
+    [patchOrder, createFromDraft, draftActions, masterActions, server, replaceOrders, upsertOrder],
   );
 
   const value = useMemo<AppContextValue>(() => {

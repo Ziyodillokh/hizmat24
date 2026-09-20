@@ -24,6 +24,7 @@ export interface RatingView {
   orderId: string;
   stars: number;
   comment: string | null;
+  tags: string[];
 }
 
 @Injectable()
@@ -46,6 +47,7 @@ export class RatingsService {
     clientId: string,
     stars: number,
     comment: string | null,
+    tags: string[],
   ): Promise<RatingView> {
     const entity = await this.orders.findEntity(orderId);
     if (!entity) throw new OrderNotFoundException(orderId);
@@ -73,7 +75,7 @@ export class RatingsService {
     const rating = await this.prisma
       .$transaction(async (tx) => {
         const created = await tx.rating.create({
-          data: { orderId, clientId, masterId, stars, comment },
+          data: { orderId, clientId, masterId, stars, comment, tags },
         });
 
         await this.orders.applyTransition(
@@ -129,6 +131,7 @@ export class RatingsService {
       orderId: rating.orderId,
       stars: rating.stars,
       comment: rating.comment,
+      tags: rating.tags,
     };
   }
 

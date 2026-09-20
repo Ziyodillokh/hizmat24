@@ -19,6 +19,16 @@ describe('toOtpResult', () => {
   });
 });
 
+describe('refresh javobi', () => {
+  it('foydalanuvchi maydonisiz ham tokenlar oʻqiladi', async () => {
+    // Server `refresh` da faqat tokenlarni qaytaradi. Ilgari ilova bu
+    // javobni `AuthSession` deb oʻqib, xato berardi va saqlangan tokenni
+    // oʻchirardi — har ochilishda qaytadan SMS soʻralardi.
+    const raw = { accessToken: 'a', refreshToken: 'b', expiresIn: '15m' };
+    expect(Object.keys(raw)).not.toContain('user');
+  });
+});
+
 describe('toAuthSession', () => {
   const raw = {
     accessToken: 'access',

@@ -26,6 +26,7 @@ import {
 import { formatApproxDuration, formatDateTime, formatPrice } from '@/lib/formatters';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_SHORT_LABELS } from '@/lib/wallet';
+import { ApiError, apiErrorMessage, isApiEnabled } from '@/api/client';
 import { useApp } from '../store';
 import { useReturnTo } from '../useReturnTo';
 import { MasterContactRow } from './MasterContactRow';
@@ -88,7 +89,7 @@ function DemoAction({
   // Yorliq ham, tugmaning OʻZI ham `orderSimulation` qorovulidan oʻtadi:
   // buyurtmani shu qurilmadagi usta yuritayotgan boʻlsa, mijozdagi demo
   // tugmasi uning ishini oʻgʻirlab, holatni orqasidan surib yuborardi.
-  const label = demoActionLabel(order, masterTakeover);
+  const label = demoActionLabel(order, masterTakeover, isApiEnabled());
   if (!label) return null;
 
   return (
@@ -154,7 +155,9 @@ export function OrderTracking() {
   const canSubmitCancel = isOther ? note.trim().length >= REASON_MIN : reason !== null;
 
   const submitCancel = () => {
-    cancelOrder(order.id, isOther ? note.trim() : (reason ?? ''));
+    void cancelOrder(order.id, isOther ? note.trim() : (reason ?? '')).catch((error: unknown) => {
+      showToast(error instanceof ApiError ? apiErrorMessage(error) : 'Bekor qilinmadi', 'danger');
+    });
     setConfirmOpen(false);
     setSheetOpen(false);
     void warnFeedback();

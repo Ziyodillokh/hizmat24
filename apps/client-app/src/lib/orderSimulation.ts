@@ -54,7 +54,12 @@ const isSearching = (status: OrderStatus): boolean =>
 export function simulationStep(
   order: Pick<SimulationOrder, 'status' | 'handledByMaster'>,
   masterTakeover: boolean,
+  apiEnabled = false,
 ): SimulationStep | null {
+  // Server ulangan boʻlsa taqlid UMUMAN yoʻq: holatni faqat server
+  // oʻzgartiradi. Ikki aktyor bitta buyurtmani sursa, ekrandagi holat
+  // serverdagidan farq qilib qolardi.
+  if (apiEnabled) return null;
   if (order.handledByMaster) return null;
   if (masterTakeover && isSearching(order.status)) return null;
   return SERVER_STEPS[order.status] ?? null;
@@ -98,8 +103,9 @@ export const simulationTimerKey = (order: Pick<SimulationOrder, 'id' | 'status'>
 export function demoActionLabel(
   order: Pick<SimulationOrder, 'status' | 'handledByMaster'>,
   masterTakeover: boolean,
+  apiEnabled = false,
 ): string | null {
-  if (!simulationStep(order, masterTakeover)) return null;
+  if (!simulationStep(order, masterTakeover, apiEnabled)) return null;
 
   switch (order.status) {
     case ORDER_STATUS.SEARCHING:

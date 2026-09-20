@@ -31,14 +31,13 @@ export function useSessionRestore(): boolean | null {
 
     let alive = true;
     void refreshSession(stored.refreshToken)
-      .then((session) => {
+      .then((tokens) => {
         if (!alive) return;
-        setAccessToken(session.accessToken);
-        saveAuth({
-          refreshToken: session.refreshToken,
-          userId: session.user.id,
-          phoneNumber: session.user.phoneNumber,
-        });
+        setAccessToken(tokens.accessToken);
+        // Foydalanuvchi maʼlumoti javobda kelmaydi — saqlangani qoladi,
+        // faqat tokenlar almashadi (server har yangilashda yangi refresh
+        // beradi va eskisini bekor qiladi).
+        saveAuth({ ...stored, refreshToken: tokens.refreshToken });
         setDone(true);
       })
       .catch(() => {

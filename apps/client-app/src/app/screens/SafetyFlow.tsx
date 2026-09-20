@@ -11,6 +11,7 @@ import { Textarea } from '@/components/Textarea';
 import { StatusBar } from '@/preview/StatusBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
 import { ORDER_STATUS } from '@/lib/orderStateMachine';
+import { ApiError, apiErrorMessage } from '@/api/client';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
 import { tapFeedback, warnFeedback } from '../native';
@@ -83,10 +84,18 @@ export function ConfirmMasterFlow() {
             variant="primary"
             className="h-[56px]"
             onClick={() => {
-              confirmMaster(order.id);
-              void tapFeedback();
-              showToast('Ish boshlandi', 'success');
-              navigate(`/app/order/${order.id}`, { replace: true });
+              void confirmMaster(order.id)
+                .then(() => {
+                  void tapFeedback();
+                  showToast('Ish boshlandi', 'success');
+                  navigate(`/app/order/${order.id}`, { replace: true });
+                })
+                .catch((error: unknown) => {
+                  showToast(
+                    error instanceof ApiError ? apiErrorMessage(error) : 'Tasdiqlanmadi',
+                    'danger',
+                  );
+                });
             }}
           >
             Ha, shu usta
@@ -128,9 +137,17 @@ export function ConfirmMasterFlow() {
           <Button
             variant="destructive"
             onClick={() => {
-              rejectMaster(order.id, note.trim());
-              void warnFeedback();
-              navigate(`/app/order/${order.id}/safety`, { replace: true });
+              void rejectMaster(order.id, note.trim())
+                .then(() => {
+                  void warnFeedback();
+                  navigate(`/app/order/${order.id}/safety`, { replace: true });
+                })
+                .catch((error: unknown) => {
+                  showToast(
+                    error instanceof ApiError ? apiErrorMessage(error) : 'Signal yuborilmadi',
+                    'danger',
+                  );
+                });
             }}
           >
             Tasdiqlash

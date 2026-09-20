@@ -23,6 +23,7 @@ import { masterById } from '@/mocks/masters';
 import { useAddresses } from '../../address-store';
 import { tapFeedback } from '../../native';
 import { useCatalog } from '../../catalog-store';
+import { ApiError, apiErrorMessage } from '@/api/client';
 import { useApp } from '../../store';
 import { useToast } from '../../ToastHost';
 import { useWallet } from '../../useWallet';
@@ -50,18 +51,28 @@ export function ConfirmStep() {
 
   const edit = (route: string) => navigate(route, { state: { returnTo: ORDER_STEP_ROUTES.confirm } });
 
-  const submit = () => {
+  const submit = async () => {
     if (isSubmitting || isStale) return;
     setIsSubmitting(true);
-    const orderId = createOrder(level.discountPercent);
-    if (orderId) {
+
+    try {
+      const orderId = await createOrder(level.discountPercent);
+      if (!orderId) {
+        setIsSubmitting(false);
+        showToast('Buyurtma yaratilmadi — maʼlumotlar toʻliq emas', 'danger');
+        return;
+      }
+
       if (draft.address) noteAddressUsed(draft.address);
       void tapFeedback();
       showToast('Buyurtma qabul qilindi', 'success');
       navigate(`/app/order/${orderId}/payment-receipt`, { replace: true });
-    } else {
+    } catch (error) {
+      // Server rad etdi yoki ulanish yoʻq — qoralama joyida qoladi va
+      // foydalanuvchi qayta urinib koʻradi. Buyurtma «yaratildi» deb
+      // koʻrsatib, keyin uni roʻyxatda topolmaslik eng yomon holat.
       setIsSubmitting(false);
-      showToast('Buyurtma yaratilmadi — maʼlumotlar toʻliq emas', 'danger');
+      showToast(error instanceof ApiError ? apiErrorMessage(error) : 'Buyurtma yaratilmadi', 'danger');
     }
   };
 
@@ -80,7 +91,7 @@ export function ConfirmStep() {
           <p className="mb-8 text-center text-caption text-text-secondary">
             Tasdiqlangach buyurtmani tahrirlab boʻlmaydi — faqat bekor qilish mumkin
           </p>
-          <Button variant="primary" loading={isSubmitting} disabled={isStale} onClick={submit}>
+          <Button variant="primary" loading={isSubmitting} disabled={isStale} onClick={() => void submit()}>
             Ustani chaqirish
           </Button>
         </StickyFooter>

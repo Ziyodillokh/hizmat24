@@ -50,13 +50,26 @@ export const apiErrorMessage = (error: ApiError): string => {
  * SOF: qobiqni yechadi. `success: false` — serverning oʻz xatosi, uni
  * tarmoq xatosidan ajratamiz: birinchisida qayta urinish maʼnosiz.
  */
+/**
+ * Server matnini foydalanuvchi tiliga tarjima qilib boʻlmaydi — u allaqachon
+ * oʻzbekcha. Lekin ikkita holat TEXNIK matn beradi va ular ekranga chiqmasligi
+ * kerak: soʻrov chegarasi (`ThrottlerException: Too Many Requests`) va
+ * kutilmagan server xatosi.
+ */
+const STATUS_MESSAGES: Record<number, string> = {
+  429: 'Juda koʻp urinish. Bir necha daqiqadan keyin qayta urinib koʻring.',
+  500: 'Serverda xatolik. Keyinroq qayta urinib koʻring.',
+  502: 'Server javob bermayapti. Keyinroq qayta urinib koʻring.',
+  503: 'Server javob bermayapti. Keyinroq qayta urinib koʻring.',
+};
+
 export function unwrap<T>(envelope: ApiEnvelope<T>, status: number): T {
   if (envelope.success && envelope.data !== null) return envelope.data;
 
   const error = envelope.error;
   throw new ApiError(
     'server',
-    error?.message ?? 'Server xatosi',
+    STATUS_MESSAGES[status] ?? error?.message ?? 'Server xatosi',
     error?.code ?? null,
     status,
   );
@@ -81,6 +94,8 @@ export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
   token?: string | null;
+  /** Qoʻshimcha sarlavhalar — masalan `Idempotency-Key`. */
+  headers?: Record<string, string>;
   signal?: AbortSignal;
 }
 
@@ -99,6 +114,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       headers: {
         ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...options.headers,
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: controller.signal,

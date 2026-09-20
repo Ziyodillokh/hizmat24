@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isApiEnabled } from '@/api/client';
 import { simulationStep, simulationTimerKey, waitMsFor } from '@/lib/orderSimulation';
 import type { LiveOrder } from './types';
 
@@ -23,7 +24,7 @@ export function useOrderTimers(
   useEffect(() => {
     const wanted = new Map<string, { order: LiveOrder; delayMs: number }>();
     for (const order of orders) {
-      const step = simulationStep(order, masterTakeover);
+      const step = simulationStep(order, masterTakeover, isApiEnabled());
       if (step) wanted.set(simulationTimerKey(order), { order, delayMs: step.delayMs });
     }
 

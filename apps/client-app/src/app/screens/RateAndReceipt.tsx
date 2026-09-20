@@ -25,6 +25,7 @@ import {
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { METHOD_LABELS } from '@/lib/wallet';
 import { cn } from '@/lib/cn';
+import { ApiError, apiErrorMessage } from '@/api/client';
 import { useApp } from '../store';
 import { useReturnTo } from '../useReturnTo';
 import { useToast } from '../ToastHost';
@@ -71,7 +72,11 @@ export function RateOrderScreen() {
   const hint = submitHint(stars, tags);
 
   const submit = () => {
-    rateOrder(order.id, { stars, comment, tags });
+    // Baho serverga ketadi; xato boʻlsa ekran oʻsha joyda qoladi va
+    // foydalanuvchi qayta yuboradi.
+    void rateOrder(order.id, { stars, comment, tags }).catch((error: unknown) => {
+      showToast(error instanceof ApiError ? apiErrorMessage(error) : 'Baho yuborilmadi', 'danger');
+    });
     void tapFeedback();
     // Past bahoda "rahmat" deyish quloqqa yot.
     if (isNegativeRating(stars)) showToast('Baho qabul qilindi');

@@ -63,7 +63,7 @@ describe('RatingsService (TZ 3.8)', () => {
 
   it('yakunlangan buyurtmani baholaydi va CLOSED holatiga yopadi', async () => {
     // Act
-    const result = await service.rateOrder('order-1', 'client-1', 5, null);
+    const result = await service.rateOrder('order-1', 'client-1', 5, null, []);
 
     // Assert
     expect(result.id).toBe('rating-1');
@@ -74,7 +74,7 @@ describe('RatingsService (TZ 3.8)', () => {
   it("ish yakunlanmagan boʻlsa baholashni rad etadi", async () => {
     orders.findEntity.mockResolvedValue(buildEntity({ status: OrderStatus.IN_PROGRESS }));
 
-    await expect(service.rateOrder('order-1', 'client-1', 5, null)).rejects.toThrow(
+    await expect(service.rateOrder('order-1', 'client-1', 5, null, [])).rejects.toThrow(
       'faqat ish yakunlangandan keyin',
     );
   });
@@ -89,19 +89,19 @@ describe('RatingsService (TZ 3.8)', () => {
     );
 
     // Act & Assert
-    await expect(service.rateOrder('order-1', 'client-1', 5, null)).rejects.toMatchObject({
+    await expect(service.rateOrder('order-1', 'client-1', 5, null, [])).rejects.toMatchObject({
       code: 'RATING_ALREADY_EXISTS',
     });
   });
 
   it("boshqa mijozning buyurtmasini baholashga yoʻl qoʻymaydi (6.1)", async () => {
-    await expect(service.rateOrder('order-1', 'begona', 5, null)).rejects.toThrow(
+    await expect(service.rateOrder('order-1', 'begona', 5, null, [])).rejects.toThrow(
       'Bu buyurtma sizga tegishli emas',
     );
   });
 
   it("reyting oʻrtachasini background job orqali qayta hisoblaydi (bloklamaydi)", async () => {
-    await service.rateOrder('order-1', 'client-1', 4, 'rahmat');
+    await service.rateOrder('order-1', 'client-1', 4, 'rahmat', []);
 
     expect(queueAdd).toHaveBeenCalledWith(
       JOB_RECALCULATE_MASTER_RATING,
@@ -111,7 +111,7 @@ describe('RatingsService (TZ 3.8)', () => {
   });
 
   it('bajarilgan buyurtmalar sonini oshiradi', async () => {
-    await service.rateOrder('order-1', 'client-1', 5, null);
+    await service.rateOrder('order-1', 'client-1', 5, null, []);
 
     expect(masterUpdate).toHaveBeenCalledWith({
       where: { id: 'master-1' },
@@ -123,7 +123,7 @@ describe('RatingsService (TZ 3.8)', () => {
 
   it("ustaning boʻsh/band holatiga bevosita tegmaydi (invariant egasi — reconcile)", async () => {
     // Kech baholash allaqachon yangi ish olgan ustani "bo'sh" qilib qo'ymasligi kerak
-    await service.rateOrder('order-1', 'client-1', 5, null);
+    await service.rateOrder('order-1', 'client-1', 5, null, []);
 
     expect(masterUpdate.mock.calls[0][0].data).not.toHaveProperty('status');
   });

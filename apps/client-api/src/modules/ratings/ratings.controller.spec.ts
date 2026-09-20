@@ -10,7 +10,7 @@ describe('RatingsController', () => {
     await controller.rate('client-1', 'order-1', { stars: 5, comment: 'rahmat' });
 
     // Assert
-    expect(rateOrder).toHaveBeenCalledWith('order-1', 'client-1', 5, 'rahmat');
+    expect(rateOrder).toHaveBeenCalledWith('order-1', 'client-1', 5, 'rahmat', []);
   });
 
   it('izohsiz baholashda null uzatadi', async () => {
@@ -19,6 +19,6 @@ describe('RatingsController', () => {
 
     await controller.rate('client-1', 'order-1', { stars: 4 });
 
-    expect(rateOrder).toHaveBeenCalledWith('order-1', 'client-1', 4, null);
+    expect(rateOrder).toHaveBeenCalledWith('order-1', 'client-1', 4, null, []);
   });
 });

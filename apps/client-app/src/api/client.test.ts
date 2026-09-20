@@ -35,6 +35,21 @@ describe('unwrap', () => {
     }
   });
 
+  it('texnik matn oʻrniga oʻzbekcha jumla', () => {
+    // Server chegarasi `ThrottlerException: Too Many Requests` deb qaytaradi —
+    // bu ekranga chiqmasligi kerak.
+    try {
+      unwrap(
+        { success: false, data: null, error: { code: 'TOO_MANY', message: 'ThrottlerException: Too Many Requests' } },
+        429,
+      );
+    } catch (error) {
+      const api = error as ApiError;
+      expect(api.message).toContain('Juda koʻp urinish');
+      expect(api.message).not.toContain('Throttler');
+    }
+  });
+
   it('maʼlumotsiz muvaffaqiyat ham xato — jim qolmaymiz', () => {
     expect(() => unwrap({ success: true, data: null, error: null }, 200)).toThrowError(ApiError);
   });
