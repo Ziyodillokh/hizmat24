@@ -125,6 +125,8 @@ ikkala ilovada ham yashil; APK `~/Desktop/hizmat24-<nom>.apk`; telefonda qoʻlda
 
 ### B1 — Server koʻtariladi va ilova uni koʻradi
 
+> **Bajarildi** · `3ed50b1` · APK `hizmat24-api-1-ulanish.apk`
+
 **Maqsad:** `docker compose up` bilan Postgres + Redis + API ishlaydi; ilova serverga ulana oladi.
 
 - `.env` toʻldiriladi (JWT sirlari, `OTP_HASH_SECRET`, `SMS_PROVIDER=console` — sinov uchun).
@@ -141,6 +143,8 @@ boʻsh boʻlsa hammasi hozirgidek ishlaydi.
 ---
 
 ### B2 — Haqiqiy kirish (SMS OTP)
+
+> **Bajarildi** · `a805283` · APK `hizmat24-api-2-kirish.apk`
 
 **Maqsad:** telefon raqami bilan haqiqiy kirish; JWT saqlanadi va yangilanadi.
 
@@ -159,6 +163,14 @@ oʻrnatganda sessiya saqlanmaydi (bu toʻgʻri), lekin qayta kirish ishlaydi.
 ---
 
 ### B3 — Katalog va buyurtma serverda
+
+> **Bajarildi** · katalog `d0dc7b5`, server `d9c6842`, ilova `eea4e28` ·
+> APK `hizmat24-api-3-buyurtma.apk`
+>
+> Rejadan chetlanish: WS hodisasi `order.status_changed` emas, `order.updated`
+> deb nomlandi — holat oʻzgarmasdan ham (usta tayinlandi, ETA yangilandi)
+> yangilanish kerak boʻladi. Bahoga `tags` ustuni qoʻshildi: ilova teglarni
+> yigʻardi, server esa ularni tashlab yuborardi.
 
 **Maqsad:** buyurtma serverga tushadi, mijoz uni serverdan koʻradi; taymer oʻchadi.
 
