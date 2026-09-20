@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Ranglar RGB KANALLARI sifatida saqlanadi ("255 255 255"), hex emas:
+ * Tailwindʼning shaffoflik utilitalari (`bg-primary/10`) rangni
+ * `rgb(... / <alpha-value>)` shaklida kutadi. Hex yozilsa utilita jimgina
+ * tushib qoladi va CSS umuman chiqmaydi.
+ */
+:root {
+  color-scheme: light;
+  --color-surface: 243 247 251;
+  --color-surface-elevated: 255 255 255;
+  --color-surface-sunken: 232 239 247;
+  --color-sidebar: 16 42 67;
+  --color-sidebar-active: 47 128 200;
+  /*
+   * Chap menyu ikkala temada ham TOʻQ koʻk. Shuning uchun uning matni
+   * ham ikkala temada bir xil — ochiq. Ilgari bu yerda `on-primary`
+   * ishlatilardi; u Dark temada qoramtir boʻlib (koʻk tugma ustidagi
+   * matn uchun toʻgʻri), menyu yozuvlari toʻq fonda koʻrinmay qolardi.
+   */
+  --color-sidebar-text: 241 246 251;
+  --color-primary: 47 128 200;
+  --color-primary-pressed: 36 105 168;
+  --color-on-primary: 255 255 255;
+  --color-border: 220 229 239;
+  --color-border-strong: 190 205 222;
+  --color-text-primary: 16 42 67;
+  --color-text-secondary: 88 111 136;
+  --color-text-disabled: 150 168 188;
+  --color-success: 26 121 70;
+  --color-success-surface: 226 243 234;
+  --color-warning: 154 84 8;
+  --color-warning-surface: 252 240 222;
+  --color-danger: 200 30 30;
+  --color-danger-surface: 253 232 232;
+  --color-neutral-surface: 237 242 248;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-surface: 8 25 43;
+  --color-surface-elevated: 15 39 64;
+  --color-surface-sunken: 5 17 31;
+  --color-sidebar: 5 17 31;
+  --color-sidebar-active: 47 128 200;
+  --color-sidebar-text: 241 246 251;
+  --color-primary: 96 165 220;
+  --color-primary-pressed: 70 140 200;
+  --color-on-primary: 6 20 36;
+  --color-border: 30 62 94;
+  --color-border-strong: 48 84 120;
+  --color-text-primary: 241 246 251;
+  --color-text-secondary: 156 178 200;
+  --color-text-disabled: 100 125 150;
+  --color-success: 52 211 153;
+  --color-success-surface: 12 54 42;
+  --color-warning: 251 191 36;
+  --color-warning-surface: 62 46 12;
+  --color-danger: 252 165 165;
+  --color-danger-surface: 68 22 22;
+  --color-neutral-surface: 20 46 74;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--color-surface));
+  color: rgb(var(--color-text-primary));
+  font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Klaviatura bilan yurgan odam qayerdaligini koʻrishi shart. */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 2px;
+}
