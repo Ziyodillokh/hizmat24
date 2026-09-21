@@ -7,10 +7,27 @@ import {
   OrderStatus,
   type PrismaClient,
 } from '@prisma/client';
-import { AppModule } from '@client/app.module';
 import { configureApp } from '@client/bootstrap';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { startInfrastructure, type TestInfrastructure } from './test-environment';
+
+/*
+ * `AppModule` ATAYLAB statik import qilinmaydi.
+ *
+ * `ConfigModule.forRoot({ validate })` modul EVALYUATSIYA paytida ishlaydi,
+ * yaʼni `import` satrida — `beforeAll` dan ancha oldin. Statik import bilan
+ * validatsiya boʻsh muhitda yugurar va CI da (u yerda `.env` yoʻq)
+ * «DATABASE_URL: Required» bilan qulardi. Mahalliy mashinada esa `.env`
+ * borligi uchun oʻtib ketardi — shuning uchun nosozlik faqat CI da
+ * koʻrinardi.
+ *
+ * Ikkinchi sabab muhimroq: `ConfigService.get()` avval VALIDATSIYA
+ * paytidagi nusxaga qaraydi va faqat keyin `process.env` ga. Konteyner
+ * manzillari (`REDIS_HOST`, `REDIS_PORT`) `beforeAll` da maʼlum boʻladi,
+ * demak validatsiya ulardan KEYIN yugurishi shart — aks holda ilova
+ * konteynerga emas, eski qiymatga ulanardi.
+ */
+type AppModuleType = Parameters<typeof Test.createTestingModule>[0]['imports'];
 
 /**
  * Kritik oqim (TZ 9.8): create-order → assign → confirm → complete → rate.
@@ -65,6 +82,11 @@ describe('Buyurtma oqimi (e2e)', () => {
       FCM_ENABLED: 'false',
       THROTTLE_LIMIT: '10000',
     });
+
+    // Import SHU YERDA — muhit toʻldirilgandan keyin (yuqoridagi izohga qarang).
+    const { AppModule } = (await import('@client/app.module')) as {
+      AppModule: NonNullable<AppModuleType>[number];
+    };
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
 

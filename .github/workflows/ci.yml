@@ -110,7 +110,7 @@ jobs:
         run: docker build -t hizmat24-client-api:ci .
 
       - name: Image vulnerability scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: hizmat24-client-api:ci
           severity: CRITICAL,HIGH
