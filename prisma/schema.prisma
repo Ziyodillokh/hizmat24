@@ -4,6 +4,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  // Distroless (Debian 12) imiji uchun dvijok: `native` faqat build
+  // mashinasiga mos keladi, konteynerda esa openssl 3 li Debian dvijoki
+  // kerak. Busiz API imijda «Query engine library not found» bilan
+  // koʻtarilmaydi.
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
