@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ShieldCheck } from 'lucide-react';
 import { ApiError } from '@/api/client';
 import { loginWithPassword, loginWithTotp } from '@/api/admin';
 import { Button, Card, Field, Notice } from '@/components/ui';
+import { BrandMark } from '@/components/BrandMark';
+import { TotpEnrollment } from '@/components/TotpEnrollment';
 import { useAuth, type SignOutReason } from '@/app/AuthProvider';
 
 const SIGN_OUT_MESSAGES: Record<SignOutReason, string> = {
@@ -63,9 +64,11 @@ export function LoginScreen() {
     <main className="flex min-h-full items-center justify-center bg-surface px-20 py-48">
       <Card className="w-full max-w-[400px] p-32">
         <div className="mb-24 flex items-center gap-12">
-          <span className="flex h-40 w-40 items-center justify-center rounded-md bg-primary text-on-primary">
-            <ShieldCheck size={22} aria-hidden />
-          </span>
+          {/* Belgining oʻzi koʻk gradient plitka — ortiga yana rangli
+              kvadrat qoʻyilmaydi, ikki qavat koʻk chekkada iflos koʻrinadi.
+              Hoshiya esa qorongʻi tema uchun: u yerda karta foni (15 39 64)
+              belgining toʻq burchagidan (3 18 60) deyarli farq qilmaydi. */}
+          <BrandMark size={44} decorative className="border border-border-strong" />
           <div>
             <h1 className="text-h2 text-text-primary">Hizmat24</h1>
             <p className="text-caption text-text-secondary">Boshqaruv paneli</p>
@@ -154,7 +157,7 @@ function TotpStep({
         onSubmit(new FormData(event.currentTarget));
       }}
     >
-      {enrollmentUri && <Enrollment uri={enrollmentUri} />}
+      {enrollmentUri && <TotpEnrollment uri={enrollmentUri} />}
 
       <Field
         label="Tasdiqlash kodi"
@@ -174,36 +177,5 @@ function TotpStep({
         Orqaga
       </Button>
     </form>
-  );
-}
-
-/**
- * Birinchi kirish: sirni autentifikator ilovasiga qoʻshish.
- *
- * QR rasm chizilmaydi — u uchun kutubxona kerak boʻlardi. Sirning oʻzi
- * matn koʻrinishida beriladi: har bir autentifikator ilovasi "kalitni
- * qoʻlda kiritish" yoʻlini biladi. Havola ham bor — telefon brauzerida
- * ochilsa ilova oʻzi koʻtariladi.
- */
-function Enrollment({ uri }: { uri: string }) {
-  const secret = new URL(uri.replace('otpauth://', 'https://')).searchParams.get('secret') ?? '';
-
-  return (
-    <div className="flex flex-col gap-8 rounded-md bg-warning-surface p-12">
-      <p className="text-body-strong text-warning">Birinchi kirish — ikki bosqichli himoyani ulang</p>
-      <p className="text-caption text-warning">
-        Google Authenticator yoki Aegis ilovasida «kalitni qoʻlda kiritish» ni tanlang va quyidagi
-        kalitni kiriting:
-      </p>
-      <code className="select-all break-all rounded-sm bg-surface-elevated px-8 py-4 font-mono text-mono text-text-primary">
-        {secret}
-      </code>
-      <a
-        href={uri}
-        className="text-caption-strong text-primary underline underline-offset-2"
-      >
-        Telefonda ochish
-      </a>
-    </div>
   );
 }

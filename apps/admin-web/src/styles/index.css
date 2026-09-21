@@ -37,6 +37,12 @@
   --color-danger: 200 30 30;
   --color-danger-surface: 253 232 232;
   --color-neutral-surface: 237 242 248;
+  /*
+   * QR ranglari ikkala temada bir xil — izoh `tokens/theme.ts` da
+   * (QR_COLORS): toʻq fondagi QR kodni telefon kamerasi oʻqiy olmaydi.
+   */
+  --color-qr-surface: 255 255 255;
+  --color-qr-ink: 16 42 67;
 }
 
 :root[data-theme='dark'] {
@@ -62,6 +68,8 @@
   --color-danger: 252 165 165;
   --color-danger-surface: 68 22 22;
   --color-neutral-surface: 20 46 74;
+  --color-qr-surface: 255 255 255;
+  --color-qr-ink: 16 42 67;
 }
 
 html,

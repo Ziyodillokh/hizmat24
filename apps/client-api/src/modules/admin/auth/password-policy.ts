@@ -25,6 +25,28 @@ export interface PasswordVerdict {
 export const MIN_PASSWORD_LENGTH = 12;
 
 /**
+ * Yuqori chegara — kirish DTO si bilan BIR XIL boʻlishi shart.
+ *
+ * scrypt kiritilgan matnning butun uzunligini qayta ishlaydi, shuning uchun
+ * juda uzun parol serverni band qilib turishi mumkin; `admin-login.dto.ts`
+ * shu sababli 200 belgidan uzunini qabul qilmaydi. Agar siyosat bu chegarani
+ * bilmasa, CLI 250 belgilik parolni bemalol qabul qilib hashni yozardi va
+ * hisob egasi keyin HECH QACHON kira olmasdi: kirish soʻrovi DTO da 400
+ * bilan qaytarilardi. Shuning uchun chegara shu yerda, bitta joyda yashaydi
+ * va DTO uni shu yerdan oladi.
+ */
+export const MAX_PASSWORD_LENGTH = 200;
+
+/**
+ * Parolda kamida shuncha TURLI belgi boʻlishi kerak.
+ *
+ * Ilgari bu yerda faqat "hammasi bitta belgidan iborat" holati tutilardi va
+ * `aaaaaaaaaaaa1` ham, `ababababababab` ham siyosatdan oʻtib ketardi —
+ * ikkalasi ham 12 belgi, ikkalasi ham bir necha soniyada topiladi.
+ */
+export const MIN_DISTINCT_CHARACTERS = 5;
+
+/**
  * Ochiq manbada koʻrinib ketgan parollar — MANGU taqiqlangan.
  *
  * NEGA mangu: bu repo GitHub da ommaviy va bu qiymatlar uning tarixida
@@ -104,9 +126,19 @@ const countCharacters = (value: string): number => Array.from(value).length;
 
 const checkLength: PasswordCheck = ({ password }) => {
   const length = countCharacters(password);
-  if (length >= MIN_PASSWORD_LENGTH) return null;
 
-  return `Parol kamida ${MIN_PASSWORD_LENGTH} belgidan iborat boʻlsin — hozir ${length} ta.`;
+  if (length < MIN_PASSWORD_LENGTH) {
+    return `Parol kamida ${MIN_PASSWORD_LENGTH} belgidan iborat boʻlsin — hozir ${length} ta.`;
+  }
+
+  // Chegara `password.length` boʻyicha ham tekshiriladi: `class-validator`
+  // UTF-16 birliklarini sanaydi, shuning uchun emojili parol kod nuqtalari
+  // boʻyicha sigʻsa ham DTO da rad etilishi mumkin edi.
+  if (length > MAX_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
+    return `Parol ${MAX_PASSWORD_LENGTH} belgidan uzun boʻlmasin — aks holda kirish sahifasi uni qabul qilmaydi.`;
+  }
+
+  return null;
 };
 
 const checkLeaked: PasswordCheck = ({ password }) =>
@@ -124,10 +156,10 @@ const checkEmail: PasswordCheck = ({ canon, email }) => {
 };
 
 const checkRepetition: PasswordCheck = ({ canon }) => {
-  const characters = Array.from(canon);
-  if (characters.length < 2 || characters.some((char) => char !== characters[0])) return null;
+  const distinct = new Set(Array.from(canon)).size;
+  if (distinct >= MIN_DISTINCT_CHARACTERS) return null;
 
-  return 'Parol bitta belgining takroridan iborat boʻlmasin.';
+  return `Parolda kamida ${MIN_DISTINCT_CHARACTERS} xil belgi boʻlsin — hozir ${distinct} ta.`;
 };
 
 /**

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { COLOR_TOKENS, SPACING } from './theme';
+import { COLOR_TOKENS, QR_COLORS, SPACING } from './theme';
 import { contrastRatio, parseChannels, type Rgb } from './contrast';
 
 const css = readFileSync(fileURLToPath(new URL('../styles/index.css', import.meta.url)), 'utf8');
@@ -52,6 +52,9 @@ describe('tema palitrasi', () => {
     ['warning', 'warning-surface', AA_NORMAL_TEXT],
     ['danger', 'danger-surface', AA_NORMAL_TEXT],
     ['text-secondary', 'neutral-surface', AA_NORMAL_TEXT],
+    // QR naqshi fonidan yetarlicha ajralmasa telefon kamerasi kodni
+    // umuman topa olmaydi — bu yerda AA matn chegarasi eng past chegara.
+    ['qr-ink', 'qr-surface', AA_NORMAL_TEXT],
   ];
 
   describe.each(['light', 'dark'] as const)('%s tema kontrasti', (theme) => {
@@ -64,6 +67,15 @@ describe('tema palitrasi', () => {
 
   it('ikkala temada bir xil tokenlar bor', () => {
     expect(Object.keys(LIGHT).sort()).toEqual(Object.keys(DARK).sort());
+  });
+
+  it.each(['light', 'dark'] as const)('%s temada QR ranglari QR_COLORS bilan bir xil', (theme) => {
+    const palette = theme === 'light' ? LIGHT : DARK;
+    const toHex = (channels: Rgb) =>
+      `#${channels.map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+
+    expect(toHex(palette['qr-surface'])).toBe(QR_COLORS.surface.toUpperCase());
+    expect(toHex(palette['qr-ink'])).toBe(QR_COLORS.ink.toUpperCase());
   });
 
   it('boʻshliq shkalasi mijoz ilovasiniki bilan bir xil', () => {

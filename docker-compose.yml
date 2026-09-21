@@ -5,7 +5,7 @@ services:
       POSTGRES_USER: hizmat24
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD kerak}
       POSTGRES_DB: hizmat24
-    # Faqat localhost'ga bog'lanadi — umumiy tarmoqqa ochilmaydi.
+    # Faqat localhostʻga bogʻlanadi — umumiy tarmoqqa ochilmaydi.
     ports:
       - '127.0.0.1:5432:5432'
     volumes:
@@ -38,18 +38,33 @@ services:
       redis:
         condition: service_healthy
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      # Dockerfileʻda ENV NODE_ENV=production turadi, lekin composeʻning
+      # `environment` bloki imij qiymatini BOSIB YOZADI. Ilgari bu yerda
+      # `:-development` edi: serverda `docker compose up` qilingan API
+      # development rejimida koʻtarilar va env.validation.ts dagi barcha
+      # production qoʻriqchilari (console SMS, OTP kodini javobda qaytarish,
+      # bir xil sirlar) jim qolardi.
+      NODE_ENV: ${NODE_ENV:-production}
       DATABASE_URL: postgresql://hizmat24:${POSTGRES_PASSWORD}@postgres:5432/hizmat24?schema=public
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # `:?` — qiymat berilmasa compose umuman ishga tushmaydi. Jim standart
+      # qiymat bu uchtasi uchun xavfli: sir boʻlmasa hech narsa himoyalanmaydi.
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET kerak}
       OTP_HASH_SECRET: ${OTP_HASH_SECRET:?OTP_HASH_SECRET kerak}
-      # production'da "console" ishlatilmaydi — env orqali haqiqiy provayder beriladi
-      SMS_PROVIDER: ${SMS_PROVIDER:-console}
+      ADMIN_TOKEN_SECRET: ${ADMIN_TOKEN_SECRET:?ADMIN_TOKEN_SECRET kerak}
+      # "console" provayderi OTP kodini logga ochiq yozadi — shuning uchun
+      # standart qiymat yoʻq, uni har bir oʻrnatishda ataylab tanlash kerak.
+      SMS_PROVIDER: ${SMS_PROVIDER:?SMS_PROVIDER kerak (eskiz yoki playmobile)}
       SMS_API_URL: ${SMS_API_URL:-}
       SMS_API_TOKEN: ${SMS_API_TOKEN:-}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
+      # Admin paneli brauzerdan ishlaydi — CORS uning manzilidan ochiladi.
+      ADMIN_WEB_ORIGIN: ${ADMIN_WEB_ORIGIN:-}
+      ADMIN_SESSION_IDLE_MINUTES: ${ADMIN_SESSION_IDLE_MINUTES:-30}
+      ADMIN_TOTP_ISSUER: ${ADMIN_TOTP_ISSUER:-Hizmat24}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
     ports:
       - '3000:3000'
 

@@ -53,8 +53,13 @@ describe('Buyurtma oqimi (e2e)', () => {
       DATABASE_URL: infrastructure.databaseUrl,
       REDIS_HOST: infrastructure.redisHost,
       REDIS_PORT: String(infrastructure.redisPort),
+      // Uchala sir ham BERILISHI shart va bir-biridan farq qilishi kerak —
+      // env.validation.ts ularsiz ilovani umuman koʻtarmaydi. Ilgari bu
+      // yerda mavjud boʻlmagan JWT_REFRESH_SECRET turar, OTP_HASH_SECRET
+      // esa yoʻq edi: E2E har bir CI yugurishida shu sababdan yiqilardi.
       JWT_ACCESS_SECRET: 'e'.repeat(40),
-      JWT_REFRESH_SECRET: 'r'.repeat(40),
+      OTP_HASH_SECRET: 'o'.repeat(40),
+      ADMIN_TOKEN_SECRET: 'd'.repeat(40),
       OTP_DEBUG_RETURN_CODE: 'true',
       SMS_PROVIDER: 'console',
       FCM_ENABLED: 'false',

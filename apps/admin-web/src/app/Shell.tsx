@@ -3,6 +3,7 @@ import { LogOut, Moon, Sun } from 'lucide-react';
 import { menuFor } from '@/lib/sections';
 import { formatCountdown } from '@/lib/idle';
 import { Notice, Pill } from '@/components/ui';
+import { BrandMark } from '@/components/BrandMark';
 import { useAuth } from './AuthProvider';
 import { useIdleLogout } from './useIdleLogout';
 import { useTheme } from './useTheme';
@@ -35,9 +36,16 @@ export function Shell() {
       {/* Oʻng chegara Dark temada SHART: u yerda menyu foni sahifa foniga
           juda yaqin va chegarasiz ikkovi bitta yuza boʻlib koʻrinadi. */}
       <nav className="flex w-sidebar shrink-0 flex-col border-r border-border bg-sidebar px-12 py-20">
-        <div className="mb-24 px-8">
-          <p className="text-h3 text-sidebar-text">Hizmat24</p>
-          <p className="text-caption text-sidebar-text/60">Boshqaruv paneli</p>
+        {/* Hoshiya menyu foni uchun: belgi gradientining toʻq burchagi
+            menyu foniga 1.04:1 kontrast bilan singib ketadi. `sidebar-text`
+            ikkala temada bir xil ochiq, 35% da chiziq ~3:1 — koʻrinadi,
+            lekin belgidan diqqatni tortmaydi. */}
+        <div className="mb-24 flex items-center gap-8 px-8">
+          <BrandMark size={32} decorative className="border border-sidebar-text/35" />
+          <div className="min-w-0">
+            <p className="text-h3 text-sidebar-text">Hizmat24</p>
+            <p className="text-caption text-sidebar-text/60">Boshqaruv paneli</p>
+          </div>
         </div>
 
         <ul className="flex flex-col gap-2">

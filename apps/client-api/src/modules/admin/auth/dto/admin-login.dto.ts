@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, Length, Matches, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { MAX_PASSWORD_LENGTH } from '../password-policy';
+
+/** Kirishdagi eng qisqa qabul qilinadigan parol — siyosat chegarasi emas. */
+const LOGIN_MIN_PASSWORD_LENGTH = 10;
 
 export class AdminLoginDto {
   @ApiProperty({ example: 'admin@hizmat24.uz' })
@@ -10,13 +14,19 @@ export class AdminLoginDto {
   email!: string;
 
   /**
-   * Yuqori chegara ham kerak: scrypt kiritilgan matnning butun uzunligini
-   * qayta ishlaydi, shuning uchun uzun parol serverni band qilib turishi
-   * mumkin (DoS).
+   * Chegaralar `password-policy.ts` dan olinadi — ikki joydagi son
+   * bir-biridan uzoqlashib ketmasin.
+   *
+   * Pastki chegara siyosatnikidan (12) PAST: kirish yoʻli siyosatni
+   * qoʻllamaydi, u faqat aql bovar qiladigan oʻlchamni tekshiradi. Siyosat
+   * ertaga qatʼiylashsa, eski parolli admin kirish sahifasidayoq
+   * toʻxtatilib, hisobidan ayrilib qolmasligi kerak.
    */
-  @ApiProperty({ minLength: 10, maxLength: 200 })
+  @ApiProperty({ minLength: LOGIN_MIN_PASSWORD_LENGTH, maxLength: MAX_PASSWORD_LENGTH })
   @IsString()
-  @Length(10, 200, { message: 'Parol kamida 10 belgidan iborat boʻlsin' })
+  @Length(LOGIN_MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, {
+    message: `Parol kamida ${LOGIN_MIN_PASSWORD_LENGTH} belgidan iborat boʻlsin`,
+  })
   password!: string;
 }
 

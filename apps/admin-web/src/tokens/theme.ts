@@ -28,9 +28,27 @@ export const COLOR_TOKENS = [
   'danger',
   'danger-surface',
   'neutral-surface',
+  'qr-surface',
+  'qr-ink',
 ] as const;
 
 export type ColorToken = (typeof COLOR_TOKENS)[number];
+
+/**
+ * QR kod ranglari — ikkala temada BIR XIL, va bu ataylab.
+ *
+ * QR skaneri oq fonda toʻq naqsh kutadi; qorongʻi temaga «moslashgan» QR
+ * (toʻq fon, ochiq naqsh) koʻp telefonda umuman oʻqilmaydi. Shuning uchun
+ * bu ikki token temadan qatʼi nazar oʻzgarmaydi.
+ *
+ * Hex shakli SVG atributlariga kerak (`qrcode.react` CSS oʻzgaruvchisini
+ * qabul qilmaydi), kanallar shakli esa `index.css` da — `theme.test.ts`
+ * ikkovining bir xilligini tekshiradi.
+ */
+export const QR_COLORS = {
+  surface: '#FFFFFF',
+  ink: '#102A43',
+} as const;
 
 /** Boʻshliq shkalasi — mijoz ilovasi bilan bir xil (spetsifikatsiya 3.5). */
 export const SPACING = [2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64] as const;

@@ -1,5 +1,6 @@
 import {
   LEAKED_PASSWORDS,
+  MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   assessPassword,
   generatePassword,
@@ -96,7 +97,7 @@ describe('assessPassword', () => {
       const verdict = assess('aaaaaaaaaaaaaaaa');
 
       expect(verdict.ok).toBe(false);
-      expect(verdict.problems).toContainEqual(expect.stringContaining('bitta belgining takrori'));
+      expect(verdict.problems).toContainEqual(expect.stringContaining('xil belgi'));
     });
 
     it.each([
@@ -146,5 +147,45 @@ describe('generatePassword', () => {
 
     expect(password).toMatch(/^[A-Za-z2-9]{5}(-[A-Za-z2-9]{5}){3}$/);
     expect(password).not.toMatch(/[0O1lI]/);
+  });
+});
+
+describe('uzunlik va xilma-xillik chegaralari', () => {
+  /** 66 × "Qw7" + "xy" = aynan 200 belgi, ketma-ketliksiz. */
+  const atLimit = `${'Qw7'.repeat(66)}xy`;
+
+  it('aynan chegaradagi uzunlikni qabul qiladi', () => {
+    expect(atLimit.length).toBe(MAX_PASSWORD_LENGTH);
+    expect(assess(atLimit).ok).toBe(true);
+  });
+
+  it('chegaradan uzunini rad etadi — aks holda hisob egasi kirolmay qolardi', () => {
+    // CLI uni qabul qilsa, hash bazaga yozilardi; keyin kirish soʻrovi DTO
+    // chegarasida 400 bilan qaytarilib, hisobga umuman kirib boʻlmasdi.
+    const tooLong = `${atLimit}z`;
+
+    const verdict = assess(tooLong);
+    expect(verdict.ok).toBe(false);
+    expect(verdict.problems).toContainEqual(expect.stringContaining(String(MAX_PASSWORD_LENGTH)));
+  });
+
+  it.each([
+    ['bitta belgining takrori', 'aaaaaaaaaaaaaa'],
+    ['bitta belgi + raqam', 'aaaaaaaaaaaa1'],
+    ['ikki belgining almashinuvi', 'abababababababab'],
+    ['toʻrt xil belgi', 'abcdabcdabcdabcd'],
+  ])('%s — rad etiladi', (_name, password) => {
+    const verdict = assess(password);
+
+    expect(verdict.ok).toBe(false);
+    expect(verdict.problems).toContainEqual(expect.stringContaining('xil belgi'));
+  });
+
+  it('besh xil belgi shikoyat tugʻdirmaydi', () => {
+    // `toContain` asimmetrik matcher bilan ishlamaydi — u tenglikni
+    // tekshiradi va test bekorga oʻtib ketardi. `toContainEqual` kerak.
+    expect(assess('Qxvt7-Rmzk4-Hbnp9').problems).not.toContainEqual(
+      expect.stringContaining('xil belgi'),
+    );
   });
 });
