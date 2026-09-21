@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { ApiError, apiRequest } from './client';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ApiError, apiRequest, resolveBaseUrl } from './client';
 
 describe('ApiError', () => {
   it('turini va matnini saqlaydi', () => {
@@ -15,7 +15,40 @@ describe('ApiError', () => {
   });
 });
 
+describe('asos manzilini aniqlash', () => {
+  it.each([
+    ['boʻsh satr', '', null],
+    ['faqat boʻshliq', '   ', null],
+    ['oddiy manzil', 'http://localhost:3100', 'http://localhost:3100'],
+    ['oxiridagi slesh', 'http://localhost:3100/', 'http://localhost:3100'],
+    ['bir nechta slesh', 'http://localhost:3100///', 'http://localhost:3100'],
+    ['atrofida boʻshliq', '  http://localhost:3100  ', 'http://localhost:3100'],
+  ])('%s → %s', (_name, raw, expected) => {
+    expect(resolveBaseUrl(raw)).toBe(expected);
+  });
+
+  it('argumentsiz chaqirilganda muhitdan oʻqiydi', () => {
+    vi.stubEnv('VITE_API_URL', 'http://muhitdan.local/');
+    expect(resolveBaseUrl()).toBe('http://muhitdan.local');
+
+    vi.stubEnv('VITE_API_URL', '');
+    expect(resolveBaseUrl()).toBeNull();
+
+    vi.unstubAllEnvs();
+  });
+});
+
 describe('xato matnini tanlash', () => {
+  // Manzil SHU YERDA beriladi: testlar `.env.local` ga bogʻlanmasligi
+  // kerak — u `.gitignore` da va CI da umuman yoʻq.
+  beforeEach(() => {
+    vi.stubEnv('VITE_API_URL', 'http://test.local');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   const respondWith = (status: number, message?: string) => {
     globalThis.fetch = (async () =>
       new Response(JSON.stringify({ success: false, data: null, error: { message } }), {
@@ -56,5 +89,24 @@ describe('xato matnini tanlash', () => {
 
   it('403 ni forbidden deb belgilaydi', async () => {
     expect((await respondWith(403, 'Ruxsat yoʻq')).kind).toBe('forbidden');
+  });
+});
+
+describe('sozlanmagan server', () => {
+  it('manzil boʻlmasa soʻrov YUBORILMAYDI', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+    const fetchSpy = vi.fn();
+    globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+    const error = await apiRequest('/test').then(
+      () => {
+        throw new Error('soʻrov xato qaytarishi kerak edi');
+      },
+      (cause: unknown) => cause as ApiError,
+    );
+
+    expect(error.kind).toBe('not-configured');
+    expect(fetchSpy).not.toHaveBeenCalled();
+    vi.unstubAllEnvs();
   });
 });

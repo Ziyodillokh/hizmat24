@@ -44,16 +44,28 @@ const STATUS_MESSAGES: Record<number, string> = {
 
 const KINDS: Record<number, ApiErrorKind> = { 401: 'unauthorized', 403: 'forbidden' };
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '');
+/**
+ * SOF: `VITE_API_URL` dan tozalangan asos manzil; sozlanmagan boʻlsa `null`.
+ *
+ * Har soʻrovda qaytadan oʻqiladi, modul yuklanganda BIR MARTA emas.
+ * Modul konstantasi boʻlganida testlar `.env.local` ga bogʻlanib qolgandi:
+ * u `.gitignore` da, shuning uchun CI da manzil boʻsh chiqib, har bir
+ * soʻrov `not-configured` bilan tugardi.
+ */
+export function resolveBaseUrl(raw: string | undefined = import.meta.env.VITE_API_URL): string | null {
+  const value = (raw ?? '').trim();
+  return value.length === 0 ? null : value.replace(/\/+$/, '');
+}
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  if (!API_BASE_URL) {
+  const baseUrl = resolveBaseUrl();
+  if (!baseUrl) {
     throw new ApiError('not-configured', 'Server manzili sozlanmagan (VITE_API_URL)');
   }
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}/api/v1${path}`, {
+    response = await fetch(`${baseUrl}/api/v1${path}`, {
       method: options.method ?? 'GET',
       headers: {
         ...(options.body ? { 'Content-Type': 'application/json' } : {}),
