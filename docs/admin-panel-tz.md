@@ -163,6 +163,19 @@ URL bilan kirilganda ham `403`; barcha kirish urinishlari audit logda.
 
 ### A2 — Usta arizalari (B4 ning sharti)
 
+> **Bajarildi** · server `b8a3165`, panel `29c82bd`, ilova `7ef5983` ·
+> APK `hizmat24-a2-ariza.apk`
+>
+> Rejadan chetlanishlar:
+> - `GET /admin/applications/categories` qoʻshildi — moderator `catalog`
+>   boʻlimiga kira olmaydi, tasdiqlashda esa xizmatlar roʻyxati kerak
+> - bitta foydalanuvchida bitta PENDING ariza bazadagi qisman unique
+>   indeks bilan kafolatlanadi (servis tekshiruvi faqat oʻzbekcha 409 uchun)
+> - audit yozuvi tranzaksiya ICHIDA, keyin emas
+> - «tasdiqlangach usta rejimiga kiradi» — maʼlumot darajasida bajarildi
+>   (`masters.user_id` bogʻlanadi); ilovaning usta rejimi hozircha
+>   mahalliy profilga tayanadi, serverga B4 da bogʻlanadi
+
 **Maqsad:** usta arizasi panelga tushadi, moderator tekshiradi, tasdiqlangach usta ilovaga kiradi.
 
 **Backend:** `MasterApplication` migratsiyasi; `POST /master/applications` (ilovadan),
