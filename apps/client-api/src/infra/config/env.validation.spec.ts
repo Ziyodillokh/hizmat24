@@ -157,4 +157,12 @@ describe('validateEnv (TZ 9.7)', () => {
   it('boʻsh satr majburiy oʻzgaruvchini qutqarmaydi', () => {
     expect(() => validateEnv({ ...BASE_ENV, DATABASE_URL: '' })).toThrow(/DATABASE_URL/);
   });
+
+  it('staging: console SMS va OTP debug ruxsat etiladi — sinov serveri uchun', () => {
+    const env = validateEnv({ ...BASE_ENV, NODE_ENV: 'staging', OTP_DEBUG_RETURN_CODE: 'true' });
+
+    expect(env.NODE_ENV).toBe('staging');
+    expect(env.SMS_PROVIDER).toBe('console');
+    expect(env.OTP_DEBUG_RETURN_CODE).toBe(true);
+  });
 });

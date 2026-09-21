@@ -16,7 +16,14 @@ const booleanFromEnv = (defaultValue: boolean) =>
     .transform((value) => value === 'true' || value === '1');
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  /**
+   * `staging` — sinov serveri: production imijda ishlaydi (pino-pretty va
+   * boshqa dev-asboblar yoʻq), lekin SMS shlyuzsiz kirish uchun `console`
+   * provayder va OTP kodini javobda qaytarish RUXSAT etiladi. Ilgari buning
+   * uchun serverga `development` yozilar edi — u esa `pino-pretty` ni talab
+   * qilib, production imijda umuman koʻtarilmasdi.
+   */
+  NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default('0.0.0.0'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
