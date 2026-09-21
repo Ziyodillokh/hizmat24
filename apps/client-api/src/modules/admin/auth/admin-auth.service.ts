@@ -9,6 +9,7 @@ import { sectionsFor, type AdminSection } from '../admin-permissions';
 import { lockStatus, registerFailure, clearedState } from './admin-lockout';
 import { isSessionAlive, secondsUntilIdleLogout, shouldTouch } from './admin-session';
 import { verifyPassword } from './admin-password';
+import { isLeakedPassword } from './password-policy';
 import { generateTotpSecret, totpUri, verifyTotp } from './admin-totp';
 
 /** Kirish soʻrovining konteksti — audit yozuvi uchun. */
@@ -113,6 +114,17 @@ export class AdminAuthService {
       }
 
       throw new UnauthorizedException(INVALID_CREDENTIALS);
+    }
+
+    // Parol TOʻGʻRI, lekin ochiq manbada koʻringan qiymat boʻlsa — kirish
+    // baribir berilmaydi. Taqiq hisob yaratishda emas, aynan SHU YERDA
+    // kuchga kiradi: yaratishdagi tekshiruv bazada allaqachon turgan eski
+    // hashlarga taʼsir qilmaydi, ular esa repo tarixidan hammaga maʼlum.
+    // Lockout hisoblagichiga tegilmaydi: parolni bilgan odam hujumchi emas,
+    // hisob egasi — uni bloklash muammoni hal qilmaydi, faqat yashiradi.
+    if (isLeakedPassword(password)) {
+      await this.recordFailure(normalized, context, 'sizib-chiqqan', admin.id);
+      throw new ForbiddenException(LEAKED_PASSWORD);
     }
 
     // TOTP hali ulanmagan boʻlsa, sir SHU YERDA yaratiladi va saqlanadi,
@@ -249,7 +261,7 @@ export class AdminAuthService {
   private recordFailure(
     email: string,
     context: RequestContext,
-    reason: 'notopildi' | 'parol' | 'totp',
+    reason: 'notopildi' | 'parol' | 'totp' | 'sizib-chiqqan',
     adminId?: string,
   ): Promise<void> {
     return this.audit.record({
@@ -309,3 +321,14 @@ const DUMMY_HASH =
 /** Email yoʻqmi, parol notoʻgʻrimi — foydalanuvchiga bitta javob. */
 const INVALID_CREDENTIALS = 'Email yoki parol notoʻgʻri';
 const CHALLENGE_EXPIRED = 'Tasdiqlash muddati tugadi — qaytadan kiring';
+
+/**
+ * NEGA kirish oʻrniga aniq matn: bu yerda "email yoki parol notoʻgʻri"
+ * deyish yolgʻon boʻlardi — parol toʻgʻri. Xabar maxfiy hech narsani
+ * ochmaydi (roʻyxat ochiq manbada), lekin hisob egasiga nima qilish
+ * kerakligini aniq aytadi. Panelda parol almashtirish oynasi hali yoʻq,
+ * shuning uchun matn ishlaydigan yoʻlni — CLI buyrugʻini koʻrsatadi.
+ */
+const LEAKED_PASSWORD =
+  'Bu parol ochiq manbada koʻringan va mangu taqiqlangan. Kirish uchun ' +
+  'administrator "npm run admin:create" buyrugʻi bilan parolni almashtirishi shart.';

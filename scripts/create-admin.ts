@@ -12,12 +12,16 @@
 import { AdminRole, PrismaClient } from '@prisma/client';
 import { createInterface } from 'node:readline';
 import { hashPassword } from '../apps/client-api/src/modules/admin/auth/admin-password';
+import {
+  assessPassword,
+  generatePassword,
+} from '../apps/client-api/src/modules/admin/auth/password-policy';
 import { sectionsFor } from '../apps/client-api/src/modules/admin/admin-permissions';
 
 const prisma = new PrismaClient();
 
-const MIN_PASSWORD_LENGTH = 10;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_QUESTION = 'Parol (boʻsh qoldirsangiz kuchli parol oʻzi yaratiladi): ';
 
 /**
  * Savollar ikki yoʻldan biri bilan javob oladi.
@@ -29,9 +33,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * closed" xatosiga uchrardi.
  */
 const isInteractive = process.stdin.isTTY === true;
-const rl = isInteractive
-  ? createInterface({ input: process.stdin, output: process.stdout })
-  : null;
+const rl = isInteractive ? createInterface({ input: process.stdin, output: process.stdout }) : null;
 
 /** Parol yozilayotganda ekranda koʻrinmasligi uchun chiqishni bosib turadi. */
 let maskedPrompt: string | null = null;
@@ -79,6 +81,58 @@ function parseRole(raw: string): AdminRole {
   throw new Error(`Notanish rol: ${raw}. Mumkin: ${Object.keys(AdminRole).join(', ')}`);
 }
 
+/**
+ * Yaratilgan parolni BIR MARTA koʻrsatadi.
+ *
+ * Boshqa yoʻl yoʻq: hash qaytarib boʻlmaydi, shuning uchun bu — parolni
+ * koʻrish mumkin boʻlgan yagona daqiqa. Shu sabab ogohlantirish ham
+ * yoziladi.
+ */
+function announceGenerated(password: string): string {
+  console.log('\nKuchli parol yaratildi:\n');
+  console.log(`    ${password}\n`);
+  console.log('Uni HOZIR parol menejeriga saqlang — boshqa koʻrsatilmaydi.\n');
+
+  return password;
+}
+
+function reportProblems(problems: string[]): void {
+  console.error('\nParol qabul qilinmadi:');
+  for (const problem of problems) console.error(`  • ${problem}`);
+}
+
+/**
+ * Parolni oladi: boʻsh qoldirilsa oʻzi yaratadi, aks holda siyosatdan
+ * oʻtkazadi.
+ *
+ * Interaktiv rejimda BARCHA muammolar birdaniga koʻrsatilib, qayta
+ * soʻraladi — foydalanuvchi xatolarni birma-bir topib yurmasligi kerak.
+ * Quvur rejimida qayta soʻrashning maʼnosi yoʻq (javoblar oldindan
+ * berilgan), shuning uchun buyruq xato bilan toʻxtaydi.
+ */
+async function resolvePassword(email: string): Promise<string> {
+  for (;;) {
+    const entered = await ask(PASSWORD_QUESTION, { masked: true });
+    if (entered === '') return announceGenerated(generatePassword());
+
+    const verdict = assessPassword(entered, { email });
+    if (!verdict.ok) {
+      reportProblems(verdict.problems);
+      if (!isInteractive) throw new Error('Parol siyosatdan oʻtmadi');
+      console.error('');
+      continue;
+    }
+
+    if ((await ask('Parolni takrorlang: ', { masked: true })) !== entered) {
+      if (!isInteractive) throw new Error('Parollar mos kelmadi');
+      console.error('\nParollar mos kelmadi, qaytadan.\n');
+      continue;
+    }
+
+    return entered;
+  }
+}
+
 async function main(): Promise<void> {
   await readPipedInput();
 
@@ -101,14 +155,7 @@ async function main(): Promise<void> {
     ? existing.role
     : parseRole(await ask(`Rol (${Object.keys(AdminRole).join(' / ')}): `));
 
-  const password = await ask('Parol: ', { masked: true });
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    throw new Error(`Parol kamida ${MIN_PASSWORD_LENGTH} belgidan iborat boʻlsin`);
-  }
-  if ((await ask('Parolni takrorlang: ', { masked: true })) !== password) {
-    throw new Error('Parollar mos kelmadi');
-  }
-
+  const password = await resolvePassword(email);
   const passwordHash = await hashPassword(password);
 
   /*

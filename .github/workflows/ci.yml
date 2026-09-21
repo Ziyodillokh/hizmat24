@@ -36,6 +36,37 @@ jobs:
           name: coverage
           path: coverage/
 
+  frontends:
+    # Ikkala frontend ildizdagi tsconfig va eslint dan ATAYLAB chiqarilgan:
+    # ularda JSX va `import.meta` bor, ildiz konfiguratsiyasi esa backend
+    # uchun sozlangan va soxta xatolar berardi. Chiqarish tekshiruvni
+    # OʻCHIRISH boʻlib qolmasligi uchun oʻrnini shu ish bosadi — har bir
+    # ilova oʻz konfiguratsiyasi bilan alohida tekshiriladi.
+    name: Frontend (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      # fail-fast: false — bitta ilova qulasa, ikkinchisining natijasi ham
+      # koʻrinib tursin, aks holda tuzatish ikki aylanishga choʻzilardi.
+      fail-fast: false
+      matrix:
+        app: [admin-web, client-app]
+    defaults:
+      run:
+        working-directory: apps/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+
   e2e:
     name: E2E (Postgres + Redis via Testcontainers)
     runs-on: ubuntu-latest
@@ -79,7 +110,7 @@ jobs:
         run: docker build -t hizmat24-client-api:ci .
 
       - name: Image vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: hizmat24-client-api:ci
           severity: CRITICAL,HIGH

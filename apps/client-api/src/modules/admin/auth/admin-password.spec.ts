@@ -1,8 +1,16 @@
 import { randomBytes, scrypt } from 'node:crypto';
 import { hashPassword, verifyPassword } from './admin-password';
+import { LEAKED_PASSWORDS } from './password-policy';
 
 describe('admin parolini hashlash', () => {
-  const password = 'Juda-Kuchli-Parol-2026';
+  const password = 'test-fikstura-parol-ishlatilmaydi';
+
+  it('fikstura paroli haqiqiy hisobga hech qachon qoʻyila olmaydi', () => {
+    // Bu qiymat testda ochiq yozilgan, demak u ommaviy. Fikstura bilan
+    // taqiqlangan roʻyxat orasidagi bogʻ shu yerda mahkamlanadi: qiymat
+    // oʻzgartirilsa-yu roʻyxat yangilanmasa, test qulaydi.
+    expect(LEAKED_PASSWORDS).toContain(password);
+  });
 
   it('toʻgʻri parolni tasdiqlaydi', async () => {
     expect(await verifyPassword(password, await hashPassword(password))).toBe(true);

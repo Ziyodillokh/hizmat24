@@ -10,8 +10,11 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'eslint.config.mjs',
-      // Frontend alohida loyiha — o'z tsconfig va eslint konfiguratsiyasi bor.
+      // Frontend loyihalar alohida: har birining oʻz tsconfig, eslint va
+      // test yuguruvchisi bor. Ularni ildizdagi konfiguratsiya bilan
+      // tekshirish notoʻgʻri xato beradi (JSX yoqilmagan, import.meta yoʻq).
       'apps/client-app/**',
+      'apps/admin-web/**',
     ],
   },
   eslint.configs.recommended,

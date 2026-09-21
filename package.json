@@ -108,7 +108,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "apps/**/*.(t|j)s",
+      "apps/client-api/**/*.(t|j)s",
       "libs/**/*.(t|j)s"
     ],
     "coveragePathIgnorePatterns": [

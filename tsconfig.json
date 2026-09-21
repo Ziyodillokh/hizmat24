@@ -28,5 +28,5 @@
       "@client/*": ["apps/client-api/src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "apps/client-app"]
+  "exclude": ["node_modules", "dist", "apps/client-app", "apps/admin-web"]
 }

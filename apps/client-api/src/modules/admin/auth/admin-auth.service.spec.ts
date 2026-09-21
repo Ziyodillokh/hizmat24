@@ -7,8 +7,18 @@ import type { PrismaService } from '@client/infra/prisma/prisma.service';
 import { AdminAuthService } from './admin-auth.service';
 import { hashPassword } from './admin-password';
 import { MAX_FAILED_ATTEMPTS } from './admin-lockout';
+import { LEAKED_PASSWORDS, generatePassword } from './password-policy';
 
-const PASSWORD = 'Juda-Kuchli-Parol-2026';
+/**
+ * Baxtli yoʻl paroli HAR YUGURISHDA yangidan yaratiladi.
+ *
+ * NEGA qatʼiy satr emas: testda ochiq yozilgan har qanday qiymat ommaviy
+ * boʻlib qoladi, demak uni taqiqlangan roʻyxatga qoʻshish kerak — roʻyxat
+ * esa endi KIRISHNI ham bloklaydi, shuning uchun bunday fikstura bilan
+ * muvaffaqiyatli kirishni umuman sinab boʻlmasdi. Tasodifiy qiymat repoda
+ * qolmaydi, siyosatdan oʻtadi va ikkala talabni ham bir vaqtda bajaradi.
+ */
+const PASSWORD = generatePassword();
 const CONTEXT = { ipAddress: '10.0.0.1', userAgent: 'jest' };
 const ENV: Record<string, unknown> = {
   ADMIN_TOKEN_SECRET: 'a'.repeat(48),
@@ -47,11 +57,11 @@ describe('AdminAuthService', () => {
     admin = await build();
     prisma = {
       adminUser: {
-        findUnique: jest.fn().mockImplementation(({ where }: { where: Record<string, string> }) =>
-          Promise.resolve(
-            where.email === admin.email || where.id === admin.id ? admin : null,
+        findUnique: jest
+          .fn()
+          .mockImplementation(({ where }: { where: Record<string, string> }) =>
+            Promise.resolve(where.email === admin.email || where.id === admin.id ? admin : null),
           ),
-        ),
         update: jest.fn().mockResolvedValue(admin),
       },
       adminSession: {
@@ -77,6 +87,52 @@ describe('AdminAuthService', () => {
   const loginOk = () => service.signInWithPassword(admin.email, PASSWORD, CONTEXT);
 
   describe('1-bosqich: parol', () => {
+    it('fikstura paroli repoda qolmaydi — taqiqlangan roʻyxatga tushmaydi', () => {
+      // Qiymat har yugurishda yangi, shuning uchun uni hech kim oldindan
+      // bila olmaydi va roʻyxatga qoʻshish shart emas.
+      expect(LEAKED_PASSWORDS).not.toContain(PASSWORD);
+    });
+
+    it.each(LEAKED_PASSWORDS)(
+      'sizib chiqqan "%s" paroli TOʻGʻRI boʻlsa ham kirish bermaydi',
+      async (leaked) => {
+        // Taqiq hujjatda "mangu" deb yozilgan. Bu yerda u aynan kirish
+        // yoʻlida sinaladi: hash mos tushsa ham sessiya berilmasligi kerak,
+        // aks holda taqiq faqat hisob yaratishda ishlagan boʻlardi.
+        admin = await build({ passwordHash: await hashPassword(leaked) });
+
+        await expect(service.signInWithPassword(admin.email, leaked, CONTEXT)).rejects.toThrow(
+          ForbiddenException,
+        );
+      },
+    );
+
+    it('sizib chiqqan parol chipta ham, TOTP sirini ham bermaydi', async () => {
+      const leaked = LEAKED_PASSWORDS[0];
+      admin = await build({ passwordHash: await hashPassword(leaked), totpSecret: null });
+
+      await expect(service.signInWithPassword(admin.email, leaked, CONTEXT)).rejects.toThrow(
+        /ochiq manbada koʻringan/,
+      );
+      // Sir yaratilmasligi kerak: kirish rad etilgan, demak hech qanday
+      // ikkinchi bosqich resursi ham berilmaydi.
+      expect(prisma.adminUser.update).not.toHaveBeenCalled();
+    });
+
+    it('sizib chiqqan parol bilan urinish auditga tushadi', async () => {
+      const leaked = LEAKED_PASSWORDS[0];
+      admin = await build({ passwordHash: await hashPassword(leaked) });
+
+      await expect(service.signInWithPassword(admin.email, leaked, CONTEXT)).rejects.toThrow();
+
+      expect(audit.record).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: AuditAction.ADMIN_LOGIN_FAILED,
+          metadata: expect.objectContaining({ reason: 'sizib-chiqqan' }),
+        }),
+      );
+    });
+
     it('toʻgʻri parol sessiya EMAS, chipta beradi', async () => {
       const result = await loginOk();
 
@@ -149,7 +205,9 @@ describe('AdminAuthService', () => {
 
       expect(result.enrollmentUri).toContain('otpauth://totp/');
       expect(prisma.adminUser.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ totpSecret: expect.any(String) }) }),
+        expect.objectContaining({
+          data: expect.objectContaining({ totpSecret: expect.any(String) }),
+        }),
       );
     });
 
