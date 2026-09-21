@@ -40,6 +40,6 @@ describe('panel boʻlimlari', () => {
 
   it('tayyor boʻlimlar bosqich belgisisiz', () => {
     const ready = ALL_SECTIONS.filter((s) => s.stage === null).map((s) => s.key);
-    expect(ready).toEqual(['dashboard', 'catalog']);
+    expect(ready).toEqual(['dashboard', 'applications', 'catalog']);
   });
 });

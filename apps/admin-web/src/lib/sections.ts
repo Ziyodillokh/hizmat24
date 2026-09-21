@@ -33,7 +33,7 @@ const SECTIONS: readonly SectionMeta[] = [
     key: 'applications',
     title: 'Usta arizalari',
     path: '/applications',
-    stage: 'A2',
+    stage: null,
     summary: 'Yangi ustalarni tekshirish va tasdiqlash',
   },
   {

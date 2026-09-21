@@ -3,6 +3,8 @@ import { landingPath, ALL_SECTIONS } from '@/lib/sections';
 import { LoginScreen } from '@/screens/LoginScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
 import { CatalogScreen } from '@/screens/CatalogScreen';
+import { ApplicationsScreen } from '@/screens/ApplicationsScreen';
+import { ApplicationDetailScreen } from '@/screens/ApplicationDetailScreen';
 import { PendingScreen } from '@/screens/PendingScreen';
 import { useAuth } from './AuthProvider';
 import { Shell } from './Shell';
@@ -10,6 +12,7 @@ import { Shell } from './Shell';
 /** Boʻlim kaliti → sahifa. Bu yerda yoʻqi hali yozilmagan. */
 const SCREENS: Record<string, JSX.Element> = {
   dashboard: <DashboardScreen />,
+  applications: <ApplicationsScreen />,
   catalog: <CatalogScreen />,
 };
 
@@ -55,6 +58,10 @@ export function AdminApp() {
             }
           />
         ))}
+        {/* Ichki sahifalar — boʻlim ruxsati bilan bir xil qoida. */}
+        {allowed.has('applications') && (
+          <Route path="/applications/:id" element={<ApplicationDetailScreen />} />
+        )}
         <Route path="*" element={<Navigate to={home} replace />} />
       </Route>
     </Routes>
