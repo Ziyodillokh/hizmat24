@@ -114,13 +114,23 @@ jobs:
       - name: Build image for scanning
         run: docker build -t hizmat24-client-api:ci .
 
+      # `aquasecurity/trivy-action` oʻrniga rasmiy imij ishlatiladi.
+      #
+      # Action ichida `setup-trivy` binarni GitHub relizlaridan yuklaydi va
+      # aynan shu bosqichda yiqilardi: versiyani topib («found version
+      # 0.65.0»), keyin exit 1 bilan toʻxtardi — skanerlashgacha yetmasdan.
+      # Token muammo emas edi (u standart boʻyicha uzatiladi). Imij bilan
+      # zanjir qisqaroq: qatʼiy versiya, qoʻshimcha yuklab olish yoʻq va
+      # tarmoqdan skript olib kelib bajarilmaydi.
       - name: Image vulnerability scan
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          image-ref: hizmat24-client-api:ci
-          severity: CRITICAL,HIGH
-          exit-code: '1'
-          ignore-unfixed: true
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.65.0 image \
+              --severity CRITICAL,HIGH \
+              --ignore-unfixed \
+              --exit-code 1 \
+              hizmat24-client-api:ci
 
   build:
     name: Docker build

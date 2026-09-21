@@ -9,6 +9,7 @@ import {
 } from '@prisma/client';
 import { configureApp } from '@client/bootstrap';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
+import { MONEY_STEP_UZS } from '@shared/index';
 import { startInfrastructure, type TestInfrastructure } from './test-environment';
 
 /*
@@ -248,13 +249,36 @@ describe('Buyurtma oqimi (e2e)', () => {
       });
       const { data } = response.json();
 
+      // Id AVVAL yoziladi: quyidagi daʼvolardan biri yiqilsa, test tanasi
+      // toʻxtaydi va `orderId` boʻsh qolib, keyingi oʻnlab test «notoʻgʻri
+      // UUID» bilan 400 olardi — asl sabab shu koʻchki ostida koʻrinmasdi.
+      orderId = data.id;
+
       // Assert
       expect(response.statusCode).toBe(201);
-      expect(data.price).toBe(100_000);
       expect(data.currency).toBe('UZS');
       expect(data.status).toBe(OrderStatus.SEARCHING);
 
-      orderId = data.id;
+      /*
+       * Narx QATʼIY songa tenglashtirilmaydi. B3b dan keyin uni server
+       * hisoblaydi va unga mijoz darajasining chegirmasi kiradi; daraja
+       * esa yopilgan buyurtmalar soniga qarab shu test davomida ham
+       * oʻzgaradi. Shuning uchun qoidaning OʻZI tekshiriladi:
+       *   jami = asos + shoshilinch yigʻim − chegirma
+       * va asos kategoriyadan olinadi (TZ 3.3).
+       */
+      expect(data.invoice.base).toBe(100_000);
+      expect(data.invoice.urgentFee).toBe(0);
+      // Formula test ichida QAYTA YOZILMAYDI — u `domain/pricing.ts` ning
+      // oʻz testlarida tekshiriladi. Bu yerda shartnoma tekshiriladi:
+      // chegirma pul qadamiga yaxlitlangan, asosdan oshmagan va jami
+      // uchta qismdan yigʻilgan.
+      expect(data.invoice.discount % MONEY_STEP_UZS).toBe(0);
+      expect(data.invoice.discount).toBeLessThanOrEqual(data.invoice.base);
+      expect(data.price).toBe(
+        data.invoice.base + data.invoice.urgentFee - data.invoice.discount,
+      );
+      expect(data.invoice.total).toBe(data.price);
     });
 
     it('fonda ustani tayinlaydi (5 soniyadan kam)', async () => {
@@ -376,7 +400,11 @@ describe('Buyurtma oqimi (e2e)', () => {
     it('chekni qaytaradi', async () => {
       const { data } = (await request('GET', `/api/v1/orders/${orderId}/receipt`)).json();
 
-      expect(data).toMatchObject({ price: 100_000, currency: 'UZS', rating: 5 });
+      // Narx yaratilishda hisoblangani bilan bir xil boʻlishi kerak —
+      // chek buyurtmadagi qiymatni koʻchiradi, qayta hisoblamaydi.
+      const { data: order } = (await request('GET', `/api/v1/orders/${orderId}`)).json();
+
+      expect(data).toMatchObject({ price: order.price, currency: 'UZS', rating: 5 });
       expect(data.masterName).toBeTruthy();
     });
 
