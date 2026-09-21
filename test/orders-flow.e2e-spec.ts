@@ -404,14 +404,30 @@ describe('Buyurtma oqimi (e2e)', () => {
     });
 
     it('usta reytingini fonda qayta hisoblaydi', async () => {
+      /*
+       * Usta BUYURTMADAN olinadi, oldindan taxmin qilinmaydi.
+       *
+       * Ilgari bu yerda `experiencedMasterId` yozilgan edi — yaʼni test
+       * qaysi usta tayinlanishini bilib turibdi deb hisoblardi. Tayinlashni
+       * esa `MasterFinderService` hal qiladi va u mos keladigan har qanday
+       * ustani tanlashi mumkin. Boshqa usta tanlansa, test «reyting qayta
+       * hisoblanmadi» deb yiqilardi — aslida reyting hisoblangan, faqat
+       * boshqa yozuvda.
+       */
+      const { masterId } = await prisma.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { masterId: true },
+      });
+      expect(masterId).toBeTruthy();
+
       await waitFor(async () => {
         const master = await prisma.master.findUniqueOrThrow({
-          where: { id: experiencedMasterId },
+          where: { id: masterId as string },
         });
         return master.ratingCount > 0;
       });
 
-      const master = await prisma.master.findUniqueOrThrow({ where: { id: experiencedMasterId } });
+      const master = await prisma.master.findUniqueOrThrow({ where: { id: masterId as string } });
       expect(master.completedOrdersCount).toBe(1);
       expect(Number(master.ratingAvg)).toBe(5);
     });
