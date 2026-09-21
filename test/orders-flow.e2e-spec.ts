@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerStorage } from '@nestjs/throttler';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import {
   ComplexityLevel,
@@ -91,19 +91,34 @@ describe('Buyurtma oqimi (e2e)', () => {
     };
 
     /*
-     * Throttler TESTDA oʻchiriladi.
+     * Throttler TESTDA oʻchiriladi — SAQLAGICH almashtirilib.
      *
      * `THROTTLE_LIMIT` ni oshirish yetarli emas: `POST /orders` da marshrut
      * darajasidagi `@Throttle({ limit: 5, ttl: 60s })` bor va u global
      * sozlamani BOSIB YOZADI. E2E bir daqiqada oʻndan ortiq buyurtma
-     * yaratadi, shuning uchun oltinchisidan boshlab 429 kelardi va
-     * tekshirilayotgan narsa (validatsiya, idempotentlik) umuman
-     * sinalmasdi. Chegaraning oʻzi production qoidasi boʻlib qoladi —
-     * uni sekinlashtirish uchun testni oʻzgartirmaymiz.
+     * yaratadi, shuning uchun oltinchisidan boshlab 429 kelar va
+     * tekshirilayotgan narsa (validatsiya whitelistʻi, idempotentlik,
+     * bekor qilish) umuman sinalmasdi.
+     *
+     * `overrideGuard(ThrottlerGuard)` ISHLAMAYDI: qorovul `APP_GUARD`
+     * tokeni ostida roʻyxatdan oʻtgan, `ThrottlerGuard` ostida emas.
+     * `APP_GUARD` ni almashtirish esa JwtAuthGuard ni ham oʻchirib
+     * yuborardi (ikkalasi bitta token ostida). Shuning uchun qorovul
+     * oʻz oʻrnida qoladi, faqat saqlagich har doim "urinishlar yoʻq"
+     * deb javob beradi. Chegaraning oʻzi production qoidasi boʻlib
+     * qoladi — uni sekinlashtirish uchun testni oʻzgartirmaymiz.
      */
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
-      .overrideGuard(ThrottlerGuard)
-      .useValue({ canActivate: () => true })
+      .overrideProvider(ThrottlerStorage)
+      .useValue({
+        increment: () =>
+          Promise.resolve({
+            totalHits: 0,
+            timeToExpire: 0,
+            isBlocked: false,
+            timeToBlockExpire: 0,
+          }),
+      })
       .compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
