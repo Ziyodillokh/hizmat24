@@ -25,6 +25,8 @@ const master: Master = {
   lastLat: 41.31,
   lastLng: 69.24,
   lastLocationAt: null,
+  // Eski, qoʻlda kiritilgan usta — ilova hisobiga hali bogʻlanmagan.
+  userId: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

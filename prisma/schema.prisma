@@ -34,6 +34,16 @@ enum MasterStatus {
   OFFLINE
 }
 
+/// Usta arizasining holati. Uch qiymat yetarli: ariza koʻrib chiqilishini
+/// kutadi, qabul qilinadi yoki sabab bilan rad etiladi. «Koʻrib chiqilmoqda»
+/// degan oraliq holat ataylab YOʻQ — u foydalanuvchiga hech narsa aytmaydi,
+/// panelda esa bir moderator boshqasini bloklab qoʻyishiga olib kelardi.
+enum MasterApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum OrderStatus {
   DRAFT
   SEARCHING
@@ -92,6 +102,9 @@ enum AuditAction {
   ADMIN_LOGIN_FAILED
   ADMIN_LOCKED
   ADMIN_LOGGED_OUT
+  MASTER_APPLICATION_SUBMITTED
+  MASTER_APPLICATION_APPROVED
+  MASTER_APPLICATION_REJECTED
 }
 
 /// Admin panel rollari. Har biri OLDINGIsining ruxsatlarini oʻz ichiga
@@ -126,6 +139,10 @@ model User {
   ratings       Rating[]
   notifications Notification[]
   refreshTokens RefreshToken[]
+
+  /// Tasdiqlangan usta hisobi — bitta foydalanuvchida koʻpi bilan bitta.
+  master             Master?
+  masterApplications MasterApplication[]
 
   @@map("users")
 }
@@ -191,16 +208,97 @@ model Master {
   lastLat              Float?                @map("last_lat")
   lastLng              Float?                @map("last_lng")
   lastLocationAt       DateTime?             @map("last_location_at") @db.Timestamptz(3)
+  /// Usta ortidagi ilova hisobi. `null` — eski, qoʻlda kiritilgan ustalar:
+  /// ular ariza orqali oʻtmagan va hali ilovaga bogʻlanmagan. Shuning uchun
+  /// ustun NULL qabul qiladi (migratsiya faqat qoʻshimcha boʻlishi shart).
+  userId               String?               @unique @map("user_id") @db.Uuid
   createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt            DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
 
+  user            User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
   orders          Order[]                 @relation("OrderAssignedMaster")
   preferredOrders Order[]                 @relation("OrderPreferredMaster")
   ratings         Rating[]
   categories      MasterServiceCategory[]
+  profile         MasterProfile?
+  applications    MasterApplication[]
 
   @@index([status, isActive])
   @@map("masters")
+}
+
+/// Ustaning OʻZI AYTGAN maʼlumotlari — `Master` dagi platforma tasdiqlagan
+/// koʻrsatkichlardan (reyting, bajarilgan ishlar, davlat sertifikati)
+/// ATAYLAB ajratilgan.
+///
+/// NEGA alohida jadval: bir jadvalda tursa, «oʻzim haqimda» matni bilan
+/// reyting bir xil ishonch darajasida koʻrinardi. Mijozga koʻrsatiladigan
+/// joyda bu farq yoʻqolmasligi kerak (halollik qoidasi).
+model MasterProfile {
+  masterId          String    @id @map("master_id") @db.Uuid
+  about             String    @db.VarChar(1000)
+  /// Usta ishlaydigan tumanlar — hozircha erkin matn roʻyxati; tuman
+  /// maʼlumotnomasi K1 (xarita) bosqichida paydo boʻladi.
+  districts         String[]
+  /// Ish vaqti — mahalliy soat (0–23). Daqiqa yoʻq: usta arizasida ham
+  /// soatdan aniqroq vaqt soʻralmaydi.
+  workFrom          Int       @map("work_from")
+  workTo            Int       @map("work_to")
+  /// «Sertifikatim bor» DAʼVOSI. Tasdiq EMAS — tasdiqlangani
+  /// `masters.has_gov_certificate` da va uni faqat admin qoʻyadi.
+  claimsCertificate Boolean   @default(false) @map("claims_certificate")
+  /// Smena qachon ochilgani. Smena yopiq boʻlsa DOIM `null`.
+  availableSince    DateTime? @map("available_since") @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@map("master_profiles")
+}
+
+/// Usta boʻlish arizasi — ilovadan tushadi, moderator koʻrib chiqadi.
+///
+/// Ariza maʼlumotlari `MasterProfile` ga KOʻCHIRILADI, unga havola
+/// qilinmaydi: ariza — muzlatilgan hujjat, moderator aynan nimani
+/// koʻrgani keyin ham oʻzgarmasligi kerak; profil esa usta tomonidan
+/// tahrirlanadi.
+model MasterApplication {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  userId               String                  @map("user_id") @db.Uuid
+  fullName             String                  @map("full_name") @db.VarChar(120)
+  /// Ariza yuborilgan paytdagi telefon — tokendan olinadi, soʻrov tanasidan
+  /// EMAS: aks holda ariza begona raqamga yozilib qolardi.
+  phoneNumber          String                  @map("phone_number") @db.VarChar(20)
+  profession           String                  @db.VarChar(120)
+  experienceLevel      MasterExperienceLevel   @map("experience_level")
+  claimsCertificate    Boolean                 @default(false) @map("claims_certificate")
+  about                String                  @db.VarChar(1000)
+  districts            String[]
+  workFrom             Int                     @map("work_from")
+  workTo               Int                     @map("work_to")
+  /// Usta OʻZI soʻragan xizmatlar. Yakuniy roʻyxatni moderator tasdiqlashda
+  /// tanlaydi — soʻralgani va berilgani bir xil boʻlishi shart emas.
+  requestedCategoryIds String[]                @map("requested_category_ids") @db.Uuid
+  status               MasterApplicationStatus @default(PENDING)
+  rejectionReason      String?                 @map("rejection_reason") @db.VarChar(500)
+  /// Koʻrib chiqqan admin. FK QOʻYILMAGAN: admin hisobi oʻchirilsa ham
+  /// «kim rad etdi» degan javob yoʻqolmasligi kerak.
+  reviewedByAdminId    String?                 @map("reviewed_by_admin_id") @db.Uuid
+  reviewedAt           DateTime?               @map("reviewed_at") @db.Timestamptz(3)
+  /// Tasdiqlashda yaratilgan (yoki topilgan) usta yozuvi.
+  masterId             String?                 @map("master_id") @db.Uuid
+  createdAt            DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  master Master? @relation(fields: [masterId], references: [id], onDelete: SetNull)
+
+  /// Panel roʻyxati aynan shu tartibda soʻraydi: holat boʻyicha filtr,
+  /// ichida yangisidan eskisiga.
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("master_applications")
 }
 
 model MasterServiceCategory {

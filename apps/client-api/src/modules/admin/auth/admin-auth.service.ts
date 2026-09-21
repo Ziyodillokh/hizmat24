@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ActorType, AdminRole, AuditAction, type AdminUser } from '@prisma/client';
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
+import type { RequestContext } from '@client/common/http/request-context';
 import type { AppEnv } from '@client/infra/config/env.validation';
 import { AuditService } from '@client/modules/audit/audit.service';
 import { sectionsFor, type AdminSection } from '../admin-permissions';
@@ -12,11 +13,14 @@ import { verifyPassword } from './admin-password';
 import { isLeakedPassword } from './password-policy';
 import { generateTotpSecret, totpUri, verifyTotp } from './admin-totp';
 
-/** Kirish soʻrovining konteksti — audit yozuvi uchun. */
-export interface RequestContext {
-  ipAddress: string | null;
-  userAgent: string | null;
-}
+/**
+ * Kirish soʻrovining konteksti — audit yozuvi uchun.
+ *
+ * Taʼrifi `common/http/request-context.ts` ga koʻchirildi: aynan shu ikki
+ * maydonni admin boʻlimlari ham, mijoz endpointlari ham yozadi. Mavjud
+ * import yoʻllari buzilmasligi uchun bu yerdan qayta eksport qilinadi.
+ */
+export type { RequestContext };
 
 export interface AdminIdentity {
   id: string;

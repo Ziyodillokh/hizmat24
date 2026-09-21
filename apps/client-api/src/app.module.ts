@@ -11,6 +11,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { HealthModule } from './modules/health/health.module';
+import { MasterApplicationsModule } from './modules/master-applications/master-applications.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
@@ -105,6 +106,7 @@ import { RedisModule } from './infra/redis/redis.module';
     OrdersModule,
     MatchingModule,
     MastersModule,
+    MasterApplicationsModule,
     RatingsModule,
     NotificationsModule,
     HealthModule,
