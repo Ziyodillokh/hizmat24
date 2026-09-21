@@ -76,8 +76,21 @@ const envSchema = z.object({
 
 export type AppEnv = z.infer<typeof envSchema>;
 
-export function validateEnv(config: Record<string, unknown>): AppEnv {
-  const parsed = envSchema.safeParse(config);
+/**
+ * Boʻsh satr = berilmagan.
+ *
+ * docker-compose ixtiyoriy oʻzgaruvchilarni `${SMS_API_URL:-}` shaklida
+ * uzatadi, yaʼni qiymat yoʻq boʻlsa ham konteynerga BOʻSH SATR yetib
+ * boradi. Zod uchun `""` — `undefined` emas: `url().optional()` uni
+ * «notoʻgʻri URL» deb rad etar va ilova serverda koʻtarilmasdi.
+ */
+const emptyToUndefined = (config: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(config).map(([key, value]) => [key, value === '' ? undefined : value]),
+  );
+
+export function validateEnv(rawConfig: Record<string, unknown>): AppEnv {
+  const parsed = envSchema.safeParse(emptyToUndefined(rawConfig));
 
   if (!parsed.success) {
     const issues = parsed.error.issues

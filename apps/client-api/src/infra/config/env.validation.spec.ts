@@ -144,4 +144,17 @@ describe('validateEnv (TZ 9.7)', () => {
   it('admin sessiyasining standart muddati — 30 daqiqa', () => {
     expect(validateEnv(BASE_ENV).ADMIN_SESSION_IDLE_MINUTES).toBe(30);
   });
+
+  it('boʻsh satrli ixtiyoriy oʻzgaruvchini berilmagan deb oʻqiydi (compose `${X:-}`)', () => {
+    // Serverda compose SMS_API_URL ni boʻsh satr qilib uzatgan va ilova
+    // «Invalid url» bilan koʻtarilmagan edi.
+    const env = validateEnv({ ...BASE_ENV, SMS_API_URL: '', SMS_API_TOKEN: '', METRICS_TOKEN: '' });
+
+    expect(env.SMS_API_URL).toBeUndefined();
+    expect(env.METRICS_TOKEN).toBeUndefined();
+  });
+
+  it('boʻsh satr majburiy oʻzgaruvchini qutqarmaydi', () => {
+    expect(() => validateEnv({ ...BASE_ENV, DATABASE_URL: '' })).toThrow(/DATABASE_URL/);
+  });
 });
