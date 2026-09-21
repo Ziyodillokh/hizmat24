@@ -1,0 +1,29 @@
+# Trivy — vaqtincha eʼtiborsiz qoldiriladigan zaifliklar.
+#
+# BU YERGA FAQAT asos imijdagi, bizning kodimiz bilan tuzatib boʻlmaydigan
+# zaifliklar yoziladi. Har bir yozuvda sabab va qayta koʻrish sanasi
+# boʻlishi SHART — aks holda roʻyxat vaqt oʻtib "hammasi eʼtiborsiz"
+# holatiga aylanadi.
+#
+# Joriy holat: gcr.io/distroless/nodejs22-debian12:nonroot imijidagi
+# libssl3 (3.0.18-1~deb12u2) eskirgan. Debian tuzatishni chiqargan
+# (3.0.19-1~deb12u2), lekin distroless imiji hali qayta yigʻilmagan.
+# Bizning kodimizda hech qanday oʻzgarish bu CVE larni yopmaydi —
+# yagona yoʻl asos imij yangilanishini kutish.
+#
+# QAYTA KOʻRISH: 2026-10-21. O'sha kuni `docker pull` bilan yangi imij
+# olinib, bu roʻyxat BOʻSHATILADI; hali tuzatilmagan boʻlsa sana
+# suriladi va sababi yangilanadi.
+#
+# Eslatma: `npm audit` va gitleaks alohida bosqichlarda ishlaydi va
+# ularga bu roʻyxat taʼsir qilmaydi — bizning bogʻliqliklarimizdagi
+# zaiflik hamon CI ni yiqitadi.
+
+# Hammasi libssl3 (openssl) — distroless asos imijida.
+# 2026-09-21 holatiga: 1 CRITICAL, 5 HIGH.
+CVE-2026-31789
+CVE-2026-28387
+CVE-2026-28388
+CVE-2026-28389
+CVE-2026-28390
+CVE-2026-45447

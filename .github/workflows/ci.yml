@@ -126,6 +126,7 @@ jobs:
         run: |
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/.trivyignore:/.trivyignore:ro" \
             aquasec/trivy:0.65.0 image \
               --severity CRITICAL,HIGH \
               --ignore-unfixed \

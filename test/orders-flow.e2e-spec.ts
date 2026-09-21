@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import {
   ComplexityLevel,
@@ -89,7 +90,21 @@ describe('Buyurtma oqimi (e2e)', () => {
       AppModule: NonNullable<AppModuleType>[number];
     };
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    /*
+     * Throttler TESTDA oʻchiriladi.
+     *
+     * `THROTTLE_LIMIT` ni oshirish yetarli emas: `POST /orders` da marshrut
+     * darajasidagi `@Throttle({ limit: 5, ttl: 60s })` bor va u global
+     * sozlamani BOSIB YOZADI. E2E bir daqiqada oʻndan ortiq buyurtma
+     * yaratadi, shuning uchun oltinchisidan boshlab 429 kelardi va
+     * tekshirilayotgan narsa (validatsiya, idempotentlik) umuman
+     * sinalmasdi. Chegaraning oʻzi production qoidasi boʻlib qoladi —
+     * uni sekinlashtirish uchun testni oʻzgartirmaymiz.
+     */
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await configureApp(app);
