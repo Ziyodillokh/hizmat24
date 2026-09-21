@@ -7,6 +7,7 @@ import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
 import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
+import { SessionReadyProvider } from './session-ready';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -70,7 +71,7 @@ function AppRoutes() {
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });
 
   return (
-    <>
+    <SessionReadyProvider value={isSessionReady}>
       <ScrollToTop />
       <PageTransition>
         <Routes>
@@ -104,7 +105,7 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
       </PageTransition>
-    </>
+    </SessionReadyProvider>
   );
 }
 

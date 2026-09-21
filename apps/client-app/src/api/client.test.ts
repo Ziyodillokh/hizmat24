@@ -50,8 +50,8 @@ describe('unwrap', () => {
     }
   });
 
-  it('maʼlumotsiz muvaffaqiyat ham xato — jim qolmaymiz', () => {
-    expect(() => unwrap({ success: true, data: null, error: null }, 200)).toThrowError(ApiError);
+  it('muvaffaqiyatli `data: null` — qiymat, xato emas («hali ariza yoʻq» kabi)', () => {
+    expect(unwrap({ success: true, data: null, error: null }, 200)).toBeNull();
   });
 });
 

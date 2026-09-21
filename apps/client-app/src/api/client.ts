@@ -64,7 +64,12 @@ const STATUS_MESSAGES: Record<number, string> = {
 };
 
 export function unwrap<T>(envelope: ApiEnvelope<T>, status: number): T {
-  if (envelope.success && envelope.data !== null) return envelope.data;
+  // Muvaffaqiyatli javobda `data: null` — haqiqiy qiymat, xato emas:
+  // masalan «hali ariza yubormagansiz». Ilgari u xato deb tashlanardi va
+  // ekranda «Server xatosi» chiqardi — mavjud boʻlmagan xato haqida.
+  // Obyekt kutgan chaqiruvchi maydonga murojaat qilganda baribir yiqiladi;
+  // `null` ni qabul qiladigan chaqiruvchi esa uni oʻzi hal qiladi.
+  if (envelope.success) return envelope.data as T;
 
   const error = envelope.error;
   throw new ApiError(

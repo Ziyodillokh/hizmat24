@@ -17,6 +17,8 @@ import { useMinuteClock } from '@/lib/useMinuteClock';
 import { useMaster } from '../master-store';
 import { tapFeedback } from '../native';
 import { useToast } from '../ToastHost';
+import { isApiEnabled } from '@/api/client';
+import { MasterApplyServer } from './master/MasterApplyServer';
 
 /**
  * Usta boʻlish uchun ariza.
@@ -26,7 +28,16 @@ import { useToast } from '../ToastHost';
  * telefon bilan — foydalanuvchi uni qoʻllab-quvvatlashga oʻzi yuboradi.
  * Murojaat (5-bosqich) bilan bir xil naqsh va bir xil komponentlar.
  */
+/**
+ * Yoʻlni tanlash: server ulangan boʻlsa ariza haqiqatan yuboriladi, aks
+ * holda faqat matn tayyorlanadi. Ikkala ekran ham oʻz holatini ochiq
+ * aytadi — foydalanuvchi qaysi yoʻlda ekanini taxmin qilmaydi.
+ */
 export function MasterApplyScreen() {
+  return isApiEnabled() ? <MasterApplyServer /> : <MasterApplyLocal />;
+}
+
+function MasterApplyLocal() {
   const navigate = useNavigate();
   const now = useMinuteClock();
   const { isComplete, application, prepareApplication, markApplicationChannelOpened } =
