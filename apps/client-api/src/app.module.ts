@@ -77,6 +77,18 @@ import { RedisModule } from './infra/redis/redis.module';
           password: config.get('REDIS_PASSWORD', { infer: true }),
           db: config.get('REDIS_DB', { infer: true }),
         },
+        /*
+         * Navbat yopilganda ioredis ulanishi ham UZILADI.
+         *
+         * `@nestjs/bullmq` da bu bayroq navbatlar uchun standart boʻyicha
+         * oʻchirilgan: `queue.close()` chaqiriladi, lekin soket ochiq
+         * qoladi. Natijada `app.close()` dan keyin jarayon oʻzi chiqmasdi —
+         * CI dagi E2E ishi testlar tugagach ham osilib turar va faqat
+         * vaqt chegarasi bilan toʻxtardi («Jest did not exit one second
+         * after the test run has completed»). Production da esa bu
+         * SIGTERM dan keyin toʻxtash kechikishi degani.
+         */
+        forceDisconnectOnShutdown: true,
       }),
     }),
 

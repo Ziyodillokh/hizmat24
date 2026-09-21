@@ -244,6 +244,7 @@ describe('Buyurtma oqimi (e2e)', () => {
         categoryId: simpleCategoryId,
         description: "Oshxonadagi kran oqmoqda, suv to'planyapti",
         clientAddress: address,
+        paymentMethod: 'cash',
       });
       const { data } = response.json();
 
@@ -394,6 +395,7 @@ describe('Buyurtma oqimi (e2e)', () => {
           categoryId: simpleCategoryId,
           description: 'Vannaxonadagi kran shovqin qilyapti',
           clientAddress: address,
+          paymentMethod: 'cash',
         })
       ).json();
 
@@ -471,6 +473,7 @@ describe('Buyurtma oqimi (e2e)', () => {
           categoryId: complexCategoryId,
           description: 'Gaz plitasini yangi joyga ulash kerak',
           clientAddress: address,
+          paymentMethod: 'cash',
         })
       ).json();
 
@@ -514,6 +517,7 @@ describe('Buyurtma oqimi (e2e)', () => {
         categoryId: simpleCategoryId,
         description: '',
         clientAddress: address,
+        paymentMethod: 'cash',
       });
 
       expect(response.statusCode).toBe(400);
@@ -524,6 +528,7 @@ describe('Buyurtma oqimi (e2e)', () => {
         categoryId: '11111111-1111-4111-8111-111111111111',
         description: "Kran oqmoqda va suv to'planyapti",
         clientAddress: address,
+        paymentMethod: 'cash',
       });
 
       expect(response.statusCode).toBe(400);
@@ -534,6 +539,7 @@ describe('Buyurtma oqimi (e2e)', () => {
         categoryId: simpleCategoryId,
         description: "Kran oqmoqda va suv to'planyapti",
         clientAddress: address,
+        paymentMethod: 'cash',
         price: 1,
       });
 
@@ -575,6 +581,7 @@ describe('Buyurtma oqimi (e2e)', () => {
         categoryId: simpleCategoryId,
         description: 'Hojatxonadagi bachok oqmoqda',
         clientAddress: address,
+        paymentMethod: 'cash',
       };
       const headers = {
         authorization: `Bearer ${accessToken}`,
@@ -631,6 +638,7 @@ describe('Buyurtma oqimi (e2e)', () => {
           categoryId: simpleCategoryId,
           description: 'Rozetka ishlamayapti, uchqun chiqyapti',
           clientAddress: address,
+          paymentMethod: 'cash',
         })
       ).json();
 
