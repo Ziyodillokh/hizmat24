@@ -9,7 +9,7 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { maskPhoneDigits } from '@/lib/phone';
 import { ApiError } from '@/api/client';
-import { requestOtp, verifyOtp } from '@/api/auth';
+import { requestOtp, verifyOtp, type OtpRequestResult } from '@/api/auth';
 import { isApiEnabled } from '@/api/client';
 import { useApp } from '../store';
 
@@ -27,6 +27,21 @@ import { useApp } from '../store';
 const OTP_LENGTH = 6;
 const DEMO_OTP = '123456';
 const RESEND_SECONDS = 60;
+
+/** Oxirgi soʻrovlar: raqam → natija va vaqt. Qisqa oyna ichida qayta ishlatiladi. */
+const recentOtpRequests = new Map<string, { at: number; result: Promise<OtpRequestResult> }>();
+const OTP_DEDUPE_MS = 5000;
+
+function requestOtpOnce(phone: string): Promise<OtpRequestResult> {
+  const recent = recentOtpRequests.get(phone);
+  if (recent && Date.now() - recent.at < OTP_DEDUPE_MS) return recent.result;
+
+  const result = requestOtp(phone);
+  recentOtpRequests.set(phone, { at: Date.now(), result });
+  // Xato boʻlsa keshda qolmasin — qayta urinish haqiqiy soʻrov yuborsin.
+  result.catch(() => recentOtpRequests.delete(phone));
+  return result;
+}
 
 export function OtpScreen() {
   const navigate = useNavigate();
@@ -58,12 +73,17 @@ export function OtpScreen() {
   /*
    * Kod ekran ochilganda soʻraladi: raqam kiritish ekrani faqat raqamni
    * yigʻadi va SMS yuborilgani haqida hech narsa vaʼda qilmaydi.
+   *
+   * `requestOtpOnce` — bir necha soniya ichida bitta raqamga IKKINCHI
+   * soʻrov ketmaydi (natija qayta ishlatiladi). Jonli serverda ekran
+   * ikki marta soʻrov yuborayotgani koʻrindi; server IP boʻyicha
+   * chegaralagani uchun foydalanuvchi ikkinchi kirishdayoq 429 olardi.
    */
   const askForCode = useCallback(async () => {
     if (!isApiEnabled()) return;
     setIsSending(true);
     try {
-      const result = await requestOtp(phone);
+      const result = await requestOtpOnce(phone);
       setSecondsLeft(result.retryAfterSeconds);
       setDebugCode(result.debugCode);
       setErrorText(null);

@@ -14,7 +14,11 @@ export class AuthController {
   @Public()
   @Post('request-otp')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 3, ttl: 300_000 } })
+  // IP boʻyicha 5 daqiqada 10 ta: bitta ofis/Wi-Fi ortidagi bir necha odam
+  // ketma-ket kirganda 3 ta juda kam edi — toʻrtinchi odam 429 olardi.
+  // Bitta raqamga SMS toshqini alohida, raqam boʻyicha 60 s kutish bilan
+  // toʻxtatiladi (OTP_RESEND_COOLDOWN_MS).
+  @Throttle({ default: { limit: 10, ttl: 300_000 } })
   @ApiOperation({ summary: 'Telefon raqamiga SMS-OTP yuborish' })
   requestOtp(@Body() dto: RequestOtpDto): Promise<RequestOtpResult> {
     return this.auth.requestOtp(dto.phoneNumber);
