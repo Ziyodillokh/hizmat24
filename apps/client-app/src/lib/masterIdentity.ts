@@ -10,7 +10,7 @@
  * `new Date()` chaqirilmaydi, `localStorage` ga tegilmaydi.
  */
 import type { LiveOrder } from '@/app/types';
-import type { ExperienceLevel, Master } from '@/mocks/types';
+import type { Master } from '@/mocks/types';
 import { formatPhone, formatRating } from './formatters';
 import { ORDER_STATUS } from './orderStateMachine';
 
@@ -22,9 +22,6 @@ export const isSelfMaster = (master: Pick<Master, 'id'>): boolean =>
 
 /** Baho hali yoʻqligining YAGONA koʻrinishi — «0,0» hech qachon chizilmaydi. */
 export const NO_RATING_LABEL = 'Hali baho yoʻq';
-
-/** Soha koʻrsatilmagan boʻlsa — toʻqilgan kasb emas, rost qator. */
-export const NO_PROFESSION_LABEL = 'Soha koʻrsatilmagan';
 
 export interface MasterJobStats {
   /** Faqat `handledByMaster && CLOSED` ishlar. */
@@ -67,8 +64,7 @@ export function masterJobStats(orders: readonly StatsOrder[]): MasterJobStats {
 export interface SelfMasterInput {
   fullName: string | null;
   phoneNumber: string;
-  profession: string | null;
-  experienceLevel: ExperienceLevel | null;
+  profession: string;
   stats: MasterJobStats;
 }
 
@@ -87,8 +83,10 @@ export function buildSelfMaster(input: SelfMasterInput): Master {
     id: SELF_MASTER_ID,
     // Ism kiritilmagan boʻlsa raqam koʻrsatiladi — toʻqilgan ism yozilmaydi.
     fullName: name && name.length > 0 ? name : formatPhone(input.phoneNumber),
-    profession: input.profession ?? NO_PROFESSION_LABEL,
-    experienceLevel: input.experienceLevel ?? 'NEW',
+    profession: input.profession,
+    // Tajriba darajasi ustadan soʻralmaydi — hech kim tekshirmasdi.
+    // `Master` tipi maydonni talab qiladi, shuning uchun eng past daraja.
+    experienceLevel: 'NEW',
     hasGovCertificate: false,
     // `Master.ratingAvg` tipi `number`, shuning uchun bu yerda 0 turadi;
     // ekranda esa `masterRatingLabel` qorovuli yulduz oʻrniga matn chizadi.

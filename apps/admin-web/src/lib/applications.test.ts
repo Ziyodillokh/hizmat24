@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   categorySelectionProblem,
   CATEGORIES_MAX,
+  formatCertificateClaim,
   formatDistricts,
   formatWorkHours,
+  NOT_ASKED_LABEL,
   rejectionReasonProblem,
   REJECTION_REASON_MAX,
   REJECTION_REASON_MIN,
@@ -77,7 +79,7 @@ describe('ish vaqti', () => {
 
 describe('tumanlar', () => {
   it('boʻsh roʻyxatni ochiq aytadi — «hamma joyda» deb tushunilmasin', () => {
-    expect(formatDistricts([])).toBe('Tuman koʻrsatilmagan');
+    expect(formatDistricts([])).toBe(NOT_ASKED_LABEL);
   });
 
   it('roʻyxatni vergul bilan yozadi', () => {
@@ -94,5 +96,29 @@ describe('holat yorliqlari', () => {
 
   it('kutilmoqda birinchi turadi — moderator shundan boshlaydi', () => {
     expect(STATUS_FILTERS[0].key).toBe('PENDING');
+  });
+});
+
+/*
+ * Soʻralmagan savol «yoʻq» degan javobdan farq qilishi SHART: usta hech
+ * qachon «sertifikatim yoʻq» demagan, undan umuman soʻralmagan.
+ */
+describe('soʻralmagan maydonlar', () => {
+  it('ish vaqti berilmagan boʻlsa soat toʻqilmaydi', () => {
+    expect(formatWorkHours(null, null)).toBe(NOT_ASKED_LABEL);
+    expect(formatWorkHours(8, null)).toBe(NOT_ASKED_LABEL);
+    expect(formatWorkHours(null, 18)).toBe(NOT_ASKED_LABEL);
+  });
+
+  it('sertifikat: soʻralmagan, yoʻq va daʼvo — uch xil javob', () => {
+    expect(formatCertificateClaim(null)).toBe(NOT_ASKED_LABEL);
+    expect(formatCertificateClaim(false)).toBe('yoʻq');
+    expect(formatCertificateClaim(true)).toContain('daʼvo');
+  });
+
+  it('matnlarda ASCII apostrof yoʻq', () => {
+    for (const text of [NOT_ASKED_LABEL, formatCertificateClaim(true), formatCertificateClaim(false)]) {
+      expect(text).not.toMatch(/[a-zA-Z]'[a-zA-Z]/);
+    }
   });
 });

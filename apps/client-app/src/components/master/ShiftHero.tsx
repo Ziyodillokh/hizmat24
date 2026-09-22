@@ -1,13 +1,7 @@
 import { Button } from '@/components/Button';
 import { cn } from '@/lib/cn';
 import type { MasterProfile } from '@/lib/masterProfile';
-import {
-  shiftActionLabel,
-  shiftHintLine,
-  shiftHoursLine,
-  shiftSinceLine,
-  shiftStateLine,
-} from '@/lib/masterShift';
+import { shiftActionLabel, shiftSinceLine, shiftStateLine } from '@/lib/masterShift';
 
 /**
  * Smena bloki — «Ishlar» ekranining eng tepasi va eng katta tugmasi.
@@ -25,10 +19,6 @@ export interface ShiftHeroProps {
   now: Date;
   onOpen: () => void;
   onClose: () => void;
-  /** Profil toʻliq boʻlmaguncha smena ochilmaydi. */
-  disabled?: boolean;
-  /** Tugma nega oʻchiq — sabab ekranda yoziladi. */
-  disabledHint?: string | null;
   className?: string;
 }
 
@@ -37,12 +27,9 @@ export function ShiftHero({
   now,
   onOpen,
   onClose,
-  disabled = false,
-  disabledHint,
   className,
 }: ShiftHeroProps) {
   const sinceLine = shiftSinceLine(profile, now);
-  const hint = shiftHintLine(profile, now);
 
   return (
     <section className={cn('banner-field rounded-lg p-16 text-on-primary-deep', className)}>
@@ -53,11 +40,6 @@ export function ShiftHero({
           boʻlsa — taxminiy raqam chizilmaydi. */}
       {sinceLine && <p className="tabular mt-4 text-body-sm text-on-primary-deep">{sinceLine}</p>}
 
-      <p className="mt-4 text-body-sm text-on-primary-deep">{shiftHoursLine(profile)}</p>
-      {hint && <p className="mt-4 text-caption text-on-primary-deep">{hint}</p>}
-      {disabled && disabledHint && (
-        <p className="mt-8 text-caption text-on-primary-deep">{disabledHint}</p>
-      )}
 
       {/*
         Ochiq smenada tugma «shisha»: `secondary` variantining koʻk chizigʻi
@@ -71,7 +53,6 @@ export function ShiftHero({
           profile.isAvailable &&
             'bg-on-primary-deep/[0.16] text-on-primary-deep ring-1 ring-inset ring-on-primary-deep/[0.45] active:bg-on-primary-deep/[0.24]',
         )}
-        disabled={disabled}
         onClick={profile.isAvailable ? onClose : onOpen}
       >
         {shiftActionLabel(profile)}

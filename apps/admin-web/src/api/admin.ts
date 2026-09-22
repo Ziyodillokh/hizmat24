@@ -101,19 +101,21 @@ export interface ApplicationListItem {
   id: string;
   fullName: string;
   phoneNumber: string;
-  profession: string;
+  /** `null` — soʻralmagan (hamma usta santexnik), «yoʻq» EMAS. */
+  profession: string | null;
   status: ApplicationStatus;
-  /** Foydalanuvchining OʻZ daʼvosi — hech kim tekshirmagan. */
-  claimsCertificate: boolean;
+  /** Foydalanuvchining OʻZ daʼvosi — hech kim tekshirmagan. `null` — soʻralmagan. */
+  claimsCertificate: boolean | null;
   createdAt: string;
 }
 
 export interface ApplicationDetail extends ApplicationListItem {
-  experienceLevel: 'NEW' | 'EXPERIENCED';
-  about: string;
+  /** `null` boʻlgan maydon — soʻralmagan savol. */
+  experienceLevel: 'NEW' | 'EXPERIENCED' | null;
+  about: string | null;
   districts: string[];
-  workFrom: number;
-  workTo: number;
+  workFrom: number | null;
+  workTo: number | null;
   requestedCategoryIds: string[];
   rejectionReason: string | null;
   reviewedByAdminId: string | null;

@@ -301,13 +301,18 @@ model MasterApplication {
   /// Ariza yuborilgan paytdagi telefon — tokendan olinadi, soʻrov tanasidan
   /// EMAS: aks holda ariza begona raqamga yozilib qolardi.
   phoneNumber          String                  @map("phone_number") @db.VarChar(20)
-  profession           String                  @db.VarChar(120)
-  experienceLevel      MasterExperienceLevel   @map("experience_level")
-  claimsCertificate    Boolean                 @default(false) @map("claims_certificate")
-  about                String                  @db.VarChar(1000)
+  /// Quyidagi maydonlar 2026-09-22 dan soʻralmaydi va shuning uchun
+  /// `null` boʻlishi mumkin. Ustunlar QOLDIRILDI: eski arizalarda haqiqiy
+  /// javob turibdi va panel uni koʻrsatishi kerak. `null` — «soʻralmagan»,
+  /// standart qiymat EMAS: aks holda panel toʻqilgan javob chizardi.
+  profession           String?                 @db.VarChar(120)
+  experienceLevel      MasterExperienceLevel?  @map("experience_level")
+  claimsCertificate    Boolean?                @map("claims_certificate")
+  about                String?                 @db.VarChar(1000)
+  /// Boʻsh roʻyxat — «soʻralmagan». Postgres massivi `null` boʻla olmaydi.
   districts            String[]
-  workFrom             Int                     @map("work_from")
-  workTo               Int                     @map("work_to")
+  workFrom             Int?                    @map("work_from")
+  workTo               Int?                    @map("work_to")
   /// Usta OʻZI soʻragan xizmatlar. Yakuniy roʻyxatni moderator tasdiqlashda
   /// tanlaydi — soʻralgani va berilgani bir xil boʻlishi shart emas.
   requestedCategoryIds String[]                @map("requested_category_ids") @db.Uuid

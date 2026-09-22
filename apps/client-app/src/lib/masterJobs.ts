@@ -185,17 +185,17 @@ export function masterJobFactLine(order: MasterFactSource, now: Date): string | 
 // ─────────────────────────────────────────────────────── qabul qilish ──
 
 export interface AcceptGuardInput {
-  isComplete: boolean;
   hasActiveJob: boolean;
 }
 
-/** Toʻliq boʻlmagan profil bilan ham, ikkinchi faol ish bilan ham qabul qilinmaydi. */
-export const canAcceptOffer = (input: AcceptGuardInput): boolean =>
-  input.isComplete && !input.hasActiveJob;
+/*
+ * Profil toʻliqligi qorovuli OLIB TASHLANDI (2026-09-22): profilda
+ * majburiy savol qolmadi. Yagona chegara — bir vaqtda bitta ish.
+ */
+export const canAcceptOffer = (input: AcceptGuardInput): boolean => !input.hasActiveJob;
 
 /** Tugma nega oʻchiq — sababi ekranda yoziladi, jimgina oʻchirilmaydi. */
 export function acceptBlockedLine(input: AcceptGuardInput): string | null {
-  if (!input.isComplete) return 'Profil toʻliq boʻlgunicha taklifni qabul qila olmaysiz.';
   if (input.hasActiveJob) {
     return 'Avval faol ishni yakunlang — bir vaqtda bitta ish olib boriladi.';
   }

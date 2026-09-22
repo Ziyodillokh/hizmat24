@@ -1,5 +1,5 @@
 import type { RemoteApplication, SubmitApplicationPayload } from '@/api/masterApplication';
-import { isMasterProfileComplete, type MasterProfile } from './masterProfile';
+import { aboutHint, type MasterProfile } from './masterProfile';
 
 /**
  * Usta arizasining SERVER yoʻli — sof funksiyalar.
@@ -9,8 +9,9 @@ import { isMasterProfileComplete, type MasterProfile } from './masterProfile';
  * React va tarmoqsiz — testda toʻliq yopiladi.
  */
 
-/** Serverdagi chegara bilan bir xil. */
+/** Serverdagi chegaralar bilan bir xil (`application-rules.ts`). */
 export const MAX_REQUESTED_CATEGORIES = 10;
+export const MIN_FULL_NAME_LENGTH = 5;
 
 export interface PayloadInput {
   profile: MasterProfile;
@@ -21,42 +22,38 @@ export interface PayloadInput {
 /**
  * Yuboriladigan maʼlumot; `null` — hali yuborib boʻlmaydi.
  *
- * Profil toʻliq boʻlmasa yoki xizmat tanlanmagan boʻlsa ariza ketmaydi:
- * server baribir rad etardi, lekin foydalanuvchi buni tugma bosmasdan
- * bilishi kerak.
+ * Ism yoʻq yoki xizmat tanlanmagan boʻlsa ariza ketmaydi: server baribir
+ * rad etardi, lekin foydalanuvchi buni tugma bosmasdan bilishi kerak.
+ * Boshqa hech narsa soʻralmaydi — usta ariza uchun bitta ekrandan
+ * nariga oʻtmaydi.
  */
 export function toSubmitPayload(input: PayloadInput): SubmitApplicationPayload | null {
-  const { profile, fullName, requestedCategoryIds } = input;
-  const name = (fullName ?? '').trim();
+  if (submitBlocker(input) !== null) return null;
 
-  if (!isMasterProfileComplete(profile) || name.length === 0) return null;
-  if (profile.profession === null || profile.experienceLevel === null) return null;
-  if (requestedCategoryIds.length === 0 || requestedCategoryIds.length > MAX_REQUESTED_CATEGORIES) {
-    return null;
-  }
+  const about = input.profile.about.trim();
 
   return {
-    fullName: name,
-    profession: profile.profession,
-    experienceLevel: profile.experienceLevel,
-    claimsCertificate: profile.claimsCertificate,
-    about: profile.about.trim(),
-    districts: [...profile.districts],
-    workFrom: profile.workFrom,
-    workTo: profile.workTo,
-    requestedCategoryIds: [...new Set(requestedCategoryIds)],
+    fullName: (input.fullName ?? '').trim().replace(/\s+/g, ' '),
+    requestedCategoryIds: [...new Set(input.requestedCategoryIds)],
+    // Boʻsh tanishtiruv umuman yuborilmaydi: boʻsh satr yuborilsa, server
+    // «yozdim, lekin boʻsh» deb qabul qilardi.
+    ...(about.length > 0 ? { about } : {}),
   };
 }
 
 /** Yuborish tugmasi nega yopiqligini aytadi; `null` — yuborish mumkin. */
 export function submitBlocker(input: PayloadInput): string | null {
-  if (!isMasterProfileComplete(input.profile)) return 'Avval profilni toʻldiring.';
-  if ((input.fullName ?? '').trim().length === 0) return 'Ismingizni kiriting — u arizada koʻrinadi.';
+  const name = (input.fullName ?? '').trim();
+  if (name.length < MIN_FULL_NAME_LENGTH || !name.includes(' ')) {
+    return 'Ism va familiyangizni toʻliq yozing.';
+  }
   if (input.requestedCategoryIds.length === 0) return 'Kamida bitta xizmat tanlang.';
   if (input.requestedCategoryIds.length > MAX_REQUESTED_CATEGORIES) {
     return `Bir arizada ${MAX_REQUESTED_CATEGORIES} tadan koʻp xizmat soʻralmaydi.`;
   }
-  return null;
+  // Tanishtiruv ixtiyoriy, lekin yarim yozilgani server tomonidan rad
+  // etilardi — buni tugma bosilgunicha aytamiz.
+  return aboutHint(input.profile.about);
 }
 
 export type ApplicationView =

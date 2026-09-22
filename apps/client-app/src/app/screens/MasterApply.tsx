@@ -1,6 +1,6 @@
 import { Info } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -40,18 +40,12 @@ export function MasterApplyScreen() {
 function MasterApplyLocal() {
   const navigate = useNavigate();
   const now = useMinuteClock();
-  const { isComplete, application, prepareApplication, markApplicationChannelOpened } =
-    useMaster();
+  const { application, prepareApplication, markApplicationChannelOpened } = useMaster();
   const showToast = useToast();
   const [copied, setCopied] = useState(false);
 
-  if (!isComplete) return <Navigate to="/app/master/setup" replace />;
-
   const prepare = () => {
-    if (!prepareApplication()) {
-      showToast('Ariza tayyorlanmadi — profil toʻliq emas', 'danger');
-      return;
-    }
+    prepareApplication();
     void tapFeedback();
     showToast('Ariza matni tayyorlandi');
   };

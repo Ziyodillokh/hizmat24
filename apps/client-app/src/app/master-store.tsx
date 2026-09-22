@@ -10,7 +10,6 @@ import {
 import {
   buildApplicationMessage,
   EMPTY_MASTER_PROFILE,
-  isMasterProfileComplete,
   type ApplicationRecord,
   type MasterProfile,
 } from '@/lib/masterProfile';
@@ -33,11 +32,10 @@ import { useApp } from './store';
  */
 interface MasterContextValue {
   profile: MasterProfile;
-  isComplete: boolean;
   application: ApplicationRecord | null;
   /** Qisman yangilaydi va `updatedAt` ni yozadi. */
   updateProfile: (patch: Partial<MasterProfile>) => void;
-  /** Ariza matnini tayyorlaydi (yoki qayta tayyorlaydi). Profil toʻliq boʻlmasa `false`. */
+  /** Ariza matnini tayyorlaydi (yoki qayta tayyorlaydi). */
   prepareApplication: () => boolean;
   markApplicationChannelOpened: (channel: SupportChannel) => void;
   /** Profil va arizani butunlay oʻchiradi. */
@@ -97,7 +95,6 @@ export function MasterProvider({ children }: { children: ReactNode }) {
   const prepareApplication = useCallback((): boolean => {
     let prepared = false;
     setState((prev) => {
-      if (!isMasterProfileComplete(prev.profile)) return prev;
       prepared = true;
       return {
         ...prev,
@@ -172,22 +169,19 @@ export function MasterProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const isComplete = isMasterProfileComplete(state.profile);
-
   /*
    * Taymer qorovuli USTA tomonidan yoqiladi, lekin buyurtmalar mijoz
    * storeʼida yashaydi. Shuning uchun bitta hosila yuqoriga uzatiladi:
-   * profil toʻliq va smena ochiq boʻlsa, qidiruvdagi buyurtma mock ustaga
-   * berilmaydi — u ustaning kabinetida taklif boʻlib turadi.
+   * smena ochiq boʻlsa, qidiruvdagi buyurtma mock ustaga berilmaydi —
+   * u ustaning kabinetida taklif boʻlib turadi.
    */
   useEffect(() => {
-    setMasterTakeover(isComplete && state.profile.isAvailable);
-  }, [isComplete, state.profile.isAvailable, setMasterTakeover]);
+    setMasterTakeover(state.profile.isAvailable);
+  }, [state.profile.isAvailable, setMasterTakeover]);
 
   const value = useMemo<MasterContextValue>(
     () => ({
       profile: state.profile,
-      isComplete,
       application: state.application,
       updateProfile,
       prepareApplication,
@@ -201,7 +195,6 @@ export function MasterProvider({ children }: { children: ReactNode }) {
     }),
     [
       state,
-      isComplete,
       updateProfile,
       prepareApplication,
       markApplicationChannelOpened,

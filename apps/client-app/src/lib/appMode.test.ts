@@ -4,7 +4,7 @@ import {
   HOME_ROUTE_FOR,
   landingRoute,
   MASTER_ROUTES,
-  masterModeHint,
+  MASTER_MODE_HINT,
   MODE_DESCRIPTIONS,
   MODE_LABELS,
   MODE_ROUTE,
@@ -62,18 +62,8 @@ describe('modeHome', () => {
 });
 
 describe('entryRouteFor', () => {
-  it('profili boshlanmagan usta sozlash oqimining birinchi qadamiga tushadi', () => {
-    expect(entryRouteFor('master', { hasMasterSteps: false })).toBe(
-      '/app/master/setup?step=profession',
-    );
-  });
-
-  it('profili boshlangan usta Ishlar boʻlimiga tushadi', () => {
-    expect(entryRouteFor('master', { hasMasterSteps: true })).toBe('/app/master/jobs');
-  });
-
-  it('mijoz uchun qadam holati ahamiyatsiz', () => {
-    expect(entryRouteFor('client', { hasMasterSteps: false })).toBe('/app/home');
+  it('har ikki rejim ham oʻz uyiga tushadi', () => {
+    expect(entryRouteFor('master')).toBe('/app/master/jobs');
     expect(entryRouteFor('client')).toBe('/app/home');
   });
 });
@@ -136,17 +126,9 @@ describe('parseModeReason va modeRouteFor', () => {
   });
 });
 
-describe('masterModeHint', () => {
-  it('toʻliq profil bitta jumla bilan aytiladi', () => {
-    expect(masterModeHint({ isComplete: true, done: 4, total: 4 })).toBe('Profil toʻliq');
-  });
-
-  it('boshlanmagan profil nol qadam deb yozilmaydi', () => {
-    expect(masterModeHint({ isComplete: false, done: 0, total: 4 })).toBe('Profil hali boshlanmagan');
-  });
-
-  it('yarim toʻldirilgan profil qadam sanogʻini koʻrsatadi', () => {
-    expect(masterModeHint({ isComplete: false, done: 2, total: 4 })).toBe('Profil: 2/4 qadam');
+describe('MASTER_MODE_HINT', () => {
+  it('ishora ustaga nima qilishini aytadi', () => {
+    expect(MASTER_MODE_HINT).toBe('Buyurtmalarni qabul qilish');
   });
 });
 
@@ -158,9 +140,7 @@ describe('matnlar', () => {
       ...Object.values(MODE_DESCRIPTIONS),
       switchToastFor('master'),
       switchToastFor('client'),
-      masterModeHint({ isComplete: true, done: 4, total: 4 }),
-      masterModeHint({ isComplete: false, done: 0, total: 4 }),
-      masterModeHint({ isComplete: false, done: 1, total: 4 }),
+      MASTER_MODE_HINT,
     ];
     for (const item of strings) expect(ASCII_APOSTROPHE.test(item)).toBe(false);
   });

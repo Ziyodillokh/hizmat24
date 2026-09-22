@@ -88,23 +88,13 @@ export function landingRoute(input: LandingInput): string | null {
   return modeHome(input.role);
 }
 
-export interface EntryOptions {
-  /** Usta profilida kamida bitta qadam toʻldirilganmi. */
-  hasMasterSteps?: boolean;
-}
-
 /**
  * Rejimga birinchi marta kirishda ochiladigan ekran.
  *
- * Profili umuman boshlanmagan usta boʻsh «Ishlar» ekraniga emas, sozlash
- * oqimining birinchi qadamiga tushadi: u yerda qiladigan ishi bor.
+ * Usta ham toʻgʻridan-toʻgʻri «Ishlar» ga tushadi: toʻldiriladigan majburiy
+ * profil qolmadi, shuning uchun uni sozlash oqimiga yuborish — boʻsh yoʻl.
  */
-export function entryRouteFor(role: UserRole, options: EntryOptions = {}): string {
-  if (role === 'master' && options.hasMasterSteps === false) {
-    return '/app/master/setup?step=profession';
-  }
-  return HOME_ROUTE_FOR[role];
-}
+export const entryRouteFor = (role: UserRole): string => HOME_ROUTE_FOR[role];
 
 /** Qaytish yoʻlining uzunlik chegarasi — URL ga yozilgan matn cheksiz emas. */
 export const NEXT_ROUTE_MAX = 100;
@@ -160,15 +150,10 @@ export function switchToastFor(mode: UserRole): string {
   return `${MODE_LABELS[mode]}ga oʻtdingiz`;
 }
 
-export interface MasterHintInput {
-  isComplete: boolean;
-  done: number;
-  total: number;
-}
-
-/** Usta kartasidagi ishora — profil qay darajada toʻldirilgani. */
-export function masterModeHint(input: MasterHintInput): string {
-  if (input.isComplete) return 'Profil toʻliq';
-  if (input.done === 0) return 'Profil hali boshlanmagan';
-  return `Profil: ${input.done}/${input.total} qadam`;
-}
+/**
+ * Usta kartasidagi ishora.
+ *
+ * Avval bu yerda profil toʻldirilishi hisoblanardi; endi majburiy savol
+ * qolmadi va ishora ustaga NIMA QILISHINI aytadi.
+ */
+export const MASTER_MODE_HINT = 'Buyurtmalarni qabul qilish';

@@ -1,4 +1,4 @@
-import { ArrowsLeftRight, ClipboardText, GearSix, Headset, Info, MapPin, Moon, PaperPlaneTilt, ShieldCheck, Sun, Wrench } from '@phosphor-icons/react';
+import { ArrowsLeftRight, ClipboardText, GearSix, Headset, Info, Moon, PaperPlaneTilt, ShieldCheck, Sun, Wrench } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -16,9 +16,7 @@ import { MODE_ROUTE } from '@/lib/appMode';
 import { masterJobStats } from '@/lib/masterIdentity';
 import { EMPTY_VALUE, formatDateTime, formatPhone, formatRating } from '@/lib/formatters';
 import {
-  completedStepCount,
-  firstIncompleteStep,
-  REQUIRED_STEP_COUNT,
+  MASTER_PROFESSION,
 } from '@/lib/masterProfile';
 import { CHANNEL_OPENED_LABELS } from '@/lib/support';
 import { useMinuteClock } from '@/lib/useMinuteClock';
@@ -42,12 +40,11 @@ export function MasterProfileTab() {
   const navigate = useNavigate();
   const now = useMinuteClock();
   const { fullName, phoneNumber, signOut, orders } = useApp();
-  const { profile, isComplete, application } = useMaster();
+  const { profile, application } = useMaster();
   const stats = useMemo(() => masterJobStats(orders), [orders]);
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
-  const done = completedStepCount(profile);
   const lastChannel = application?.openedChannels[application.openedChannels.length - 1];
   const displayName = fullName?.trim() ? fullName.trim() : formatPhone(phoneNumber);
 
@@ -65,26 +62,16 @@ export function MasterProfileTab() {
           },
         ]
       : []),
-    ...(isComplete
-      ? [
-          {
-            icon: GearSix,
-            label: 'Sozlamalar',
-            hint: profile.isAvailable ? 'Ishga tayyor' : 'Tayyor emas',
-            onSelect: () => navigate('/app/master/settings'),
-          },
-          {
-            icon: PaperPlaneTilt,
-            label: 'Ariza',
-            onSelect: () => navigate('/app/master/apply'),
-          },
-        ]
-      : []),
     {
-      icon: MapPin,
-      label: 'Hududlar',
-      hint: profile.districts.length > 0 ? `${profile.districts.length} ta` : undefined,
-      onSelect: () => navigate('/app/master/setup?step=area'),
+      icon: GearSix,
+      label: 'Sozlamalar',
+      hint: profile.isAvailable ? 'Ishga tayyor' : 'Tayyor emas',
+      onSelect: () => navigate('/app/master/settings'),
+    },
+    {
+      icon: PaperPlaneTilt,
+      label: 'Ariza',
+      onSelect: () => navigate('/app/master/apply'),
     },
   ];
 
@@ -148,7 +135,7 @@ export function MasterProfileTab() {
         <div className="min-w-0 flex-1">
           <p className="truncate text-h3 text-text-primary">{displayName}</p>
           <p className="mt-2 truncate text-body-sm text-text-secondary">
-            {profile.profession ?? 'Soha tanlanmagan'}
+            {MASTER_PROFESSION}
           </p>
           {/* Belgini ilova bermaydi — u DOIM tekshirilmagan. */}
           <InfoChip tone="warning" className="mt-8">
@@ -170,62 +157,55 @@ export function MasterProfileTab() {
         </div>
       </Card>
 
-      {/* Toʻliqlik — huddan koʻchirilgan blok. */}
-      {!isComplete ? (
-        <Card className="mt-12">
-          <p className="text-title text-text-primary">Profil hali toʻliq emas</p>
-          <p className="mt-4 text-body-sm text-text-secondary">
-            {done} / {REQUIRED_STEP_COUNT} qadam toʻldirildi. Profil toʻliq boʻlgach ariza matnini
-            tayyorlaysiz.
-          </p>
-          <Button
-            variant="primary"
-            className="mt-16"
-            onClick={() => navigate(`/app/master/setup?step=${firstIncompleteStep(profile)}`)}
+      <Card className="mt-12">
+        <div className="flex items-start gap-12">
+          <span
+            className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-md bg-surface-sunken"
+            aria-hidden
           >
-            {done === 0 ? 'Boshlash' : 'Davom etish'}
-          </Button>
-        </Card>
-      ) : (
-        <Card className="mt-12">
-          <div className="flex items-start gap-12">
-            <span
-              className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-md bg-surface-sunken"
-              aria-hidden
-            >
-              <Icon
-                icon={application ? PaperPlaneTilt : ClipboardText}
-                size={20}
-                className="text-primary"
-              />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-title text-text-primary">
-                {application ? 'Ariza matni tayyor' : 'Ariza hali tayyorlanmagan'}
-              </p>
-              <p className="mt-2 text-body-sm text-text-secondary">
-                {application
+            <Icon
+              icon={application ? PaperPlaneTilt : ClipboardText}
+              size={20}
+              className="text-primary"
+            />
+          </span>
+          <div className="min-w-0 flex-1">
+            {/*
+              Ikki yoʻl ikki xil gapiradi: server ulanganda ariza haqiqatan
+              yuboriladi, ulanmaganda esa ilova faqat MATN tayyorlaydi va
+              uni foydalanuvchining oʻzi yuboradi.
+            */}
+            <p className="text-title text-text-primary">
+              {isApiEnabled()
+                ? 'Usta boʻlish uchun ariza'
+                : application
+                  ? 'Ariza matni tayyor'
+                  : 'Ariza hali tayyorlanmagan'}
+            </p>
+            <p className="mt-2 text-body-sm text-text-secondary">
+              {isApiEnabled()
+                ? 'Ism va bajaradigan ishlaringizni belgilab yuborasiz — javob shu yerda koʻrinadi.'
+                : application
                   ? `Tayyorlangan: ${formatDateTime(application.createdAt, now)}`
                   : 'Profil maʼlumotidan tekshiruv uchun matn yigʻiladi — uni siz yuborasiz.'}
+            </p>
+            {/* "Yuborildi" YOʻQ: faqat qaysi kanal ochilgani maʼlum. */}
+            {lastChannel && (
+              <p className="mt-2 text-caption text-text-secondary">
+                {CHANNEL_OPENED_LABELS[lastChannel.channel]} ·{' '}
+                {formatDateTime(lastChannel.openedAt, now)}
               </p>
-              {/* "Yuborildi" YOʻQ: faqat qaysi kanal ochilgani maʼlum. */}
-              {lastChannel && (
-                <p className="mt-2 text-caption text-text-secondary">
-                  {CHANNEL_OPENED_LABELS[lastChannel.channel]} ·{' '}
-                  {formatDateTime(lastChannel.openedAt, now)}
-                </p>
-              )}
-            </div>
+            )}
           </div>
-          <Button
-            variant={application ? 'secondary' : 'primary'}
-            className="mt-16"
-            onClick={() => navigate('/app/master/apply')}
-          >
-            {application ? 'Arizani ochish' : 'Ariza tayyorlash'}
-          </Button>
-        </Card>
-      )}
+        </div>
+        <Button
+          variant={application ? 'secondary' : 'primary'}
+          className="mt-16"
+          onClick={() => navigate('/app/master/apply')}
+        >
+          {isApiEnabled() ? 'Arizani ochish' : application ? 'Arizani ochish' : 'Ariza tayyorlash'}
+        </Button>
+      </Card>
 
       {sections.map((section) => (
         <MenuGroup key={section.title} section={section} />

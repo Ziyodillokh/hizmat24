@@ -5,6 +5,7 @@ import {
   MIN_ABOUT_LENGTH,
   assessApplication,
   normalizeDraft,
+  toStoredApplication,
   type ApplicationDraft,
 } from './application-rules';
 
@@ -26,7 +27,7 @@ describe('assessApplication', () => {
 
   it('barcha muammolarni birdaniga qaytaradi — odam birma-bir topmaydi', () => {
     const verdict = assessApplication(
-      validDraft({ fullName: 'Ali', about: 'qisqa', districts: [] }),
+      validDraft({ fullName: 'Ali', about: 'qisqa', profession: 'ab', workFrom: 9, workTo: 9 }),
     );
 
     expect(verdict.ok).toBe(false);
@@ -55,12 +56,12 @@ describe('assessApplication', () => {
   });
 
   describe('tumanlar', () => {
-    it('boʻsh roʻyxat rad etiladi', () => {
-      expect(assessApplication(validDraft({ districts: [] })).ok).toBe(false);
+    it('boʻsh roʻyxat qabul qilinadi — tuman endi soʻralmaydi', () => {
+      expect(assessApplication(validDraft({ districts: [] })).ok).toBe(true);
     });
 
     it('faqat boʻshliqdan iborat nom hisobga olinmaydi', () => {
-      expect(assessApplication(validDraft({ districts: ['   '] })).ok).toBe(false);
+      expect(assessApplication(validDraft({ districts: ['   '] })).ok).toBe(true);
     });
 
     it('takror rad etiladi — registr va boʻshliqqa qaramay', () => {
@@ -135,5 +136,56 @@ describe('normalizeDraft', () => {
     expect(normalized.fullName).toBe('Alisher Karimov');
     expect(normalized.districts).toEqual(['Chilonzor']);
     expect(draft.districts).toEqual([' Chilonzor ', ' ']);
+  });
+});
+
+/*
+ * Santexnikaga oʻtishdan keyin roʻyxatdan oʻtish bitta ekranga tushdi:
+ * ustadan faqat ism va xizmatlar soʻraladi. Quyidagi testlar aynan shu
+ * qisqargan arizani himoya qiladi — kimdir maydonni yana majburiy qilib
+ * qoʻysa, shu yerda yiqiladi.
+ */
+describe('qisqargan ariza', () => {
+  const minimal: ApplicationDraft = {
+    fullName: 'Alisher Karimov',
+    requestedCategoryIds: ['11111111-1111-4111-8111-111111111111'],
+  };
+
+  it('faqat ism va xizmat bilan qabul qilinadi', () => {
+    expect(assessApplication(minimal)).toEqual({ ok: true, problems: [] });
+  });
+
+  it('ismsiz yoki xizmatsiz baribir rad etiladi', () => {
+    expect(assessApplication({ ...minimal, fullName: 'Ali' }).ok).toBe(false);
+    expect(assessApplication({ ...minimal, requestedCategoryIds: [] }).ok).toBe(false);
+  });
+
+  it('boʻsh «oʻzim haqimda» xato emas, yarim yozilgani xato', () => {
+    expect(assessApplication({ ...minimal, about: '' }).ok).toBe(true);
+    expect(assessApplication({ ...minimal, about: 'qisqa' }).ok).toBe(false);
+  });
+
+  it('ish vaqtining faqat bir uchi berilsa — xato', () => {
+    expect(assessApplication({ ...minimal, workFrom: 9 }).ok).toBe(false);
+  });
+
+  it('berilmagan maydon `undefined` boʻlib qoladi', () => {
+    expect(normalizeDraft(minimal).about).toBeUndefined();
+    expect(normalizeDraft(minimal).districts).toBeUndefined();
+  });
+
+  it('soʻralmagan maydon `null` boʻlib saqlanadi — toʻqilgan javob emas', () => {
+    const stored = toStoredApplication(normalizeDraft(minimal));
+
+    expect(stored.profession).toBeNull();
+    expect(stored.about).toBeNull();
+    expect(stored.workFrom).toBeNull();
+    expect(stored.workTo).toBeNull();
+    // Postgres massivi `null` boʻla olmaydi — boʻsh roʻyxat shu maʼnoda.
+    expect(stored.districts).toEqual([]);
+  });
+
+  it('boʻsh satr ham «yozmadim» deb saqlanadi', () => {
+    expect(toStoredApplication(normalizeDraft({ ...minimal, about: '   ' })).about).toBeNull();
   });
 });

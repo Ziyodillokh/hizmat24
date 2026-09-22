@@ -1,19 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { reviveMasterState, serializeMasterState, type MasterState } from './master-persistence';
-import { DISTRICTS_MAX, EMPTY_MASTER_PROFILE, TASHKENT_DISTRICTS } from '@/lib/masterProfile';
+import { EMPTY_MASTER_PROFILE } from '@/lib/masterProfile';
 
 const NOW = new Date(2026, 8, 12, 14, 30);
 
 function state(extra: Partial<MasterState> = {}): MasterState {
   return {
     profile: {
-      profession: 'Smesitel ustasi',
-      experienceLevel: 'NEW',
-      claimsCertificate: true,
       about: 'Rozetka va lyustra oʻrnataman.',
-      districts: ['Chilonzor'],
-      workFrom: 8,
-      workTo: 20,
       isAvailable: true,
       availableSince: NOW,
       updatedAt: NOW,
@@ -67,23 +61,35 @@ describe('reviveMasterState — buzuq maʼlumot', () => {
     const stored = serializeMasterState(state());
     const result = reviveMasterState({
       ...stored,
-      profile: { ...stored.profile, profession: 'Kosmonavt', workFrom: 99 },
+      profile: { ...stored.profile, about: 42 },
     });
     // Buzuqlari zaxira qiymatga tushadi, qolgani saqlanadi.
-    expect(result?.profile.profession).toBeNull();
-    expect(result?.profile.workFrom).toBe(EMPTY_MASTER_PROFILE.workFrom);
-    expect(result?.profile.about).toBe('Rozetka va lyustra oʻrnataman.');
-    expect(result?.profile.districts).toEqual(['Chilonzor']);
+    expect(result?.profile.about).toBe('');
+    expect(result?.profile.isAvailable).toBe(true);
   });
 
-  it('lugʻatda yoʻq tuman tushib qoladi, chegaradan ortigʻi kesiladi', () => {
+  /*
+   * Eski qurilmada saqlangan profilda kasb, tajriba, tumanlar va ish vaqti
+   * ham bor. Ular endi oʻqilmaydi — lekin smena holati va ariza YOʻQOLMASLIGI
+   * kerak, chunki foydalanuvchi uchun bu yangilanish hech narsani buzmasligi
+   * lozim.
+   */
+  it('eski, keng profilda ham smena va ariza saqlanadi', () => {
     const stored = serializeMasterState(state());
     const result = reviveMasterState({
       ...stored,
-      profile: { ...stored.profile, districts: ['Marsdagi tuman', ...TASHKENT_DISTRICTS] },
+      profile: {
+        ...stored.profile,
+        profession: 'Smesitel ustasi',
+        experienceLevel: 'NEW',
+        claimsCertificate: true,
+        districts: ['Chilonzor'],
+        workFrom: 8,
+        workTo: 20,
+      },
     });
-    expect(result?.profile.districts).not.toContain('Marsdagi tuman');
-    expect(result?.profile.districts).toHaveLength(DISTRICTS_MAX);
+    expect(result?.profile).toEqual(state().profile);
+    expect(result?.application?.openedChannels).toHaveLength(1);
   });
 
   it('yopiq smenada boshlanish vaqti majburan tozalanadi', () => {
@@ -105,7 +111,7 @@ describe('reviveMasterState — buzuq maʼlumot', () => {
     const result = reviveMasterState({ ...withoutDeclined, profile: legacyProfile });
     expect(result?.declinedOrderIds).toEqual([]);
     expect(result?.profile.availableSince).toBeNull();
-    expect(result?.profile.profession).toBe('Smesitel ustasi');
+    expect(result?.profile.about).toBe('Rozetka va lyustra oʻrnataman.');
   });
 
   it('rad etilganlar roʻyxati tozalanadi: string boʻlmaganlar va dublikatlar', () => {
@@ -128,7 +134,7 @@ describe('reviveMasterState — buzuq maʼlumot', () => {
     const stored = serializeMasterState(state());
     const result = reviveMasterState({ ...stored, application: { message: '', createdAt: 'x' } });
     expect(result?.application).toBeNull();
-    expect(result?.profile.profession).toBe('Smesitel ustasi');
+    expect(result?.profile.about).toBe('Rozetka va lyustra oʻrnataman.');
   });
 
   it('buzuq kanal hodisasi arizani tashlamaydi', () => {

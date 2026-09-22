@@ -15,7 +15,6 @@ const self = buildSelfMaster({
   fullName: 'Ziyodullo',
   phoneNumber: '+998901234567',
   profession: 'Santexnik',
-  experienceLevel: 'EXPERIENCED',
   stats: EMPTY_MASTER_STATS,
 });
 

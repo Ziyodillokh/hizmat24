@@ -1,6 +1,6 @@
 import { CheckCircle, Clock, Info, XCircle } from '@phosphor-icons/react';
 import { useCallback, useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ApiError, apiErrorMessage } from '@/api/client';
 import {
   fetchMyApplication,
@@ -10,7 +10,9 @@ import {
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
+import { Input } from '@/components/Input';
 import { SelectableChip } from '@/components/SelectableChip';
+import { Textarea } from '@/components/Textarea';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { formatDateTime } from '@/lib/formatters';
 import {
@@ -20,6 +22,7 @@ import {
   VIEW_TITLES,
   type ApplicationView,
 } from '@/lib/masterApplication';
+import { ABOUT_MAX, aboutHint } from '@/lib/masterProfile';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { useCatalog } from '../../catalog-store';
 import { useMaster } from '../../master-store';
@@ -35,11 +38,17 @@ type Remote =
   | { state: 'ready'; application: RemoteApplication | null };
 
 /**
- * Usta arizasi — SERVER yoʻli.
+ * Usta arizasi — SERVER yoʻli, BITTA ekran.
  *
- * Mahalliy yoʻldan (matn tayyorlash + Telegram) farqli oʻlaroq bu yerda
- * ariza haqiqatan yuboriladi va uning taqdiri shu ekranda koʻrinadi:
- * koʻrib chiqilmoqda, tasdiqlandi yoki rad etildi — sababi bilan.
+ * Avval bu ekranga kirish uchun besh qadamli profil toʻldirilishi kerak
+ * edi. Endi ariza ikkita javobdan iborat: KIM va NIMA QILA OLADI. Kasb
+ * soʻralmaydi (hamma usta santexnik), tajriba va sertifikat soʻralmaydi
+ * (ularni hech kim tekshirmasdi), tuman va ish vaqti soʻralmaydi (ish
+ * hozircha faqat Namangan shahrida, vaqtni esa smena tugmasi aytadi).
+ *
+ * Xizmatlar HAMMASI yoqilgan holda ochiladi: usta odatda koʻpini qiladi va
+ * qila olmaydiganini oʻchirish tanlashdan tezroq. Keyin buni «Mening
+ * xizmatlarim» da istalgan vaqt oʻzgartiradi.
  *
  * Holat har ochilishda serverdan olinadi, qurilmada saqlanmaydi: moderator
  * qarori boshqa joyda beriladi va eski nusxa yolgʻon boʻlardi.
@@ -48,13 +57,25 @@ export function MasterApplyServer() {
   const navigate = useNavigate();
   const now = useMinuteClock();
   const showToast = useToast();
-  const { profile, isComplete } = useMaster();
-  const { fullName } = useApp();
+  const { profile, updateProfile } = useMaster();
+  const { fullName, setFullName } = useApp();
   const { categories } = useCatalog();
   const sessionReady = useSessionReady();
 
   const [remote, setRemote] = useState<Remote>({ state: 'loading' });
-  const [selected, setSelected] = useState<string[]>([]);
+  /**
+   * `null` — foydalanuvchi hali xizmatlarga tegmagan: shunda HAMMASI
+   * yoqilgan deb hisoblanadi. Boʻsh massivdan farqi bor — boʻsh massiv
+   * «hammasini oʻchirdim» degani va tugmani yopadi.
+   */
+  const [selected, setSelected] = useState<string[] | null>(null);
+  /*
+   * Ism AYNAN shu yerda turadi, storeʼda emas: `setFullName` qiymatni
+   * trim qiladi, yaʼni har bosilgan boʻshliq darhol yoʻqolardi va
+   * «Ali Karimov» ni yozib boʻlmasdi. Storeʼga yuborishdan oldin
+   * yoziladi.
+   */
+  const [name, setName] = useState(fullName ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   /** Rad etilgandan keyin foydalanuvchi qayta yuborishni tanladi. */
   const [isResubmitting, setIsResubmitting] = useState(false);
@@ -77,9 +98,8 @@ export function MasterApplyServer() {
     if (sessionReady !== null) load();
   }, [sessionReady, load]);
 
-  if (!isComplete) return <Navigate to="/app/master/setup" replace />;
-
-  const input = { profile, fullName, requestedCategoryIds: selected };
+  const chosen = selected ?? categories.map((category) => category.id);
+  const input = { profile, fullName: name, requestedCategoryIds: chosen };
   const blocker = submitBlocker(input);
 
   const submit = async () => {
@@ -88,6 +108,9 @@ export function MasterApplyServer() {
     setIsSubmitting(true);
     try {
       const application = await submitApplication(payload);
+      // Ism arizada qabul qilindi — endi ilovaning qolgan qismi ham
+      // ustani shu nom bilan chaqiradi.
+      setFullName(payload.fullName);
       void tapFeedback();
       showToast('Ariza yuborildi', 'success');
       setIsResubmitting(false);
@@ -147,21 +170,35 @@ export function MasterApplyServer() {
       {showForm && (
         <>
           <p className="mt-8 text-body text-text-secondary">
-            Profilingizdagi maʼlumotlar moderatorga yuboriladi. Sertifikat «oʻzim aytdim» deb
-            belgilanadi — uni odam tekshiradi.
+            Ikki savol — shu. Javobingizni moderator koʻrib chiqadi.
           </p>
 
-          <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">Qaysi xizmatlarni bajarasiz?</h2>
+          <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">Ismingiz</h2>
+          <Input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Ism va familiya"
+            autoComplete="name"
+            className="mt-8"
+          />
+
+          <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">
+            Qaysi ishlarni bajarasiz?
+          </h2>
+          <p className="mt-4 px-4 text-caption text-text-secondary">
+            Hammasi yoqilgan. Qila olmaydiganingizni bosib oʻchiring — buyurtma faqat yoqilganlari
+            boʻyicha tushadi.
+          </p>
           <div className="mt-8 flex flex-wrap gap-8">
             {categories.map((category) => (
               <SelectableChip
                 key={category.id}
-                selected={selected.includes(category.id)}
+                selected={chosen.includes(category.id)}
                 onSelect={() =>
-                  setSelected((current) =>
-                    current.includes(category.id)
-                      ? current.filter((id) => id !== category.id)
-                      : [...current, category.id],
+                  setSelected(
+                    chosen.includes(category.id)
+                      ? chosen.filter((id) => id !== category.id)
+                      : [...chosen, category.id],
                   )
                 }
               >
@@ -169,6 +206,18 @@ export function MasterApplyServer() {
               </SelectableChip>
             ))}
           </div>
+
+          <h2 className="mt-24 px-4 text-overline uppercase text-text-secondary">
+            Oʻzingiz haqingizda — ixtiyoriy
+          </h2>
+          <Textarea
+            value={profile.about}
+            onChange={(event) => updateProfile({ about: event.target.value })}
+            maxLength={ABOUT_MAX}
+            placeholder="Masalan: 8 yildan beri santexnika bilan shugʻullanaman…"
+            error={aboutHint(profile.about) ?? undefined}
+            className="mt-8"
+          />
         </>
       )}
 

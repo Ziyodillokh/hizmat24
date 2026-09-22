@@ -8,82 +8,135 @@ import {
   VIEW_TITLES,
 } from './masterApplication';
 
-function complete(extra: Partial<MasterProfile> = {}): MasterProfile {
-  return {
-    ...EMPTY_MASTER_PROFILE,
-    profession: 'Santexnik',
-    experienceLevel: 'EXPERIENCED',
-    about: 'Oʻn yildan beri santexnika bilan shugʻullanaman, kran va quvurlar.',
-    districts: ['Chilonzor', 'Yunusobod'],
-    ...extra,
-  };
-}
+const ABOUT = 'Oʻn yildan beri santexnika bilan shugʻullanaman, kran va quvurlar.';
+
+const profileWith = (about = ''): MasterProfile => ({ ...EMPTY_MASTER_PROFILE, about });
 
 const CATS = ['cat-1', 'cat-2'];
 
+const NAME = 'Sardor Ibragimov';
+
 describe('toSubmitPayload', () => {
-  it('toʻliq profil va tanlovdan payload yigʻadi', () => {
-    const payload = toSubmitPayload({ profile: complete(), fullName: ' Sardor ', requestedCategoryIds: CATS });
+  it('ism va tanlovdan payload yigʻadi', () => {
+    const payload = toSubmitPayload({
+      profile: profileWith(ABOUT),
+      fullName: `  ${NAME}  `,
+      requestedCategoryIds: CATS,
+    });
 
     expect(payload).toEqual({
-      fullName: 'Sardor',
-      profession: 'Santexnik',
-      experienceLevel: 'EXPERIENCED',
-      claimsCertificate: false,
-      about: 'Oʻn yildan beri santexnika bilan shugʻullanaman, kran va quvurlar.',
-      districts: ['Chilonzor', 'Yunusobod'],
-      workFrom: EMPTY_MASTER_PROFILE.workFrom,
-      workTo: EMPTY_MASTER_PROFILE.workTo,
+      fullName: NAME,
       requestedCategoryIds: CATS,
+      about: ABOUT,
     });
   });
 
-  it('telefon raqami payloadda YOʻQ — server uni tokendan oladi', () => {
-    const payload = toSubmitPayload({ profile: complete(), fullName: 'Sardor', requestedCategoryIds: CATS });
-    expect(payload && 'phoneNumber' in payload).toBe(false);
+  /*
+   * Eng muhim oʻzgarish: kasb, tajriba, sertifikat, tuman va ish vaqti
+   * serverga YUBORILMAYDI. Ular ustadan soʻralmaydi, demak ilova ular
+   * haqida hech narsa «bilmaydi» va toʻqib yubormaydi.
+   */
+  it('soʻralmaydigan maydonlar payloadda YOʻQ', () => {
+    const payload = toSubmitPayload({
+      profile: profileWith(ABOUT),
+      fullName: NAME,
+      requestedCategoryIds: CATS,
+    });
+
+    for (const key of [
+      'phoneNumber',
+      'profession',
+      'experienceLevel',
+      'claimsCertificate',
+      'districts',
+      'workFrom',
+      'workTo',
+    ]) {
+      expect(payload && key in payload).toBe(false);
+    }
   });
 
-  it('toʻliq boʻlmagan profilda null', () => {
-    expect(toSubmitPayload({ profile: complete({ about: '' }), fullName: 'Sardor', requestedCategoryIds: CATS })).toBeNull();
+  it('tanishtiruvsiz ham yuboriladi — maydon umuman qoʻshilmaydi', () => {
+    const payload = toSubmitPayload({
+      profile: profileWith('   '),
+      fullName: NAME,
+      requestedCategoryIds: CATS,
+    });
+
+    expect(payload).not.toBeNull();
+    expect(payload && 'about' in payload).toBe(false);
   });
 
-  it('ismsiz null', () => {
-    expect(toSubmitPayload({ profile: complete(), fullName: '  ', requestedCategoryIds: CATS })).toBeNull();
+  it('yarim yozilgan tanishtiruvda null', () => {
+    expect(
+      toSubmitPayload({
+        profile: profileWith('qisqa'),
+        fullName: NAME,
+        requestedCategoryIds: CATS,
+      }),
+    ).toBeNull();
+  });
+
+  it('ismsiz yoki bitta soʻzli ismda null', () => {
+    expect(
+      toSubmitPayload({ profile: profileWith(), fullName: '  ', requestedCategoryIds: CATS }),
+    ).toBeNull();
+    expect(
+      toSubmitPayload({ profile: profileWith(), fullName: 'Sardor', requestedCategoryIds: CATS }),
+    ).toBeNull();
   });
 
   it('xizmat tanlanmagan boʻlsa null', () => {
-    expect(toSubmitPayload({ profile: complete(), fullName: 'Sardor', requestedCategoryIds: [] })).toBeNull();
+    expect(
+      toSubmitPayload({ profile: profileWith(), fullName: NAME, requestedCategoryIds: [] }),
+    ).toBeNull();
   });
 
-  it('takroriy tanlovni birlashtiradi', () => {
-    const payload = toSubmitPayload({ profile: complete(), fullName: 'S', requestedCategoryIds: ['a', 'a', 'b'] });
+  it('takroriy tanlovni birlashtiradi va ortiqcha boʻshliqni yigʻishtiradi', () => {
+    const payload = toSubmitPayload({
+      profile: profileWith(),
+      fullName: 'Sardor   Ibragimov',
+      requestedCategoryIds: ['a', 'a', 'b'],
+    });
     expect(payload?.requestedCategoryIds).toEqual(['a', 'b']);
+    expect(payload?.fullName).toBe(NAME);
   });
 
   it('profil obyektini oʻzgartirmaydi', () => {
-    const profile = complete();
+    const profile = profileWith(ABOUT);
     const before = JSON.stringify(profile);
-    toSubmitPayload({ profile, fullName: 'S', requestedCategoryIds: CATS });
+    toSubmitPayload({ profile, fullName: NAME, requestedCategoryIds: CATS });
     expect(JSON.stringify(profile)).toBe(before);
   });
 });
 
 describe('submitBlocker', () => {
-  it('yuborish mumkin boʻlsa null', () => {
-    expect(submitBlocker({ profile: complete(), fullName: 'Sardor', requestedCategoryIds: CATS })).toBeNull();
+  it('ism va xizmat boʻlsa — boshqa hech narsa soʻralmaydi', () => {
+    expect(
+      submitBlocker({ profile: EMPTY_MASTER_PROFILE, fullName: NAME, requestedCategoryIds: CATS }),
+    ).toBeNull();
   });
 
-  it('sabablarni tartib bilan aytadi: avval profil, keyin ism, keyin xizmat', () => {
-    expect(submitBlocker({ profile: EMPTY_MASTER_PROFILE, fullName: '', requestedCategoryIds: [] })).toContain('profil');
-    expect(submitBlocker({ profile: complete(), fullName: '', requestedCategoryIds: [] })).toContain('Ism');
-    expect(submitBlocker({ profile: complete(), fullName: 'S', requestedCategoryIds: [] })).toContain('xizmat');
+  it('sabablarni tartib bilan aytadi: avval ism, keyin xizmat', () => {
+    expect(
+      submitBlocker({ profile: profileWith(), fullName: '', requestedCategoryIds: [] }),
+    ).toContain('Ism');
+    expect(
+      submitBlocker({ profile: profileWith(), fullName: NAME, requestedCategoryIds: [] }),
+    ).toContain('xizmat');
+  });
+
+  it('yarim yozilgan tanishtiruvni tugma bosilgunicha aytadi', () => {
+    expect(
+      submitBlocker({ profile: profileWith('qisqa'), fullName: NAME, requestedCategoryIds: CATS }),
+    ).not.toBeNull();
   });
 
   it('chegaradan koʻp xizmatni rad etadi', () => {
     const many = Array.from({ length: MAX_REQUESTED_CATEGORIES + 1 }, (_, i) => `c${i}`);
-    expect(submitBlocker({ profile: complete(), fullName: 'S', requestedCategoryIds: many })).toContain(
-      String(MAX_REQUESTED_CATEGORIES),
-    );
+    expect(
+      submitBlocker({ profile: profileWith(), fullName: NAME, requestedCategoryIds: many }),
+    ).toContain(String(MAX_REQUESTED_CATEGORIES));
   });
 });
 

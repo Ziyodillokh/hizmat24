@@ -196,16 +196,14 @@ describe('masterWaitingCopy', () => {
 });
 
 describe('qabul qilish qorovuli', () => {
-  it('toʻliq profil va faol ishsiz — ruxsat', () => {
-    expect(canAcceptOffer({ isComplete: true, hasActiveJob: false })).toBe(true);
-    expect(acceptBlockedLine({ isComplete: true, hasActiveJob: false })).toBeNull();
+  it('faol ishsiz — ruxsat', () => {
+    expect(canAcceptOffer({ hasActiveJob: false })).toBe(true);
+    expect(acceptBlockedLine({ hasActiveJob: false })).toBeNull();
   });
 
-  it('toʻliq boʻlmagan profil va ikkinchi ish — sabab bilan rad', () => {
-    expect(canAcceptOffer({ isComplete: false, hasActiveJob: false })).toBe(false);
-    expect(acceptBlockedLine({ isComplete: false, hasActiveJob: false })).toContain('Profil');
-    expect(canAcceptOffer({ isComplete: true, hasActiveJob: true })).toBe(false);
-    expect(acceptBlockedLine({ isComplete: true, hasActiveJob: true })).toContain('bitta ish');
+  it('ikkinchi ish — sabab bilan rad', () => {
+    expect(canAcceptOffer({ hasActiveJob: true })).toBe(false);
+    expect(acceptBlockedLine({ hasActiveJob: true })).toContain('bitta ish');
   });
 });
 
@@ -254,8 +252,7 @@ describe('matn qoidalari', () => {
       MASTER_NEXT_STAGE_LINE,
       ETA_SHEET_TITLE,
       ETA_SHEET_HINT,
-      acceptBlockedLine({ isComplete: false, hasActiveJob: false }) ?? '',
-      acceptBlockedLine({ isComplete: true, hasActiveJob: true }) ?? '',
+      acceptBlockedLine({ hasActiveJob: true }) ?? '',
     ];
     texts.forEach((text) => expect(text).not.toMatch(/[a-zA-Z]'[a-zA-Z]/));
   });

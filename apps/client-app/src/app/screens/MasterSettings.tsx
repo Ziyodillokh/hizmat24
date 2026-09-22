@@ -1,6 +1,6 @@
-import { Briefcase, Clock, Info, MapPin, NotePencil, SealCheck, Wrench } from '@phosphor-icons/react';
+import { Info, NotePencil, Wrench } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -8,52 +8,37 @@ import { Header } from '@/components/Header';
 import { MenuGroup, type MenuSection } from '@/components/MenuGroup';
 import { Modal } from '@/components/Modal';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
-import { EXPERIENCE_LABELS, formatWorkHours } from '@/lib/masterProfile';
 import { useMaster } from '../master-store';
 import { useToast } from '../ToastHost';
 
 /**
  * Usta profili sozlamalari.
  *
- * Har qator sozlash oqimining kerakli qadamiga olib boradi — ikkinchi forma
- * yasalmaydi. "Ishga tayyorman" kaliti FAQAT qurilmada saqlanadi va ekran
- * buni yashirmaydi: backend yoʻq, kalit hech kimga hech narsa yubormaydi.
+ * Qatorlar KAM: platforma faqat santexnikaga xizmat qilgani uchun kasb,
+ * tajriba, sertifikat, tuman va ish vaqti soʻralmaydi. Qolgani ikkita
+ * haqiqiy sozlama — tanishtiruv matni va bajariladigan ishlar roʻyxati.
  */
 export function MasterSettingsScreen() {
   const navigate = useNavigate();
-  const { profile, isComplete, application, resetMaster } = useMaster();
+  const { profile, application, resetMaster } = useMaster();
   const showToast = useToast();
   const [resetOpen, setResetOpen] = useState(false);
-
-  // Toʻliq boʻlmagan profil sozlamalarda emas, oqimda toʻldiriladi.
-  if (!isComplete) return <Navigate to="/app/master/setup" replace />;
-
-  const edit = (step: string) => () => navigate(`/app/master/setup?step=${step}`);
 
   const fields: MenuSection = {
     title: 'Profil',
     items: [
-      { icon: Wrench, label: 'Soha', hint: profile.profession ?? undefined, onSelect: edit('profession') },
       {
-        icon: Briefcase,
-        label: 'Tajriba',
-        hint: profile.experienceLevel ? EXPERIENCE_LABELS[profile.experienceLevel] : undefined,
-        onSelect: edit('experience'),
+        icon: NotePencil,
+        label: 'Oʻzingiz haqingizda',
+        hint: profile.about.trim() ? 'Yozilgan' : 'Yozilmagan',
+        onSelect: () => navigate('/app/master/setup'),
       },
       {
-        icon: SealCheck,
-        label: 'Sertifikat',
-        hint: profile.claimsCertificate ? 'Bor (tekshirilmagan)' : 'Yoʻq',
-        onSelect: edit('experience'),
+        icon: Wrench,
+        label: 'Mening xizmatlarim',
+        hint: 'Qaysi ishlarni qabul qilasiz',
+        onSelect: () => navigate('/app/master/services'),
       },
-      { icon: NotePencil, label: 'Oʻzingiz haqingizda', onSelect: edit('about') },
-      {
-        icon: MapPin,
-        label: 'Tumanlar',
-        hint: `${profile.districts.length} ta`,
-        onSelect: edit('area'),
-      },
-      { icon: Clock, label: 'Ish vaqti', hint: formatWorkHours(profile), onSelect: edit('area') },
     ],
   };
 

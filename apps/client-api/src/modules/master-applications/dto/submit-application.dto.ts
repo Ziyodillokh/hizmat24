@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MasterExperienceLevel } from '@prisma/client';
 import {
   ArrayMaxSize,
@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsEnum,
   IsInt,
+  IsOptional,
   IsString,
   IsUUID,
   Length,
@@ -21,7 +22,6 @@ import {
   MAX_PROFESSION_LENGTH,
   MAX_REQUESTED_CATEGORIES,
   MIN_ABOUT_LENGTH,
-  MIN_DISTRICTS,
   MIN_DISTRICT_LENGTH,
   MIN_FULL_NAME_LENGTH,
   MIN_PROFESSION_LENGTH,
@@ -43,46 +43,65 @@ export class SubmitApplicationDto {
   @Length(MIN_FULL_NAME_LENGTH, MAX_FULL_NAME_LENGTH)
   fullName: string;
 
-  @ApiProperty({ example: 'Santexnik' })
+  /*
+   * Quyidagilar IXTIYORIY.
+   *
+   * Platforma faqat santexnikaga qaratildi: kasbni soʻrash maʼnosiz —
+   * hamma usta santexnik. Usta nimani qila olishini `requestedCategoryIds`
+   * bilan OʻZI aytadi, shuning uchun tajriba darajasi ham keraksiz: ish
+   * ustaning darajasiga emas, yoqib qoʻygan xizmatiga qarab tushadi.
+   * Tuman va ish vaqti ham soʻralmaydi — smena tugmasi oʻsha ishni
+   * bajaradi.
+   *
+   * Ustunlar bazada QOLADI va eski arizalar buzilmaydi; yangi ariza
+   * ularsiz ham qabul qilinadi.
+   */
+  @ApiPropertyOptional({ example: 'Santexnik' })
+  @IsOptional()
   @IsString()
   @Length(MIN_PROFESSION_LENGTH, MAX_PROFESSION_LENGTH)
-  profession: string;
+  profession?: string;
 
-  @ApiProperty({ enum: MasterExperienceLevel, example: MasterExperienceLevel.EXPERIENCED })
+  @ApiPropertyOptional({ enum: MasterExperienceLevel })
+  @IsOptional()
   @IsEnum(MasterExperienceLevel)
-  experienceLevel: MasterExperienceLevel;
+  experienceLevel?: MasterExperienceLevel;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'Foydalanuvchining DAʼVOSI — tasdiq emas. Panel buni «tekshirilmagan» deb koʻrsatadi.',
   })
+  @IsOptional()
   @IsBoolean()
-  claimsCertificate: boolean;
+  claimsCertificate?: boolean;
 
-  @ApiProperty({ example: 'Sakkiz yildan beri santexnika bilan shugʻullanaman...' })
+  @ApiPropertyOptional({ example: 'Sakkiz yildan beri santexnika bilan shugʻullanaman...' })
+  @IsOptional()
   @IsString()
   @Length(MIN_ABOUT_LENGTH, MAX_ABOUT_LENGTH)
-  about: string;
+  about?: string;
 
-  @ApiProperty({ example: ['Chilonzor', 'Yunusobod'] })
+  @ApiPropertyOptional({ example: ['Chilonzor', 'Yunusobod'] })
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(MIN_DISTRICTS)
   @ArrayMaxSize(MAX_DISTRICTS)
   @IsString({ each: true })
   @Length(MIN_DISTRICT_LENGTH, MAX_DISTRICT_LENGTH, { each: true })
-  districts: string[];
+  districts?: string[];
 
-  @ApiProperty({ example: 9, minimum: WORK_HOUR_MIN, maximum: WORK_HOUR_MAX })
+  @ApiPropertyOptional({ minimum: WORK_HOUR_MIN, maximum: WORK_HOUR_MAX })
+  @IsOptional()
   @IsInt()
   @Min(WORK_HOUR_MIN)
   @Max(WORK_HOUR_MAX)
-  workFrom: number;
+  workFrom?: number;
 
-  @ApiProperty({ example: 18, minimum: WORK_HOUR_MIN, maximum: WORK_HOUR_MAX })
+  @ApiPropertyOptional({ minimum: WORK_HOUR_MIN, maximum: WORK_HOUR_MAX })
+  @IsOptional()
   @IsInt()
   @Min(WORK_HOUR_MIN)
   @Max(WORK_HOUR_MAX)
-  workTo: number;
+  workTo?: number;
 
   @ApiProperty({ description: 'Usta oʻzi soʻragan xizmatlar', type: [String] })
   @IsArray()

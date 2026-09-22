@@ -58,7 +58,7 @@ describe('AdminCatalogService — qisman yangilash', () => {
   const patch = (dto: Partial<UpsertCategoryDto>) =>
     service.updateCategory(
       'cat-1',
-      { name: 'Kran taʼmirlash', basePrice: 150_000, ...dto } as UpsertCategoryDto,
+      { name: 'Kran taʼmirlash', basePrice: 150_000, ...dto },
       ADMIN,
       CONTEXT,
     );

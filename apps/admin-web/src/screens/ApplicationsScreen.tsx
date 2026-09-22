@@ -5,7 +5,14 @@ import { fetchApplications, type ApplicationListItem } from '@/api/admin';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/app/AuthProvider';
 import { formatDateTime } from '@/lib/format';
-import { STATUS_FILTERS, STATUS_LABELS, STATUS_TONES, type StatusFilter } from '@/lib/applications';
+import {
+  formatCertificateClaim,
+  NOT_ASKED_LABEL,
+  STATUS_FILTERS,
+  STATUS_LABELS,
+  STATUS_TONES,
+  type StatusFilter,
+} from '@/lib/applications';
 import { Button, Card, Field, Notice, PageTitle, Pill } from '@/components/ui';
 
 /**
@@ -148,13 +155,17 @@ function ApplicationsTable({
                   </Link>
                   <p className="text-caption text-text-secondary">{item.phoneNumber}</p>
                 </td>
-                <td className="px-16 py-12 text-text-secondary">{item.profession}</td>
+                <td className="px-16 py-12 text-text-secondary">
+                  {item.profession ?? NOT_ASKED_LABEL}
+                </td>
                 <td className="px-16 py-12">
                   {/* Daʼvo — tasdiq emas. Yashil belgi chizilmaydi (QOIDA 2). */}
-                  {item.claimsCertificate ? (
+                  {item.claimsCertificate === true ? (
                     <Pill tone="neutral">daʼvo qiladi · tekshirilmagan</Pill>
                   ) : (
-                    <span className="text-caption text-text-secondary">yoʻq</span>
+                    <span className="text-caption text-text-secondary">
+                      {formatCertificateClaim(item.claimsCertificate)}
+                    </span>
                   )}
                 </td>
                 <td className="px-16 py-12">

@@ -13,14 +13,13 @@ import { ServerStatusRow } from '@/components/ServerStatusRow';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { AppTabBar } from '../AppTabBar';
 import { cn } from '@/lib/cn';
-import { HOME_ROUTE_FOR, MODE_ROUTE, MODE_SHORT_LABELS } from '@/lib/appMode';
+import { HOME_ROUTE_FOR, MASTER_MODE_HINT, MODE_ROUTE, MODE_SHORT_LABELS } from '@/lib/appMode';
 import { formatPhone, orderDateGroup } from '@/lib/formatters';
 import { ORDER_STATUS, isTerminal } from '@/lib/orderStateMachine';
 import { notificationUiType } from '@/mocks/notifications';
 import { useDisputes } from '../dispute-store';
 import { useAddresses } from '../address-store';
 import { useFavorites } from '../favorites-store';
-import { useMaster } from '../master-store';
 import { Toggle } from '@/components/Toggle';
 import { useApp } from '../store';
 import { useServerStatus } from '../useServerStatus';
@@ -120,7 +119,6 @@ export function ProfileTab() {
   const { openCount } = useDisputes();
   const { addresses } = useAddresses();
   const { count: favoriteCount } = useFavorites();
-  const { isComplete: isMasterComplete } = useMaster();
   const { level } = useWallet();
   const { theme, toggleTheme } = useTheme();
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -194,7 +192,7 @@ export function ProfileTab() {
               {
                 icon: Wrench,
                 label: 'Usta kabineti',
-                hint: isMasterComplete ? 'Profil toʻliq' : 'Profil toʻldirilmagan',
+                hint: MASTER_MODE_HINT,
                 onSelect: () => navigate(HOME_ROUTE_FOR.master),
               },
             ],

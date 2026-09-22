@@ -7,8 +7,10 @@ import { useAuth } from '@/app/AuthProvider';
 import { formatDateTime } from '@/lib/format';
 import {
   EXPERIENCE_LABELS,
+  formatCertificateClaim,
   formatDistricts,
   formatWorkHours,
+  NOT_ASKED_LABEL,
   STATUS_LABELS,
   STATUS_TONES,
 } from '@/lib/applications';
@@ -73,11 +75,18 @@ function ApplicationCard({
         <Card className="p-20">
           <h2 className="text-h3 text-text-primary">Kasbi</h2>
           <dl className="mt-12 grid grid-cols-[auto_1fr] gap-x-16 gap-y-8 text-body">
+            {/*
+              Soʻralmagan savol «yoʻq» deb yozilmaydi. 2026-09-22 dan
+              arizada faqat ism va xizmatlar soʻraladi; eski arizalarda
+              esa haqiqiy javob turibdi va u shu yerda koʻrinadi.
+            */}
             <dt className="text-text-secondary">Kasb</dt>
-            <dd className="text-text-primary">{application.profession}</dd>
+            <dd className="text-text-primary">{application.profession ?? NOT_ASKED_LABEL}</dd>
             <dt className="text-text-secondary">Tajriba</dt>
             <dd className="text-text-primary">
-              {EXPERIENCE_LABELS[application.experienceLevel] ?? application.experienceLevel}
+              {application.experienceLevel === null
+                ? NOT_ASKED_LABEL
+                : (EXPERIENCE_LABELS[application.experienceLevel] ?? application.experienceLevel)}
             </dd>
             <dt className="text-text-secondary">Sertifikat</dt>
             <dd className="text-text-primary">
@@ -85,13 +94,12 @@ function ApplicationCard({
                 Foydalanuvchining oʻz soʻzi. Yashil belgi YOʻQ — hech kim
                 hujjatni koʻrmagan. Tasdiqlash A5 bosqichida alohida amal.
               */}
-              {application.claimsCertificate ? (
+              {application.claimsCertificate === true ? (
                 <span>
-                  bor deb daʼvo qiladi{' '}
-                  <Pill tone="neutral">tekshirilmagan</Pill>
+                  {formatCertificateClaim(true)} <Pill tone="neutral">tekshirilmagan</Pill>
                 </span>
               ) : (
-                'yoʻq'
+                formatCertificateClaim(application.claimsCertificate)
               )}
             </dd>
             <dt className="text-text-secondary">Tumanlar</dt>
@@ -107,7 +115,9 @@ function ApplicationCard({
 
         <Card className="p-20">
           <h2 className="text-h3 text-text-primary">Oʻzi haqida</h2>
-          <p className="mt-12 whitespace-pre-line text-body text-text-primary">{application.about}</p>
+          <p className="mt-12 whitespace-pre-line text-body text-text-primary">
+            {application.about?.trim() ? application.about : 'Yozilmagan — bu maydon ixtiyoriy.'}
+          </p>
           <p className="mt-12 text-caption text-text-secondary">
             Soʻragan xizmatlar: {application.requestedCategoryIds.length} ta
           </p>

@@ -1,23 +1,21 @@
 import { apiRequest } from './client';
 import { getAccessToken } from './session';
-import type { ExperienceLevel } from '@/mocks/types';
 
 /**
  * Usta arizasi — serverga.
  *
  * Telefon raqami yuborilmaydi: server uni tokendan oladi. Aks holda
  * ilova begona raqamga ariza yozib qoʻyishi mumkin edi.
+ *
+ * Kasb, tajriba, sertifikat, tuman va ish vaqti YUBORILMAYDI: server ham
+ * ularni ixtiyoriy qilgan (`submit-application.dto.ts`). Ariza ikkita
+ * javobdan iborat — kim va nima qila oladi.
  */
 export interface SubmitApplicationPayload {
   fullName: string;
-  profession: string;
-  experienceLevel: ExperienceLevel;
-  claimsCertificate: boolean;
-  about: string;
-  districts: string[];
-  workFrom: number;
-  workTo: number;
   requestedCategoryIds: string[];
+  /** Ixtiyoriy tanishtiruv; boʻsh boʻlsa umuman yuborilmaydi. */
+  about?: string;
 }
 
 export type RemoteApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';

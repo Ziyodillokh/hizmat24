@@ -4,6 +4,7 @@ import {
   AuditAction,
   type ComplexityLevel,
   MasterApplicationStatus,
+  MasterExperienceLevel,
   Prisma,
   type MasterApplication,
 } from '@prisma/client';
@@ -13,6 +14,7 @@ import { AuditService } from '@client/modules/audit/audit.service';
 import type { PaginatedResult } from '@client/modules/orders/dto/pagination.dto';
 import type { AdminIdentity } from '@client/modules/admin/auth/admin-auth.service';
 import { canTransition } from './domain/application-status';
+import { DEFAULT_WORK_FROM, DEFAULT_WORK_TO } from './domain/application-rules';
 import { decideMasterLink } from './domain/master-link';
 import type { ApproveApplicationDto, RejectApplicationDto } from './dto/review-application.dto';
 import type { ListApplicationsQueryDto } from './dto/list-applications.dto';
@@ -213,7 +215,7 @@ export class AdminApplicationsService {
         data: {
           userId: application.userId,
           fullName: application.fullName,
-          experienceLevel: application.experienceLevel,
+          experienceLevel: experienceLevelOf(application),
           isActive: true,
         },
       });
@@ -225,7 +227,7 @@ export class AdminApplicationsService {
         userId: application.userId,
         fullName: application.fullName,
         phoneNumber: application.phoneNumber,
-        experienceLevel: application.experienceLevel,
+        experienceLevel: experienceLevelOf(application),
         hasGovCertificate: false,
       },
     });
@@ -321,13 +323,28 @@ function attachCategories(
   });
 }
 
+/**
+ * Arizada daraja soʻralmagan boʻlsa — eng past daraja.
+ *
+ * `masters.experience_level` majburiy ustun va u ariza emas, USTA
+ * yozuvi: mijozga koʻrsatiladigan qiymat boʻlishi shart. Arizaning oʻzi
+ * esa `null` boʻlib qolaveradi — panel «soʻralmagan» deb koʻrsatadi.
+ */
+const experienceLevelOf = (application: MasterApplication): MasterExperienceLevel =>
+  application.experienceLevel ?? MasterExperienceLevel.NEW;
+
+/**
+ * Usta profili — bu ariza emas, ustaning tahrirlanadigan yozuvi.
+ * Soʻralmagan maydonlar shu yerda standart qiymat oladi va ustaning
+ * oʻzi keyin oʻzgartira oladi.
+ */
 function writeProfile(tx: Tx, masterId: string, application: MasterApplication): Promise<unknown> {
   const profile = {
-    about: application.about,
+    about: application.about ?? '',
     districts: application.districts,
-    workFrom: application.workFrom,
-    workTo: application.workTo,
-    claimsCertificate: application.claimsCertificate,
+    workFrom: application.workFrom ?? DEFAULT_WORK_FROM,
+    workTo: application.workTo ?? DEFAULT_WORK_TO,
+    claimsCertificate: application.claimsCertificate ?? false,
   };
 
   // `upsert`: eski usta qayta ariza bergan boʻlsa, profili yangilanadi.

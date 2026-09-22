@@ -5,7 +5,11 @@ import type { RequestContext } from '@client/common/http/request-context';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { AuditService } from '@client/modules/audit/audit.service';
 import type { SubmitApplicationDto } from './dto/submit-application.dto';
-import { assessApplication, normalizeDraft } from './domain/application-rules';
+import {
+  assessApplication,
+  normalizeDraft,
+  toStoredApplication,
+} from './domain/application-rules';
 import {
   DuplicatePendingApplicationException,
   InvalidApplicationException,
@@ -85,20 +89,18 @@ export class MasterApplicationsService {
      * tranzaksiya klientini qabul qiladi.
      */
     return this.prisma.$transaction(async (tx) => {
+      const stored = toStoredApplication(draft);
       const application = await tx.masterApplication.create({
         data: {
           userId: user.id,
-          fullName: draft.fullName,
           // Telefon tokendan — soʻrov tanasida bu maydon umuman yoʻq.
           phoneNumber: user.phoneNumber,
-          profession: draft.profession,
-          experienceLevel: dto.experienceLevel,
-          claimsCertificate: dto.claimsCertificate,
-          about: draft.about,
-          districts: [...draft.districts],
-          workFrom: draft.workFrom,
-          workTo: draft.workTo,
-          requestedCategoryIds: [...draft.requestedCategoryIds],
+          ...stored,
+          // Soʻralmaydi: santexnikada daraja emas, yoqilgan xizmat muhim.
+          // `null` — «soʻralmagan»; panel buni toʻqilgan javob bilan
+          // almashtirmasligi uchun standart qiymat qoʻyilmaydi.
+          experienceLevel: dto.experienceLevel ?? null,
+          claimsCertificate: dto.claimsCertificate ?? null,
         },
       });
 
@@ -110,7 +112,7 @@ export class MasterApplicationsService {
           toStatus: application.status,
           metadata: {
             applicationId: application.id,
-            requestedCategoryIds: [...draft.requestedCategoryIds],
+            requestedCategoryIds: stored.requestedCategoryIds,
           },
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,

@@ -64,13 +64,24 @@ Yaʼni tizim «ustaning kasbi» emas, **«katalogdagi aniq ish»** atrofida quri
 
 ---
 
-### P2 — Usta rejimini soddalashtirish (ilova + server + panel) — YARIM BAJARILDI
+### P2 — Usta rejimini soddalashtirish (ilova + server + panel) — ✅ BAJARILDI
 
 > Bajarildi: `is_enabled`, `GET/PUT /master/me/services`, matching filtri,
 > ilovada «Mening xizmatlarim» ekrani (profildan ochiladi).
 >
-> Qoldi: roʻyxatdan oʻtishni bitta ekranga tushirish (kasb, tajriba,
-> sertifikat, tumanlar, ish vaqti savollarini olib tashlash).
+> Bajarildi (2026-09-22): ariza BITTA ekranga tushdi — faqat ism, xizmatlar
+> (hammasi yoqilgan holda ochiladi) va ixtiyoriy tanishtiruv. Kasb, tajriba,
+> sertifikat, tumanlar va ish vaqti savollari olib tashlandi; besh qadamli
+> sozlash oqimi bitta ixtiyoriy maydonga aylandi; smenani ochish uchun
+> «profil toʻliq» qorovuli olib tashlandi (majburiy savol qolmadi).
+>
+> Bazada ustunlar QOLDI, lekin `NULL` qabul qiladi
+> (`20260925000000_master_application_optional_fields`): eski arizalardagi
+> haqiqiy javoblar oʻqilaveradi, yangilarida esa panel «soʻralmagan» deb
+> koʻrsatadi — «yoʻq» deb yozish toʻqilgan maʼlumot boʻlardi.
+>
+> Jonli tekshirildi: minimal ariza → panelda `null` maydonlar → tasdiqlash →
+> 3 ta xizmati yoqilgan faol usta. Sinov maʼlumotlari oʻchirildi.
 
 **Maqsad:** usta 1 daqiqada ishga tayyor boʻladi; qaysi ishlarni qilishini oʻzi boshqaradi.
 

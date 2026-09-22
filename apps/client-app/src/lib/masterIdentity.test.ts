@@ -5,7 +5,6 @@ import {
   isSelfMaster,
   masterJobStats,
   masterRatingLabel,
-  NO_PROFESSION_LABEL,
   NO_RATING_LABEL,
   SELF_MASTER_ID,
 } from './masterIdentity';
@@ -73,8 +72,8 @@ describe('buildSelfMaster', () => {
     expect(master.fullName).toContain('998');
   });
 
-  it('soha tanlanmagan boʻlsa rost yorliq', () => {
-    expect(buildSelfMaster({ ...input, profession: null }).profession).toBe(NO_PROFESSION_LABEL);
+  it('tajriba darajasi soʻralmaydi — doim eng past daraja yoziladi', () => {
+    expect(buildSelfMaster(input).experienceLevel).toBe('NEW');
   });
 
   it('katalogdagi id bilan kesishmaydi', () => {
@@ -95,7 +94,6 @@ describe('masterRatingLabel', () => {
     fullName: 'Ziyodullo',
     phoneNumber: '+998901234567',
     profession: 'Santexnik',
-    experienceLevel: 'NEW',
     stats: EMPTY_MASTER_STATS,
   });
 
@@ -118,8 +116,6 @@ describe('masterRatingLabel', () => {
 
 describe('matn qoidalari', () => {
   it('ASCII apostrof yoʻq', () => {
-    [NO_RATING_LABEL, NO_PROFESSION_LABEL].forEach((text) =>
-      expect(text).not.toMatch(/[a-zA-Z]'[a-zA-Z]/),
-    );
+    expect(NO_RATING_LABEL).not.toMatch(/[a-zA-Z]'[a-zA-Z]/);
   });
 });

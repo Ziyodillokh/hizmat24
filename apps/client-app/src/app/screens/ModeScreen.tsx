@@ -6,7 +6,7 @@ import { ModeChoiceCards } from '@/components/ModeChoiceCards';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import {
   entryRouteFor,
-  masterModeHint,
+  MASTER_MODE_HINT,
   MODE_NEXT_PARAM,
   MODE_REASON_PARAM,
   modeHome,
@@ -14,8 +14,6 @@ import {
   parseNextRoute,
   switchToastFor,
 } from '@/lib/appMode';
-import { completedStepCount, REQUIRED_STEP_COUNT } from '@/lib/masterProfile';
-import { useMaster } from '../master-store';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
 import type { UserRole } from '../types';
@@ -34,11 +32,9 @@ export function ModeScreen() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { role, setRole } = useApp();
-  const { profile, isComplete } = useMaster();
   const showToast = useToast();
 
   const reason = parseModeReason(params.get(MODE_REASON_PARAM));
-  const done = completedStepCount(profile);
 
   const choose = (next: UserRole) => {
     // Joriy rejim — oʻlik tugma qolmaydi: karta uyga qaytaradi, toast yoʻq.
@@ -51,7 +47,7 @@ export function ModeScreen() {
     showToast(switchToastFor(next));
 
     const wanted = parseNextRoute(params.get(MODE_NEXT_PARAM), next);
-    navigate(wanted ?? entryRouteFor(next, { hasMasterSteps: done > 0 }), { replace: true });
+    navigate(wanted ?? entryRouteFor(next), { replace: true });
   };
 
   return (
@@ -81,7 +77,7 @@ export function ModeScreen() {
         className="mt-20"
         value={role}
         onChoose={choose}
-        masterHint={masterModeHint({ isComplete, done, total: REQUIRED_STEP_COUNT })}
+        masterHint={MASTER_MODE_HINT}
       />
 
       <Banner variant="info" icon={Info} className="mt-20">

@@ -28,23 +28,29 @@ export interface AdminApplicationListItem {
   id: string;
   fullName: string;
   phoneNumber: string;
-  profession: string;
+  /**
+   * `null` — kasb SOʻRALMAGAN (2026-09-22 dan beri hamma usta santexnik).
+   * Panel buni toʻqilgan javob bilan almashtirmaydi.
+   */
+  profession: string | null;
   status: MasterApplicationStatus;
   /**
    * Foydalanuvchi «sertifikatim bor» dedi. Bu TEKSHIRILMAGAN daʼvo —
    * maydon nomi ham shuni aytadi, panel yonida belgi chiqaradi.
+   * `null` — soʻralmagan, «yoʻq» EMAS.
    */
-  claimsCertificate: boolean;
+  claimsCertificate: boolean | null;
   createdAt: Date;
 }
 
 /** Ariza kartasi — moderator qaror qabul qilishi uchun barcha maʼlumot. */
 export interface AdminApplicationDetail extends AdminApplicationListItem {
-  experienceLevel: string;
-  about: string;
+  /** `null` — soʻralmagan. Boʻsh massiv/`null` ham shu maʼnoda. */
+  experienceLevel: string | null;
+  about: string | null;
   districts: string[];
-  workFrom: number;
-  workTo: number;
+  workFrom: number | null;
+  workTo: number | null;
   requestedCategoryIds: string[];
   rejectionReason: string | null;
   reviewedByAdminId: string | null;

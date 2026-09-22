@@ -37,13 +37,22 @@ export const MAX_PROFESSION_LENGTH = 120;
 export const MIN_REQUESTED_CATEGORIES = 1;
 export const MAX_REQUESTED_CATEGORIES = 10;
 
+/**
+ * Ariza mazmuni.
+ *
+ * Faqat ISM va XIZMATLAR majburiy. Qolganlari ixtiyoriy: platforma
+ * santexnikaga qaratildi (kasbni soʻrash maʼnosiz — hamma usta
+ * santexnik) va ish ustaning darajasiga emas, yoqib qoʻygan xizmatiga
+ * qarab tushadi. Tuman va ish vaqti ham soʻralmaydi — smena tugmasi
+ * oʻsha ishni bajaradi. Berilgan boʻlsa, ular baribir tekshiriladi.
+ */
 export interface ApplicationDraft {
   readonly fullName: string;
-  readonly profession: string;
-  readonly about: string;
-  readonly districts: readonly string[];
-  readonly workFrom: number;
-  readonly workTo: number;
+  readonly profession?: string;
+  readonly about?: string;
+  readonly districts?: readonly string[];
+  readonly workFrom?: number;
+  readonly workTo?: number;
   readonly requestedCategoryIds: readonly string[];
 }
 
@@ -81,6 +90,8 @@ const checkFullName: Rule = ({ fullName }) => {
 };
 
 const checkProfession: Rule = ({ profession }) => {
+  if (profession === undefined) return null;
+
   const length = countCharacters(profession);
   if (length >= MIN_PROFESSION_LENGTH && length <= MAX_PROFESSION_LENGTH) return null;
 
@@ -88,7 +99,11 @@ const checkProfession: Rule = ({ profession }) => {
 };
 
 const checkAbout: Rule = ({ about }) => {
+  if (about === undefined) return null;
+
   const length = countCharacters(about);
+  // Boʻsh satr — «yozmadim», xato emas: maydon ixtiyoriy.
+  if (length === 0) return null;
 
   if (length < MIN_ABOUT_LENGTH) {
     return `«Oʻzim haqimda» kamida ${MIN_ABOUT_LENGTH} belgi boʻlsin — hozir ${length} ta.`;
@@ -101,6 +116,11 @@ const checkAbout: Rule = ({ about }) => {
 };
 
 const checkWorkHours: Rule = ({ workFrom, workTo }) => {
+  if (workFrom === undefined && workTo === undefined) return null;
+  if (workFrom === undefined || workTo === undefined) {
+    return 'Ish vaqtining boshlanishi va tugashi birga koʻrsatiladi.';
+  }
+
   if (!isWholeHour(workFrom) || !isWholeHour(workTo)) {
     return `Ish vaqti ${WORK_HOUR_MIN} dan ${WORK_HOUR_MAX} gacha boʻlgan butun soat boʻlsin.`;
   }
@@ -117,11 +137,12 @@ const checkWorkHours: Rule = ({ workFrom, workTo }) => {
 };
 
 const checkDistricts: Rule = ({ districts }) => {
-  const cleaned = districts.map(canonical).filter((district) => district.length > 0);
+  if (districts === undefined) return null;
 
-  if (cleaned.length < MIN_DISTRICTS) {
-    return 'Kamida bitta tumanni koʻrsating — buyurtma aynan shu boʻyicha yoʻnaltiriladi.';
-  }
+  const cleaned = districts.map(canonical).filter((district) => district.length > 0);
+  // Boʻsh roʻyxat — «tuman koʻrsatmadim». Hozir buyurtma tuman boʻyicha
+  // emas, xizmat boʻyicha yoʻnaltiriladi.
+  if (cleaned.length === 0) return null;
   if (cleaned.length > MAX_DISTRICTS) {
     return `Tumanlar soni ${MAX_DISTRICTS} tadan oshmasin.`;
   }
@@ -178,11 +199,53 @@ export function assessApplication(draft: ApplicationDraft): ApplicationVerdict {
 export function normalizeDraft(draft: ApplicationDraft): ApplicationDraft {
   return {
     fullName: draft.fullName.trim().replace(/\s+/g, ' '),
-    profession: draft.profession.trim(),
-    about: draft.about.trim(),
-    districts: draft.districts.map((district) => district.trim()).filter(Boolean),
+    // Berilmagan maydon `undefined` boʻlib qoladi: boʻsh satrga
+    // aylantirilsa «yozmadim» bilan «boʻsh yozdim» farq qilmay qolardi.
+    profession: draft.profession?.trim(),
+    about: draft.about?.trim(),
+    districts: draft.districts?.map((district) => district.trim()).filter(Boolean),
     workFrom: draft.workFrom,
     workTo: draft.workTo,
+    requestedCategoryIds: [...draft.requestedCategoryIds],
+  };
+}
+
+/**
+ * Usta PROFILI uchun standart ish vaqti.
+ *
+ * Arizada ish vaqti soʻralmaydi va `null` boʻlib qoladi, lekin tasdiqdan
+ * keyin yaratiladigan usta profilida ustun majburiy. Usta bu qiymatni
+ * keyin oʻzi oʻzgartiradi.
+ */
+export const DEFAULT_WORK_FROM = 8;
+export const DEFAULT_WORK_TO = 20;
+
+/**
+ * Bazaga yoziladigan maydonlar.
+ *
+ * Soʻralmagan maydon `null` boʻlib yoziladi — standart qiymat EMAS.
+ * «Tajribasi yoʻq» bilan «tajribasi soʻralmagan» ikki xil gap va panel
+ * ikkinchisini birinchisi qilib koʻrsatmasligi kerak.
+ */
+export interface StoredApplication {
+  readonly fullName: string;
+  readonly profession: string | null;
+  readonly about: string | null;
+  readonly districts: string[];
+  readonly workFrom: number | null;
+  readonly workTo: number | null;
+  readonly requestedCategoryIds: string[];
+}
+
+export function toStoredApplication(draft: ApplicationDraft): StoredApplication {
+  return {
+    fullName: draft.fullName,
+    profession: draft.profession ?? null,
+    // Boʻsh satr ham «yozmadim» — panelda ikkisi bir xil koʻrinadi.
+    about: draft.about?.trim() ? draft.about : null,
+    districts: [...(draft.districts ?? [])],
+    workFrom: draft.workFrom ?? null,
+    workTo: draft.workTo ?? null,
     requestedCategoryIds: [...draft.requestedCategoryIds],
   };
 }

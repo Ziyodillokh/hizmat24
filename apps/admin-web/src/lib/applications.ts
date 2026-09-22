@@ -73,10 +73,22 @@ export function toggleId(selected: readonly string[], id: string): string[] {
 }
 
 /**
+ * Soʻralmagan savolning YAGONA koʻrinishi.
+ *
+ * 2026-09-22 dan arizada faqat ism va xizmatlar soʻraladi. Eski
+ * arizalarda esa haqiqiy javob turibdi — shuning uchun maydonlar
+ * yoʻqotilmadi. Panel ikkisini ADASHTIRMASLIGI kerak: javob yoʻqligini
+ * «yoʻq» deb yozish — toʻqilgan maʼlumot.
+ */
+export const NOT_ASKED_LABEL = 'soʻralmagan';
+
+/**
  * "08:00 – 18:00" yoki tungi smena uchun "22:00 – 06:00 (tunda)".
  * Soatlar 0–23 oraligʻida; server shuni kafolatlaydi.
  */
-export function formatWorkHours(from: number, to: number): string {
+export function formatWorkHours(from: number | null, to: number | null): string {
+  if (from === null || to === null) return NOT_ASKED_LABEL;
+
   const pad = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
   const base = `${pad(from)} – ${pad(to)}`;
   return to <= from ? `${base} (tunda)` : base;
@@ -87,5 +99,11 @@ export function formatWorkHours(from: number, to: number): string {
  * boʻsh joy «hamma joyda ishlaydi» degan notoʻgʻri maʼno berardi.
  */
 export function formatDistricts(districts: readonly string[]): string {
-  return districts.length === 0 ? 'Tuman koʻrsatilmagan' : districts.join(', ');
+  return districts.length === 0 ? NOT_ASKED_LABEL : districts.join(', ');
+}
+
+/** Daʼvo qilinmagan sertifikat bilan soʻralmagan sertifikat bir xil emas. */
+export function formatCertificateClaim(claims: boolean | null): string {
+  if (claims === null) return NOT_ASKED_LABEL;
+  return claims ? 'bor deb daʼvo qiladi' : 'yoʻq';
 }

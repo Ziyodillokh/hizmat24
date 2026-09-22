@@ -1,9 +1,6 @@
 import {
   ABOUT_MAX,
-  DISTRICTS_MAX,
   EMPTY_MASTER_PROFILE,
-  MASTER_PROFESSIONS,
-  TASHKENT_DISTRICTS,
   type ApplicationRecord,
   type MasterProfile,
 } from '@/lib/masterProfile';
@@ -33,14 +30,14 @@ export interface MasterState {
 /** Rad etilganlar cheksiz oʻsmasin — eng yangisi saqlanadi. */
 export const DECLINED_IDS_MAX = 200;
 
+/*
+ * Saqlangan shakl. Eski qurilmalarda bu yerda kasb, tajriba, tumanlar va
+ * ish vaqti ham bor — ular oʻqilmaydi va jimgina tushib qoladi. Kalit
+ * oʻzgartirilmadi: shu bilan smena holati va rad etilganlar roʻyxati
+ * yangilanishdan keyin ham joyida qoladi.
+ */
 interface StoredProfile {
-  profession: string | null;
-  experienceLevel: string | null;
-  claimsCertificate: boolean;
   about: string;
-  districts: string[];
-  workFrom: number;
-  workTo: number;
   isAvailable: boolean;
   availableSince: string | null;
   updatedAt: string | null;
@@ -64,47 +61,21 @@ const reviveDate = (value: unknown): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-const isHour = (value: unknown): value is number =>
-  typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 23;
-
 const isChannel = (value: unknown): value is 'telegram' | 'phone' =>
   value === 'telegram' || value === 'phone';
 
 /**
  * Profil MAYDONMA-MAYDON tiklanadi: bitta buzuq maydon butun profilni
- * tashlamaydi — foydalanuvchi besh qadamni qayta toʻldirmasligi kerak.
+ * tashlamaydi.
  */
 function reviveProfile(raw: unknown): MasterProfile {
   if (typeof raw !== 'object' || raw === null) return EMPTY_MASTER_PROFILE;
   const value = raw as Partial<StoredProfile>;
 
-  // Lugʻatdan chiqib ketgan qiymat `null` ga tushadi — foydalanuvchi shu
-  // qadamni qayta tanlaydi, boshqasini emas.
-  const profession =
-    typeof value.profession === 'string' && MASTER_PROFESSIONS.includes(value.profession)
-      ? value.profession
-      : null;
-  const experienceLevel =
-    value.experienceLevel === 'NEW' || value.experienceLevel === 'EXPERIENCED'
-      ? value.experienceLevel
-      : null;
-  const districts = Array.isArray(value.districts)
-    ? value.districts
-        .filter((item): item is string => typeof item === 'string')
-        .filter((item) => TASHKENT_DISTRICTS.includes(item))
-        .slice(0, DISTRICTS_MAX)
-    : [];
-
   const isAvailable = value.isAvailable === true;
 
   return {
-    profession,
-    experienceLevel,
-    claimsCertificate: value.claimsCertificate === true,
     about: typeof value.about === 'string' ? value.about.slice(0, ABOUT_MAX) : '',
-    districts,
-    workFrom: isHour(value.workFrom) ? value.workFrom : EMPTY_MASTER_PROFILE.workFrom,
-    workTo: isHour(value.workTo) ? value.workTo : EMPTY_MASTER_PROFILE.workTo,
     isAvailable,
     // Yopiq smenada boshlanish vaqti MAʼNOSIZ: buzuq yozuvda u qolib ketsa,
     // ekran «0 daqiqadan beri smenadasiz» deb yolgʻon gapirardi.
@@ -159,7 +130,8 @@ export function reviveMasterState(parsed: unknown): MasterState | null {
 export function serializeMasterState(state: MasterState): StoredMasterState {
   return {
     profile: {
-      ...state.profile,
+      about: state.profile.about,
+      isAvailable: state.profile.isAvailable,
       availableSince: state.profile.availableSince
         ? state.profile.availableSince.toISOString()
         : null,

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
 import { DashedChip } from '@/components/DashedChip';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterTabs, type FilterTabItem } from '@/components/FilterTabs';
@@ -45,11 +44,8 @@ import {
   masterJobStats,
 } from '@/lib/masterIdentity';
 import {
-  completedStepCount,
-  firstIncompleteStep,
-  REQUIRED_STEP_COUNT,
+  MASTER_PROFESSION,
 } from '@/lib/masterProfile';
-import { canOpenShift } from '@/lib/masterShift';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { MasterTabBar } from '../../MasterTabBar';
 import { SwipeSurface } from '../orders/SwipeSurface';
@@ -90,7 +86,6 @@ export function MasterJobsTab() {
   } = useApp();
   const {
     profile,
-    isComplete,
     declinedOrderIds,
     declineOffer,
     openShift,
@@ -114,10 +109,9 @@ export function MasterJobsTab() {
   const counts = useMemo(() => countMasterJobs(orders, input), [orders, input]);
   const { offers, active } = useMemo(() => splitMasterJobs(orders, input), [orders, input]);
 
-  const guard = { isComplete, hasActiveJob: active.length > 0 };
+  const guard = { hasActiveJob: active.length > 0 };
   const canAccept = canAcceptOffer(guard);
   const blockedHint = acceptBlockedLine(guard);
-  const done = completedStepCount(profile);
 
   const tabItems: FilterTabItem<MasterJobFilter>[] = MASTER_FILTERS.map((key) => ({
     key,
@@ -157,8 +151,7 @@ export function MasterJobsTab() {
     const master = buildSelfMaster({
       fullName,
       phoneNumber,
-      profession: profile.profession,
-      experienceLevel: profile.experienceLevel,
+      profession: MASTER_PROFESSION,
       stats: masterJobStats(orders),
     });
 
@@ -203,27 +196,8 @@ export function MasterJobsTab() {
         now={now}
         onOpen={openShift}
         onClose={closeShift}
-        disabled={!canOpenShift(isComplete)}
-        disabledHint={`Profil ${done} / ${REQUIRED_STEP_COUNT} qadam toʻldirilgan — smena toʻliq profil bilan ochiladi.`}
         className="mt-4 shrink-0"
       />
-
-      {!isComplete && (
-        <Card className="mt-12 shrink-0">
-          <p className="text-title text-text-primary">Usta profili toʻldirilmagan</p>
-          <p className="mt-4 text-body-sm text-text-secondary">
-            {done} / {REQUIRED_STEP_COUNT} qadam toʻldirildi. Profil toʻliq boʻlgunicha smena
-            ochilmaydi va taklifni qabul qila olmaysiz.
-          </p>
-          <Button
-            variant="secondary"
-            className="mt-16"
-            onClick={() => navigate(`/app/master/setup?step=${firstIncompleteStep(profile)}`)}
-          >
-            Profilni toʻldirish
-          </Button>
-        </Card>
-      )}
 
       {/* Manba bayonoti — hech qachon yashirilmaydi (TZ 0.1). */}
       <Banner variant="info" icon={Info} className="mt-12 shrink-0">
