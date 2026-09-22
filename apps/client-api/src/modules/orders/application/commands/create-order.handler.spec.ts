@@ -4,7 +4,15 @@ import { ORDER_EVENTS } from '@shared/index';
 import { CreateOrderCommand } from './create-order.command';
 import { CreateOrderHandler } from './create-order.handler';
 
-const address = { label: 'Chilonzor 9', lat: 41.3, lng: 69.2 };
+// Namangan markazidagi manzil — platforma faqat shu shaharda ishlaydi.
+const address = { label: 'Namangan, Boburshoh 12', lat: 40.9983, lng: 71.6726 };
+
+const NAMANGAN_AREA = {
+  cityName: 'Namangan',
+  centerLat: 40.9983,
+  centerLng: 71.6726,
+  radiusKm: 12,
+};
 
 const persistedOrder = {
   id: 'order-1',
@@ -43,7 +51,7 @@ interface CommandOverrides {
   isUrgent?: boolean;
   scheduledAt?: Date | null;
   preferredMasterId?: string | null;
-  address?: typeof address;
+  address?: { label: string; lat?: number; lng?: number };
 }
 
 const buildCommand = ({
@@ -75,6 +83,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
   let events: EventEmitter2;
   let masterFind: jest.Mock;
   let levels: { percentForClient: jest.Mock };
+  let serviceAreas: { listActive: jest.Mock };
 
   beforeEach(() => {
     orderCreate = jest.fn().mockResolvedValue(persistedOrder);
@@ -91,6 +100,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
 
     masterFind = jest.fn().mockResolvedValue({ isActive: true });
     levels = { percentForClient: jest.fn().mockResolvedValue(2) };
+    serviceAreas = { listActive: jest.fn().mockResolvedValue([NAMANGAN_AREA]) };
 
     const prisma = {
       order: { create: orderCreate },
@@ -104,6 +114,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
       matching as never,
       events,
       levels as never,
+      serviceAreas as never,
     );
   });
 
@@ -144,7 +155,7 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
   });
 
   it('koordinatasiz manzilni soxta nuqta bilan toʻldirmaydi', async () => {
-    await handler.execute(buildCommand({ address: { label: 'Chilonzor 9' } as typeof address }));
+    await handler.execute(buildCommand({ address: { label: 'Namangan, Uychi 5' } }));
 
     expect(dataOf()).toMatchObject({ addressLat: null, addressLng: null });
   });
@@ -241,5 +252,43 @@ describe('CreateOrderHandler (TZ 3.3)', () => {
     const result = await handler.execute(buildCommand());
 
     expect(result.currency).toBe('UZS');
+  });
+
+  /*
+   * Platforma faqat Namangan shahrida ishlaydi (P3). Tekshiruv buyurtma
+   * YOZILISHIDAN OLDIN boʻlishi shart: aks holda mijoz 5 daqiqa usta
+   * kutib, keyin sababsiz qolardi.
+   */
+  describe('xizmat hududi', () => {
+    it('hududdan tashqaridagi manzil bilan buyurtma yozilmaydi', async () => {
+      const outside = { label: 'Toshkent, Chilonzor 9', lat: 41.3111, lng: 69.2406 };
+
+      await expect(handler.execute(buildCommand({ address: outside }))).rejects.toThrow(
+        /Namangan/,
+      );
+      expect(orderCreate).not.toHaveBeenCalled();
+      expect(matching.requestMatching).not.toHaveBeenCalled();
+    });
+
+    it('koordinatasiz manzil shahar nomi boʻyicha oʻtadi', async () => {
+      await handler.execute(
+        buildCommand({ address: { label: 'Namangan, Uychi koʻchasi 5' } }),
+      );
+
+      expect(orderCreate).toHaveBeenCalled();
+    });
+
+    it('koordinatasiz begona shahar rad etiladi', async () => {
+      await expect(
+        handler.execute(buildCommand({ address: { label: 'Samarqand, Registon 1' } })),
+      ).rejects.toThrow(/Namangan/);
+    });
+
+    it('faol hudud boʻlmasa buyurtma qabul qilinmaydi', async () => {
+      serviceAreas.listActive.mockResolvedValue([]);
+
+      await expect(handler.execute(buildCommand())).rejects.toThrow();
+      expect(orderCreate).not.toHaveBeenCalled();
+    });
   });
 });

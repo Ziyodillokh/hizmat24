@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsLatitude, IsLongitude, IsOptional, IsString, Length } from 'class-validator';
 
 export class AddressDto {
-  @ApiProperty({ example: 'Toshkent, Chilonzor 9-kvartal, 42-uy' })
+  @ApiProperty({ example: 'Namangan, Uychi koʻchasi 12, 4-uy' })
   @IsString()
   @Length(5, 300)
   label: string;
@@ -12,12 +12,12 @@ export class AddressDto {
    * soxta koordinata yozish taqiqlanadi. Koordinatasiz buyurtma ham usta
    * topadi — faqat masofa boʻyicha emas, reyting boʻyicha.
    */
-  @ApiPropertyOptional({ example: 41.311081 })
+  @ApiPropertyOptional({ example: 40.9983 })
   @IsOptional()
   @IsLatitude()
   lat?: number;
 
-  @ApiPropertyOptional({ example: 69.240562 })
+  @ApiPropertyOptional({ example: 71.6726 })
   @IsOptional()
   @IsLongitude()
   lng?: number;

@@ -8,6 +8,8 @@ import { MediaStorageService } from './catalog/media-storage.service';
 import { CatalogModule } from '../catalog/catalog.module';
 import { AdminAuthService } from './auth/admin-auth.service';
 import { AdminGuard } from './guards/admin.guard';
+import { AdminSettingsController } from './settings/admin-settings.controller';
+import { AdminSettingsService } from './settings/admin-settings.service';
 
 /**
  * Admin paneli backendi.
@@ -18,8 +20,19 @@ import { AdminGuard } from './guards/admin.guard';
  */
 @Module({
   imports: [AuditModule, CatalogModule],
-  controllers: [AdminAuthController, AdminProfileController, AdminCatalogController],
-  providers: [AdminAuthService, AdminCatalogService, MediaStorageService, AdminGuard],
+  controllers: [
+    AdminAuthController,
+    AdminProfileController,
+    AdminCatalogController,
+    AdminSettingsController,
+  ],
+  providers: [
+    AdminAuthService,
+    AdminCatalogService,
+    MediaStorageService,
+    AdminSettingsService,
+    AdminGuard,
+  ],
   exports: [AdminAuthService, AdminGuard],
 })
 export class AdminModule {}

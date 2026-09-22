@@ -6,6 +6,7 @@ import { CatalogScreen } from '@/screens/CatalogScreen';
 import { ApplicationsScreen } from '@/screens/ApplicationsScreen';
 import { ApplicationDetailScreen } from '@/screens/ApplicationDetailScreen';
 import { CategoryEditScreen } from '@/screens/CategoryEditScreen';
+import { SettingsScreen } from '@/screens/SettingsScreen';
 import { PendingScreen } from '@/screens/PendingScreen';
 import { useAuth } from './AuthProvider';
 import { Shell } from './Shell';
@@ -15,6 +16,7 @@ const SCREENS: Record<string, JSX.Element> = {
   dashboard: <DashboardScreen />,
   applications: <ApplicationsScreen />,
   catalog: <CatalogScreen />,
+  settings: <SettingsScreen />,
 };
 
 export function AdminApp() {

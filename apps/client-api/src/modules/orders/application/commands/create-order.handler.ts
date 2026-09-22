@@ -6,6 +6,8 @@ import { ORDER_EVENTS, OrderCreatedEvent } from '@shared/index';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { DomainException } from '@client/common/exceptions/domain.exception';
 import { MatchingService } from '@client/modules/matching/matching.service';
+import { addressCoverageProblem } from '@client/modules/service-area/domain/service-area-rules';
+import { ServiceAreaService } from '@client/modules/service-area/service-area.service';
 import { ORDER_RELATIONS, OrdersRepository } from '../../infrastructure/orders.repository';
 import { presentOrder, type OrderView } from '../../infrastructure/order.presenter';
 import { toDbPaymentMethod } from '../../domain/payment-method';
@@ -23,6 +25,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
     private readonly matching: MatchingService,
     private readonly events: EventEmitter2,
     private readonly levels: LevelDiscountService,
+    private readonly serviceAreas: ServiceAreaService,
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<OrderView> {
@@ -46,6 +49,8 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
         { categoryId: command.categoryId },
       );
     }
+
+    await this.assertAddressCovered(command);
 
     await this.assertPreferredMasterUsable(command.preferredMasterId);
 
@@ -97,6 +102,23 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
         "Qidiruv navbatiga yozib boʻlmadi — buyurtma keyingi sweepʼda tiklanadi",
       );
     }
+  }
+
+  /**
+   * Platforma ishlamaydigan joyga buyurtma QABUL QILINMAYDI.
+   *
+   * Tekshiruv buyurtma yozilishidan OLDIN: yozib boʻlib «usta topilmadi»
+   * deyish mijozni 5 daqiqa kutdirib, keyin sababsiz qoldirardi. Sabab
+   * darhol va aniq aytiladi.
+   */
+  private async assertAddressCovered(command: CreateOrderCommand): Promise<void> {
+    const areas = await this.serviceAreas.listActive();
+    const problem = addressCoverageProblem(areas, command.clientAddress);
+    if (!problem) return;
+
+    throw new DomainException('OUTSIDE_SERVICE_AREA', problem, HttpStatus.BAD_REQUEST, {
+      label: command.clientAddress.label,
+    });
   }
 
   /**

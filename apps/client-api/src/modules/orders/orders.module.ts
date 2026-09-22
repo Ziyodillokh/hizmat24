@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MatchingModule } from '@client/modules/matching/matching.module';
+import { ServiceAreaModule } from '@client/modules/service-area/service-area.module';
 import { NotificationsModule } from '@client/modules/notifications/notifications.module';
 import { CancelOrderHandler } from './application/commands/cancel-order.handler';
 import { ConfirmMasterHandler } from './application/commands/confirm-master.handler';
@@ -25,7 +26,13 @@ const queryHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, OrdersInfrastructureModule, MatchingModule, NotificationsModule],
+  imports: [
+    CqrsModule,
+    OrdersInfrastructureModule,
+    MatchingModule,
+    NotificationsModule,
+    ServiceAreaModule,
+  ],
   controllers: [OrdersController],
   providers: [...commandHandlers, ...queryHandlers, LevelDiscountService, OrderRealtimeListener],
 })

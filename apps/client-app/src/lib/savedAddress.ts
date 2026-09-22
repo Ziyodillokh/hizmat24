@@ -4,7 +4,7 @@ import type { OrderAddress } from '@/mocks/types';
  * Saqlangan manzillar.
  *
  * Bugun buyurtma berishda manzil HAR SAFAR qoʻldan yoziladi — va yozilmaydi
- * ham: forma qattiq yozilgan "Toshkent, Chilonzor 9-kvartal, 42-uy" bilan
+ * ham: forma qattiq yozilgan namunaviy manzil bilan
  * toʻldirilgan holda ochilardi. Bu ilovadagi eng koʻp takrorlanadigan ish va
  * eng arzon yolgʻon edi.
  *

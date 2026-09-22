@@ -256,4 +256,40 @@ export async function uploadMedia(
 }
 
 /** Media yoʻli serverga nisbatan (`/media/x.webp`) — toʻliq manzilga aylantiradi. */
+/**
+ * Platforma ishlaydigan hudud.
+ *
+ * Shahar nomi panelga ham, ilovaga ham KODDA yozilmaydi: ikkinchi shahar
+ * qoʻshilganda ikkalasi ham qayta yigʻilishi kerak boʻlardi.
+ */
+export interface ServiceArea {
+  id: string;
+  cityName: string;
+  centerLat: number;
+  centerLng: number;
+  radiusKm: number;
+  isActive: boolean;
+  sortOrder: number;
+  updatedAt: string;
+}
+
+/** Yuborilmagan maydon serverda TEGILMAYDI — qisman yangilash. */
+export interface ServiceAreaInput {
+  cityName?: string;
+  centerLat?: number;
+  centerLng?: number;
+  radiusKm?: number;
+  isActive?: boolean;
+}
+
+export const fetchServiceAreas = (token: string): Promise<ServiceArea[]> =>
+  apiRequest('/admin/settings/service-areas', { token });
+
+export const updateServiceArea = (
+  token: string,
+  id: string,
+  body: ServiceAreaInput,
+): Promise<ServiceArea> =>
+  apiRequest(`/admin/settings/service-areas/${id}`, { method: 'PATCH', token, body });
+
 export const mediaSrc = (url: string): string => `${resolveBaseUrl() ?? ''}${url}`;

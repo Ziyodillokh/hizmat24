@@ -1,4 +1,4 @@
-import { BookmarkSimple } from '@phosphor-icons/react';
+import { BookmarkSimple, MapPin } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AddressPartFields } from '@/components/AddressPartFields';
@@ -15,23 +15,33 @@ import { StepSection } from '@/components/order/StepSection';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { ORDER_STEP_ROUTES, resolveNextRoute, saveOfferHint } from '@/lib/orderFlow';
 import {
-  ADDRESS_KIND_LABELS, ADDRESS_KINDS, ADDRESS_LABEL_MAX, ADDRESS_LABEL_MIN,
+  ADDRESS_KIND_LABELS, ADDRESS_KINDS, ADDRESS_LABEL_MAX,
   buildAddress, canSaveAddress, EMPTY_ADDRESS_FORM, isSameAddress, toAddressForm,
   type AddressFormInput,
 } from '@/lib/savedAddress';
+import { cityBadge, streetProblem, withCity, withoutCity } from '@/lib/serviceArea';
 import { useAddresses } from '../../address-store';
+import { useServiceCity } from '../../service-area-store';
 import { useCatalog } from '../../catalog-store';
 import { useApp } from '../../store';
 import { useToast } from '../../ToastHost';
 import { useReturnTo } from '../../useReturnTo';
 
-/** 09b · Yangi manzil. Koordinata yoʻq — faqat matn (savedAddress.ts). */
+/**
+ * 09b · Yangi manzil. Koordinata yoʻq — faqat matn (savedAddress.ts).
+ *
+ * Shahar TANLANMAYDI: platforma hozir faqat bitta shaharda ishlaydi
+ * (P3) va uni tanlatish — boʻlmagan tanlovni bor qilib koʻrsatish
+ * boʻlardi. Foydalanuvchi koʻcha va uyni yozadi, shahar esa maydonning
+ * oldida qulflangan holda turadi va serverga ketadigan matnga qoʻshiladi.
+ */
 export function AddressStep() {
   const navigate = useNavigate();
   const { draft, setDraftAddress } = useApp();
   const { addresses, addAddress, isFull, findDuplicateAddress } = useAddresses();
   const showToast = useToast();
   const returnTo = useReturnTo();
+  const city = useServiceCity();
 
   const [form, setForm] = useState<AddressFormInput>(() => {
     const current = draft.address;
@@ -54,11 +64,12 @@ export function AddressStep() {
   if (!category) return <Navigate to={ORDER_STEP_ROUTES.services} replace />;
 
   const patch = (partial: Partial<AddressFormInput>) => setForm((prev) => ({ ...prev, ...partial }));
-  const isValid = canSaveAddress(form);
+  const street = withoutCity(form.label, city);
+  const streetError = street.trim().length > 0 ? streetProblem(street) : null;
+  const isValid = canSaveAddress(form) && streetProblem(street) === null;
   const duplicate = findDuplicateAddress(form);
   const canOfferSave = !isFull && !duplicate;
   const isSaving = shouldSave && canOfferSave && isValid;
-  const labelError = form.label.trim().length > 0 && !isValid ? `Kamida ${ADDRESS_LABEL_MIN} belgi` : undefined;
 
   const back = () => {
     // Notoʻgʻri manzil qoralamaga hech qachon kirmaydi.
@@ -90,13 +101,27 @@ export function AddressStep() {
       <StepDots currentStep={1} />
       <ServiceSummaryCard service={category} basePrice={category.basePrice} className="mt-16" />
 
-      <StepSection title="Manzil" hint="Shahar, tuman, koʻcha va uy raqami — usta aynan shu matnni oʻqiydi">
+      <StepSection title="Manzil" hint="Koʻcha, uy va mahalla — usta aynan shu matnni oʻqiydi">
+        {/*
+          Shahar qulflangan: platforma hozir faqat shu yerda ishlaydi.
+          Kiritish maydoni emas, yorliq — bosib boʻlmaydigan tugma qoʻyish
+          taqiqlangan.
+        */}
+        <div className="mb-8 flex items-center gap-8 rounded-md bg-surface-sunken px-16 py-12">
+          <Icon icon={MapPin} size={20} weight="duotone" className="shrink-0 text-primary" />
+          <div className="min-w-0">
+            <p className="text-body-strong text-text-primary">{cityBadge(city)}</p>
+            <p className="text-caption text-text-secondary">
+              Hozircha faqat shu shaharda xizmat koʻrsatamiz
+            </p>
+          </div>
+        </div>
         <Input
-          value={form.label}
-          onChange={(event) => patch({ label: event.target.value })}
-          placeholder="Toshkent, Chilonzor 9-kvartal, 42-uy"
+          value={street}
+          onChange={(event) => patch({ label: withCity(event.target.value, city) })}
+          placeholder="Uychi koʻchasi 12, 4-uy"
           maxLength={ADDRESS_LABEL_MAX}
-          error={labelError}
+          error={streetError ?? undefined}
         />
         <AddressPartFields
           values={{ entrance: form.entrance, floor: form.floor, apartment: form.apartment }}

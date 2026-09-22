@@ -75,3 +75,20 @@ export function toFlatCategories(groups: readonly ServiceGroup[]): FlatServiceCa
 
 export const fetchServiceGroups = async (): Promise<ServiceGroup[]> =>
   (await apiRequest<RawGroup[]>('/api/v1/service-groups')).map(toServiceGroup);
+
+/** Platforma ishlaydigan hudud — shahar nomi va chegarasi. */
+export interface RemoteServiceArea {
+  cityName: string;
+  centerLat: number;
+  centerLng: number;
+  radiusKm: number;
+}
+
+/**
+ * Hududlar serverdan.
+ *
+ * Shahar nomi ilovaga kodda yozilmaydi: chegara paneldan oʻzgarganda
+ * ilova ham darhol yangi nomni koʻrsatishi kerak.
+ */
+export const fetchServiceAreas = (): Promise<RemoteServiceArea[]> =>
+  apiRequest('/api/v1/service-area');

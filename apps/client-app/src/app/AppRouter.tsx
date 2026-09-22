@@ -17,6 +17,7 @@ import { syncStatusBar } from './native';
 import { ThemeProvider, useTheme } from './theme-context';
 import { AppProvider, useApp } from './store';
 import { CatalogProvider } from './catalog-store';
+import { ServiceAreaProvider } from './service-area-store';
 import { AiProvider } from './ai-store';
 import { DisputeProvider } from './dispute-store';
 import { AddressProvider } from './address-store';
@@ -120,6 +121,7 @@ export function AppRouter() {
     <ThemeProvider>
       <AppProvider>
         <CatalogProvider>
+        <ServiceAreaProvider>
         <AiProvider>
           <DisputeProvider>
             <AddressProvider>
@@ -131,6 +133,7 @@ export function AppRouter() {
             </AddressProvider>
           </DisputeProvider>
         </AiProvider>
+        </ServiceAreaProvider>
         </CatalogProvider>
       </AppProvider>
     </ThemeProvider>

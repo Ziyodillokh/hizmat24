@@ -81,7 +81,7 @@ export class SubmitApplicationDto {
   @Length(MIN_ABOUT_LENGTH, MAX_ABOUT_LENGTH)
   about?: string;
 
-  @ApiPropertyOptional({ example: ['Chilonzor', 'Yunusobod'] })
+  @ApiPropertyOptional({ example: ['Namangan shahri'] })
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(MAX_DISTRICTS)

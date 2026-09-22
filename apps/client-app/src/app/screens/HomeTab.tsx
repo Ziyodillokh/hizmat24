@@ -1,4 +1,4 @@
-import { ArrowRight } from '@phosphor-icons/react';
+import { ArrowRight, MapPin } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
@@ -21,6 +21,8 @@ import { useApp } from '../store';
 import { useOpenService } from '../useSelectService';
 import { API_BASE_URL } from '@/api/client';
 import { mediaSrc } from '@/lib/servicePresentation';
+import { cityBadge } from '@/lib/serviceArea';
+import { useServiceCity } from '../service-area-store';
 
 /**
  * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
@@ -78,6 +80,7 @@ export function HomeTab() {
   const homeServices = (groups[0]?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
   const now = useMinuteClock();
   const selectService = useOpenService();
+  const city = useServiceCity();
 
   return (
     <div className="flex h-full flex-col bg-surface">
@@ -102,6 +105,17 @@ export function HomeTab() {
             unreadCount={unreadCount}
             onNotificationsClick={() => navigate('/app/notifications')}
           />
+
+          {/*
+            Platforma qayerda ishlayotgani — bosh sahifada ochiq aytiladi.
+            Ish hozircha faqat bitta shaharda va buni mijoz buyurtma
+            berishdan OLDIN bilishi kerak, tasdiqlash bosilgandan keyin
+            emas. Shahar nomi serverdan keladi (`service-area-store`).
+          */}
+          <div className="flex items-center gap-4 px-20 pt-4 text-caption text-on-primary-deep">
+            <Icon icon={MapPin} size={14} weight="fill" aria-hidden />
+            <span>{cityBadge(city)}</span>
+          </div>
 
           {/*
             Qidiruv maydoni oʻrniga premium ustalar qatori. Qidiruv "Barcha

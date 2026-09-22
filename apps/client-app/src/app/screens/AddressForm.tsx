@@ -12,7 +12,6 @@ import {
   ADDRESS_KIND_LABELS,
   ADDRESS_KINDS,
   ADDRESS_LABEL_MAX,
-  ADDRESS_LABEL_MIN,
   ADDRESS_NAME_MAX,
   addressSaveHint,
   canSaveAddress,
@@ -20,7 +19,9 @@ import {
   toAddressForm,
   type AddressFormInput,
 } from '@/lib/savedAddress';
+import { cityBadge, streetProblem, withCity, withoutCity } from '@/lib/serviceArea';
 import { ADDRESS_KIND_ICONS } from './AddressBook';
+import { useServiceCity } from '../service-area-store';
 import { useAddresses } from '../address-store';
 import { tapFeedback } from '../native';
 import { useToast } from '../ToastHost';
@@ -38,6 +39,7 @@ export function AddressFormScreen() {
   const { findAddress, addAddress, updateAddress, removeAddress, findDuplicateAddress, isFull } =
     useAddresses();
   const showToast = useToast();
+  const city = useServiceCity();
 
   const existing = addressId ? findAddress(addressId) : undefined;
   const isEditing = Boolean(addressId);
@@ -56,7 +58,9 @@ export function AddressFormScreen() {
 
   const duplicate = findDuplicateAddress(form, existing?.id);
   const hint = addressSaveHint(form, duplicate);
-  const canSave = canSaveAddress(form) && !duplicate;
+  const street = withoutCity(form.label, city);
+  const streetError = street.trim().length > 0 ? streetProblem(street) : null;
+  const canSave = canSaveAddress(form) && streetProblem(street) === null && !duplicate;
 
   const patch = (next: Partial<AddressFormInput>) => setForm((prev) => ({ ...prev, ...next }));
 
@@ -135,18 +139,18 @@ export function AddressFormScreen() {
 
       <h2 className="mt-24 text-h3 text-text-primary">Manzil</h2>
       <p className="mt-4 text-caption text-text-secondary">
-        Shahar, tuman va uy raqami — usta shu matnni oʻqiydi
+        Koʻcha, uy va mahalla — usta shu matnni oʻqiydi
+      </p>
+      {/* Shahar tanlanmaydi: platforma hozir faqat shu yerda ishlaydi. */}
+      <p className="mt-12 rounded-md bg-surface-sunken px-16 py-12 text-body-strong text-text-primary">
+        {cityBadge(city)}
       </p>
       <Input
-        value={form.label}
-        onChange={(event) => patch({ label: event.target.value })}
-        placeholder="Toshkent, Chilonzor 9-kvartal, 42-uy"
+        value={street}
+        onChange={(event) => patch({ label: withCity(event.target.value, city) })}
+        placeholder="Uychi koʻchasi 12, 4-uy"
         maxLength={ADDRESS_LABEL_MAX}
-        error={
-          form.label.trim().length > 0 && form.label.trim().length < ADDRESS_LABEL_MIN
-            ? `Kamida ${ADDRESS_LABEL_MIN} belgi`
-            : undefined
-        }
+        error={streetError ?? undefined}
         className="mt-12"
       />
 

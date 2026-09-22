@@ -72,6 +72,13 @@ const SECTIONS: readonly SectionMeta[] = [
     summary: 'Statistika va audit yozuvlari',
   },
   {
+    key: 'settings',
+    title: 'Sozlamalar',
+    path: '/settings',
+    stage: null,
+    summary: 'Platforma qaysi shaharda va qanday chegarada ishlaydi',
+  },
+  {
     key: 'admins',
     title: 'Adminlar',
     path: '/admins',

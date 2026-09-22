@@ -110,7 +110,25 @@ Yaʼni tizim «ustaning kasbi» emas, **«katalogdagi aniq ish»** atrofida quri
 
 ---
 
-### P3 — Faqat Namangan
+### P3 — Faqat Namangan — ✅ BAJARILDI
+
+> Bajarildi (2026-09-22): `service_areas` jadvali (Namangan, 40.9983 /
+> 71.6726, 12 km), buyurtma yaratishda hudud tekshiruvi, paneldagi
+> «Sozlamalar» boʻlimi (faqat SUPERADMIN, oʻzgarish auditga yoziladi),
+> ilovada shahar qulflangan manzil maydoni va bosh sahifadagi belgi.
+>
+> Qoida: koordinata bor boʻlsa faqat U hisobga olinadi (matn aldashi
+> mumkin — «Namangan koʻchasi, Toshkent»); koordinatasiz manzil shahar
+> nomi boʻyicha tekshiriladi.
+>
+> Jonli tekshirildi: Toshkent manzili, Toshkent koordinatasi va Namangan
+> chekkasidan tashqarisi rad etildi; Namangan ichidagi ikki manzil qabul
+> qilindi. Paneldan radius 40 km qilinganda oʻzgarish darhol kuchga kirdi
+> (kesh yoʻq), audit yozuvida oldingi va yangi qiymat koʻrindi.
+>
+> Qoldi: usta qidiruvini hudud boʻyicha cheklash — ustalarda koordinata
+> YOʻQ (xarita K1 bosqichida). Hozir manzil chegara ichida boʻlgani
+> yetarli.
 
 **Maqsad:** platforma faqat Namangan shahrida, belgilangan chegara ichida ishlaydi.
 

@@ -19,6 +19,7 @@ export const ADMIN_SECTIONS = [
   'users',
   'catalog',
   'reports',
+  'settings',
   'admins',
 ] as const;
 
@@ -32,6 +33,10 @@ const SECTION_ROLES: Record<AdminSection, readonly AdminRole[]> = {
   users: [AdminRole.SUPERADMIN, AdminRole.OPERATOR],
   catalog: [AdminRole.SUPERADMIN],
   reports: [AdminRole.SUPERADMIN, AdminRole.OPERATOR],
+  // Xizmat hududi — platformaning qayerda ishlashini hal qiladi. Uni
+  // oʻzgartirish butun mamlakatga buyurtma ochib yuborishi mumkin,
+  // shuning uchun eng tor doirada qoladi.
+  settings: [AdminRole.SUPERADMIN],
   admins: [AdminRole.SUPERADMIN],
 };
 
