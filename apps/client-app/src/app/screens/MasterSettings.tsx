@@ -63,7 +63,7 @@ export function MasterSettingsScreen() {
       </Card>
 
       <Banner variant="info" icon={Info} className="mt-12">
-        Smena faqat shu qurilmada saqlanadi: ish takliflari serverdan keladi va server ulanmagan.
+        Smena faqat shu qurilmada saqlanadi — uni har safar oʻzingiz ochasiz va yopasiz.
       </Banner>
 
       <MenuGroup section={fields} />

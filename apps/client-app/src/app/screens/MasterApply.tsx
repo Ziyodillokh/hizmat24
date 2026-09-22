@@ -90,9 +90,8 @@ function MasterApplyLocal() {
 
       {!application ? (
         <Banner variant="info" icon={Info} className="mt-16">
-          Matnga soha, tajriba, sertifikat haqidagi javobingiz, tumanlar, ish vaqti, ismingiz va
-          telefon raqamingiz qoʻshiladi. Sertifikat «oʻzim aytdim» deb belgilanadi — tekshiruvni
-          odam qiladi.
+          Matnga ismingiz, telefon raqamingiz va yozgan boʻlsangiz tanishtiruvingiz qoʻshiladi.
+          Boshqa hech narsa soʻralmaydi — platforma faqat santexnika ishlari bilan shugʻullanadi.
         </Banner>
       ) : (
         <>

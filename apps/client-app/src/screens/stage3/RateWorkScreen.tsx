@@ -55,7 +55,6 @@ export function RateWorkScreen({ variant = 'selected' }: RateWorkScreenProps) {
           profession={master.profession}
           rating={master.ratingAvg}
           completedOrders={master.completedOrdersCount}
-          experience={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
           isCertified={master.hasGovCertificate}
           compact
           className="mt-16"

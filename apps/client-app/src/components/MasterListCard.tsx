@@ -26,8 +26,6 @@ export interface MasterListCardProps {
   photoUrl?: string;
   /** Davlat sertifikati bor ustada ism yonida tasdiq belgisi chiziladi. */
   isCertified?: boolean;
-  /** Yangi usta — kam ish bajargan; roʻyxatda ochiq belgilanadi. */
-  isNew?: boolean;
   onOpen?: () => void;
   className?: string;
 }
@@ -39,7 +37,6 @@ export function MasterListCard({
   completedOrders,
   photoUrl,
   isCertified = false,
-  isNew = false,
   onOpen,
   className,
 }: MasterListCardProps) {
@@ -90,16 +87,14 @@ export function MasterListCard({
           butun boʻsh joyni egallagani uchun u ismdan uzoqlashib, qator
           chetiga yopishib qolardi.
         */}
-        {isCertified ? (
+        {/* «Yangi» yorligʻi olib tashlandi: tajriba darajasi ustadan
+            soʻralmaydi va har kimga «Yangi» yozib qoʻyish aldov boʻlardi. */}
+        {isCertified && (
           <span className="flex shrink-0 items-center gap-4 rounded-full bg-primary-surface px-8 py-2 text-badge text-primary-pressed">
             <Icon icon={SealCheck} size={14} weight="fill" aria-hidden />
             Sertifikatli
           </span>
-        ) : isNew ? (
-          <span className="shrink-0 rounded-full bg-neutral-surface px-8 py-2 text-badge text-text-secondary">
-            Yangi
-          </span>
-        ) : null}
+        )}
       </div>
     </Card>
   );

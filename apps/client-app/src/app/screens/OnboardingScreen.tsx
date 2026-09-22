@@ -21,11 +21,12 @@ import { useSwipe } from '../useSwipe';
 import { useApp } from '../store';
 import type { UserRole } from '../types';
 import workImage from '@/assets/services/santexnika-tamiri.webp';
+import priceImage from '@/assets/services/suv-isitgich.webp';
 import mastersImage from '@/assets/services/quvurlar.webp';
 import aiImage from '@/assets/brand/ai-robot.webp';
 
 /**
- * Tanishtiruv oqimi: uchta vaʼda va yakunda rejim tanlash.
+ * Tanishtiruv oqimi: toʻrtta vaʼda va yakunda rejim tanlash.
  *
  * Oqim BIR MARTA koʻrsatiladi — tugagach `hasOnboarded` saqlanadi.
  *
@@ -36,6 +37,7 @@ import aiImage from '@/assets/brand/ai-robot.webp';
  */
 const SLIDE_IMAGES: Record<OnboardingSlide['imageKey'], string> = {
   work: workImage,
+  price: priceImage,
   masters: mastersImage,
   ai: aiImage,
 };

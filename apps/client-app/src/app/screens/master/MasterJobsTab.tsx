@@ -1,4 +1,5 @@
 import { ClipboardText, Info, Wrench } from '@phosphor-icons/react';
+import { isApiEnabled } from '@/api/client';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ import {
   MASTER_EMPTY_CTA_LABELS,
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
-  MASTER_SOURCE_LINE,
+  masterSourceLine,
   isMyJob,
   masterEmptyStateFor,
   splitMasterJobs,
@@ -120,7 +121,11 @@ export function MasterJobsTab() {
     count: formatTabCount(counts[key]),
   }));
 
-  const empty = masterEmptyStateFor(filter, { isAvailable: profile.isAvailable, counts });
+  const empty = masterEmptyStateFor(filter, {
+    isAvailable: profile.isAvailable,
+    counts,
+    isServerConnected: isApiEnabled(),
+  });
   const rows = filter === 'offers' ? offers : active;
 
   const goClientMode = () => {
@@ -201,7 +206,7 @@ export function MasterJobsTab() {
 
       {/* Manba bayonoti — hech qachon yashirilmaydi (TZ 0.1). */}
       <Banner variant="info" icon={Info} className="mt-12 shrink-0">
-        {MASTER_SOURCE_LINE}
+        {masterSourceLine(isApiEnabled())}
       </Banner>
 
       <FilterTabs
@@ -224,11 +229,17 @@ export function MasterJobsTab() {
                 icon={EMPTY_ICONS[filter]}
                 title={empty.title}
                 description={empty.description}
-                action={{
-                  label: MASTER_EMPTY_CTA_LABELS[empty.cta],
-                  onClick: EMPTY_HANDLERS[empty.cta],
-                  variant: 'secondary',
-                }}
+                // Amal yoʻq boʻlsa tugma UMUMAN chizilmaydi: kutishdan
+                // boshqa qiladigan ishi yoʻq odamga tugma koʻrsatish aldov.
+                action={
+                  empty.cta
+                    ? {
+                        label: MASTER_EMPTY_CTA_LABELS[empty.cta],
+                        onClick: EMPTY_HANDLERS[empty.cta],
+                        variant: 'secondary',
+                      }
+                    : undefined
+                }
               />
 
               {/*

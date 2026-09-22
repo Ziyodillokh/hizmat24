@@ -27,13 +27,23 @@ export interface MasterLimit {
   sentence: string;
 }
 
-export const MASTER_LIMITS_INTRO =
-  'Ilova hozir serversiz ishlaydi. Quyidagilar yoʻq va biz ularni yoʻqdek koʻrsatamiz:';
+/**
+ * Kirish jumlasi SERVER ULANGANLIGIGA qarab oʻzgaradi.
+ *
+ * «Ilova serversiz ishlaydi» degan jumla server ulangan ilovada YOLGʻON
+ * boʻlardi: buyurtmalar haqiqatan boshqa mijozlardan keladi va usta
+ * ularni qabul qiladi. Roʻyxatning maʼnosi — rost gapirish, shuning
+ * uchun u rejimga qarab oʻzgaradi.
+ */
+export const masterLimitsIntro = (isServerConnected: boolean): string =>
+  isServerConnected
+    ? 'Quyidagilar hali yoʻq va biz ularni yoʻqdek koʻrsatamiz:'
+    : 'Ilova hozir serversiz ishlaydi. Quyidagilar yoʻq va biz ularni yoʻqdek koʻrsatamiz:';
 
 /** Ishlamaydigan imkoniyat yonidagi yagona yorliq. */
 export const SOON_LABEL = 'Tez orada';
 
-export const MASTER_LIMITS: readonly MasterLimit[] = [
+const ALL_LIMITS: readonly MasterLimit[] = [
   {
     id: 'chat',
     title: 'Yozishuv (chat)',
@@ -49,7 +59,7 @@ export const MASTER_LIMITS: readonly MasterLimit[] = [
     id: 'push',
     title: 'Push bildirishnoma',
     sentence:
-      'Yangi taklif kelganda telefon ovoz chiqarmaydi: bildirishnoma serverdan keladi, server ulanmagan.',
+      'Yangi taklif kelganda telefon ovoz chiqarmaydi: push xizmati hali ulanmagan. Ilova ochiq boʻlsa taklif darhol koʻrinadi.',
   },
   {
     id: 'payout',
@@ -66,7 +76,7 @@ export const MASTER_LIMITS: readonly MasterLimit[] = [
     id: 'certificate',
     title: 'Hujjat/sertifikat tekshiruvi',
     sentence:
-      'Sertifikat ilovada tekshirilmaydi. U hamma joyda «oʻzim aytdim, tekshirilmagan» deb belgilanadi.',
+      'Sertifikat ilovada tekshirilmaydi. Uni faqat admin tasdiqlaydi, tasdiqlanmagunicha belgi chizilmaydi.',
   },
   {
     id: 'otherOrders',
@@ -88,6 +98,17 @@ export const MASTER_LIMITS: readonly MasterLimit[] = [
     id: 'districtFilter',
     title: 'Tumanlar boʻyicha filtr',
     sentence:
-      'Tumanlar arizada koʻrsatiladi. Buyurtma manzilida tuman maydoni yoʻq, shuning uchun roʻyxat tuman boʻyicha filtrlanmaydi.',
+      'Ish hozircha bitta shahar chegarasida, shuning uchun tuman soʻralmaydi va roʻyxat tuman boʻyicha filtrlanmaydi.',
   },
 ];
+
+/**
+ * Server ulanganda tushib qoladigan qatorlar — ular endi ROST EMAS.
+ *
+ * `otherOrders`: boshqa mijozlarning buyurtmalari haqiqatan tushadi.
+ * Ularni «yoʻq» deb turish ustani platformaga ishonchsiz qilardi.
+ */
+const SERVER_SOLVED: readonly MasterLimitId[] = ['otherOrders'];
+
+export const masterLimits = (isServerConnected: boolean): readonly MasterLimit[] =>
+  isServerConnected ? ALL_LIMITS.filter((limit) => !SERVER_SOLVED.includes(limit.id)) : ALL_LIMITS;

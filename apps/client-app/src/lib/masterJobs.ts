@@ -228,12 +228,24 @@ export const MASTER_EMPTY_CTA_LABELS: Record<MasterEmptyCta, string> = {
 export interface MasterEmptyCopy {
   title: string;
   description: string;
-  cta: MasterEmptyCta;
+  /**
+   * `null` — qiladigan amal yoʻq, faqat kutish. Bunda tugma umuman
+   * chizilmaydi: hech nima qilmaydigan tugma — boʻsh vaʼda.
+   */
+  cta: MasterEmptyCta | null;
 }
 
 export interface MasterEmptyInput {
   isAvailable: boolean;
   counts: MasterJobCounts;
+  /**
+   * Server ulanganmi. Matn shunga qarab oʻzgaradi: serversiz rejimda
+   * takliflar SHU telefondagi buyurtmalardan chiqadi va ustaga «mijoz
+   * rejimiga oʻtib bitta buyurtma bering» deyish oʻrinli. Server
+   * ulanganda esa taklif haqiqiy mijozlardan keladi va bu maslahat
+   * ustani chalgʻitardi.
+   */
+  isServerConnected: boolean;
 }
 
 /** `null` — roʻyxat boʻsh emas, boʻsh holat chizilmaydi. */
@@ -254,13 +266,22 @@ export function masterEmptyStateFor(
   if (!input.isAvailable) {
     return {
       title: 'Smena yopiq',
-      description: 'Smenani boshlang — shu qurilmadagi buyurtmalar taklif boʻlib shu yerda chiqadi.',
+      description: input.isServerConnected
+        ? 'Smenani boshlang — yoqib qoʻygan xizmatlaringiz boʻyicha buyurtmalar shu yerda taklif boʻlib chiqadi.'
+        : 'Smenani boshlang — shu qurilmadagi buyurtmalar taklif boʻlib shu yerda chiqadi.',
       cta: 'open-shift',
     };
   }
 
-  return input.counts.offers > 0
-    ? null
+  if (input.counts.offers > 0) return null;
+
+  return input.isServerConnected
+    ? {
+        title: 'Hozircha taklif yoʻq',
+        description:
+          'Smena ochiq — yangi buyurtma tushishi bilan u shu yerda koʻrinadi. Qaysi ishlarni qabul qilishingizni «Mening xizmatlarim» da oʻzgartirasiz.',
+        cta: null,
+      }
     : {
         title: 'Hozircha taklif yoʻq',
         description:
@@ -271,9 +292,17 @@ export function masterEmptyStateFor(
 
 // ───────────────────────────────────────────────────────── ekran matni ──
 
-/** Ishlar ekranidagi manba bayonoti — hech qachon yashirilmaydi (TZ 0.1). */
-export const MASTER_SOURCE_LINE =
-  'Server ulanmagan. Takliflar shu telefonda mijoz rejimida berilgan buyurtmalardan keladi; boshqa odamlarning buyurtmalari ilovaga tushmaydi.';
+/**
+ * Ishlar ekranidagi manba bayonoti — hech qachon yashirilmaydi (TZ 0.1).
+ *
+ * Jumla REJIMGA qarab oʻzgaradi: server ulangan ilovada «boshqa
+ * odamlarning buyurtmalari tushmaydi» deyish yolgʻon boʻlardi — ular
+ * aynan shu yoʻl bilan keladi.
+ */
+export const masterSourceLine = (isServerConnected: boolean): string =>
+  isServerConnected
+    ? 'Takliflar serverdan keladi — siz yoqib qoʻygan xizmatlar boʻyicha. Qaysi ishlarni qabul qilishingizni «Mening xizmatlarim» da oʻzgartirasiz.'
+    : 'Server ulanmagan. Takliflar shu telefonda mijoz rejimida berilgan buyurtmalardan keladi; boshqa odamlarning buyurtmalari ilovaga tushmaydi.';
 
 /** Rad etishdan keyingi toast — buyurtma mijoz dunyosida qoladi. */
 export const DECLINE_TOAST = 'Rad etdingiz — buyurtma shu qurilmada boshqa ustaga qoladi.';

@@ -67,10 +67,13 @@ export function MasterProfileScreen({ variant = 'with-phone' }: MasterProfileScr
         <h1 className="mt-16 text-center text-h1 text-text-primary">{master.fullName}</h1>
         <p className="mt-4 text-body text-text-secondary">{master.profession}</p>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
-          <Badge variant={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'} />
-          {master.hasGovCertificate && <Badge variant="certified" />}
-        </div>
+        {/* Yagona yorliq — ADMIN tasdiqlagan sertifikat. Tajriba darajasi
+            ustadan soʻralmaydi, demak uni chizish toʻqilgan maʼlumot. */}
+        {master.hasGovCertificate && (
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
+            <Badge variant="certified" />
+          </div>
+        )}
 
         <StarRating value={master.ratingAvg} size="md" showValue className="mt-16" />
         <p className="mt-8 text-body text-text-secondary">

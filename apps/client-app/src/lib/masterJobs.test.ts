@@ -32,7 +32,7 @@ import {
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
   MASTER_NEXT_STAGE_LINE,
-  MASTER_SOURCE_LINE,
+  masterSourceLine,
   MASTER_STATUS_CHIPS,
   masterEmptyStateFor,
   masterJobFactLine,
@@ -221,22 +221,41 @@ describe('ETA tanlovlari', () => {
 
 describe('masterEmptyStateFor', () => {
   const counts = { offers: 0, active: 0 };
-
-  it('smena yopiq boʻlsa — smenani boshlash', () => {
-    expect(masterEmptyStateFor('offers', { isAvailable: false, counts })?.cta).toBe('open-shift');
+  /** Serversiz rejim — mahalliy oqim. */
+  const local = (extra: Record<string, unknown> = {}) => ({
+    isAvailable: true,
+    counts,
+    isServerConnected: false,
+    ...extra,
   });
 
-  it('smena ochiq, taklif yoʻq — mijoz rejimi', () => {
-    expect(masterEmptyStateFor('offers', { isAvailable: true, counts })?.cta).toBe('client-mode');
+  it('smena yopiq boʻlsa — smenani boshlash', () => {
+    expect(masterEmptyStateFor('offers', local({ isAvailable: false }))?.cta).toBe('open-shift');
+  });
+
+  it('serversiz rejimda: smena ochiq, taklif yoʻq — mijoz rejimi', () => {
+    expect(masterEmptyStateFor('offers', local())?.cta).toBe('client-mode');
+  });
+
+  /*
+   * Server ulanganda taklif haqiqiy mijozlardan keladi. Ustaga «mijoz
+   * rejimiga oʻtib oʻzingizga buyurtma bering» deyish uni chalgʻitardi —
+   * qiladigan ishi yoʻq, kutadi. Shuning uchun tugma ham chizilmaydi.
+   */
+  it('server ulanganda taklif kutiladi — tugma yoʻq', () => {
+    const empty = masterEmptyStateFor('offers', local({ isServerConnected: true }));
+
+    expect(empty?.cta).toBeNull();
+    expect(empty?.description).toContain('Mening xizmatlarim');
   });
 
   it('roʻyxat boʻsh emas — boʻsh holat yoʻq', () => {
-    expect(masterEmptyStateFor('offers', { isAvailable: true, counts: { offers: 2, active: 0 } })).toBeNull();
-    expect(masterEmptyStateFor('active', { isAvailable: true, counts: { offers: 0, active: 1 } })).toBeNull();
+    expect(masterEmptyStateFor('offers', local({ counts: { offers: 2, active: 0 } }))).toBeNull();
+    expect(masterEmptyStateFor('active', local({ counts: { offers: 0, active: 1 } }))).toBeNull();
   });
 
   it('faol ish yoʻq — takliflarga', () => {
-    expect(masterEmptyStateFor('active', { isAvailable: true, counts })?.cta).toBe('show-offers');
+    expect(masterEmptyStateFor('active', local())?.cta).toBe('show-offers');
   });
 });
 
@@ -246,7 +265,8 @@ describe('matn qoidalari', () => {
       ...Object.values(MASTER_FILTER_LABELS),
       ...Object.values(MASTER_STATUS_CHIPS).map((chip) => chip.label),
       ...Object.values(MASTER_EMPTY_CTA_LABELS),
-      MASTER_SOURCE_LINE,
+      masterSourceLine(true),
+      masterSourceLine(false),
       DECLINE_TOAST,
       ACCEPT_TOAST,
       MASTER_NEXT_STAGE_LINE,
@@ -258,7 +278,13 @@ describe('matn qoidalari', () => {
   });
 
   it('vaʼda beruvchi soʻzlar yoʻq', () => {
-    [MASTER_SOURCE_LINE, DECLINE_TOAST, ACCEPT_TOAST, MASTER_NEXT_STAGE_LINE].forEach((text) => {
+    [
+      masterSourceLine(true),
+      masterSourceLine(false),
+      DECLINE_TOAST,
+      ACCEPT_TOAST,
+      MASTER_NEXT_STAGE_LINE,
+    ].forEach((text) => {
       expect(text.toLowerCase()).not.toContain('yuborildi');
       expect(text.toLowerCase()).not.toContain('xabar beramiz');
     });
@@ -334,5 +360,16 @@ describe('M3 matnlari', () => {
   it('bekor sabablari erkin matn emas, tanlov', () => {
     expect(MASTER_CANCEL_REASONS.length).toBeGreaterThanOrEqual(4);
     expect(new Set(MASTER_CANCEL_REASONS).size).toBe(MASTER_CANCEL_REASONS.length);
+  });
+
+  /*
+   * Manba bayonoti — ilovaning eng muhim halollik qatori. Server ulangan
+   * rejimda u «server ulanmagan» deb turgan edi; bu yolgʻonni test
+   * qaytadan kirib kelishidan saqlaydi.
+   */
+  it('manba bayonoti rejimga mos keladi', () => {
+    expect(masterSourceLine(false).toLowerCase()).toContain('server ulanmagan');
+    expect(masterSourceLine(true).toLowerCase()).not.toContain('server ulanmagan');
+    expect(masterSourceLine(true)).toContain('Mening xizmatlarim');
   });
 });

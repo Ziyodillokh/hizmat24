@@ -58,12 +58,12 @@ export function ConfirmMasterFlow() {
         <h1 className="mt-16 text-center text-h1 text-text-primary">{master.fullName}</h1>
         <p className="mt-4 text-body text-text-secondary">{master.profession}</p>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
-          {master.experienceLevel === 'EXPERIENCED' && (
-            <VerificationChip>Tajribali</VerificationChip>
-          )}
-          {master.hasGovCertificate && <VerificationChip>Sertifikatli</VerificationChip>}
-        </div>
+        {/* Tajriba chipi olib tashlandi: usta bunday daʼvo qilmagan. */}
+        {master.hasGovCertificate && (
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
+            <VerificationChip>Sertifikatli</VerificationChip>
+          </div>
+        )}
 
         <div className="mt-12 flex items-center gap-12">
           <StarRating value={master.ratingAvg} size="md" showValue />

@@ -8,19 +8,20 @@ import { StarRating } from './StarRating';
 
 /**
  * Usta kartasi — spetsifikatsiya 9.7-bandi.
- * 64px avatar · ism `h3` · kasbi `body` `text-secondary` · "Yangi"/"Tajribali" badge ·
- * "Sertifikatli" chipi (agar mavjud boʻlsa) · yulduz + reyting · "142 ta buyurtma bajargan".
+ * 64px avatar · ism `h3` · kasbi `body` `text-secondary` ·
+ * "Sertifikatli" chipi (agar mavjud boʻlsa) · yulduz + reyting · "142 ta ish bajargan".
  * Kartada "Buyurtma berish" tugmasi YOʻQ — usta tanlanmaydi (14.1-band, 3-punkt).
+ *
+ * Tajriba yorligʻi OLIB TASHLANDI: ustadan tajriba darajasi soʻralmaydi,
+ * shuning uchun uni koʻrsatish toʻqilgan maʼlumot boʻlardi (`Badge.tsx`).
+ * Ustaning haqiqiy tarixi — bajarilgan ishlar soni va baho.
  */
-export type MasterExperience = 'new' | 'experienced';
-
 export interface MasterCardProps {
   name: string;
-  /** Kasbi — masalan "Elektrik". */
+  /** Kasbi — platformada yagona qiymat: «Santexnik». */
   profession: string;
   rating: number;
   completedOrders: number;
-  experience?: MasterExperience;
   isCertified?: boolean;
   /** Ilova ichiga joylangan rasm; boʻlmasa ism bosh harfi chiziladi. */
   photoUrl?: string;
@@ -36,7 +37,6 @@ export function MasterCard({
   profession,
   rating,
   completedOrders,
-  experience = 'new',
   photoUrl,
   isCertified = false,
   compact = false,
@@ -68,10 +68,12 @@ export function MasterCard({
         <p className="truncate text-h3 text-text-primary">{name}</p>
         <p className="truncate text-body text-text-secondary">{profession}</p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-8">
-          <Badge variant={experience} />
-          {isCertified && <Badge variant="certified" />}
-        </div>
+        {/* Sertifikat — ADMIN tasdiqlagan yagona yorliq. */}
+        {isCertified && (
+          <div className="mt-8 flex flex-wrap items-center gap-8">
+            <Badge variant="certified" />
+          </div>
+        )}
 
         <div className="mt-8 flex flex-wrap items-center gap-12">
           {/* Bajarilgan ishi yoʻq ustada yulduz chizilmaydi: «0,0» — «yomon
@@ -83,7 +85,7 @@ export function MasterCard({
           )}
           {/* Reyting yonida "N ta baho" yozilmaydi (14.1-band, 6-punkt). */}
           {!compact && (
-            <span className="text-body-sm text-text-secondary">{completedOrders} ta buyurtma bajargan</span>
+            <span className="text-body-sm text-text-secondary">{completedOrders} ta ish bajargan</span>
           )}
         </div>
       </div>

@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MASTER_LIMITS,
-  MASTER_LIMITS_INTRO,
-  SOON_LABEL,
-  type MasterLimitId,
-} from './masterLimits';
+import { masterLimits, masterLimitsIntro, SOON_LABEL, type MasterLimitId } from './masterLimits';
+
+/** Serversiz rejim — toʻliq roʻyxat. */
+const MASTER_LIMITS = masterLimits(false);
 
 /** Oʻzbek tipografiyasi: ASCII apostrof (U+0027) taqiqlanadi. */
 const ASCII_APOSTROPHE = /'/;
@@ -24,8 +22,32 @@ const EXPECTED_IDS: MasterLimitId[] = [
 ];
 
 describe('MASTER_LIMITS', () => {
-  it('oʻnta qator, tartibi TZ jadvalidagidek', () => {
+  it('serversiz rejimda oʻnta qator, tartibi TZ jadvalidagidek', () => {
     expect(MASTER_LIMITS.map((limit) => limit.id)).toEqual(EXPECTED_IDS);
+  });
+
+  /*
+   * Roʻyxatning butun maʼnosi — rost gapirish. Server ulangan ilovada
+   * «boshqa mijozlarning buyurtmalari tushmaydi» deb turish yolgʻon:
+   * ular haqiqatan tushadi va usta ularni qabul qiladi.
+   */
+  it('server ulanganda hal boʻlgan chegara roʻyxatdan tushadi', () => {
+    const connected = masterLimits(true).map((limit) => limit.id);
+
+    expect(connected).not.toContain('otherOrders');
+    expect(connected).toContain('chat');
+    expect(connected.length).toBe(MASTER_LIMITS.length - 1);
+  });
+
+  it('kirish jumlasi rejimga qarab oʻzgaradi', () => {
+    expect(masterLimitsIntro(false)).toContain('serversiz');
+    expect(masterLimitsIntro(true)).not.toContain('serversiz');
+  });
+
+  it('server ulangan rejimda «server ulanmagan» degan jumla YOʻQ', () => {
+    for (const limit of masterLimits(true)) {
+      expect(limit.sentence.toLowerCase()).not.toContain('server ulanmagan');
+    }
   });
 
   it('id lar takrorlanmaydi', () => {
@@ -50,7 +72,8 @@ describe('MASTER_LIMITS', () => {
 
   it('ASCII apostrof yoʻq', () => {
     const strings = [
-      MASTER_LIMITS_INTRO,
+      masterLimitsIntro(true),
+      masterLimitsIntro(false),
       SOON_LABEL,
       ...MASTER_LIMITS.map((limit) => limit.title),
       ...MASTER_LIMITS.map((limit) => limit.sentence),

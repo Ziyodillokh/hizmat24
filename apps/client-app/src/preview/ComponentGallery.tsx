@@ -90,7 +90,7 @@ function Gallery() {
 
       <GallerySection title="9.5 / 9.6 · Grid elementi va xizmat kartasi">
         <div className="flex w-[300px] gap-12">
-          <ServiceGroupTile label="Elektrik xizmatlari" icon={Plug} />
+          <ServiceGroupTile label="Suv isitgich xizmatlari" icon={Drop} />
           <ServiceGroupTile label="Santexnika" icon={Drop} />
         </div>
         <div className="w-[340px]">
@@ -108,8 +108,6 @@ function Gallery() {
           <Avatar size={80} />
         </GalleryRow>
         <GalleryRow label="Badge">
-          <Badge variant="new" />
-          <Badge variant="experienced" />
           <Badge variant="certified" />
         </GalleryRow>
         <GalleryRow label="Reyting">
@@ -119,10 +117,10 @@ function Gallery() {
         </GalleryRow>
         <GalleryRow label="Usta kartasi">
           <div className="w-[340px]">
-            <MasterCard name="Akmal Rahimov" profession="Santexnik" rating={4.8} completedOrders={142} experience="experienced" isCertified onOpen={() => undefined} />
+            <MasterCard name="Akmal Rahimov" profession="Santexnik" rating={4.8} completedOrders={142} isCertified onOpen={() => undefined} />
           </div>
           <div className="w-[340px]">
-            <MasterCard name="Bekzod Toʻraev" profession="Elektrik" rating={4.2} completedOrders={9} compact />
+            <MasterCard name="Bekzod Toʻraev" profession="Santexnik" rating={4.2} completedOrders={9} compact />
           </div>
         </GalleryRow>
       </GallerySection>

@@ -17,12 +17,8 @@ import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
 import { SupportPhoneBlock } from '@/components/PreparedMessage';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
-import {
-  MASTER_LIMITS,
-  MASTER_LIMITS_INTRO,
-  SOON_LABEL,
-  type MasterLimitId,
-} from '@/lib/masterLimits';
+import { isApiEnabled } from '@/api/client';
+import { masterLimits, masterLimitsIntro, SOON_LABEL, type MasterLimitId } from '@/lib/masterLimits';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 
 /**
@@ -48,6 +44,10 @@ const LIMIT_ICONS: Record<MasterLimitId, IconGlyph> = {
 export function MasterLimitsScreen() {
   const navigate = useNavigate();
   const now = useMinuteClock();
+  // Roʻyxat rejimga qarab qisqaradi: server ulanganda baʼzi chegaralar
+  // yoʻqoladi va ularni sanab turish yolgʻon boʻlardi.
+  const isConnected = isApiEnabled();
+  const limits = masterLimits(isConnected);
 
   return (
     <ScreenShell
@@ -59,10 +59,10 @@ export function MasterLimitsScreen() {
         />
       }
     >
-      <p className="mt-8 text-body text-text-secondary">{MASTER_LIMITS_INTRO}</p>
+      <p className="mt-8 text-body text-text-secondary">{masterLimitsIntro(isConnected)}</p>
 
       <ul className="mt-20 flex flex-col gap-16">
-        {MASTER_LIMITS.map((limit) => (
+        {limits.map((limit) => (
           <li key={limit.id} className="flex items-start gap-12">
             <span
               className="flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-md bg-neutral-surface"

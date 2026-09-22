@@ -9,6 +9,8 @@ import { PhoneField } from '@/components/PhoneField';
 import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { PHONE_DIGITS } from '@/lib/phone';
 import { cn } from '@/lib/cn';
+import { cityBadge } from '@/lib/serviceArea';
+import { useServiceCity } from '../service-area-store';
 
 /**
  * Kirish ekrani.
@@ -43,7 +45,7 @@ const BENEFITS: Benefit[] = [
   {
     icon: SealCheck,
     title: 'Usta haqida maʼlumot ochiq',
-    description: 'Sertifikat, reyting va bajarilgan ishlar soni koʻrinadi',
+    description: 'Reyting va bajarilgan ishlar soni ishdan oldin koʻrinadi',
   },
   {
     icon: Robot,
@@ -54,6 +56,7 @@ const BENEFITS: Benefit[] = [
 
 export function LoginScreen() {
   const navigate = useNavigate();
+  const city = useServiceCity();
   const [digits, setDigits] = useState('');
 
   const isComplete = digits.length === PHONE_DIGITS;
@@ -68,8 +71,14 @@ export function LoginScreen() {
       <div className="flex flex-col items-center pt-24">
         <BrandMark className="h-[96px] w-[96px]" />
         <p className="mt-12 text-wordmark text-text-primary">Hizmat24</p>
+        {/*
+          Ilovaning BIRINCHI jumlasi. «Oʻzbekistonning professional
+          xizmatlar platformasi» degan edi — ikkalasi ham rost emas:
+          platforma faqat santexnika bilan va faqat bitta shaharda
+          ishlaydi. Shahar nomi serverdan keladi.
+        */}
         <p className="mt-8 text-center text-body text-text-secondary">
-          Oʻzbekistonning professional xizmatlar platformasi
+          {cityBadge(city)} uchun santexnika ustalari
         </p>
       </div>
 

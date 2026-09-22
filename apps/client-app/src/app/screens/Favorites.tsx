@@ -77,7 +77,6 @@ export function FavoritesScreen() {
                   completedOrders={master.completedOrdersCount}
                   photoUrl={master.photoUrl}
                   isCertified={master.hasGovCertificate}
-                  isNew={master.experienceLevel !== 'EXPERIENCED'}
                   onOpen={() => navigate(`/app/masters/${master.id}`)}
                 />
 

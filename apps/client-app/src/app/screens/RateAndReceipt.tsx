@@ -122,7 +122,6 @@ export function RateOrderScreen() {
           rating={order.master.ratingAvg}
           completedOrders={order.master.completedOrdersCount}
           photoUrl={order.master.photoUrl}
-          experience={order.master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
           isCertified={order.master.hasGovCertificate}
           compact
           className="mt-16"

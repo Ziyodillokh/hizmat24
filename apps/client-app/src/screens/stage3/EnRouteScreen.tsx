@@ -53,7 +53,6 @@ export function EnRouteScreen({ variant = 'default' }: EnRouteScreenProps) {
           profession={master.profession}
           rating={master.ratingAvg}
           completedOrders={master.completedOrdersCount}
-          experience={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
           isCertified={master.hasGovCertificate}
           onOpen={() => undefined}
           className="mt-20"

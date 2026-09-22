@@ -9,9 +9,27 @@ import {
 } from './onboarding';
 
 describe('ONBOARDING_SLIDES', () => {
-  it('uchta slayd va toʻrtta qadam', () => {
-    expect(ONBOARDING_SLIDES).toHaveLength(3);
-    expect(ONBOARDING_STEPS).toBe(4);
+  it('toʻrtta slayd va beshta qadam', () => {
+    expect(ONBOARDING_SLIDES).toHaveLength(4);
+    expect(ONBOARDING_STEPS).toBe(5);
+  });
+
+  /*
+   * Platforma faqat santexnikaga xizmat qiladi va faqat bitta shaharda.
+   * Ikkalasi ham BIRINCHI slaydda aytiladi: mijoz buyurtma berishdan
+   * oldin bilishi kerak, tasdiqlash bosilgandan keyin emas.
+   */
+  it('birinchi slayd soha va shaharni ochiq aytadi', () => {
+    const first = ONBOARDING_SLIDES[0];
+    const text = `${first.title} ${first.description} ${first.caveat ?? ''}`.toLowerCase();
+
+    expect(text).toContain('santexnika');
+    expect(text).toContain('namangan');
+  });
+
+  it('tajriba darajasi haqida gap YOʻQ — u ustadan soʻralmaydi', () => {
+    const texts = ONBOARDING_SLIDES.flatMap((s) => [s.title, s.description, s.caveat ?? '']);
+    texts.forEach((text) => expect(text.toLowerCase()).not.toContain('tajriba'));
   });
 
   it('har bir slaydning kaliti va rasmi yagona', () => {

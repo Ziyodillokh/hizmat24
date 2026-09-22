@@ -5,15 +5,18 @@ import { Icon } from './Icon';
 /**
  * Badge — spetsifikatsiya 9.12-bandi.
  * h=24, radius/full, padding 10px, matn 11/14/600.
- * "Yangi" — `border-strong` fon · "Tajribali" — `success` 14% fon ·
  * "Sertifikatli" — `primary` 14% fon + 14px shield ikona.
+ *
+ * «Yangi» va «Tajribali» yorliqlari 2026-09-22 da OLIB TASHLANDI. Usta
+ * roʻyxatdan oʻtishda tajriba darajasi soʻralmaydi (platforma faqat
+ * santexnikaga qaratildi), demak har bir ustada «Yangi» chiqib turardi —
+ * yigirma yillik ustaga ham. Platforma bilmaydigan narsani yorliq qilib
+ * chizish — toʻqilgan maʼlumot.
  */
-export type BadgeVariant = 'new' | 'experienced' | 'certified';
+export type BadgeVariant = 'certified';
 
 /** Yorliqlar 8.2-jadvaldan olinadi — boshqa matn ishlatilmaydi. */
 const VARIANT_LABELS: Record<BadgeVariant, string> = {
-  new: 'Yangi',
-  experienced: 'Tajribali',
   certified: 'Sertifikatli',
 };
 
@@ -28,8 +31,6 @@ const VARIANT_LABELS: Record<BadgeVariant, string> = {
  * shuning uchun bu satrlarni funksiya bilan yigʻish mumkin emas.
  */
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  new: 'bg-border-strong text-text-secondary',
-  experienced: 'bg-neutral-surface text-text-secondary',
   certified: 'bg-primary-surface text-primary-pressed',
 };
 

@@ -14,6 +14,7 @@ import {
 } from '@phosphor-icons/react';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
+import { isApiEnabled } from '@/api/client';
 import { Banner } from '@/components/Banner';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -49,7 +50,12 @@ interface Protection {
   limit: string;
 }
 
-const PROTECTIONS: Protection[] = [
+/**
+ * Himoyalar roʻyxati REJIMGA bogʻliq: server ulanganda baho haqiqatan
+ * ustaning umumiy reytingiga tushadi va «shu qurilmada saqlanadi» degan
+ * chegara yolgʻon boʻlib qoladi.
+ */
+const protections = (isServerConnected: boolean): Protection[] => [
   {
     icon: Prohibit,
     tone: 'text-danger',
@@ -76,7 +82,9 @@ const PROTECTIONS: Protection[] = [
     tone: 'text-warning',
     title: 'Baho va sabab tegi',
     body: 'Past baho qoʻyganingizda sabab tegi majburiy — usta nimani tuzatishi kerakligi yoziladi. Bahoni keyin oʻzgartirib boʻlmaydi.',
-    limit: 'Bahoingiz hozircha shu qurilmada saqlanadi; umumiy reytingga backend ulangach taʼsir qiladi.',
+    limit: isServerConnected
+      ? 'Baho ustaning umumiy reytingiga darhol qoʻshiladi va uni ortga qaytarib boʻlmaydi.'
+      : 'Bahoingiz hozircha shu qurilmada saqlanadi; umumiy reytingga server ulangach taʼsir qiladi.',
   },
   {
     icon: NotePencil,
@@ -133,7 +141,7 @@ export function GuaranteeScreen() {
         Bugun nima ishlaydi
       </h2>
 
-      {PROTECTIONS.map((item) => (
+      {protections(isApiEnabled()).map((item) => (
         <div
           key={item.title}
           className="mt-12 rounded-lg border border-border bg-surface-elevated px-16 py-12"

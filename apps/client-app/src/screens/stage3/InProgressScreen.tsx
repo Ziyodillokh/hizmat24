@@ -50,7 +50,6 @@ export function InProgressScreen({ variant = 'default' }: InProgressScreenProps)
           profession={master.profession}
           rating={master.ratingAvg}
           completedOrders={master.completedOrdersCount}
-          experience={master.experienceLevel === 'EXPERIENCED' ? 'experienced' : 'new'}
           isCertified={master.hasGovCertificate}
           onOpen={() => undefined}
           className="mt-20"
