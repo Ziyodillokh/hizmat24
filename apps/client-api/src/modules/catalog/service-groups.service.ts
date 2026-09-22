@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { ServiceMediaKind, ServicePriceKind } from '@prisma/client';
 import { CURRENCY, type Currency } from '@shared/index';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { CATALOG_CACHE_KEYS, CatalogCacheService } from './catalog-cache.service';
@@ -14,6 +15,17 @@ export interface GroupedCategoryView {
    * Ilova xizmat fotosini ham shu kalit boʻyicha topadi.
    */
   iconKey: string | null;
+  /** Roʻyxatdagi bir qatorli izoh (yangi maydon; `description` ning oʻrnini bosadi). */
+  summary: string | null;
+  /** Xizmat sahifasidagi batafsil tavsif. */
+  details: string | null;
+  includes: string[];
+  excludes: string[];
+  durationMinutes: number | null;
+  priceKind: ServicePriceKind;
+  /** Roʻyxatdagi karta rasmi; `null` boʻlsa ilova ikonka chizadi. */
+  coverUrl: string | null;
+  media: Array<{ kind: ServiceMediaKind; url: string }>;
 }
 
 export interface ServiceGroupView {
@@ -47,6 +59,7 @@ export class ServiceGroupsService {
           categories: {
             where: { isActive: true },
             orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+            include: { media: { orderBy: { sortOrder: 'asc' } } },
           },
         },
       });
@@ -62,6 +75,14 @@ export class ServiceGroupsService {
           basePrice: category.basePrice,
           currency: CURRENCY,
           iconKey: category.iconKey,
+          summary: category.summary,
+          details: category.details,
+          includes: category.includes,
+          excludes: category.excludes,
+          durationMinutes: category.durationMinutes,
+          priceKind: category.priceKind,
+          coverUrl: category.media.find((item) => item.isCover)?.url ?? null,
+          media: category.media.map((item) => ({ kind: item.kind, url: item.url })),
         })),
       }));
     });

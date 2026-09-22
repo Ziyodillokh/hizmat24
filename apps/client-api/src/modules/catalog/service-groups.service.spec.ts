@@ -16,6 +16,16 @@ const GROUP = {
       complexityLevel: 'SIMPLE',
       isActive: true,
       sortOrder: 0,
+      iconKey: 'socket',
+      summary: 'Yangi rozetka oʻrnatamiz',
+      details: null,
+      includes: ['Usta chiqishi'],
+      excludes: [],
+      durationMinutes: 30,
+      priceKind: 'FIXED',
+      media: [
+        { id: 'm1', kind: 'IMAGE', url: '/media/m1.webp', isCover: true, sortOrder: 0 },
+      ],
     },
   ],
 };
@@ -51,6 +61,15 @@ describe('ServiceGroupsService', () => {
             description: null,
             basePrice: 80_000,
             currency: 'UZS',
+            iconKey: 'socket',
+            summary: 'Yangi rozetka oʻrnatamiz',
+            details: null,
+            includes: ['Usta chiqishi'],
+            excludes: [],
+            durationMinutes: 30,
+            priceKind: 'FIXED',
+            coverUrl: '/media/m1.webp',
+            media: [{ kind: 'IMAGE', url: '/media/m1.webp' }],
           },
         ],
       },
@@ -95,5 +114,15 @@ describe('ServiceGroupsService', () => {
     await service.listActive();
 
     expect(readThrough).toHaveBeenCalledWith(CATALOG_CACHE_KEYS.groups, expect.any(Function));
+  });
+
+  it('muqova boʻlmasa `coverUrl` null — ilova ikonka chizadi', async () => {
+    findMany.mockResolvedValue([
+      { ...GROUP, categories: [{ ...GROUP.categories[0], media: [] }] },
+    ]);
+
+    const [group] = await service.listActive();
+
+    expect(group.categories[0].coverUrl).toBeNull();
   });
 });
