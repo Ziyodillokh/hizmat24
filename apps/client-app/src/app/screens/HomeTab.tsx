@@ -18,7 +18,9 @@ import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import aiRobot from '@/assets/brand/ai-robot.webp';
 import { useCatalog } from '../catalog-store';
 import { useApp } from '../store';
-import { useSelectService } from '../useSelectService';
+import { useOpenService } from '../useSelectService';
+import { API_BASE_URL } from '@/api/client';
+import { mediaSrc } from '@/lib/servicePresentation';
 
 /**
  * Bosh sahifa 2026-09-13 dan santexnikaga qaratilgan (egasining maketi):
@@ -75,7 +77,7 @@ export function HomeTab() {
    */
   const homeServices = (groups[0]?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
   const now = useMinuteClock();
-  const selectService = useSelectService();
+  const selectService = useOpenService();
 
   return (
     <div className="flex h-full flex-col bg-surface">
@@ -155,7 +157,14 @@ export function HomeTab() {
               key={category.id}
               label={category.name}
               icon={serviceIcon(category.iconKey ?? 'plumber')}
-              imageUrl={category.iconKey ? SERVICE_IMAGES[category.iconKey] : undefined}
+              imageUrl={
+                // Paneldan qoʻyilgan muqova ustun; boʻlmasa ilova ichidagi rasm.
+                category.coverUrl
+                  ? mediaSrc(API_BASE_URL, category.coverUrl)
+                  : category.iconKey
+                    ? SERVICE_IMAGES[category.iconKey]
+                    : undefined
+              }
               onClick={() => selectService(category.id)}
             />
           ))}

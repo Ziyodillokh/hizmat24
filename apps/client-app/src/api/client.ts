@@ -96,7 +96,7 @@ export const isApiEnabled = (): boolean => API_BASE_URL !== null;
 const TIMEOUT_MS = 8000;
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   token?: string | null;
   /** Qoʻshimcha sarlavhalar — masalan `Idempotency-Key`. */

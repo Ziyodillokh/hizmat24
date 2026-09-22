@@ -10,8 +10,10 @@ import { ScreenShell } from '@/screens/_shared/ScreenShell';
 import { serviceIcon } from '@/lib/serviceIcons';
 import type { FlatServiceCategory } from '@/mocks/serviceGroups';
 import { SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { API_BASE_URL } from '@/api/client';
+import { mediaSrc } from '@/lib/servicePresentation';
 import { useCatalog } from '../catalog-store';
-import { useSelectService } from '../useSelectService';
+import { useOpenService } from '../useSelectService';
 
 /** "Barchasi" chipining kaliti — hech bir guruh id si bilan toʻqnashmaydi. */
 const ALL_GROUPS = 'all';
@@ -33,7 +35,11 @@ function ServiceGrid({
             description={category.description}
             price={category.basePrice}
             icon={serviceIcon(category.iconKey)}
-            imageUrl={SERVICE_IMAGES[category.iconKey]}
+            // Serverdagi muqova ustun: egasi paneldan qoʻygan rasm aynan
+            // shu yerda koʻrinadi. Boʻlmasa ilova ichidagi zaxira rasm.
+            imageUrl={
+              category.coverUrl ? mediaSrc(API_BASE_URL, category.coverUrl) : SERVICE_IMAGES[category.iconKey]
+            }
             onSelect={() => onSelect(category.id)}
           />
         </li>
@@ -46,7 +52,7 @@ function ServiceGrid({
 export function GroupServicesTab() {
   const navigate = useNavigate();
   const { groupId } = useParams<{ groupId: string }>();
-  const select = useSelectService();
+  const select = useOpenService();
 
   const { groups, categories } = useCatalog();
   const group = groups.find((item) => item.id === groupId) ?? groups[0];
@@ -73,7 +79,7 @@ export function GroupServicesTab() {
  */
 export function AllServicesTab() {
   const navigate = useNavigate();
-  const select = useSelectService();
+  const select = useOpenService();
   const { groups, categories } = useCatalog();
   const [query, setQuery] = useState('');
   const [groupId, setGroupId] = useState(ALL_GROUPS);

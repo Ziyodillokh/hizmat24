@@ -1,6 +1,6 @@
 import { apiRequest } from './client';
 import type { FlatServiceCategory } from '@/mocks/serviceGroups';
-import type { ServiceGroup } from '@/mocks/types';
+import type { ServiceGroup, ServiceMedia, ServicePriceKind } from '@/mocks/types';
 
 /**
  * Katalog — serverdan.
@@ -17,6 +17,14 @@ interface RawCategory {
   basePrice: number;
   currency: string;
   iconKey: string | null;
+  summary?: string | null;
+  details?: string | null;
+  includes?: string[];
+  excludes?: string[];
+  durationMinutes?: number | null;
+  priceKind?: ServicePriceKind;
+  coverUrl?: string | null;
+  media?: ServiceMedia[];
 }
 
 interface RawGroup {
@@ -38,9 +46,18 @@ export function toServiceGroup(raw: RawGroup): ServiceGroup {
       // ikonasiz katak qolmaydi.
       iconKey: category.iconKey ?? raw.iconKey,
       name: category.name,
-      description: category.description,
+      // Server yangi `summary` ni ham, eski `description` ni ham yuboradi;
+      // eskirgan ilova ishlab tursin deb ikkalasi ham toʻldiriladi.
+      description: category.summary ?? category.description,
       groupId: raw.id,
       basePrice: category.basePrice,
+      details: category.details ?? null,
+      includes: category.includes ?? [],
+      excludes: category.excludes ?? [],
+      durationMinutes: category.durationMinutes ?? null,
+      priceKind: category.priceKind ?? 'FIXED',
+      coverUrl: category.coverUrl ?? null,
+      media: category.media ?? [],
     })),
   };
 }

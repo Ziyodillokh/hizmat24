@@ -1,15 +1,4 @@
-import {
-  ArrowsLeftRight,
-  ClipboardText,
-  GearSix,
-  Headset,
-  Info,
-  MapPin,
-  Moon,
-  PaperPlaneTilt,
-  ShieldCheck,
-  Sun,
-} from '@phosphor-icons/react';
+import { ArrowsLeftRight, ClipboardText, GearSix, Headset, Info, MapPin, Moon, PaperPlaneTilt, ShieldCheck, Sun, Wrench } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -34,6 +23,7 @@ import {
 import { CHANNEL_OPENED_LABELS } from '@/lib/support';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { MasterTabBar } from '../../MasterTabBar';
+import { isApiEnabled } from '@/api/client';
 import { useMaster } from '../../master-store';
 import { useApp } from '../../store';
 import { useTheme } from '../../theme-context';
@@ -62,6 +52,19 @@ export function MasterProfileTab() {
   const displayName = fullName?.trim() ? fullName.trim() : formatPhone(phoneNumber);
 
   const masterItems: MenuItem[] = [
+    // «Mening xizmatlarim» — server ulangandagina maʼnoli: roʻyxat
+    // katalogdan keladi va tanlov serverda saqlanadi. Mock rejimda
+    // bosilganda hech narsa boʻlmasligi — ishlamaydigan tugma boʻlardi.
+    ...(isApiEnabled()
+      ? [
+          {
+            icon: Wrench,
+            label: 'Mening xizmatlarim',
+            hint: 'Qaysi ishlarni qabul qilasiz',
+            onSelect: () => navigate('/app/master/services'),
+          },
+        ]
+      : []),
     ...(isComplete
       ? [
           {

@@ -1,5 +1,13 @@
 import type { OrderStatus } from '@/lib/orderStateMachine';
 
+export type ServicePriceKind = 'FIXED' | 'FROM';
+
+export interface ServiceMedia {
+  kind: 'IMAGE' | 'VIDEO';
+  /** Serverga nisbatan yoʻl: `/media/x.webp`. */
+  url: string;
+}
+
 export interface ServiceCategory {
   id: string;
   name: string;
@@ -8,6 +16,19 @@ export interface ServiceCategory {
   basePrice: number;
   /** Xizmatning OʻZ ikonasi. Berilmasa guruhnikini meros qiladi. */
   iconKey?: string;
+  /** Batafsil tavsif — xizmat sahifasida. Mockʼda boʻlmaydi. */
+  details?: string | null;
+  /** «Narx ichiga kiradi» bandlari. */
+  includes?: string[];
+  /** «Narx ichiga kirmaydi». */
+  excludes?: string[];
+  /** Taxminiy davomiylik (daqiqa); `null` — vaqt aytilmaydi. */
+  durationMinutes?: number | null;
+  /** `FROM` — «shundan boshlab». */
+  priceKind?: ServicePriceKind;
+  /** Roʻyxatdagi karta rasmi (serverdan). */
+  coverUrl?: string | null;
+  media?: ServiceMedia[];
 }
 
 export interface ServiceGroup {

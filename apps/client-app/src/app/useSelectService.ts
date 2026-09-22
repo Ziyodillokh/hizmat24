@@ -22,3 +22,20 @@ export function useSelectService(): (categoryId: string) => void {
     [navigate, setDraftCategory],
   );
 }
+
+/**
+ * Xizmat kartasini ochish — katalogdagi va bosh sahifadagi bosish shu
+ * yerga olib keladi.
+ *
+ * Buyurtma DARHOL boshlanmaydi: mijoz avval nimani olayotganini koʻradi
+ * (narx ichiga nimalar kiradi, qancha vaqt, rasm). Buyurtma kartadagi
+ * tugmadan boshlanadi va u `useSelectService` ni chaqiradi.
+ */
+export function useOpenService(): (categoryId: string) => void {
+  const navigate = useNavigate();
+
+  return useCallback(
+    (categoryId: string) => navigate(`/app/services/${categoryId}`),
+    [navigate],
+  );
+}

@@ -36,6 +36,8 @@ import { ProfileEditScreen } from './screens/ProfileEdit';
 import { MasterSetupScreen } from './screens/MasterSetup';
 import { MasterSettingsScreen } from './screens/MasterSettings';
 import { MasterApplyScreen } from './screens/MasterApply';
+import { ServiceDetailScreen } from './screens/ServiceDetail';
+import { MasterServicesScreen } from './screens/master/MasterServicesScreen';
 import { ModeScreen } from './screens/ModeScreen';
 import { MasterFinishScreen } from './screens/master/MasterFinishScreen';
 import { MasterJobScreen } from './screens/master/MasterJobScreen';
@@ -99,6 +101,8 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'home', element: <HomeTab /> },
   { path: 'groups/:groupId', element: <GroupServicesTab /> },
   { path: 'services', element: <AllServicesTab /> },
+  // Xizmat kartasi — buyurtma berishdan OLDIN koʻriladi.
+  { path: 'services/:categoryId', element: <ServiceDetailScreen /> },
   { path: 'masters/:masterId', element: <MasterProfile /> },
 
   // Buyurtma berish oqimi
@@ -160,4 +164,5 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'master/setup', element: <MasterSetupScreen />, role: 'master' },
   { path: 'master/settings', element: <MasterSettingsScreen />, role: 'master' },
   { path: 'master/apply', element: <MasterApplyScreen />, role: 'master' },
+  { path: 'master/services', element: <MasterServicesScreen />, role: 'master' },
 ];
