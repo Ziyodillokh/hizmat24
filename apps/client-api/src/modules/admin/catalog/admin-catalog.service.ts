@@ -187,7 +187,10 @@ export class AdminCatalogService {
     const before = await this.prisma.serviceCategory.findUnique({ where: { id } });
     if (!before) throw new NotFoundException('Xizmat topilmadi');
 
-    const updated = await this.prisma.serviceCategory.update({ where: { id }, data: toData(dto) });
+    const updated = await this.prisma.serviceCategory.update({
+      where: { id },
+      data: toUpdateData(dto),
+    });
 
     await this.afterWrite({
       action:
@@ -348,6 +351,38 @@ const orNull = (value: string | undefined): string | null => value?.trim() || nu
  * `summary` uning oʻrnini bosadi. Ikkovini bir vaqtda yozib turamiz —
  * eski APK oʻrnatilgan telefonlarda karta boʻsh qolmasin.
  */
+/**
+ * PATCH — QISMAN yangilash: faqat yuborilgan maydonlar tegadi.
+ *
+ * Ilgari bu yerda ham `toData` ishlatilardi va u yuborilmagan maydonni
+ * standart qiymatga tushirardi. Jonli serverda bu koʻrindi: guruhsiz
+ * yuborilgan PATCH xizmatni guruhdan chiqarib yubordi va u mijoz
+ * katalogidan butunlay yoʻqoldi (mijoz endpointi guruhlar boʻyicha
+ * oʻqiydi). Qiymatni TOZALASH uchun uni ataylab `null`/boʻsh qilib
+ * yuborish kerak — jim tushib qolish emas.
+ */
+function toUpdateData(dto: UpsertCategoryDto): Prisma.ServiceCategoryUncheckedUpdateInput {
+  const data: Prisma.ServiceCategoryUncheckedUpdateInput = { name: dto.name, basePrice: dto.basePrice };
+
+  if (dto.summary !== undefined) {
+    data.summary = orNull(dto.summary);
+    // Eski maydon ilovaning hozirgi versiyalarida ishlatiladi.
+    data.description = orNull(dto.summary);
+  }
+  if (dto.details !== undefined) data.details = orNull(dto.details);
+  if (dto.includes !== undefined) data.includes = dto.includes;
+  if (dto.excludes !== undefined) data.excludes = dto.excludes;
+  if (dto.priceKind !== undefined) data.priceKind = dto.priceKind;
+  if (dto.durationMinutes !== undefined) data.durationMinutes = dto.durationMinutes;
+  if (dto.complexityLevel !== undefined) data.complexityLevel = dto.complexityLevel;
+  if (dto.groupId !== undefined) data.groupId = dto.groupId;
+  if (dto.iconKey !== undefined) data.iconKey = orNull(dto.iconKey);
+  if (dto.sortOrder !== undefined) data.sortOrder = dto.sortOrder;
+  if (dto.isActive !== undefined) data.isActive = dto.isActive;
+
+  return data;
+}
+
 function toData(dto: UpsertCategoryDto): Prisma.ServiceCategoryUncheckedCreateInput {
   const summary = orNull(dto.summary);
 
