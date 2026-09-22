@@ -1,15 +1,11 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCategories, type AdminCategory } from '@/api/admin';
+import { fetchCategories, mediaSrc, type AdminCategory } from '@/api/admin';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/app/AuthProvider';
 import { formatPrice } from '@/lib/format';
-import { Card, Notice, PageTitle, Pill } from '@/components/ui';
-
-const COMPLEXITY_LABELS: Record<AdminCategory['complexityLevel'], string> = {
-  SIMPLE: 'Oddiy',
-  MEDIUM: 'Oʻrtacha',
-  COMPLEX: 'Murakkab',
-};
+import { priceLabel } from '@/lib/catalogForm';
+import { Button, Card, Notice, PageTitle, Pill } from '@/components/ui';
 
 /**
  * Katalog — A1 da faqat OʻQISH.
@@ -27,10 +23,15 @@ export function CatalogScreen() {
 
   return (
     <>
-      <PageTitle
-        title="Katalog"
-        subtitle="Xizmatlar va ularning boshlangʻich narxlari. Tahrirlash A6 bosqichida qoʻshiladi."
-      />
+      <div className="flex flex-wrap items-start justify-between gap-16">
+        <PageTitle
+          title="Katalog"
+          subtitle="Mijoz ilovasida koʻrinadigan xizmatlar: tavsif, narx, rasm va video"
+        />
+        <Link to="/catalog/new">
+          <Button>Yangi xizmat</Button>
+        </Link>
+      </div>
 
       {query.isPending && <p className="text-body text-text-secondary">Yuklanmoqda…</p>}
 
@@ -61,26 +62,47 @@ function CategoryTable({ categories }: { categories: AdminCategory[] }) {
               <th className="px-16 py-12">Xizmat</th>
               <th className="px-16 py-12">Guruh</th>
               <th className="px-16 py-12 text-right">Narx</th>
-              <th className="px-16 py-12">Murakkablik</th>
+              <th className="px-16 py-12">Vaqt</th>
               <th className="px-16 py-12 text-right">Ustalar</th>
               <th className="px-16 py-12">Holat</th>
             </tr>
           </thead>
           <tbody>
             {categories.map((category) => (
-              <tr key={category.id} className="border-b border-border last:border-0">
+              <tr key={category.id} className="border-b border-border last:border-0 hover:bg-neutral-surface">
                 <td className="px-16 py-12">
-                  <p className="text-body-strong text-text-primary">{category.name}</p>
-                  {category.description && (
-                    <p className="text-caption text-text-secondary">{category.description}</p>
-                  )}
+                  <div className="flex items-center gap-12">
+                    {/* Muqova — mijoz roʻyxatda aynan shuni koʻradi. */}
+                    {category.media.find((item) => item.isCover) ? (
+                      <img
+                        src={mediaSrc(category.media.find((item) => item.isCover)!.url)}
+                        alt=""
+                        className="h-40 w-40 shrink-0 rounded-md object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-40 w-40 shrink-0 items-center justify-center rounded-md bg-neutral-surface text-caption text-text-disabled">
+                        rasm
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <Link
+                        to={`/catalog/${category.id}`}
+                        className="text-body-strong text-primary underline-offset-2 hover:underline"
+                      >
+                        {category.name}
+                      </Link>
+                      {category.summary && (
+                        <p className="text-caption text-text-secondary">{category.summary}</p>
+                      )}
+                    </div>
+                  </div>
                 </td>
                 <td className="px-16 py-12 text-text-secondary">{category.groupName ?? '—'}</td>
                 <td className="px-16 py-12 text-right tabular-nums text-text-primary">
-                  {formatPrice(category.basePrice)}
+                  {priceLabel(formatPrice(category.basePrice), category.priceKind)}
                 </td>
                 <td className="px-16 py-12 text-text-secondary">
-                  {COMPLEXITY_LABELS[category.complexityLevel]}
+                  {category.durationMinutes === null ? '—' : `${category.durationMinutes} daq`}
                 </td>
                 <td className="px-16 py-12 text-right tabular-nums text-text-secondary">
                   {category.masterCount}

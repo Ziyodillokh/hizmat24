@@ -5,6 +5,7 @@ import { DashboardScreen } from '@/screens/DashboardScreen';
 import { CatalogScreen } from '@/screens/CatalogScreen';
 import { ApplicationsScreen } from '@/screens/ApplicationsScreen';
 import { ApplicationDetailScreen } from '@/screens/ApplicationDetailScreen';
+import { CategoryEditScreen } from '@/screens/CategoryEditScreen';
 import { PendingScreen } from '@/screens/PendingScreen';
 import { useAuth } from './AuthProvider';
 import { Shell } from './Shell';
@@ -61,6 +62,9 @@ export function AdminApp() {
         {/* Ichki sahifalar — boʻlim ruxsati bilan bir xil qoida. */}
         {allowed.has('applications') && (
           <Route path="/applications/:id" element={<ApplicationDetailScreen />} />
+        )}
+        {allowed.has('catalog') && (
+          <Route path="/catalog/:id" element={<CategoryEditScreen />} />
         )}
         <Route path="*" element={<Navigate to={home} replace />} />
       </Route>
