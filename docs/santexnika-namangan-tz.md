@@ -30,7 +30,16 @@ Yaʼni tizim «ustaning kasbi» emas, **«katalogdagi aniq ish»** atrofida quri
 
 ## 3. Bosqichlar
 
-### P1 — Xizmat kartasi va katalog boshqaruvi (server + panel + ilova)
+### P1 — Xizmat kartasi va katalog boshqaruvi (server + panel + ilova) ✅ BAJARILDI
+
+> Jonli serverda tekshirildi: paneldan xizmat yaratildi, rasm yuklandi
+> (webp ga qayta kodlandi), ilovada karta toʻliq koʻrindi.
+>
+> Yoʻl-yoʻlakay uchta nuqson tuzatildi:
+> - `/service-groups` yangi maydonlarni qaytarmasdi (ilova aynan shundan oʻqiydi)
+> - katalog `PATCH` toʻliq almashtirish kabi ishlab, yuborilmagan guruhni
+>   nolga tushirardi va xizmat mijoz katalogidan yoʻqolardi
+> - media papkasining egasi konteyner foydalanuvchisiga mos kelmasdi (EACCES)
 
 **Maqsad:** egasi paneldan toʻliq xizmat kartasini yaratadi; mijoz ilovada uni koʻradi.
 
@@ -55,7 +64,13 @@ Yaʼni tizim «ustaning kasbi» emas, **«katalogdagi aniq ish»** atrofida quri
 
 ---
 
-### P2 — Usta rejimini soddalashtirish (ilova + server + panel)
+### P2 — Usta rejimini soddalashtirish (ilova + server + panel) — YARIM BAJARILDI
+
+> Bajarildi: `is_enabled`, `GET/PUT /master/me/services`, matching filtri,
+> ilovada «Mening xizmatlarim» ekrani (profildan ochiladi).
+>
+> Qoldi: roʻyxatdan oʻtishni bitta ekranga tushirish (kasb, tajriba,
+> sertifikat, tumanlar, ish vaqti savollarini olib tashlash).
 
 **Maqsad:** usta 1 daqiqada ishga tayyor boʻladi; qaysi ishlarni qilishini oʻzi boshqaradi.
 
