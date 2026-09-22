@@ -64,7 +64,13 @@ services:
       ADMIN_WEB_ORIGIN: ${ADMIN_WEB_ORIGIN:-}
       ADMIN_SESSION_IDLE_MINUTES: ${ADMIN_SESSION_IDLE_MINUTES:-30}
       ADMIN_TOTP_ISSUER: ${ADMIN_TOTP_ISSUER:-Hizmat24}
+      MEDIA_ROOT: /app/media
       CORS_ORIGINS: ${CORS_ORIGINS:-}
+    volumes:
+      # Xizmat kartalarining rasm va videolari. Imij ichida emas, TASHQARIDA:
+      # aks holda har bir yangilanishda barcha rasmlar yoʻqolardi. Nginx
+      # ham shu papkani /media/ manzilida beradi.
+      - ${MEDIA_ROOT_HOST:-./media}:/app/media
     ports:
       - '3000:3000'
 
