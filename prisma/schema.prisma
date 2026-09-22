@@ -3,7 +3,7 @@
 // Barcha vaqtlar UTC'da saqlanadi (@db.Timestamptz), mijozga Asia/Tashkent'da qaytariladi.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   // Distroless (Debian 12) imiji uchun dvijok: `native` faqat build
   // mashinasiga mos keladi, konteynerda esa openssl 3 li Debian dvijoki
   // kerak. Busiz API imijda «Query engine library not found» bilan
@@ -21,6 +21,16 @@ datasource db {
 enum UserStatus {
   ACTIVE
   BLOCKED
+}
+
+/// Narx qanday koʻrsatiladi: aniq summa yoki «shundan boshlab».
+///
+/// Baʼzi ishning hajmi joyida maʼlum boʻladi (quvur almashtirish uzunligiga
+/// qarab). Bunda aniq son yozish — mijozga yolgʻon vaʼda; `FROM` esa buni
+/// ochiq aytadi.
+enum ServicePriceKind {
+  FIXED
+  FROM
 }
 
 enum ComplexityLevel {
@@ -107,6 +117,10 @@ enum AuditAction {
   ADMIN_LOGIN_FAILED
   ADMIN_LOCKED
   ADMIN_LOGGED_OUT
+  CATALOG_CATEGORY_CREATED
+  CATALOG_CATEGORY_UPDATED
+  CATALOG_PRICE_CHANGED
+  MASTER_SERVICES_CHANGED
   MASTER_APPLICATION_SUBMITTED
   MASTER_APPLICATION_APPROVED
   MASTER_APPLICATION_REJECTED
@@ -172,25 +186,37 @@ model ServiceGroup {
 }
 
 model ServiceCategory {
-  id              String          @id @default(uuid()) @db.Uuid
-  name            String          @unique @db.VarChar(120)
-  description     String?         @db.VarChar(500)
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique @db.VarChar(120)
+  description     String?          @db.VarChar(500)
   /// Ilova ikonani va xizmat fotosini SHU kalit boʻyicha tanlaydi
   /// (`tap`, `toilet`, `pipes`…). Boʻsh boʻlsa guruhning kaliti ishlatiladi.
-  iconKey         String?         @map("icon_key") @db.VarChar(60)
+  iconKey         String?          @map("icon_key") @db.VarChar(60)
   /// Guruhsiz xizmatlar ham bo'lishi mumkin — shuning uchun nullable.
-  groupId         String?         @map("group_id") @db.Uuid
+  groupId         String?          @map("group_id") @db.Uuid
   /// So'mda, butun son. Admin panel orqali tahrirlanadi — hech qachon hardcode qilinmaydi.
-  basePrice       Int             @map("base_price")
-  complexityLevel ComplexityLevel @default(SIMPLE) @map("complexity_level")
-  sortOrder       Int             @default(0) @map("sort_order")
-  isActive        Boolean         @default(true) @map("is_active")
-  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  basePrice       Int              @map("base_price")
+  complexityLevel ComplexityLevel  @default(SIMPLE) @map("complexity_level")
+  /// Kartadagi bir qatorli izoh — roʻyxatda koʻrinadi.
+  summary         String?          @db.VarChar(200)
+  /// Batafsil tavsif — xizmat sahifasida, bir necha xatboshi boʻlishi mumkin.
+  details         String?          @db.Text
+  /// «Narx ichiga kiradi» — har bir qator alohida band.
+  includes        String[]         @default([])
+  /// «Narx ichiga kirmaydi» — kutilmagan qoʻshimcha toʻlovning oldini oladi.
+  excludes        String[]         @default([])
+  /// Taxminiy davomiylik (daqiqa). `null` — vaqt aytilmaydi, taxmin qilinmaydi.
+  durationMinutes Int?             @map("duration_minutes")
+  priceKind       ServicePriceKind @default(FIXED) @map("price_kind")
+  sortOrder       Int              @default(0) @map("sort_order")
+  isActive        Boolean          @default(true) @map("is_active")
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   group   ServiceGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull)
   orders  Order[]
   masters MasterServiceCategory[]
+  media   ServiceMedia[]
 
   @@index([isActive])
   @@index([groupId, sortOrder])
@@ -307,14 +333,22 @@ model MasterApplication {
 }
 
 model MasterServiceCategory {
-  masterId   String @map("master_id") @db.Uuid
-  categoryId String @map("category_id") @db.Uuid
+  masterId   String   @map("master_id") @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  /// Usta shu ishni hozir qabul qiladimi.
+  ///
+  /// Yozuv OʻCHIRILMAYDI, faqat `false` ga oʻtadi: usta ertaga qaytadan
+  /// yoqishi mumkin va tarix (qachon biriktirilgan) saqlanib qoladi.
+  /// Katalogga yangi xizmat qoʻshilsa ustada u `false` boʻlib paydo
+  /// boʻladi — hech kim soʻramagan ishni avtomatik yuklamaymiz.
+  isEnabled  Boolean  @default(true) @map("is_enabled")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   master   Master          @relation(fields: [masterId], references: [id], onDelete: Cascade)
   category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([masterId, categoryId])
-  @@index([categoryId])
+  @@index([categoryId, isEnabled])
   @@map("master_service_categories")
 }
 
@@ -589,4 +623,33 @@ model AdminSession {
   @@index([adminId])
   @@index([lastSeenAt])
   @@map("admin_sessions")
+}
+
+/// Xizmat kartasidagi rasm va videolar.
+///
+/// Fayllar bazada emas, diskda (`/var/www/hizmat24/media`) yashaydi va
+/// nginx orqali beriladi — bazaga faqat yoʻl yoziladi. Rasmni bazaga
+/// solish zaxira nusxani ogʻirlashtiradi va uzatishni sekinlashtiradi.
+model ServiceMedia {
+  id         String           @id @default(uuid()) @db.Uuid
+  categoryId String           @map("category_id") @db.Uuid
+  kind       ServiceMediaKind
+  /// Saytga nisbatan yoʻl: `/media/xxx.webp`.
+  url        String           @db.VarChar(300)
+  /// Video uchun muqova rasmi; rasm uchun `null`.
+  posterUrl  String?          @map("poster_url") @db.VarChar(300)
+  sortOrder  Int              @default(0) @map("sort_order")
+  /// Roʻyxatdagi kartada koʻrinadigan asosiy rasm. Kategoriyada bitta.
+  isCover    Boolean          @default(false) @map("is_cover")
+  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId, sortOrder])
+  @@map("service_media")
+}
+
+enum ServiceMediaKind {
+  IMAGE
+  VIDEO
 }

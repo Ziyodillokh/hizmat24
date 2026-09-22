@@ -77,6 +77,14 @@ const envSchema = z.object({
   ADMIN_SESSION_IDLE_MINUTES: z.coerce.number().int().positive().default(30),
   /** Autentifikator ilovasida koʻrinadigan nom. */
   ADMIN_TOTP_ISSUER: z.string().default('Hizmat24'),
+  /**
+   * Xizmat kartalari uchun yuklangan rasm va videolar katalogi.
+   *
+   * Konteynerda bu yoʻl tashqi papkaga ulanadi (volume), aks holda imij
+   * yangilanganda barcha rasmlar yoʻqolardi.
+   */
+  MEDIA_ROOT: z.string().default('/var/www/hizmat24/media'),
+
   /** Admin paneli manzili — CORS shu yerdan ochiladi. Boʻsh boʻlsa panel ulanmaydi. */
   ADMIN_WEB_ORIGIN: z.string().default(''),
 });

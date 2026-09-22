@@ -4,6 +4,8 @@ import { AdminProfileController } from './admin-profile.controller';
 import { AdminAuthController } from './auth/admin-auth.controller';
 import { AdminCatalogController } from './catalog/admin-catalog.controller';
 import { AdminCatalogService } from './catalog/admin-catalog.service';
+import { MediaStorageService } from './catalog/media-storage.service';
+import { CatalogModule } from '../catalog/catalog.module';
 import { AdminAuthService } from './auth/admin-auth.service';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -15,9 +17,9 @@ import { AdminGuard } from './guards/admin.guard';
  * `@AdminOnly()` ishlatadi va qorovul ularga ham kerak boʻladi.
  */
 @Module({
-  imports: [AuditModule],
+  imports: [AuditModule, CatalogModule],
   controllers: [AdminAuthController, AdminProfileController, AdminCatalogController],
-  providers: [AdminAuthService, AdminCatalogService, AdminGuard],
+  providers: [AdminAuthService, AdminCatalogService, MediaStorageService, AdminGuard],
   exports: [AdminAuthService, AdminGuard],
 })
 export class AdminModule {}

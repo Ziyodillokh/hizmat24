@@ -38,6 +38,8 @@ const FIND_CANDIDATES_SQL = `
   FROM masters m
   JOIN master_service_categories msc ON msc.master_id = m.id
   WHERE msc.category_id = $1::uuid
+    -- Usta oʻchirib qoʻygan ish unga TUSHMAYDI (u buni profilidan boshqaradi).
+    AND msc.is_enabled = true
     AND m.is_active = true
     AND m.status = 'AVAILABLE'
     AND m.last_lat IS NOT NULL
@@ -64,6 +66,8 @@ const FIND_CANDIDATES_WITHOUT_LOCATION_SQL = `
   FROM masters m
   JOIN master_service_categories msc ON msc.master_id = m.id
   WHERE msc.category_id = $1::uuid
+    -- Usta oʻchirib qoʻygan ish unga TUSHMAYDI (u buni profilidan boshqaradi).
+    AND msc.is_enabled = true
     AND m.is_active = true
     AND m.status = 'AVAILABLE'
     AND ($2::boolean = false OR m.experience_level = 'EXPERIENCED')
@@ -120,7 +124,7 @@ export class MasterFinderService {
       where: {
         isActive: true,
         status: { not: 'OFFLINE' },
-        categories: { some: { categoryId } },
+        categories: { some: { categoryId, isEnabled: true } },
       },
     });
   }

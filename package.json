@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@fastify/helmet": "^12.0.1",
+    "@fastify/multipart": "^9.4.0",
     "@fastify/static": "^10.1.3",
     "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.12",
@@ -63,6 +64,7 @@
     "prom-client": "^15.1.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sharp": "^0.34.5",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"

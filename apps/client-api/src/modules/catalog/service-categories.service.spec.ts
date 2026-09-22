@@ -1,4 +1,4 @@
-import { ComplexityLevel } from '@prisma/client';
+import { ComplexityLevel, ServiceMediaKind, ServicePriceKind } from '@prisma/client';
 import { ServiceCategoriesService } from './service-categories.service';
 import { CATALOG_CACHE_KEYS } from './catalog-cache.service';
 
@@ -11,6 +11,17 @@ const CATEGORY = {
   complexityLevel: ComplexityLevel.COMPLEX,
   sortOrder: 0,
   isActive: true,
+  iconKey: null,
+  summary: 'Yangi plitani xavfsiz ulaymiz',
+  details: 'Gaz quvuriga ulash, germetiklik tekshiruvi.',
+  includes: ['Ulash', 'Tekshiruv'],
+  excludes: ['Yangi shlang narxi'],
+  durationMinutes: 90,
+  priceKind: ServicePriceKind.FROM,
+  media: [
+    { id: 'm1', kind: ServiceMediaKind.IMAGE, url: '/media/m1.webp', isCover: true, sortOrder: 0 },
+    { id: 'm2', kind: ServiceMediaKind.VIDEO, url: '/media/m2.mp4', isCover: false, sortOrder: 1 },
+  ],
 };
 
 describe('ServiceCategoriesService (TZ 3.2)', () => {
@@ -39,6 +50,18 @@ describe('ServiceCategoriesService (TZ 3.2)', () => {
         groupId: 'group-1',
         basePrice: 350_000,
         currency: 'UZS',
+        iconKey: null,
+        summary: 'Yangi plitani xavfsiz ulaymiz',
+        details: 'Gaz quvuriga ulash, germetiklik tekshiruvi.',
+        includes: ['Ulash', 'Tekshiruv'],
+        excludes: ['Yangi shlang narxi'],
+        durationMinutes: 90,
+        priceKind: ServicePriceKind.FROM,
+        coverUrl: '/media/m1.webp',
+        media: [
+          { kind: ServiceMediaKind.IMAGE, url: '/media/m1.webp' },
+          { kind: ServiceMediaKind.VIDEO, url: '/media/m2.mp4' },
+        ],
       },
     ]);
   });
@@ -53,15 +76,34 @@ describe('ServiceCategoriesService (TZ 3.2)', () => {
   it("faqat is_active=true kategoriyalarni soʻraydi", async () => {
     await service.listActive();
 
-    expect(findMany).toHaveBeenCalledWith({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    });
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      }),
+    );
   });
 
   it('kategoriyalar cache kalitidan foydalanadi', async () => {
     await service.listActive();
 
     expect(readThrough).toHaveBeenCalledWith(CATALOG_CACHE_KEYS.categories, expect.any(Function));
+  });
+
+  it('muqova rasmi boʻlmasa `coverUrl` null — ilova ikonka chizadi', async () => {
+    findMany.mockResolvedValue([{ ...CATEGORY, media: [] }]);
+
+    const [category] = await service.listActive();
+
+    expect(category.coverUrl).toBeNull();
+    expect(category.media).toEqual([]);
+  });
+
+  it('media tartib boʻyicha soʻraladi', async () => {
+    await service.listActive();
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ include: { media: { orderBy: { sortOrder: 'asc' } } } }),
+    );
   });
 });

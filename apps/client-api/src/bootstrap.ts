@@ -2,6 +2,8 @@ import { RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
+import { MAX_VIDEO_BYTES } from './modules/admin/catalog/domain/media-rules';
 import type { AppEnv } from './infra/config/env.validation';
 
 /**
@@ -10,6 +12,16 @@ import type { AppEnv } from './infra/config/env.validation';
  */
 export async function configureApp(app: NestFastifyApplication): Promise<void> {
   await app.register(helmet, { contentSecurityPolicy: false });
+
+  /*
+   * Fayl yuklash — faqat admin katalogida ishlatiladi, lekin plagin
+   * ilovaning butun HTTP qatlamiga bir marta ulanadi.
+   *
+   * Chegara SHU YERDA ham qoʻyiladi: `checkMedia` faylni butunlay
+   * oʻqib boʻlgach tekshiradi, bu esa 500 MB li faylni xotiraga
+   * yuklashga imkon berardi. Plagin uni oʻqish paytidayoq toʻxtatadi.
+   */
+  await app.register(multipart, { limits: { fileSize: MAX_VIDEO_BYTES, files: 1 } });
 
   // Har qanday Origin'ni credentials bilan qaytarish — klassik CORS xatosi.
   // Ruxsat faqat aniq roʻyxatdagi manzillarga beriladi; mobil ilova uchun

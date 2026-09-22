@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { HealthModule } from './modules/health/health.module';
 import { MasterApplicationsModule } from './modules/master-applications/master-applications.module';
+import { MasterServicesModule } from './modules/master-services/master-services.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
@@ -106,6 +107,7 @@ import { RedisModule } from './infra/redis/redis.module';
     OrdersModule,
     MatchingModule,
     MastersModule,
+    MasterServicesModule,
     MasterApplicationsModule,
     RatingsModule,
     NotificationsModule,
