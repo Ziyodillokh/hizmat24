@@ -32,7 +32,7 @@ import {
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
   MASTER_NEXT_STAGE_LINE,
-  masterSourceLine,
+  MASTER_SOURCE_LINE,
   MASTER_STATUS_CHIPS,
   masterEmptyStateFor,
   masterJobFactLine,
@@ -225,7 +225,6 @@ describe('masterEmptyStateFor', () => {
   const local = (extra: Record<string, unknown> = {}) => ({
     isAvailable: true,
     counts,
-    isServerConnected: false,
     ...extra,
   });
 
@@ -233,20 +232,8 @@ describe('masterEmptyStateFor', () => {
     expect(masterEmptyStateFor('offers', local({ isAvailable: false }))?.cta).toBe('open-shift');
   });
 
-  it('serversiz rejimda: smena ochiq, taklif yoʻq — mijoz rejimi', () => {
+  it('smena ochiq, taklif yoʻq — mijoz rejimi', () => {
     expect(masterEmptyStateFor('offers', local())?.cta).toBe('client-mode');
-  });
-
-  /*
-   * Server ulanganda taklif haqiqiy mijozlardan keladi. Ustaga «mijoz
-   * rejimiga oʻtib oʻzingizga buyurtma bering» deyish uni chalgʻitardi —
-   * qiladigan ishi yoʻq, kutadi. Shuning uchun tugma ham chizilmaydi.
-   */
-  it('server ulanganda taklif kutiladi — tugma yoʻq', () => {
-    const empty = masterEmptyStateFor('offers', local({ isServerConnected: true }));
-
-    expect(empty?.cta).toBeNull();
-    expect(empty?.description).toContain('Mening xizmatlarim');
   });
 
   it('roʻyxat boʻsh emas — boʻsh holat yoʻq', () => {
@@ -265,8 +252,7 @@ describe('matn qoidalari', () => {
       ...Object.values(MASTER_FILTER_LABELS),
       ...Object.values(MASTER_STATUS_CHIPS).map((chip) => chip.label),
       ...Object.values(MASTER_EMPTY_CTA_LABELS),
-      masterSourceLine(true),
-      masterSourceLine(false),
+      MASTER_SOURCE_LINE,
       DECLINE_TOAST,
       ACCEPT_TOAST,
       MASTER_NEXT_STAGE_LINE,
@@ -279,8 +265,7 @@ describe('matn qoidalari', () => {
 
   it('vaʼda beruvchi soʻzlar yoʻq', () => {
     [
-      masterSourceLine(true),
-      masterSourceLine(false),
+      MASTER_SOURCE_LINE,
       DECLINE_TOAST,
       ACCEPT_TOAST,
       MASTER_NEXT_STAGE_LINE,
@@ -363,13 +348,13 @@ describe('M3 matnlari', () => {
   });
 
   /*
-   * Manba bayonoti — ilovaning eng muhim halollik qatori. Server ulangan
-   * rejimda u «server ulanmagan» deb turgan edi; bu yolgʻonni test
-   * qaytadan kirib kelishidan saqlaydi.
+   * Manba bayonoti — ilovaning eng muhim halollik qatori. Usta navbati
+   * serverga ULANMAGAN (B5), shuning uchun u ikkala rejimda ham bir xil
+   * gapiradi. «Takliflar serverdan keladi» degan jumla bir marta shu
+   * yerga kirib qolgan edi — test uni qaytib kelishidan saqlaydi.
    */
-  it('manba bayonoti rejimga mos keladi', () => {
-    expect(masterSourceLine(false).toLowerCase()).toContain('server ulanmagan');
-    expect(masterSourceLine(true).toLowerCase()).not.toContain('server ulanmagan');
-    expect(masterSourceLine(true)).toContain('Mening xizmatlarim');
+  it('manba bayonoti takliflar shu qurilmadan ekanini aytadi', () => {
+    expect(MASTER_SOURCE_LINE).toContain('shu telefonda');
+    expect(MASTER_SOURCE_LINE.toLowerCase()).not.toContain('serverdan keladi');
   });
 });

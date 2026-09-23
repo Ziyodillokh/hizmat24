@@ -37,7 +37,7 @@ export interface MasterLimit {
  */
 export const masterLimitsIntro = (isServerConnected: boolean): string =>
   isServerConnected
-    ? 'Quyidagilar hali yoʻq va biz ularni yoʻqdek koʻrsatamiz:'
+    ? 'Mijoz tomoni serverga ulangan, usta navbati esa hali yoʻq. Quyidagilar ishlamaydi va biz ularni ishlaydigandek koʻrsatmaymiz:'
     : 'Ilova hozir serversiz ishlaydi. Quyidagilar yoʻq va biz ularni yoʻqdek koʻrsatamiz:';
 
 /** Ishlamaydigan imkoniyat yonidagi yagona yorliq. */
@@ -81,7 +81,8 @@ const ALL_LIMITS: readonly MasterLimit[] = [
   {
     id: 'otherOrders',
     title: 'Boshqa odamlarning buyurtmalari',
-    sentence: 'Server ulanmagan — boshqa mijozlarning buyurtmalari ilovaga tushmaydi.',
+    sentence:
+      'Usta navbati serverga hali ulanmagan: takliflar shu telefonda berilgan buyurtmalardan chiqadi, boshqa mijozlarniki tushmaydi.',
   },
   {
     id: 'price',
@@ -103,12 +104,12 @@ const ALL_LIMITS: readonly MasterLimit[] = [
 ];
 
 /**
- * Server ulanganda tushib qoladigan qatorlar — ular endi ROST EMAS.
- *
- * `otherOrders`: boshqa mijozlarning buyurtmalari haqiqatan tushadi.
- * Ularni «yoʻq» deb turish ustani platformaga ishonchsiz qilardi.
+ * Server ulanganda hal boʻlgan chegaralar. Hozircha BOʻSH: mijoz tomoni
+ * serverga oʻtgan boʻlsa ham, ustaning ish navbati hali ulanmagan
+ * (`/master/offers` — B5 bosqichi). Bu roʻyxatga qator qoʻshishdan
+ * oldin oʻsha imkoniyat HAQIQATAN ishlayotganini tekshirish shart.
  */
-const SERVER_SOLVED: readonly MasterLimitId[] = ['otherOrders'];
+const SERVER_SOLVED: readonly MasterLimitId[] = [];
 
 export const masterLimits = (isServerConnected: boolean): readonly MasterLimit[] =>
   isServerConnected ? ALL_LIMITS.filter((limit) => !SERVER_SOLVED.includes(limit.id)) : ALL_LIMITS;

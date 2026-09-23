@@ -1,5 +1,4 @@
 import { ClipboardText, Info, Wrench } from '@phosphor-icons/react';
-import { isApiEnabled } from '@/api/client';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +31,7 @@ import {
   MASTER_EMPTY_CTA_LABELS,
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
-  masterSourceLine,
+  MASTER_SOURCE_LINE,
   isMyJob,
   masterEmptyStateFor,
   splitMasterJobs,
@@ -121,11 +120,7 @@ export function MasterJobsTab() {
     count: formatTabCount(counts[key]),
   }));
 
-  const empty = masterEmptyStateFor(filter, {
-    isAvailable: profile.isAvailable,
-    counts,
-    isServerConnected: isApiEnabled(),
-  });
+  const empty = masterEmptyStateFor(filter, { isAvailable: profile.isAvailable, counts });
   const rows = filter === 'offers' ? offers : active;
 
   const goClientMode = () => {
@@ -206,7 +201,7 @@ export function MasterJobsTab() {
 
       {/* Manba bayonoti — hech qachon yashirilmaydi (TZ 0.1). */}
       <Banner variant="info" icon={Info} className="mt-12 shrink-0">
-        {masterSourceLine(isApiEnabled())}
+        {MASTER_SOURCE_LINE}
       </Banner>
 
       <FilterTabs
