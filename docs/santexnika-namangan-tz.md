@@ -147,7 +147,30 @@ Yaʼni tizim «ustaning kasbi» emas, **«katalogdagi aniq ish»** atrofida quri
 
 ---
 
-### P4 — Ilova matnlari va bosh sahifa
+### P4 — Ilova matnlari va bosh sahifa — ✅ BAJARILDI
+
+> Bajarildi (2026-09-22):
+> - Kirish ekranining birinchi jumlasi «Oʻzbekistonning professional
+>   xizmatlar platformasi» edi — ikkala daʼvo ham rost emas. Endi
+>   «Namangan shahri uchun santexnika ustalari», shahar serverdan.
+> - Tanishtiruv: toʻrtta slayd. Birinchisi nima qilishimizni va qayerda
+>   ishlashimizni aytadi (santexnika + Namangan chegarasi).
+> - Tajriba yorligʻi («Yangi»/«Tajribali») HAMMA joydan olib tashlandi:
+>   usta roʻyxatdan oʻtishda tajriba soʻralmaydi, demak har bir ustada
+>   «Yangi» chiqib turardi. Qolgan yagona yorliq — admin tasdiqlaydigan
+>   sertifikat. Usta kartasi endi: «Santexnik · N ta ish bajargan · baho».
+> - Eskirgan «server ulanmagan» jumlalari rejimga bogʻlandi (usta
+>   chegaralari roʻyxati, manba bayonoti, boʻsh holatlar, Kafolat
+>   sahifasidagi baho qatori).
+> - Bosh sahifadagi guruh chiplari allaqachon rasmli xizmat kartalari
+>   bilan almashtirilgan edi (P1), sarlavha katalogdan keladi.
+>
+> Jonli tekshirildi (brauzer, hizmat24.uz): kirish → 4 slayd → rejim →
+> bosh sahifa → xizmat kartasi → tavsif → manzil qadami. Konsolda xato
+> yoʻq, manzil qadamida shahar qulflangan holda koʻrindi. Sinov
+> foydalanuvchilari oʻchirildi.
+
+#### Dastlabki reja
 
 - Bosh sahifa: guruh chiplari oʻrniga toʻgʻridan-toʻgʻri santexnika ishlari (rasmli kartalar, P1 dan).
 - Barcha «santexnik/elektrik», «soha», «kasb» soʻzlari olib tashlanadi; tanishtiruv slaydlari santexnikaga moslanadi.
