@@ -12,9 +12,12 @@ describe('MasterAvailabilityService', () => {
     service = new MasterAvailabilityService({ master: { findMany, updateMany } } as never);
   });
 
-  it("aktiv buyurtmasiz band ustalarni boʻshatadi", async () => {
+  const onShift = (id: string) => ({ id, profile: { availableSince: new Date() } });
+  const offShift = (id: string) => ({ id, profile: { availableSince: null } });
+
+  it("smenasi ochiq ustalarni boʻshatadi", async () => {
     // Arrange
-    findMany.mockResolvedValue([{ id: 'master-1' }, { id: 'master-2' }]);
+    findMany.mockResolvedValue([onShift('master-1'), onShift('master-2')]);
 
     // Act
     const freed = await service.reconcile();
@@ -25,6 +28,32 @@ describe('MasterAvailabilityService', () => {
       where: { id: { in: ['master-1', 'master-2'] }, status: MasterStatus.BUSY },
       data: { status: MasterStatus.AVAILABLE },
     });
+  });
+
+  /*
+   * Smenasini yopib qoʻygan usta ish tugagach yana `AVAILABLE` boʻlib
+   * qolsa, u soʻramagan taklif kelardi — telefoni jiringlab, oʻzi esa
+   * ishlamayotgan boʻlardi.
+   */
+  it("smenasi yopiq usta OFFLINE boʻladi va navbatga qaytarilmaydi", async () => {
+    findMany.mockResolvedValue([offShift('master-3')]);
+
+    const freed = await service.reconcile();
+
+    expect(freed).toEqual([]);
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['master-3'] }, status: MasterStatus.BUSY },
+      data: { status: MasterStatus.OFFLINE },
+    });
+  });
+
+  it("aralash holatda har biri oʻz holatini oladi", async () => {
+    findMany.mockResolvedValue([onShift('master-1'), offShift('master-3')]);
+
+    const freed = await service.reconcile();
+
+    expect(freed).toEqual(['master-1']);
+    expect(updateMany).toHaveBeenCalledTimes(2);
   });
 
   it("faqat aktiv buyurtmasi yoʻq ustalarni qidiradi", async () => {
@@ -46,7 +75,7 @@ describe('MasterAvailabilityService', () => {
           },
         },
       },
-      select: { id: true },
+      select: { id: true, profile: { select: { availableSince: true } } },
     });
   });
 

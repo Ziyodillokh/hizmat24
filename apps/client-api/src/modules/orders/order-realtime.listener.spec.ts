@@ -1,5 +1,5 @@
 import { OrderStatus, PaymentMethod } from '@prisma/client';
-import { WS_EVENT_ORDER_UPDATED } from '@shared/index';
+import { WS_EVENT_MASTER_ORDERS_CHANGED, WS_EVENT_ORDER_UPDATED } from '@shared/index';
 import { OrderSnapshotChangedEvent } from './domain/events/order-snapshot-changed.event';
 import { OrderRealtimeListener } from './order-realtime.listener';
 import type { OrderWithRelations } from './infrastructure/order.presenter';
@@ -109,5 +109,56 @@ describe('OrderRealtimeListener (TZ 3.5 — jonli yangilanish)', () => {
     expect(() =>
       listener.onSnapshotChanged(new OrderSnapshotChangedEvent('order-1', 'client-1', snapshot)),
     ).not.toThrow();
+  });
+
+  /*
+   * Bitta oʻzgarish — ikki ekran. Mijoz ustani eshik oldida
+   * tasdiqlaganda usta «Ishni boshlash» tugmasini ilovani qayta
+   * yuklamasdan koʻrishi kerak (B5).
+   */
+  describe('ustaga uzatish', () => {
+    const withMaster = (userId: string | null) =>
+      ({
+        ...snapshot,
+        masterId: 'master-1',
+        master: { id: 'master-1', userId, fullName: 'Sardor', experienceLevel: 'NEW' },
+      }) as unknown as OrderWithRelations;
+
+    it('ustaning ilova hisobiga ham yuboradi', () => {
+      listener.onSnapshotChanged(new OrderSnapshotChangedEvent('order-1', 'client-1', withMaster('user-9')));
+
+      const snapshots = emitToUser.mock.calls.filter((call) => call[1] === WS_EVENT_ORDER_UPDATED);
+      expect(snapshots.map((call) => call[0])).toEqual(['client-1', 'user-9']);
+    });
+
+    /*
+     * Ustaga QISQA signal ham ketadi: toʻliq surat mijoz koʻrinishi va
+     * unda ustaning boʻlimi (taklif/faol) yoʻq. Ilova shu signaldan
+     * keyin oʻz roʻyxatini qayta oʻqiydi.
+     */
+    it('ustaga roʻyxatni yangilash signali yuboriladi', () => {
+      listener.onSnapshotChanged(new OrderSnapshotChangedEvent('order-1', 'client-1', withMaster('user-9')));
+
+      const signals = emitToUser.mock.calls.filter(
+        (call) => call[1] === WS_EVENT_MASTER_ORDERS_CHANGED,
+      );
+      expect(signals).toHaveLength(1);
+      expect(signals[0][0]).toBe('user-9');
+    });
+
+    it('hisobga bogʻlanmagan ustaga yuborilmaydi — xato ham bermaydi', () => {
+      listener.onSnapshotChanged(new OrderSnapshotChangedEvent('order-1', 'client-1', withMaster(null)));
+
+      expect(emitToUser).toHaveBeenCalledTimes(1);
+    });
+
+    it('mijozning oʻzi usta boʻlsa surat ikki marta ketmaydi', () => {
+      listener.onSnapshotChanged(
+        new OrderSnapshotChangedEvent('order-1', 'client-1', withMaster('client-1')),
+      );
+
+      const snapshots = emitToUser.mock.calls.filter((call) => call[1] === WS_EVENT_ORDER_UPDATED);
+      expect(snapshots).toHaveLength(1);
+    });
   });
 });

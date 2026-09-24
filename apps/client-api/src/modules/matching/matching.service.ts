@@ -177,6 +177,7 @@ export class MatchingService {
   ): Promise<string | null> {
     return this.prisma.$transaction(async (tx) => {
       const candidates = await this.finder.findCandidates(tx, {
+        orderId: order.id,
         categoryId: order.categoryId,
         complexityLevel: order.category.complexityLevel,
         lat: order.addressLat,

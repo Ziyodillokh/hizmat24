@@ -2,6 +2,7 @@ import type { LiveOrder, OrderDraft, PaymentMethod } from '@/app/types';
 import type { OrderInvoice } from '@/lib/pricing';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
 import type { ExperienceLevel, Master, OrderAddress } from '@/mocks/types';
+import { MASTER_PROFESSION } from '@/lib/masterProfile';
 
 /**
  * Server buyurtmasi ↔ ilova buyurtmasi — SOF oʻgirish.
@@ -68,12 +69,19 @@ const toDate = (raw: string | null): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-/** Usta yozuvi; kasb serverda yoʻq — daraja boʻyicha rost yorliq beriladi. */
+/**
+ * Usta yozuvi.
+ *
+ * Kasb serverda YOʻQ ustun emas — platformada u yagona: santexnik.
+ * Ilgari bu yerda tajriba darajasidan «Yangi usta» / «Tajribali usta»
+ * degan yorliq yasalardi. Bu TOʻQILGAN maʼlumot edi: ustadan tajriba
+ * soʻralmaydi va har kimda «Yangi usta» chiqib turardi.
+ */
 function toMaster(raw: NonNullable<ServerOrder['master']>): Master {
   return {
     id: raw.id,
     fullName: raw.fullName,
-    profession: raw.experienceLevel === 'EXPERIENCED' ? 'Tajribali usta' : 'Yangi usta',
+    profession: MASTER_PROFESSION,
     experienceLevel: raw.experienceLevel,
     hasGovCertificate: raw.hasGovCertificate,
     ratingAvg: raw.ratingAvg,

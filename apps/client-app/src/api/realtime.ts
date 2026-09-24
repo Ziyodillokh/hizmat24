@@ -18,8 +18,20 @@ import type { LiveOrder } from '@/app/types';
  */
 export const WS_ORDER_UPDATED = 'order.updated';
 
+/**
+ * Ustaning ish roʻyxati oʻzgardi.
+ *
+ * `order.updated` — MIJOZ koʻrinishi va unda ustaning boʻlimi
+ * (taklif/faol/tarix) yoʻq. Shuning uchun ustaga qisqa signal keladi va
+ * ilova roʻyxatni qayta oʻqiydi: boʻlimni hisoblash mantigʻi faqat
+ * serverda qoladi va ikki joyda ikki xil natija chiqmaydi.
+ */
+export const WS_MASTER_ORDERS_CHANGED = 'master.orders.changed';
+
 export interface RealtimeHandlers {
   onOrder: (order: LiveOrder) => void;
+  /** Ustaning roʻyxatini qayta oʻqish kerak. */
+  onMasterOrders?: () => void;
   onReconnect?: () => void;
 }
 
@@ -43,10 +55,13 @@ export function connectRealtime(handlers: RealtimeHandlers): () => void {
     }
   });
 
+  socket.on(WS_MASTER_ORDERS_CHANGED, () => handlers.onMasterOrders?.());
+
   socket.io.on('reconnect', () => handlers.onReconnect?.());
 
   return () => {
     socket.off(WS_ORDER_UPDATED);
+    socket.off(WS_MASTER_ORDERS_CHANGED);
     socket.disconnect();
   };
 }

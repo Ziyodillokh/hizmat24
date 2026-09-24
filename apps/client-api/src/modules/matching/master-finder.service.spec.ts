@@ -2,6 +2,8 @@ import { ComplexityLevel } from '@prisma/client';
 import { MATCHING_RADIUS_KM } from '@shared/index';
 import { MasterFinderService } from './master-finder.service';
 
+const ORDER = '99999999-9999-4999-8999-999999999999';
+
 describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
   let service: MasterFinderService;
   let queryRawUnsafe: jest.Mock;
@@ -18,6 +20,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
   it('murakkab ish uchun "faqat tajribali usta" filtrini yoqadi', async () => {
     // Act
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.COMPLEX,
       lat: 41.3,
@@ -30,6 +33,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it("oddiy ish uchun tajriba filtri qoʻllanmaydi", async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
       lat: 41.3,
@@ -41,6 +45,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it('tajriba filtri SQL darajasida bajariladi (frontendga ishonilmaydi)', async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.COMPLEX,
       lat: 41.3,
@@ -55,6 +60,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it('ikkita buyurtma bitta ustaga tushmasligi uchun qatorlarni bloklaydi', async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
       lat: 41.3,
@@ -66,6 +72,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it("standart radius va kategoriya boʻyicha qidiradi", async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
       lat: 41.3,
@@ -78,6 +85,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it("chetlatilgan ustalar boʻlmasa NULL uzatadi (SQL sharti oʻchadi)", async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
       lat: 41.3,
@@ -89,6 +97,7 @@ describe('MasterFinderService.findCandidates (biznes-qoida 5.3)', () => {
 
   it("javob bermagan ustani keyingi urinishda chetlab oʻtadi", async () => {
     await service.findCandidates(tx as never, {
+      orderId: ORDER,
       categoryId: 'category-1',
       complexityLevel: ComplexityLevel.SIMPLE,
       lat: 41.3,

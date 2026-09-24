@@ -20,6 +20,12 @@ import { isApiEnabled } from '@/api/client';
 import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
 import { buildLocalMasterActions } from './localMasterActions';
 import { buildServerOrderActions } from './serverOrderActions';
+import { buildServerMasterActions } from './serverMasterActions';
+import {
+  fromServerMasterActions,
+  toMasterJobActions,
+  type MasterJobActions,
+} from './masterJobActions';
 import { useOrderTimers } from './useOrderTimers';
 import type { RatingInput } from './types';
 import type { PaymentMethod } from './types';
@@ -130,6 +136,10 @@ interface AppActions {
   createDemoOrder: () => string | null;
   setMasterTakeover: (on: boolean) => void;
   markNotificationsRead: () => void;
+  /** Usta amallari — rejimga qarab mahalliy yoki serverga ketadi. */
+  masterJobs: MasterJobActions;
+  /** Roʻyxatdan bitta buyurtmani olib tashlaydi (usta rad etganda). */
+  removeOrder: (orderId: string) => void;
   /** Serverdan kelgan roʻyxat bilan almashtiradi (faqat server rejimida). */
   replaceOrders: (orders: LiveOrder[]) => void;
   /** Bitta buyurtmani qoʻshadi yoki almashtiradi — WebSocket hodisasi uchun. */
@@ -237,6 +247,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [upsertOrder],
   );
 
+  const removeOrder = useCallback((orderId: string) => {
+    setState((prev) => ({ ...prev, orders: prev.orders.filter((item) => item.id !== orderId) }));
+  }, []);
+
   /** Roʻyxatni serverdan kelgani bilan almashtiradi. */
   const replaceOrders = useCallback(
     (orders: LiveOrder[]) => setState((prev) => ({ ...prev, orders })),
@@ -245,8 +259,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const draftActions = useMemo(() => buildDraftActions(setState), []);
 
-  // Usta amallari hozircha shu qurilmada (B5 da serverga koʻchadi).
   const masterActions = useMemo(() => buildLocalMasterActions(setState), []);
+
+  /**
+   * Usta amallari: server ulangan boʻlsa serverga, aks holda shu
+   * qurilmada. Ekran farqni bilmaydi — ikkalasi bir xil shaklda.
+   */
+  const masterJobs = useMemo<MasterJobActions>(
+    () =>
+      isApiEnabled()
+        ? fromServerMasterActions(buildServerMasterActions({ upsertOrder, removeOrder }))
+        : toMasterJobActions(masterActions),
+    [masterActions, upsertOrder, removeOrder],
+  );
 
   const patchOrder = useCallback((orderId: string, patch: Partial<LiveOrder>) => {
     setState((prev) => ({
@@ -449,8 +474,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       ...masterActions,
 
+      masterJobs,
       replaceOrders,
       upsertOrder,
+      removeOrder,
 
       setMasterTakeover: (on) =>
         setState((prev) => (prev.masterTakeover === on ? prev : { ...prev, masterTakeover: on })),
@@ -464,7 +491,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })),
         })),
     }),
-    [patchOrder, createFromDraft, draftActions, masterActions, server, replaceOrders, upsertOrder],
+    [
+      patchOrder,
+      createFromDraft,
+      draftActions,
+      masterActions,
+      masterJobs,
+      server,
+      replaceOrders,
+      upsertOrder,
+      removeOrder,
+    ],
   );
 
   const value = useMemo<AppContextValue>(() => {

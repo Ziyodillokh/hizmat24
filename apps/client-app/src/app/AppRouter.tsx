@@ -7,7 +7,7 @@ import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
 import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
-import { SessionReadyProvider } from './session-ready';
+import { SessionReadyProvider, useSessionReady } from './session-ready';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -61,18 +61,20 @@ function ScrollToTop() {
 function AppRoutes() {
   const { isAuthenticated, hasOnboarded, role } = useApp();
   useBackButton();
-  // Saqlangan `refresh` tokendan yangi `access` olinadi. Natija B3 da kerak
-  // boʻladi (buyurtmalar serverdan kelganda) — hozir faqat tiklanadi.
-  const isSessionReady = useSessionRestore();
-  // Sessiya tiklangach buyurtmalar serverdan oʻqiladi va jonli yangilanish
-  // ulanadi. Mock rejimda ikkalasi ham hech narsa qilmaydi.
-  useServerSync(isSessionReady === true);
+  // Sessiya `AppRouter` da tiklanadi va kontekst orqali keladi: uni shu
+  // yerda tiklash ustа smenasi kabi provayderlardan YUQORIDA turgan
+  // holatni koʻrmay qoldirardi.
+  const isSessionReady = useSessionReady();
+  // Sessiya masalasi HAL BOʻLGACH (tiklandi yoki yoʻq edi) buyurtmalar
+  // serverdan oʻqiladi va jonli yangilanish ulanadi. Mock rejimda
+  // ikkalasi ham hech narsa qilmaydi.
+  useServerSync(isSessionReady !== null);
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });
 
   return (
-    <SessionReadyProvider value={isSessionReady}>
+    <>
       <ScrollToTop />
       <PageTransition>
         <Routes>
@@ -106,7 +108,7 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
       </PageTransition>
-    </SessionReadyProvider>
+    </>
   );
 }
 
@@ -117,7 +119,16 @@ function AppRoutes() {
  * boʻylab chiziladi va tugmalar haqiqatan ishlaydi.
  */
 export function AppRouter() {
+  /*
+   * Sessiya EN YUQORIDA tiklanadi: natijaga faqat marshrutlar emas, usta
+   * smenasi kabi provayderlar ham qaraydi. Ilgari u `AppRoutes` ichida
+   * edi va `MasterProvider` undan yuqorida turgani uchun smena holati
+   * serverdan hech qachon oʻqilmasdi.
+   */
+  const isSessionReady = useSessionRestore();
+
   return (
+    <SessionReadyProvider value={isSessionReady}>
     <ThemeProvider>
       <AppProvider>
         <CatalogProvider>
@@ -137,6 +148,7 @@ export function AppRouter() {
         </CatalogProvider>
       </AppProvider>
     </ThemeProvider>
+    </SessionReadyProvider>
   );
 }
 

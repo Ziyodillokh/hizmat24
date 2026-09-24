@@ -1,5 +1,6 @@
 import { Info, Warning } from '@phosphor-icons/react';
-import { MASTER_SOURCE_LINE } from '@/lib/masterJobs';
+import { isApiEnabled } from '@/api/client';
+import { masterSourceLine } from '@/lib/masterJobs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Banner } from '@/components/Banner';
 import { Header } from '@/components/Header';
@@ -87,7 +88,7 @@ export function ModeScreen() {
       </Banner>
 
       <p className="mt-12 px-4 text-caption text-text-secondary">
-        {MASTER_SOURCE_LINE}
+        {masterSourceLine(isApiEnabled())}
       </p>
 
       <div className="h-24" aria-hidden />

@@ -20,6 +20,11 @@ export class MasterAvailabilityService {
    * O'zini-o'zi tuzatuvchi invariant: usta `BUSY` boʻlishi mumkin FAQAT unga
    * aktiv buyurtma biriktirilgan bo'lsa.
    *
+   * Boʻshatilgan usta SMENAGA qarab holat oladi: smenasi ochiq boʻlsa
+   * `AVAILABLE`, yopiq boʻlsa `OFFLINE`. Ilgari hammasi `AVAILABLE`
+   * boʻlardi va smenasini yopib qoʻygan ustaga u soʻramagan taklif
+   * kelib qolardi.
+   *
    * Bu bir nechta holatni bir yo'la yopadi:
    *  - mijoz ishni baholamay ketsa, usta abadiy band boʻlib qolmaydi;
    *  - usta ilovasi buyurtmani yakunlagach (bu jarayondan tashqarida) usta bo'shaydi;
@@ -33,20 +38,33 @@ export class MasterAvailabilityService {
         status: MasterStatus.BUSY,
         orders: { none: { status: { in: [...ACTIVE_ORDER_STATUSES] } } },
       },
-      select: { id: true },
+      select: { id: true, profile: { select: { availableSince: true } } },
     });
 
     if (stuck.length === 0) return [];
 
-    const ids = stuck.map((master) => master.id);
+    const onShift = stuck.filter((master) => master.profile?.availableSince).map((m) => m.id);
+    const offShift = stuck.filter((master) => !master.profile?.availableSince).map((m) => m.id);
 
-    await this.prisma.master.updateMany({
-      where: { id: { in: ids }, status: MasterStatus.BUSY },
-      data: { status: MasterStatus.AVAILABLE },
-    });
+    if (onShift.length > 0) {
+      await this.prisma.master.updateMany({
+        where: { id: { in: onShift }, status: MasterStatus.BUSY },
+        data: { status: MasterStatus.AVAILABLE },
+      });
+    }
+    if (offShift.length > 0) {
+      await this.prisma.master.updateMany({
+        where: { id: { in: offShift }, status: MasterStatus.BUSY },
+        data: { status: MasterStatus.OFFLINE },
+      });
+    }
 
-    this.logger.log({ masterIds: ids }, "Aktiv buyurtmasiz band ustalar boʻshatildi");
+    this.logger.log(
+      { available: onShift, offline: offShift },
+      "Aktiv buyurtmasiz band ustalar boʻshatildi",
+    );
 
-    return ids;
+    // Navbatni faqat ISH OLADIGAN ustalar uchun tekshirish maʼnoli.
+    return onShift;
   }
 }

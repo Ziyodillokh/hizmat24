@@ -84,3 +84,13 @@ export const URGENT_SCORE_BOOST_MS = 10 * 365 * 24 * 60 * 60 * 1000;
  * yozilsa, birini oʻzgartirib ikkinchisini unutish muqarrar.
  */
 export const WS_EVENT_ORDER_UPDATED = 'order.updated';
+
+/**
+ * Ustaning ish roʻyxati oʻzgardi.
+ *
+ * `order.updated` da ustaning boʻlimi (taklif/faol/tarix) YOʻQ — u
+ * mijoz koʻrinishi. Ustaga toʻliq surat oʻrniga qisqa signal yuboriladi
+ * va ilova roʻyxatni oʻzi qayta oʻqiydi. Shunda boʻlimni hisoblash
+ * mantigʻi bitta joyda — serverda — qoladi.
+ */
+export const WS_EVENT_MASTER_ORDERS_CHANGED = 'master.orders.changed';

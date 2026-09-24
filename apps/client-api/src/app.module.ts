@@ -20,6 +20,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RatingsModule } from './modules/ratings/ratings.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ServiceAreaModule } from './modules/service-area/service-area.module';
+import { MasterOrdersModule } from './modules/master-orders/master-orders.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import {
@@ -106,6 +107,7 @@ import { RedisModule } from './infra/redis/redis.module';
     AdminModule,
     CatalogModule,
     ServiceAreaModule,
+    MasterOrdersModule,
     OrdersModule,
     MatchingModule,
     MastersModule,

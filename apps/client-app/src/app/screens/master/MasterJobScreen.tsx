@@ -64,7 +64,7 @@ export function MasterJobScreen() {
   const { orderId } = useParams<{ orderId: string }>();
   const now = useMinuteClock();
   const showToast = useToast();
-  const { findOrder, masterDepart, masterArrive, masterCancelOrder, setRole, fullName, phoneNumber } =
+  const { findOrder, masterJobs, setRole, fullName, phoneNumber } =
     useApp();
 
   const [etaOpen, setEtaOpen] = useState(false);
@@ -90,8 +90,7 @@ export function MasterJobScreen() {
         setEtaOpen(true);
         return;
       case 'arrive':
-        masterArrive(order.id);
-        showToast(ARRIVE_TOAST);
+        void masterJobs.arrive(order.id).then((r) => report(r, ARRIVE_TOAST));
         return;
       case 'finish':
         navigate(`/app/master/jobs/${order.id}/finish`);
@@ -110,17 +109,23 @@ export function MasterJobScreen() {
     }
   };
 
+  /** Muvaffaqiyatda oʻz matni, xatoda SERVER aytgan sabab. */
+  const report = (result: { ok: boolean; message: string | null }, success: string) => {
+    showToast(result.ok ? success : (result.message ?? 'Amal bajarilmadi'), result.ok ? undefined : 'danger');
+    return result.ok;
+  };
+
   const depart = (etaMinutes: number) => {
     setEtaOpen(false);
-    masterDepart(order.id, etaMinutes);
-    showToast(DEPART_TOAST);
+    void masterJobs.depart(order.id, etaMinutes).then((r) => report(r, DEPART_TOAST));
   };
 
   const cancel = (reason: string) => {
     setCancelOpen(false);
-    masterCancelOrder(order.id, reason);
-    showToast(CANCEL_TOAST);
-    navigate('/app/master/jobs', { replace: true });
+    void masterJobs.cancel(order.id, reason).then((r) => {
+      if (!report(r, CANCEL_TOAST)) return;
+      navigate('/app/master/jobs', { replace: true });
+    });
   };
 
   return (

@@ -79,7 +79,7 @@ describe('toLiveOrder', () => {
     expect(order.master).toMatchObject({
       id: 'm-1',
       fullName: 'Akmal Rahimov',
-      profession: 'Tajribali usta',
+      profession: 'Santexnik',
       ratingAvg: 4.8,
       phoneNumber: '+998901112233',
     });
@@ -87,12 +87,18 @@ describe('toLiveOrder', () => {
     expect(order.etaMinutes).toBe(20);
   });
 
-  it('yangi usta boshqa yorliq oladi', () => {
+  /*
+   * Kasb tajribadan YASALMAYDI. Ilgari bu yerda «Yangi usta» /
+   * «Tajribali usta» degan yorliq chiqardi — ustadan tajriba
+   * soʻralmaydi va bu toʻqilgan maʼlumot edi.
+   */
+  it('tajriba darajasi kasbni oʻzgartirmaydi', () => {
     const order = toLiveOrder({
       ...raw,
       master: { ...raw.master, id: 'm-2', fullName: 'Yangi', photoUrl: null, experienceLevel: 'NEW', hasGovCertificate: false, ratingAvg: 0, completedOrdersCount: 0, phoneNumber: null } as ServerOrder['master'],
     });
-    expect(order.master?.profession).toBe('Yangi usta');
+    // Kasb tajribadan YASALMAYDI: platformada u yagona — santexnik.
+    expect(order.master?.profession).toBe('Santexnik');
   });
 
   it('baho teglari boʻlmasa boʻsh massiv', () => {

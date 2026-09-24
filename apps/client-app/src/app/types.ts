@@ -36,6 +36,9 @@ export interface OrderDraft {
  */
 export type UserRole = 'client' | 'master';
 
+/** Ish ustaning ekranida qaysi roʻyxatga tushadi (server aytadi). */
+export type MasterBucket = 'offer' | 'active' | 'history';
+
 export interface LiveOrder {
   id: string;
   shortId: string;
@@ -71,6 +74,17 @@ export interface LiveOrder {
   cancelReason: string | null;
   cancelledBy: 'CLIENT' | 'MASTER' | 'SYSTEM' | null;
   rating: OrderRating | null;
+  /**
+   * Buyurtma USTANING serverdagi roʻyxatidan kelganmi va u yerda qaysi
+   * boʻlimga tushadi.
+   *
+   * Mijozning oʻz buyurtmalarida bu maydon YOʻQ. Farq shart: ikkala
+   * roʻyxat bitta massivda yashaydi va usta ekrani mijozning qidiruvdagi
+   * buyurtmasini oʻziga taklif qilib koʻrsatib qoʻyardi.
+   */
+  masterBucket?: MasterBucket;
+  /** Mijozning bogʻlanish maʼlumoti — faqat qabul qilingan ishda. */
+  clientContact?: { fullName: string | null; phoneNumber: string } | null;
   /**
    * Buyurtmani shu qurilmadagi usta rejimi yuritadimi.
    *

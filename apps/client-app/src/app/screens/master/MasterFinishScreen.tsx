@@ -33,7 +33,7 @@ export function MasterFinishScreen() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const showToast = useToast();
-  const { findOrder, masterFinish } = useApp();
+  const { findOrder, masterJobs } = useApp();
 
   const [note, setNote] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -41,7 +41,9 @@ export function MasterFinishScreen() {
   const order = orderId ? findOrder(orderId) : undefined;
 
   if (!order) return <Navigate to="/app/master/jobs" replace />;
-  if (order.status !== ORDER_STATUS.IN_PROGRESS || !order.handledByMaster) {
+  // Server rejimida `handledByMaster` faqat qabul qilingandan keyin
+  // yoziladi; mahalliy oqimda esa u yagona belgi edi.
+  if (order.status !== ORDER_STATUS.IN_PROGRESS) {
     return <Navigate to={`/app/master/jobs/${order.id}`} replace />;
   }
 
@@ -49,9 +51,16 @@ export function MasterFinishScreen() {
 
   const finish = () => {
     setConfirmOpen(false);
-    masterFinish(order.id, note);
-    showToast(FINISH_TOAST);
-    navigate('/app/master/jobs', { replace: true });
+    void masterJobs.finish(order.id, note).then((result) => {
+      if (!result.ok) {
+        // Xato SERVER matni bilan: «mijoz sizni hali tasdiqlamadi» kabi
+        // sabab ustaga aniq aytilishi kerak.
+        showToast(result.message ?? 'Ish yakunlanmadi', 'danger');
+        return;
+      }
+      showToast(FINISH_TOAST);
+      navigate('/app/master/jobs', { replace: true });
+    });
   };
 
   return (

@@ -122,6 +122,9 @@ enum AuditAction {
   CATALOG_PRICE_CHANGED
   MASTER_SERVICES_CHANGED
   SERVICE_AREA_UPDATED
+  MASTER_ORDER_ACCEPTED
+  MASTER_ORDER_DECLINED
+  MASTER_SHIFT_CHANGED
   MASTER_APPLICATION_SUBMITTED
   MASTER_APPLICATION_APPROVED
   MASTER_APPLICATION_REJECTED
@@ -254,6 +257,7 @@ model Master {
   categories      MasterServiceCategory[]
   profile         MasterProfile?
   applications    MasterApplication[]
+  declines        OrderMasterDecline[]
 
   @@index([status, isActive])
   @@map("masters")
@@ -439,6 +443,7 @@ model Order {
   notifications   Notification[]
   safetyAlerts    SafetyAlert[]
   statusHistory   OrderStatusHistory[]
+  masterDeclines  OrderMasterDecline[]
 
   @@unique([clientId, idempotencyKey], name: "order_client_idempotency")
   @@index([status, isUrgent, createdAt])
@@ -686,4 +691,24 @@ model ServiceArea {
 
   @@index([isActive, sortOrder])
   @@map("service_areas")
+}
+
+/// Usta RAD ETGAN buyurtma.
+///
+/// Rad etish javob bermaslikdan farq qiladi: usta ochiq «yoʻq» dedi.
+/// Bu yozuvsiz qidiruv uni bir necha soniyadan keyin oʻsha buyurtmaga
+/// qaytarardi — sweep tayinlashni qaytadan boshlaydi va joriy urinishdagi
+/// istisno roʻyxati unda yoʻq. Yozuv buyurtma bilan birga oʻchadi.
+model OrderMasterDecline {
+  orderId   String   @map("order_id") @db.Uuid
+  masterId  String   @map("master_id") @db.Uuid
+  reason    String?  @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, masterId])
+  @@index([masterId])
+  @@map("order_master_declines")
 }

@@ -13,6 +13,9 @@ import {
   type ApplicationRecord,
   type MasterProfile,
 } from '@/lib/masterProfile';
+import { isApiEnabled } from '@/api/client';
+import { fetchMasterShift, setMasterShift } from '@/api/master';
+import { getAccessToken } from '@/api/session';
 import type { SupportChannel } from '@/lib/support';
 import {
   clearMasterState,
@@ -21,6 +24,7 @@ import {
   saveMasterState,
   type MasterState,
 } from './master-persistence';
+import { useSessionReady } from './session-ready';
 import { useApp } from './store';
 
 /**
@@ -66,6 +70,7 @@ const EMPTY_STATE: MasterState = {
 
 export function MasterProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, fullName, phoneNumber, setMasterTakeover } = useApp();
+  const sessionReady = useSessionReady();
   const [state, setState] = useState<MasterState>(() => loadMasterState() ?? EMPTY_STATE);
 
   useEffect(() => {
@@ -147,27 +152,73 @@ export function MasterProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const openShift = useCallback(() => {
-    const now = new Date();
+  /**
+   * Smenani yozish.
+   *
+   * Server ulangan boʻlsa u YAGONA haqiqat manbai: qidiruv `masters.status`
+   * ni oʻqiydi va ekrandagi kalit bilan server holati bir xil boʻlishi
+   * shart. Shuning uchun ekran avval serverga yozadi, keyin oʻzini
+   * yangilaydi — teskarisi boʻlsa, soʻrov yiqilganda kalit «ochiq» deb
+   * turib, usta esa ish olmasdi.
+   */
+  const applyShift = useCallback((isOpen: boolean, since: Date | null) => {
     setState((prev) => ({
       ...prev,
-      profile: { ...prev.profile, isAvailable: true, availableSince: now, updatedAt: now },
-    }));
-  }, []);
-
-  const closeShift = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      // `availableSince` majburan tozalanadi: yopiq smenaning davomiyligi
-      // degan narsa yoʻq va eskirgan vaqt qolsa ekran yolgʻon gapirardi.
       profile: {
         ...prev.profile,
-        isAvailable: false,
-        availableSince: null,
+        isAvailable: isOpen,
+        // Yopiq smenaning davomiyligi degan narsa yoʻq.
+        availableSince: isOpen ? (since ?? new Date()) : null,
         updatedAt: new Date(),
       },
     }));
   }, []);
+
+  const setShift = useCallback(
+    (isOpen: boolean) => {
+      if (!isApiEnabled()) {
+        applyShift(isOpen, isOpen ? new Date() : null);
+        return;
+      }
+
+      void setMasterShift(isOpen)
+        .then((shift) => applyShift(shift.isOpen, shift.since ? new Date(shift.since) : null))
+        .catch(() => {
+          // Jim qolmaymiz: ekrandagi kalit oʻzgarmaydi va usta smenasi
+          // ochilmaganini koʻradi. Xato matni amal tugmasida chiqadi.
+        });
+    },
+    [applyShift],
+  );
+
+  const openShift = useCallback(() => setShift(true), [setShift]);
+  const closeShift = useCallback(() => setShift(false), [setShift]);
+
+  /*
+   * Server ulanganda smena holati UNDAN oʻqiladi: usta boshqa
+   * qurilmadan smenani ochgan boʻlishi mumkin va qurilmadagi eski
+   * qiymat yolgʻon boʻlardi.
+   */
+  /*
+   * Sessiya tiklanguncha soʻrov YUBORILMAYDI: token hali yoʻq va server
+   * 401 qaytarardi — smena holati esa hech qachon oʻqilmasdi.
+   */
+  useEffect(() => {
+    if (!isApiEnabled() || sessionReady === null || !isAuthenticated || !getAccessToken()) return;
+
+    let alive = true;
+    void fetchMasterShift()
+      .then((shift) => {
+        if (alive) applyShift(shift.isOpen, shift.since ? new Date(shift.since) : null);
+      })
+      .catch(() => {
+        // Usta boʻlmagan odamda 404 — bu xato emas, holat.
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [applyShift, sessionReady, isAuthenticated]);
 
   /*
    * Taymer qorovuli USTA tomonidan yoqiladi, lekin buyurtmalar mijoz

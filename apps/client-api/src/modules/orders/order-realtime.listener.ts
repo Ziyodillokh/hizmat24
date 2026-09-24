@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   ORDER_EVENTS,
+  WS_EVENT_MASTER_ORDERS_CHANGED,
   WS_EVENT_ORDER_UPDATED,
   type OrderQueuedEvent,
   type OrderQueuePositionChangedEvent,
@@ -14,8 +15,12 @@ import {
 import { OrdersRepository } from './infrastructure/orders.repository';
 import { presentOrder } from './infrastructure/order.presenter';
 
+/** Ustaga yuborish uchun `master.userId` kerak — u `ORDER_RELATIONS` da bor. */
+type OrderWithMaster = Parameters<typeof presentOrder>[0];
+
 /**
- * Buyurtma oʻzgarganda mijozga toʻliq suratni yuboradi (TZ 3.5).
+ * Buyurtma oʻzgarganda MIJOZGA ham, USTAGA ham toʻliq suratni yuboradi
+ * (TZ 3.5).
  *
  * Nega surat, nega "nima oʻzgardi" emas: ilova WS xabarini boy berishi
  * mumkin (tunnel uzildi, telefon uxladi). Har safar toʻliq holat kelsa,
@@ -37,7 +42,7 @@ export class OrderRealtimeListener {
   /** Holat oʻzgarishi: tayinlash, bekor qilish, tasdiqlash, baholash. */
   @OnEvent(ORDER_SNAPSHOT_CHANGED, { async: true })
   onSnapshotChanged(event: OrderSnapshotChangedEvent): void {
-    this.emit(event.clientId, event.snapshot);
+    this.broadcast(event.clientId, event.snapshot);
   }
 
   /**
@@ -53,16 +58,46 @@ export class OrderRealtimeListener {
     const order = await this.orders.findById(event.orderId);
     if (!order) return;
 
-    this.emit(order.clientId, order);
+    this.broadcast(order.clientId, order);
+  }
+
+  /**
+   * Bitta oʻzgarish — ikki ekran.
+   *
+   * Usta ham AYNAN shu buyurtmani ekranida koʻrib turadi: mijoz ustani
+   * eshik oldida tasdiqlaganda usta «Ishni boshlash» tugmasini oʻzi
+   * qayta yuklamasdan koʻrishi kerak. Usta yozuvi ilova hisobiga
+   * bogʻlanmagan boʻlishi mumkin (eski, qoʻlda kiritilgan usta) —
+   * bunda unga yuborish shunchaki tashlab ketiladi.
+   */
+  private broadcast(clientId: string, order: OrderWithMaster): void {
+    this.emit(clientId, order);
+
+    const masterUserId = order.master?.userId;
+    if (!masterUserId) return;
+
+    if (masterUserId !== clientId) this.emit(masterUserId, order);
+
+    /*
+     * Ustaga QISQA signal ham ketadi: `order.updated` mijoz koʻrinishi
+     * boʻlib, unda ustaning boʻlimi (taklif/faol/tarix) yoʻq. Ilova shu
+     * signaldan keyin roʻyxatni qayta oʻqiydi va boʻlimni hisoblash
+     * mantigʻi faqat serverda qoladi.
+     */
+    try {
+      this.gateway.emitToUser(masterUserId, WS_EVENT_MASTER_ORDERS_CHANGED, { orderId: order.id });
+    } catch (error) {
+      this.logger.error({ err: error, orderId: order.id }, 'Usta signali yuborilmadi');
+    }
   }
 
   /**
    * WS uzatish xatosi domen oqimini toʻxtatmaydi: buyurtma allaqachon
    * saqlangan va ilova uni keyingi `GET /orders/:id` da baribir koʻradi.
    */
-  private emit(clientId: string, order: Parameters<typeof presentOrder>[0]): void {
+  private emit(userId: string, order: OrderWithMaster): void {
     try {
-      this.gateway.emitToUser(clientId, WS_EVENT_ORDER_UPDATED, presentOrder(order));
+      this.gateway.emitToUser(userId, WS_EVENT_ORDER_UPDATED, presentOrder(order));
     } catch (error) {
       this.logger.error({ err: error, orderId: order.id }, "Jonli yangilanish yuborilmadi");
     }

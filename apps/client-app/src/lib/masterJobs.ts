@@ -70,6 +70,18 @@ export const MASTER_STATUS_CHIPS: Record<OrderStatus, { label: string; tone: Chi
 };
 
 /**
+ * Kartadagi holat yorligʻi.
+ *
+ * `ASSIGNED` ikki xil maʼno beradi va yorliq ularni ARALASHTIRMASLIGI
+ * kerak: usta hali javob bermagan boʻlsa bu TAKLIF («Qabul qildingiz»
+ * deb yozish ochiq yolgʻon boʻlardi), javob bergan boʻlsa — uning ishi.
+ */
+export function masterStatusChip(order: MasterJobOrder): { label: string; tone: ChipTone } {
+  if (order.masterBucket === 'offer') return MASTER_STATUS_CHIPS.SEARCHING;
+  return MASTER_STATUS_CHIPS[order.status];
+}
+
+/**
  * Ustadan hech narsa talab qilinmaydigan, lekin kutish sababi bor holatlar.
  *
  * Ikkala oʻtishni ham MIJOZ qiladi: shaxsni tasdiqlash va baho. Ekran buni
@@ -85,7 +97,10 @@ export function masterWaitingCopy(status: OrderStatus): string | null {
 
 // ──────────────────────────────────────────────────── roʻyxatga boʻlish ──
 
-export type MasterJobOrder = Pick<LiveOrder, 'id' | 'status' | 'createdAt' | 'handledByMaster'>;
+export type MasterJobOrder = Pick<
+  LiveOrder,
+  'id' | 'status' | 'createdAt' | 'handledByMaster' | 'masterBucket'
+>;
 
 export interface MasterJobsInput {
   /** Usta rad etgan buyurtmalar — ular taklif boʻlib qaytmaydi. */
@@ -94,21 +109,37 @@ export interface MasterJobsInput {
   isAvailable: boolean;
 }
 
-/** Taklif shartlari (TZ 0.1) — toʻrttasi ham bajarilishi shart. */
+/**
+ * Taklif shartlari.
+ *
+ * SERVER aytgan boʻlim har doim ustun: `masterBucket` bor buyurtma
+ * ustaning serverdagi roʻyxatidan kelgan va uni qayta hisoblash shart
+ * emas. Bu maydonsiz buyurtma — mahalliy (serversiz) oqimdan va u eski
+ * qoida boʻyicha baholanadi.
+ *
+ * Smena yopiq boʻlsa taklif KOʻRSATILMAYDI: serverda ham shu qoida bor
+ * (yopiq smenali ustaga tayinlanmaydi), lekin ekran eski javobni ushlab
+ * turgan boʻlishi mumkin.
+ */
 export function isOffer(
   order: MasterJobOrder,
   declinedIds: readonly string[],
   isAvailable: boolean,
 ): boolean {
-  if (!isAvailable || order.handledByMaster) return false;
+  if (!isAvailable) return false;
+  if (order.masterBucket) return order.masterBucket === 'offer' && !declinedIds.includes(order.id);
+
+  if (order.handledByMaster) return false;
   const isSearching =
     order.status === ORDER_STATUS.SEARCHING || order.status === ORDER_STATUS.SEARCHING_QUEUED;
   return isSearching && !declinedIds.includes(order.id);
 }
 
 /** Faol ish — usta qabul qilgan va hali yopilmagan buyurtma. */
-export const isMyJob = (order: MasterJobOrder): boolean =>
-  order.handledByMaster && !isTerminal(order.status);
+export const isMyJob = (order: MasterJobOrder): boolean => {
+  if (order.masterBucket) return order.masterBucket === 'active';
+  return order.handledByMaster && !isTerminal(order.status);
+};
 
 export interface MasterJobsView<T> {
   offers: readonly T[];
@@ -238,6 +269,13 @@ export interface MasterEmptyCopy {
 export interface MasterEmptyInput {
   isAvailable: boolean;
   counts: MasterJobCounts;
+  /**
+   * Server ulanganmi. Matn shunga qarab oʻzgaradi: serversiz rejimda
+   * takliflar SHU telefondagi buyurtmalardan chiqadi va ustaga «mijoz
+   * rejimiga oʻtib bitta buyurtma bering» deyish oʻrinli. Server
+   * ulanganda taklif haqiqiy mijozlardan keladi — usta kutadi, xolos.
+   */
+  isServerConnected: boolean;
 }
 
 /** `null` — roʻyxat boʻsh emas, boʻsh holat chizilmaydi. */
@@ -258,13 +296,22 @@ export function masterEmptyStateFor(
   if (!input.isAvailable) {
     return {
       title: 'Smena yopiq',
-      description: 'Smenani boshlang — shu qurilmadagi buyurtmalar taklif boʻlib shu yerda chiqadi.',
+      description: input.isServerConnected
+        ? 'Smenani boshlang — yoqib qoʻygan xizmatlaringiz boʻyicha buyurtmalar shu yerda taklif boʻlib chiqadi.'
+        : 'Smenani boshlang — shu qurilmadagi buyurtmalar taklif boʻlib shu yerda chiqadi.',
       cta: 'open-shift',
     };
   }
 
-  return input.counts.offers > 0
-    ? null
+  if (input.counts.offers > 0) return null;
+
+  return input.isServerConnected
+    ? {
+        title: 'Hozircha taklif yoʻq',
+        description:
+          'Smena ochiq — yangi buyurtma tushishi bilan u shu yerda koʻrinadi. Qaysi ishlarni qabul qilishingizni «Mening xizmatlarim» da oʻzgartirasiz.',
+        cta: null,
+      }
     : {
         title: 'Hozircha taklif yoʻq',
         description:
@@ -278,14 +325,19 @@ export function masterEmptyStateFor(
 /**
  * Ishlar ekranidagi manba bayonoti — hech qachon yashirilmaydi (TZ 0.1).
  *
- * Jumla REJIMDAN QATʼI NAZAR bir xil: mijoz tomoni serverga ulangan
- * boʻlsa ham, USTA NAVBATI hali ulanmagan (`/master/offers` endpointi
- * yozilmagan — B5 bosqichi). Takliflar ikkala rejimda ham shu
- * telefonda berilgan buyurtmalardan chiqadi va buni yashirish
- * ilovadagi eng katta yolgʻon boʻlardi.
+ * B5 bosqichida usta navbati serverga ulandi: taklif endi HAQIQIY
+ * mijozlardan keladi va server uni ustaning yoqib qoʻygan xizmatlari
+ * boʻyicha tanlaydi. Serversiz rejimda esa eski haqiqat qoladi — shu
+ * telefondagi buyurtmalar.
+ *
+ * Bu jumla bir marta xato yozilgan edi («serverdan keladi» — usta
+ * navbati hali ulanmagan paytda). Endi u rost, lekin uni oʻzgartirishdan
+ * oldin `GET /master/orders` haqiqatan ishlayotganini tekshirish shart.
  */
-export const MASTER_SOURCE_LINE =
-  'Takliflar shu telefonda mijoz rejimida berilgan buyurtmalardan keladi; boshqa odamlarning buyurtmalari ustaga hali tushmaydi.';
+export const masterSourceLine = (isServerConnected: boolean): string =>
+  isServerConnected
+    ? 'Takliflar serverdan keladi — siz yoqib qoʻygan xizmatlar boʻyicha. Qaysi ishlarni qabul qilishingizni «Mening xizmatlarim» da oʻzgartirasiz.'
+    : 'Server ulanmagan. Takliflar shu telefonda mijoz rejimida berilgan buyurtmalardan keladi; boshqa odamlarning buyurtmalari ilovaga tushmaydi.';
 
 /** Rad etishdan keyingi toast — buyurtma mijoz dunyosida qoladi. */
 export const DECLINE_TOAST = 'Rad etdingiz — buyurtma shu qurilmada boshqa ustaga qoladi.';

@@ -28,11 +28,12 @@ import {
   ETA_SHEET_TITLE,
   isMyJob,
   isOffer,
+  masterStatusChip,
   MASTER_EMPTY_CTA_LABELS,
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
   MASTER_NEXT_STAGE_LINE,
-  MASTER_SOURCE_LINE,
+  masterSourceLine,
   MASTER_STATUS_CHIPS,
   masterEmptyStateFor,
   masterJobFactLine,
@@ -225,6 +226,7 @@ describe('masterEmptyStateFor', () => {
   const local = (extra: Record<string, unknown> = {}) => ({
     isAvailable: true,
     counts,
+    isServerConnected: false,
     ...extra,
   });
 
@@ -232,8 +234,20 @@ describe('masterEmptyStateFor', () => {
     expect(masterEmptyStateFor('offers', local({ isAvailable: false }))?.cta).toBe('open-shift');
   });
 
-  it('smena ochiq, taklif yoʻq — mijoz rejimi', () => {
+  it('serversiz rejimda: smena ochiq, taklif yoʻq — mijoz rejimi', () => {
     expect(masterEmptyStateFor('offers', local())?.cta).toBe('client-mode');
+  });
+
+  /*
+   * Server ulanganda taklif haqiqiy mijozlardan keladi. Ustaga «mijoz
+   * rejimiga oʻtib oʻzingizga buyurtma bering» deyish uni chalgʻitardi —
+   * qiladigan ishi yoʻq, kutadi. Shuning uchun tugma ham chizilmaydi.
+   */
+  it('server ulanganda taklif kutiladi — tugma yoʻq', () => {
+    const empty = masterEmptyStateFor('offers', local({ isServerConnected: true }));
+
+    expect(empty?.cta).toBeNull();
+    expect(empty?.description).toContain('Mening xizmatlarim');
   });
 
   it('roʻyxat boʻsh emas — boʻsh holat yoʻq', () => {
@@ -252,7 +266,8 @@ describe('matn qoidalari', () => {
       ...Object.values(MASTER_FILTER_LABELS),
       ...Object.values(MASTER_STATUS_CHIPS).map((chip) => chip.label),
       ...Object.values(MASTER_EMPTY_CTA_LABELS),
-      MASTER_SOURCE_LINE,
+      masterSourceLine(true),
+      masterSourceLine(false),
       DECLINE_TOAST,
       ACCEPT_TOAST,
       MASTER_NEXT_STAGE_LINE,
@@ -265,7 +280,8 @@ describe('matn qoidalari', () => {
 
   it('vaʼda beruvchi soʻzlar yoʻq', () => {
     [
-      MASTER_SOURCE_LINE,
+      masterSourceLine(true),
+      masterSourceLine(false),
       DECLINE_TOAST,
       ACCEPT_TOAST,
       MASTER_NEXT_STAGE_LINE,
@@ -353,8 +369,71 @@ describe('M3 matnlari', () => {
    * gapiradi. «Takliflar serverdan keladi» degan jumla bir marta shu
    * yerga kirib qolgan edi — test uni qaytib kelishidan saqlaydi.
    */
-  it('manba bayonoti takliflar shu qurilmadan ekanini aytadi', () => {
-    expect(MASTER_SOURCE_LINE).toContain('shu telefonda');
-    expect(MASTER_SOURCE_LINE.toLowerCase()).not.toContain('serverdan keladi');
+  it('manba bayonoti rejimga mos keladi', () => {
+    expect(masterSourceLine(false)).toContain('shu telefonda');
+    expect(masterSourceLine(true)).toContain('serverdan keladi');
+    expect(masterSourceLine(true)).toContain('Mening xizmatlarim');
   });
+
+/*
+ * Server ulanganda ikkala roʻyxat BITTA massivda yashaydi: mijozning oʻz
+ * buyurtmalari va ustaga tayinlangan ishlar. Farqni server aytadi
+ * (`masterBucket`) — busiz mijozning qidiruvdagi buyurtmasi oʻziga
+ * taklif boʻlib koʻrinardi.
+ */
+describe('server boʻlimlari', () => {
+  const base = { id: 'o-1', createdAt: new Date(), handledByMaster: false };
+
+  /*
+   * `ASSIGNED` ikki xil maʼno beradi. Javob berilmagan taklifda
+   * «Qabul qildingiz» deb yozish ochiq yolgʻon boʻlardi — usta hech
+   * narsa qabul qilmagan.
+   */
+  it('javob berilmagan taklifda yorliq «Qabul qildingiz» EMAS', () => {
+    const offer = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'offer' as const };
+    const mine = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'active' as const };
+
+    expect(masterStatusChip(offer).label).toBe('Yangi taklif');
+    expect(masterStatusChip(mine).label).toBe('Qabul qildingiz');
+  });
+
+  it('serverdagi taklif — taklif', () => {
+    const order = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'offer' as const };
+
+    expect(isOffer(order, [], true)).toBe(true);
+    expect(isMyJob(order)).toBe(false);
+  });
+
+  it('serverdagi faol ish — faol, taklif emas', () => {
+    const order = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'active' as const };
+
+    expect(isOffer(order, [], true)).toBe(false);
+    expect(isMyJob(order)).toBe(true);
+  });
+
+  it('serverdagi tarix hech qaysi roʻyxatga tushmaydi', () => {
+    const order = { ...base, status: ORDER_STATUS.CLOSED, masterBucket: 'history' as const };
+
+    expect(isOffer(order, [], true)).toBe(false);
+    expect(isMyJob(order)).toBe(false);
+  });
+
+  it('boʻlimsiz (mijozning oʻz) buyurtmasi taklif boʻlib koʻrinmaydi', () => {
+    const clientOrder = { ...base, status: ORDER_STATUS.ASSIGNED };
+
+    expect(isOffer(clientOrder, [], true)).toBe(false);
+  });
+
+  it('yopiq smenada serverdagi taklif ham chizilmaydi', () => {
+    const order = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'offer' as const };
+
+    expect(isOffer(order, [], false)).toBe(false);
+  });
+
+  it('rad etilgan taklif qaytib chizilmaydi', () => {
+    const order = { ...base, status: ORDER_STATUS.ASSIGNED, masterBucket: 'offer' as const };
+
+    expect(isOffer(order, ['o-1'], true)).toBe(false);
+  });
+});
 });

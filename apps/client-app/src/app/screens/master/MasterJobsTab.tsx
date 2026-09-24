@@ -1,4 +1,5 @@
 import { ClipboardText, Info, Wrench } from '@phosphor-icons/react';
+import { isApiEnabled } from '@/api/client';
 import type { Icon as IconGlyph } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ import {
   MASTER_EMPTY_CTA_LABELS,
   MASTER_FILTER_LABELS,
   MASTER_FILTERS,
-  MASTER_SOURCE_LINE,
+  masterSourceLine,
   isMyJob,
   masterEmptyStateFor,
   splitMasterJobs,
@@ -79,9 +80,7 @@ export function MasterJobsTab() {
     setRole,
     fullName,
     phoneNumber,
-    masterAcceptOrder,
-    masterDepart,
-    masterArrive,
+    masterJobs,
     createDemoOrder,
   } = useApp();
   const {
@@ -120,7 +119,11 @@ export function MasterJobsTab() {
     count: formatTabCount(counts[key]),
   }));
 
-  const empty = masterEmptyStateFor(filter, { isAvailable: profile.isAvailable, counts });
+  const empty = masterEmptyStateFor(filter, {
+    isAvailable: profile.isAvailable,
+    counts,
+    isServerConnected: isApiEnabled(),
+  });
   const rows = filter === 'offers' ? offers : active;
 
   const goClientMode = () => {
@@ -134,31 +137,60 @@ export function MasterJobsTab() {
     'show-offers': () => setFilter('offers'),
   };
 
-  // Usta yozuvi HAR SAFAR yangidan yigʻiladi: ism, soha va statistika
-  // oʻzgargan boʻlishi mumkin, muzlatilgan nusxa esa eskirgan maʼlumotni
-  // mijoz buyurtmasiga yozib qoʻyardi.
-  const submitEta = (etaMinutes: number) => {
-    const request = pending;
-    setPending(null);
-    if (!request) return;
+  /**
+   * Amal natijasi: muvaffaqiyatda oʻz matni, xatoda SERVER aytgan sabab.
+   *
+   * Xato yutilmaydi — usta nima uchun boʻlmaganini bilishi kerak
+   * («Bu buyurtmani boshqa usta oldi»).
+   */
+  const report = (result: { ok: boolean; message: string | null }, success: string) => {
+    showToast(result.ok ? success : (result.message ?? 'Amal bajarilmadi'), result.ok ? undefined : 'danger');
+    return result.ok;
+  };
 
-    if (request.mode === 'depart') {
-      masterDepart(request.id, etaMinutes);
-      showToast(DEPART_TOAST);
-      return;
-    }
-
-    const master = buildSelfMaster({
+  // Usta yozuvi HAR SAFAR yangidan yigʻiladi: ism va statistika oʻzgargan
+  // boʻlishi mumkin, muzlatilgan nusxa esa eskirgan maʼlumotni mijoz
+  // buyurtmasiga yozib qoʻyardi. Serverda bu yozuv umuman kerak emas —
+  // u ustani oʻzi biladi.
+  const selfMaster = () =>
+    buildSelfMaster({
       fullName,
       phoneNumber,
       profession: MASTER_PROFESSION,
       stats: masterJobStats(orders),
     });
 
-    if (masterAcceptOrder(request.id, { master, etaMinutes })) {
-      setFilter('active');
-      showToast(ACCEPT_TOAST);
+  const submitEta = (etaMinutes: number) => {
+    const request = pending;
+    setPending(null);
+    if (!request) return;
+
+    if (request.mode === 'depart') {
+      void masterJobs.depart(request.id, etaMinutes).then((r) => report(r, DEPART_TOAST));
+      return;
     }
+
+    void masterJobs
+      .accept(request.id, { master: selfMaster(), etaMinutes })
+      .then((r) => report(r, ACCEPT_TOAST) && setFilter('active'));
+  };
+
+  /**
+   * Taklifni qabul qilish.
+   *
+   * Serverda «qabul qildim» va «yoʻlga chiqdim» — IKKI amal: usta ishni
+   * olib, keyinroq yoʻlga chiqishi mumkin. Shuning uchun u yerda ETA
+   * soʻralmaydi. Mahalliy oqimda ikkalasi bitta qadam edi.
+   */
+  const acceptOffer = (orderId: string) => {
+    if (masterJobs.asksEtaOnAccept) {
+      setPending({ id: orderId, mode: 'accept' });
+      return;
+    }
+
+    void masterJobs
+      .accept(orderId, { master: selfMaster(), etaMinutes: 0 })
+      .then((r) => report(r, ACCEPT_TOAST) && setFilter('active'));
   };
 
   /** Kartadagi asosiy amal — roʻyxatdan chiqmasdan bajariladi. */
@@ -168,16 +200,22 @@ export function MasterJobsTab() {
       return;
     }
     if (action === 'arrive') {
-      masterArrive(orderId);
-      showToast(ARRIVE_TOAST);
+      void masterJobs.arrive(orderId).then((r) => report(r, ARRIVE_TOAST));
       return;
     }
     if (action === 'finish') navigate(`/app/master/jobs/${orderId}/finish`);
   };
 
+  /**
+   * Rad etish.
+   *
+   * Serverda bu haqiqiy amal: ish boshqa ustaga yoʻnaltiriladi va shu
+   * ustaga qaytmaydi. Mahalliy oqimda buyurtma qurilmada qoladi va
+   * faqat roʻyxatdan yashiriladi.
+   */
   const decline = (orderId: string) => {
     declineOffer(orderId);
-    showToast(DECLINE_TOAST);
+    void masterJobs.decline(orderId).then((r) => report(r, DECLINE_TOAST));
   };
 
   const createDemo = () => {
@@ -201,7 +239,7 @@ export function MasterJobsTab() {
 
       {/* Manba bayonoti — hech qachon yashirilmaydi (TZ 0.1). */}
       <Banner variant="info" icon={Info} className="mt-12 shrink-0">
-        {MASTER_SOURCE_LINE}
+        {masterSourceLine(isApiEnabled())}
       </Banner>
 
       <FilterTabs
@@ -241,8 +279,12 @@ export function MasterJobsTab() {
                 Ekranni toʻldirish uchun SOXTA yozuv emas — haqiqiy buyurtma:
                 tugma `createOrder` quvuridan oʻtadi va natija mijoz rejimida
                 ham koʻrinadi (TZ 0.1).
+
+                Server ulanganda tugma CHIZILMAYDI: taklif haqiqiy
+                mijozlardan keladi va ustaga «oʻzingizga buyurtma bering»
+                deyish uni chalgʻitardi.
               */}
-              {filter === 'offers' && profile.isAvailable && (
+              {filter === 'offers' && profile.isAvailable && !isApiEnabled() && (
                 <div className="mt-16 flex flex-col items-center gap-8 px-20 text-center">
                   <DashedChip size="compact">Demo</DashedChip>
                   <p className="text-caption text-text-secondary">
@@ -262,7 +304,7 @@ export function MasterJobsTab() {
                     order={order}
                     now={now}
                     variant={filter === 'offers' ? 'offer' : 'active'}
-                    onAccept={canAccept ? () => setPending({ id: order.id, mode: 'accept' }) : null}
+                    onAccept={canAccept ? () => acceptOffer(order.id) : null}
                     onDecline={() => decline(order.id)}
                     blockedHint={blockedHint}
                     onOpen={() => navigate(`/app/master/jobs/${order.id}`)}

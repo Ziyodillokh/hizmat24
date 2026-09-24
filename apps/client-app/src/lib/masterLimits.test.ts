@@ -27,14 +27,14 @@ describe('MASTER_LIMITS', () => {
   });
 
   /*
-   * Roʻyxatning butun maʼnosi — rost gapirish. Usta navbati serverga
-   * hali ULANMAGAN (`/master/offers` yozilmagan), shuning uchun
-   * «boshqa mijozlarning buyurtmalari tushmaydi» qatori server ulangan
-   * rejimda ham qoladi. Bu qator bir marta xato olib tashlangan edi.
+   * B5 da usta navbati serverga ulandi: boshqa mijozlarning buyurtmalari
+   * haqiqatan tushadi. Bu qatorni roʻyxatda qoldirish endi yolgʻon
+   * boʻlardi — lekin serversiz rejimda u hali ham rost.
    */
-  it('usta navbati ulanmagani uchun chegara ikkala rejimda ham qoladi', () => {
-    expect(masterLimits(true).map((limit) => limit.id)).toContain('otherOrders');
+  it('server ulanganda hal boʻlgan chegara roʻyxatdan tushadi', () => {
+    expect(masterLimits(true).map((limit) => limit.id)).not.toContain('otherOrders');
     expect(masterLimits(false).map((limit) => limit.id)).toContain('otherOrders');
+    expect(masterLimits(true)).toHaveLength(MASTER_LIMITS.length - 1);
   });
 
   it('kirish jumlasi rejimga qarab oʻzgaradi', () => {

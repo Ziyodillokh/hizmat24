@@ -12,7 +12,7 @@ import {
   getMasterActions,
   isPrimaryMasterAction,
   MASTER_ACTION_LABELS,
-  MASTER_STATUS_CHIPS,
+  masterStatusChip,
   masterJobFactLine,
   masterWaitingCard,
   type MasterAction,
@@ -65,7 +65,7 @@ export function MasterJobCard({
   className,
 }: MasterJobCardProps) {
   const { value, currency } = splitFormattedPrice(order.invoice.total);
-  const chip = MASTER_STATUS_CHIPS[order.status];
+  const chip = masterStatusChip(order);
   const fact = masterJobFactLine(order as MasterFactSource, now);
   const details = addressDetailsLine(order.address);
   const isBlocking = isBlockingConfirmation(order.status);
