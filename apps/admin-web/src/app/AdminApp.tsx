@@ -7,6 +7,9 @@ import { ApplicationsScreen } from '@/screens/ApplicationsScreen';
 import { ApplicationDetailScreen } from '@/screens/ApplicationDetailScreen';
 import { CategoryEditScreen } from '@/screens/CategoryEditScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
+import { OrdersScreen } from '@/screens/OrdersScreen';
+import { OrderDetailScreen } from '@/screens/OrderDetailScreen';
+import { SafetyScreen } from '@/screens/SafetyScreen';
 import { PendingScreen } from '@/screens/PendingScreen';
 import { useAuth } from './AuthProvider';
 import { Shell } from './Shell';
@@ -16,6 +19,8 @@ const SCREENS: Record<string, JSX.Element> = {
   dashboard: <DashboardScreen />,
   applications: <ApplicationsScreen />,
   catalog: <CatalogScreen />,
+  orders: <OrdersScreen />,
+  safety: <SafetyScreen />,
   settings: <SettingsScreen />,
 };
 
@@ -68,6 +73,7 @@ export function AdminApp() {
         {allowed.has('catalog') && (
           <Route path="/catalog/:id" element={<CategoryEditScreen />} />
         )}
+        {allowed.has('orders') && <Route path="/orders/:id" element={<OrderDetailScreen />} />}
         <Route path="*" element={<Navigate to={home} replace />} />
       </Route>
     </Routes>

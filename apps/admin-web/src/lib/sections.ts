@@ -40,14 +40,14 @@ const SECTIONS: readonly SectionMeta[] = [
     key: 'orders',
     title: 'Buyurtmalar',
     path: '/orders',
-    stage: 'A3',
+    stage: null,
     summary: 'Jonli buyurtmalar va eskalatsiya',
   },
   {
     key: 'safety',
     title: 'Xavfsizlik',
     path: '/safety',
-    stage: 'A4',
+    stage: null,
     summary: 'Mijozlardan kelgan xavfsizlik signallari',
   },
   {

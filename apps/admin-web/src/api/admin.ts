@@ -256,6 +256,160 @@ export async function uploadMedia(
 }
 
 /** Media yoʻli serverga nisbatan (`/media/x.webp`) — toʻliq manzilga aylantiradi. */
+// ─────────────────────────────────────── operator boʻlimlari (A3, A4) ──
+
+export type OrderStatus =
+  | 'DRAFT'
+  | 'SEARCHING'
+  | 'SEARCHING_QUEUED'
+  | 'ASSIGNED'
+  | 'MASTER_EN_ROUTE'
+  | 'ARRIVED_PENDING_CONFIRMATION'
+  | 'IN_PROGRESS'
+  | 'COMPLETED_BY_MASTER'
+  | 'RATED'
+  | 'CLOSED'
+  | 'CANCELLED'
+  | 'SAFETY_FLAGGED';
+
+export interface AdminOrderRow {
+  id: string;
+  shortId: string;
+  status: OrderStatus;
+  categoryName: string | null;
+  clientName: string | null;
+  clientPhone: string;
+  masterName: string | null;
+  price: number;
+  isUrgent: boolean;
+  /** Server hisoblaydi — panel buni qayta hisoblamaydi. */
+  isEscalated: boolean;
+  assignmentAttempts: number;
+  addressLabel: string | null;
+  createdAt: string;
+}
+
+export interface AdminOrderTimelineEntry {
+  fromStatus: OrderStatus | null;
+  toStatus: OrderStatus;
+  actorType: 'CLIENT' | 'MASTER' | 'ADMIN' | 'SYSTEM';
+  reason: string | null;
+  createdAt: string;
+}
+
+export interface AdminOrderDetail extends AdminOrderRow {
+  description: string;
+  /** Qaysi amal mumkinligini server aytadi — panel qoidani takrorlamaydi. */
+  canRequeue: boolean;
+  requeueBlockedReason: string | null;
+  canCancel: boolean;
+  cancelBlockedReason: string | null;
+  masterPhone: string | null;
+  paymentMethod: string | null;
+  workNote: string | null;
+  cancelReason: string | null;
+  scheduledAt: string | null;
+  timeline: AdminOrderTimelineEntry[];
+}
+
+export interface AdminOrdersPage {
+  items: AdminOrderRow[];
+  total: number;
+  escalatedCount: number;
+}
+
+export interface OrdersQuery extends Record<string, string | number | undefined> {
+  status?: OrderStatus;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+const queryString = (query: Record<string, string | number | undefined>): string => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  }
+  const text = params.toString();
+  return text ? `?${text}` : '';
+};
+
+export const fetchAdminOrders = (token: string, query: OrdersQuery = {}): Promise<AdminOrdersPage> =>
+  apiRequest(`/admin/orders${queryString(query)}`, { token });
+
+export const fetchEscalatedOrders = (token: string): Promise<AdminOrderRow[]> =>
+  apiRequest('/admin/orders/escalated', { token });
+
+export const fetchAdminOrder = (token: string, id: string): Promise<AdminOrderDetail> =>
+  apiRequest(`/admin/orders/${id}`, { token });
+
+export const requeueOrder = (token: string, id: string): Promise<AdminOrderDetail> =>
+  apiRequest(`/admin/orders/${id}/requeue`, { method: 'POST', token });
+
+export const cancelAdminOrder = (
+  token: string,
+  id: string,
+  reason: string,
+): Promise<AdminOrderDetail> =>
+  apiRequest(`/admin/orders/${id}/cancel`, { method: 'POST', token, body: { reason } });
+
+export type SafetyAlertStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
+export type SafetyResolution = 'CONFIRMED' | 'FALSE_ALARM' | 'NO_CONTACT';
+
+export interface SafetyAlert {
+  id: string;
+  status: SafetyAlertStatus;
+  orderId: string;
+  orderShortId: string;
+  clientName: string | null;
+  clientPhone: string;
+  masterId: string | null;
+  masterName: string | null;
+  masterPhone: string | null;
+  masterIsActive: boolean | null;
+  clientNote: string | null;
+  resolution: SafetyResolution | null;
+  resolutionNote: string | null;
+  createdAt: string;
+  resolvedAt: string | null;
+  suggestsBlock: boolean;
+}
+
+export interface SafetyAlertsPage {
+  items: SafetyAlert[];
+  openCount: number;
+}
+
+export const fetchSafetyAlerts = (
+  token: string,
+  status?: SafetyAlertStatus,
+): Promise<SafetyAlertsPage> =>
+  apiRequest(`/admin/safety-alerts${queryString({ status })}`, { token });
+
+export const resolveSafetyAlert = (
+  token: string,
+  id: string,
+  resolution: SafetyResolution,
+  note: string,
+): Promise<SafetyAlert> =>
+  apiRequest(`/admin/safety-alerts/${id}/resolve`, {
+    method: 'POST',
+    token,
+    body: { resolution, note },
+  });
+
+export const setMasterBlocked = (
+  token: string,
+  masterId: string,
+  blocked: boolean,
+  reason: string,
+): Promise<{ id: string; fullName: string; isActive: boolean }> =>
+  apiRequest(`/admin/safety-alerts/masters/${masterId}/${blocked ? 'block' : 'unblock'}`, {
+    method: 'POST',
+    token,
+    body: { reason },
+  });
+
 /**
  * Platforma ishlaydigan hudud.
  *

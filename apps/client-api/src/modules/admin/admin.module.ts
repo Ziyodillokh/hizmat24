@@ -9,6 +9,14 @@ import { CatalogModule } from '../catalog/catalog.module';
 import { AdminAuthService } from './auth/admin-auth.service';
 import { AdminGuard } from './guards/admin.guard';
 import { AdminSettingsController } from './settings/admin-settings.controller';
+import {
+  AdminOrdersController,
+  AdminSafetyController,
+} from './operations/admin-operations.controller';
+import { AdminOrdersService } from './operations/admin-orders.service';
+import { AdminSafetyService } from './operations/admin-safety.service';
+import { MatchingModule } from '../matching/matching.module';
+import { OrdersInfrastructureModule } from '../orders/orders-infrastructure.module';
 import { AdminSettingsService } from './settings/admin-settings.service';
 
 /**
@@ -19,18 +27,22 @@ import { AdminSettingsService } from './settings/admin-settings.service';
  * `@AdminOnly()` ishlatadi va qorovul ularga ham kerak boʻladi.
  */
 @Module({
-  imports: [AuditModule, CatalogModule],
+  imports: [AuditModule, CatalogModule, MatchingModule, OrdersInfrastructureModule],
   controllers: [
     AdminAuthController,
     AdminProfileController,
     AdminCatalogController,
     AdminSettingsController,
+    AdminOrdersController,
+    AdminSafetyController,
   ],
   providers: [
     AdminAuthService,
     AdminCatalogService,
     MediaStorageService,
     AdminSettingsService,
+    AdminOrdersService,
+    AdminSafetyService,
     AdminGuard,
   ],
   exports: [AdminAuthService, AdminGuard],

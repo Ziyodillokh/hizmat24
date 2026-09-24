@@ -106,6 +106,18 @@ enum SafetyAlertStatus {
   RESOLVED
 }
 
+/// Operator signalni qanday yopgani.
+///
+/// «Yopildi» degan yagona holat yetarli emas: uch xil natija uch xil
+/// xulosa beradi — tasdiqlangan hodisa ustani bloklashga olib keladi,
+/// yolgʻon signal esa hech narsaga. Bogʻlana olmaslik ham alohida: ish
+/// tugamagan, keyinroq qaytib koʻriladi.
+enum SafetyResolution {
+  CONFIRMED
+  FALSE_ALARM
+  NO_CONTACT
+}
+
 enum AuditAction {
   ORDER_STATUS_CHANGED
   SAFETY_FLAG_RAISED
@@ -125,6 +137,11 @@ enum AuditAction {
   MASTER_ORDER_ACCEPTED
   MASTER_ORDER_DECLINED
   MASTER_SHIFT_CHANGED
+  ADMIN_ORDER_REQUEUED
+  ADMIN_ORDER_CANCELLED
+  SAFETY_ALERT_RESOLVED
+  MASTER_BLOCKED
+  MASTER_UNBLOCKED
   MASTER_APPLICATION_SUBMITTED
   MASTER_APPLICATION_APPROVED
   MASTER_APPLICATION_REJECTED
@@ -527,6 +544,13 @@ model SafetyAlert {
   masterId   String?           @map("master_id") @db.Uuid
   status     SafetyAlertStatus @default(OPEN)
   clientNote String?           @map("client_note") @db.VarChar(1000)
+  /// Operator qarori; `null` — hali yopilmagan.
+  resolution SafetyResolution?
+  /// Operator izohi — qaror sababi. Audit uchun ham shu matn yoziladi.
+  resolutionNote String?        @map("resolution_note") @db.VarChar(1000)
+  /// Qaror qabul qilgan admin. FK QOʻYILMAGAN: admin hisobi oʻchirilsa
+  /// ham «kim yopdi» degan javob yoʻqolmasligi kerak.
+  resolvedByAdminId String?     @map("resolved_by_admin_id") @db.Uuid
   createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   resolvedAt DateTime?         @map("resolved_at") @db.Timestamptz(3)
 
