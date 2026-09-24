@@ -5,6 +5,10 @@ coverage/
 .env
 .env.*
 !.env.example
+# Frontend manzillari bundle'ga baribir tushadi — sir emas, lekin
+# kuzatilmasa production qurilishi .env.local dagi localhost'ni oladi.
+!apps/admin-web/.env.production
+!apps/client-app/.env.production
 .DS_Store
 tsconfig.tsbuildinfo
 .idea/

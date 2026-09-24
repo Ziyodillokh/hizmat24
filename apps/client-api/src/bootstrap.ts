@@ -4,6 +4,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import { MAX_VIDEO_BYTES } from './modules/admin/catalog/domain/media-rules';
+import { buildCorsOptions } from './common/http/cors-options';
 import type { AppEnv } from './infra/config/env.validation';
 
 /**
@@ -23,23 +24,15 @@ export async function configureApp(app: NestFastifyApplication): Promise<void> {
    */
   await app.register(multipart, { limits: { fileSize: MAX_VIDEO_BYTES, files: 1 } });
 
-  // Har qanday Origin'ni credentials bilan qaytarish — klassik CORS xatosi.
-  // Ruxsat faqat aniq roʻyxatdagi manzillarga beriladi; mobil ilova uchun
-  // ro'yxat bo'sh qoladi va CORS umuman yoqilmaydi.
   const config = app.get(ConfigService<AppEnv, true>);
 
-  // Admin paneli brauzerdan ishlaydi, shuning uchun uning manzili ham shu
-  // roʻyxatga tushadi — alohida ADMIN_WEB_ORIGIN dan, chunki mobil ilova
-  // uchun CORS_ORIGINS boʻsh qoladi va panel bu yerda unutilib ketardi.
-  const allowedOrigins = [
-    ...config.get('CORS_ORIGINS', { infer: true }).split(','),
+  const corsOptions = buildCorsOptions(
+    config.get('CORS_ORIGINS', { infer: true }),
     config.get('ADMIN_WEB_ORIGIN', { infer: true }),
-  ]
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  );
 
-  if (allowedOrigins.length > 0) {
-    app.enableCors({ origin: allowedOrigins, credentials: true });
+  if (corsOptions) {
+    app.enableCors(corsOptions);
   }
 
   app.enableShutdownHooks();
