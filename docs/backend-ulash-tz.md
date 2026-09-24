@@ -222,7 +222,29 @@ rejimi ochiladi; profil boshqa qurilmada ham koʻrinadi.
 
 ---
 
-### B5 — Usta ishlaydi: takliflar va amallar
+### B5 — Usta ishlaydi: takliflar va amallar — ✅ BAJARILDI
+
+> Bajarildi (2026-09-24). TZ dan ATAYLAB chekinish bor: `GET /master/offers`
+> + `accept` (pull) oʻrniga serverda allaqachon ishlayotgan push+ack
+> modeli ochildi. Qidiruv ustani oʻzi tanlaydi va javob kutish taymeri
+> qoʻyadi; yangi endpointlar oʻsha modelning ustaga koʻrinadigan
+> tomoni: `GET /master/orders`, `accept` (= ack), `decline`, `depart`,
+> `arrive`, `finish`, `cancel`, `GET/PUT /master/shift`.
+>
+> Qoʻshimcha: smena serverga koʻchdi (`masters.status` ni boshqaradi),
+> rad etish `order_master_declines` da yozuv boʻlib qoladi (aks holda
+> rejalashtiruvchi ishni oʻsha ustaga qaytarardi), WS ustaga ham
+> yuboriladi.
+>
+> Qabul sinovi bajarildi: ikki brauzer konteksti, bitta buyurtma —
+> taklif (WS orqali, qayta yuklamasdan) → qabul → yoʻlga chiqish →
+> yetib kelish → mijoz tasdigʻi → yakunlash. Baza: COMPLETED_BY_MASTER,
+> ish izohi joyida, usta AVAILABLE.
+>
+> Qoldi: push bildirishnoma (FCM oʻchirilgan) va ikki QURILMADAGI
+> sinov — hozir ikkala tomon bitta mashinadagi ikki brauzerda edi.
+
+#### Dastlabki reja
 
 **Maqsad:** ikki telefon bir-birini koʻradi. Mijoz buyurtma beradi — usta qabul qiladi.
 
