@@ -195,7 +195,24 @@ usta rejimiga kiradi; rad etilganda ilovada sabab koʻrinadi. Har ikki amal audi
 
 ---
 
-### A3 — Buyurtmalar monitoringi va eskalatsiya
+### A3 — Buyurtmalar monitoringi va eskalatsiya — ✅ BAJARILDI
+
+> Bajarildi (2026-09-24). Eskalatsiya USTUN EMAS, hisoblanadigan holat:
+> «qidiruv davom etyapti va urinishlar tugagan». Ustun qoʻshilsa u
+> haqiqat bilan ajralib qolishi mumkin edi.
+>
+> Qaysi amal mumkinligini server aytadi (`canRequeue`, `canCancel` va
+> sabab) — panel qoidani takrorlamaydi.
+>
+> TZ dan chekinish: virtualizatsiya va kursorli sahifalash yozilmadi
+> (hozircha `limit`/`offset`), xarita nuqtasi K1 gacha yoʻq. Jonli
+> yangilanish WS emas, 5 soniyalik takroriy soʻrov.
+>
+> Qabul sinovi: eskalatsiya navbati → qayta qidiruv (urinishlar nolga
+> tushdi, usta darhol tayinlandi) → operator bekor qilishi (sabab mijoz
+> kartochkasida koʻrindi). Audit izi joyida.
+
+#### Dastlabki reja
 
 **Maqsad:** operator butun oqimni koʻradi va tiqilib qolganini qoʻl bilan hal qiladi.
 
@@ -216,7 +233,22 @@ oʻzgaradi va sabab koʻrinadi.
 
 ---
 
-### A4 — Xavfsizlik signallari
+### A4 — Xavfsizlik signallari — ✅ BAJARILDI
+
+> Bajarildi (2026-09-24). Uch xil xulosa (CONFIRMED / FALSE_ALARM /
+> NO_CONTACT) va majburiy izoh; usta bloklash va blokdan chiqarish shu
+> yerdan. Buyurtma holati OʻZGARTIRILMAYDI va bloklash AVTOMATIK emas.
+>
+> TZ dan chekinish: admin WS (`/ws/admin`) va ovozli bildirishnoma
+> yozilmadi — panelda alohida WS kanali yoʻq va uni faqat hisoblagich
+> uchun qurish ortiqcha edi. Signallar 3 soniyalik takroriy soʻrov
+> bilan yangilanadi (qabul sharti «3 soniyada» bajariladi).
+>
+> Qabul sinovi: ilovada «Bu men chaqirgan usta emas» → signal panelda →
+> xulosa bilan yopildi → usta bloklandi → bloklangan usta
+> `/master/orders` dan aniq sabab bilan qaytarildi.
+
+#### Dastlabki reja
 
 **Maqsad:** «Bu men chaqirgan usta emas» signali panelga darhol tushadi.
 
