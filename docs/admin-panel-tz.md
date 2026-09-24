@@ -264,7 +264,26 @@ qaror audit logda va buyurtma `SAFETY_FLAGGED` holatida qoladi (oʻzgartirilmayd
 
 ---
 
-### A5 — Foydalanuvchilar va ustalar
+### A5 — Foydalanuvchilar va ustalar — ✅ BAJARILDI
+
+> Bajarildi (2026-09-24). PII qoidasi bajarildi: roʻyxatda raqam
+> maskalangan, toʻliq koʻrish alohida amal va `PII_VIEWED` yozuvi
+> qoldiradi.
+>
+> Bekor qilish ulushi usta TEGGAN ishlardan hisoblanadi; ishi yoʻq
+> ustada `null` (nol foiz yolgʻon boʻlardi).
+>
+> TZ dan chekinish: `GET /admin/masters/:id` alohida kartochkasi va
+> `PATCH /admin/masters/:id/categories` yozilmadi — usta xizmatlarini
+> oʻzi boshqaradi (P2) va admin tomondan oʻzgartirish hozircha kerak
+> emas. Reyting TARIXI ham yoʻq: `ratings` jadvalida vaqt boʻyicha
+> kesim saqlanmaydi.
+>
+> Qabul sinovi: maskalangan roʻyxat → toʻliq raqam ochildi va auditga
+> tushdi → bloklash → ikkinchi marta bloklab boʻlmadi → blokdan
+> chiqarish.
+
+#### Dastlabki reja
 
 **Maqsad:** qoʻllab-quvvatlash ishi: kim, nima qilgan, kimni bloklash kerak.
 
@@ -300,7 +319,22 @@ allaqachon berilgan buyurtmaning narxi oʻzgarmaydi (u muzlatilgan).
 
 ---
 
-### A7 — Hisobotlar va audit koʻrinishi
+### A7 — Hisobotlar va audit koʻrinishi — ✅ BAJARILDI
+
+> Bajarildi (2026-09-24). Raqamlar keshsiz SQL agregatsiyasi; audit
+> filtr bilan va CSV eksport (`@RawResponse()` — konvertdan chetlab
+> oʻtadi, aks holda Fastify obyektni yubora olmasdi).
+>
+> Maʼlumot boʻlmagan davrda «Bu davrda maʼlumot yoʻq» yoziladi;
+> oʻrtacha tayinlash vaqti `null` boʻlishi mumkin.
+>
+> TZ dan chekinish: grafik chizilmadi — raqamli roʻyxat qoʻyildi.
+> Grafik kutubxonasi qoʻshish hozirgi hajmda ortiqcha.
+>
+> Qabul sinovi: hisobot raqami psql bilan bir xil (17 = 17); CSV
+> `text/csv` sarlavhasi bilan keldi, ichki qoʻshtirnoqlar ikkilangan.
+
+#### Dastlabki reja
 
 **Maqsad:** «bugun nima boʻldi» degan savolga bir ekranda javob.
 
