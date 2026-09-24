@@ -54,7 +54,7 @@ const SECTIONS: readonly SectionMeta[] = [
     key: 'users',
     title: 'Foydalanuvchilar',
     path: '/users',
-    stage: 'A5',
+    stage: null,
     summary: 'Mijozlar va ustalar roʻyxati',
   },
   {
@@ -68,7 +68,7 @@ const SECTIONS: readonly SectionMeta[] = [
     key: 'reports',
     title: 'Hisobotlar',
     path: '/reports',
-    stage: 'A7',
+    stage: null,
     summary: 'Statistika va audit yozuvlari',
   },
   {

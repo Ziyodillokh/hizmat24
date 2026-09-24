@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import type { OrderStatus } from '@/api/admin';
 import {
   ACTOR_LABELS,
+  assignSecondsLabel,
+  auditActionLabel,
+  AUDIT_ACTION_FILTERS,
+  AUDIT_ACTION_LABELS,
+  MASTER_STATUS_LABELS,
+  percentLabel,
+  USER_STATUS_LABELS,
   ALERT_STATUS_LABELS,
   NOTE_MAX,
   NOTE_MIN,
@@ -134,6 +141,63 @@ describe('paymentLabel', () => {
   });
 });
 
+describe('assignSecondsLabel', () => {
+  /*
+   * `null` — bu davrda tayinlangan buyurtma yoʻq. «0 s» deb yozish
+   * «bir zumda tayinlandi» degan yolgʻon boʻlardi.
+   */
+  it('maʼlumot yoʻqligi ochiq aytiladi', () => {
+    expect(assignSecondsLabel(null)).toBe('maʼlumot yoʻq');
+  });
+
+  it('bir daqiqagacha soniyada', () => {
+    expect(assignSecondsLabel(12)).toBe('12 soniya');
+  });
+
+  it('daqiqa va soniya birga', () => {
+    expect(assignSecondsLabel(90)).toBe('1 daq 30 s');
+    expect(assignSecondsLabel(120)).toBe('2 daqiqa');
+  });
+});
+
+describe('percentLabel', () => {
+  it('hisoblab boʻlmaydigan foiz chiziq bilan', () => {
+    expect(percentLabel(null)).toBe('—');
+  });
+
+  it('foiz belgisi bilan', () => {
+    expect(percentLabel(10)).toBe('10%');
+  });
+});
+
+describe('auditActionLabel', () => {
+  it('tanish amal odam tilida', () => {
+    expect(auditActionLabel('PII_VIEWED')).toBe('Telefon raqami ochildi');
+  });
+
+  /*
+   * Serverda yangi amal paydo boʻlsa u xom nomi bilan koʻrinadi —
+   * «nomaʼlum» deb yashirishdan yaxshi: operator hech boʻlmasa nima
+   * boʻlganini taxmin qila oladi.
+   */
+  it('notanish amal yashirilmaydi', () => {
+    expect(auditActionLabel('YANGI_AMAL')).toBe('YANGI_AMAL');
+  });
+
+  it('filtrdagi har bir amalning nomi bor', () => {
+    for (const key of AUDIT_ACTION_FILTERS) {
+      expect(AUDIT_ACTION_LABELS[key]).toBeTruthy();
+    }
+  });
+});
+
+describe('holat yorliqlari', () => {
+  it('foydalanuvchi va usta holatlari nomlangan', () => {
+    expect(USER_STATUS_LABELS.BLOCKED).toBe('Bloklangan');
+    expect(MASTER_STATUS_LABELS.OFFLINE).toBe('Smena yopiq');
+  });
+});
+
 describe('matn qoidalari', () => {
   it('ASCII apostrof yoʻq', () => {
     const texts = [
@@ -144,6 +208,10 @@ describe('matn qoidalari', () => {
       ...ORDER_FILTERS.map((item) => item.label),
       reasonProblem('') ?? '',
       reasonProblem('qisqa') ?? '',
+      ...Object.values(AUDIT_ACTION_LABELS),
+      ...Object.values(USER_STATUS_LABELS),
+      ...Object.values(MASTER_STATUS_LABELS),
+      assignSecondsLabel(null),
     ];
     for (const text of texts) expect(ASCII_APOSTROPHE.test(text)).toBe(false);
   });

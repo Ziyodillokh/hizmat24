@@ -71,10 +71,3 @@ export class ResolveAlertDto {
   @Length(10, 1000, { message: 'Xulosani kamida 10 belgi bilan yozing' })
   note!: string;
 }
-
-export class SetMasterActiveDto {
-  @ApiProperty({ example: 'Xavfsizlik signali tasdiqlandi' })
-  @IsString()
-  @Length(10, 500, { message: 'Sababni kamida 10 belgi bilan yozing' })
-  reason!: string;
-}

@@ -10,6 +10,8 @@ import { SettingsScreen } from '@/screens/SettingsScreen';
 import { OrdersScreen } from '@/screens/OrdersScreen';
 import { OrderDetailScreen } from '@/screens/OrderDetailScreen';
 import { SafetyScreen } from '@/screens/SafetyScreen';
+import { UsersScreen } from '@/screens/UsersScreen';
+import { ReportsScreen } from '@/screens/ReportsScreen';
 import { PendingScreen } from '@/screens/PendingScreen';
 import { useAuth } from './AuthProvider';
 import { Shell } from './Shell';
@@ -21,6 +23,8 @@ const SCREENS: Record<string, JSX.Element> = {
   catalog: <CatalogScreen />,
   orders: <OrdersScreen />,
   safety: <SafetyScreen />,
+  users: <UsersScreen />,
+  reports: <ReportsScreen />,
   settings: <SettingsScreen />,
 };
 

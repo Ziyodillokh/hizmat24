@@ -14,6 +14,12 @@ import {
   AdminSafetyController,
 } from './operations/admin-operations.controller';
 import { AdminOrdersService } from './operations/admin-orders.service';
+import {
+  AdminPeopleController,
+  AdminReportsController,
+} from './people/admin-people.controller';
+import { AdminPeopleService } from './people/admin-people.service';
+import { AdminReportsService } from './reports/admin-reports.service';
 import { AdminSafetyService } from './operations/admin-safety.service';
 import { MatchingModule } from '../matching/matching.module';
 import { OrdersInfrastructureModule } from '../orders/orders-infrastructure.module';
@@ -35,6 +41,8 @@ import { AdminSettingsService } from './settings/admin-settings.service';
     AdminSettingsController,
     AdminOrdersController,
     AdminSafetyController,
+    AdminPeopleController,
+    AdminReportsController,
   ],
   providers: [
     AdminAuthService,
@@ -43,6 +51,8 @@ import { AdminSettingsService } from './settings/admin-settings.service';
     AdminSettingsService,
     AdminOrdersService,
     AdminSafetyService,
+    AdminPeopleService,
+    AdminReportsService,
     AdminGuard,
   ],
   exports: [AdminAuthService, AdminGuard],

@@ -140,3 +140,89 @@ const PAYMENT_LABELS: Record<string, string> = {
   CARD: 'Karta',
   ESCROW: 'Kafolatli toʻlov',
 };
+
+// ──────────────────────────────── foydalanuvchilar va audit (A5, A7) ──
+
+export const USER_STATUS_LABELS: Record<string, string> = {
+  ACTIVE: 'Faol',
+  BLOCKED: 'Bloklangan',
+};
+
+export const MASTER_STATUS_LABELS: Record<string, string> = {
+  AVAILABLE: 'Boʻsh',
+  BUSY: 'Ishda',
+  OFFLINE: 'Smena yopiq',
+};
+
+/**
+ * Audit amallarining odam tilidagi nomi.
+ *
+ * Roʻyxat toʻliq boʻlmasligi mumkin — serverda yangi amal paydo
+ * boʻlsa, u xom nomi bilan koʻrinadi. Bu «nomaʼlum» deb yashirishdan
+ * yaxshi: operator hech boʻlmasa nima boʻlganini taxmin qila oladi.
+ */
+export const AUDIT_ACTION_LABELS: Record<string, string> = {
+  ORDER_STATUS_CHANGED: 'Buyurtma holati oʻzgardi',
+  SAFETY_FLAG_RAISED: 'Xavfsizlik signali',
+  MASTER_ASSIGNED: 'Usta tayinlandi',
+  MASTER_ACK_TIMEOUT: 'Usta javob bermadi',
+  MATCHING_ESCALATED: 'Usta topilmadi',
+  ORDER_CANCELLED: 'Buyurtma bekor qilindi',
+  ADMIN_LOGIN_SUCCEEDED: 'Panelga kirish',
+  ADMIN_LOGIN_FAILED: 'Kirish urinishi rad etildi',
+  ADMIN_LOCKED: 'Hisob qulflandi',
+  ADMIN_LOGGED_OUT: 'Paneldan chiqish',
+  CATALOG_CATEGORY_CREATED: 'Xizmat qoʻshildi',
+  CATALOG_CATEGORY_UPDATED: 'Xizmat tahrirlandi',
+  CATALOG_PRICE_CHANGED: 'Narx oʻzgardi',
+  MASTER_SERVICES_CHANGED: 'Usta xizmatlarini oʻzgartirdi',
+  MASTER_APPLICATION_SUBMITTED: 'Ariza yuborildi',
+  MASTER_APPLICATION_APPROVED: 'Ariza tasdiqlandi',
+  MASTER_APPLICATION_REJECTED: 'Ariza rad etildi',
+  SERVICE_AREA_UPDATED: 'Xizmat hududi oʻzgardi',
+  MASTER_ORDER_ACCEPTED: 'Usta ishni qabul qildi',
+  MASTER_ORDER_DECLINED: 'Usta ishni rad etdi',
+  MASTER_SHIFT_CHANGED: 'Usta smenasi oʻzgardi',
+  ADMIN_ORDER_REQUEUED: 'Qayta qidiruvga qoʻyildi',
+  ADMIN_ORDER_CANCELLED: 'Operator bekor qildi',
+  SAFETY_ALERT_RESOLVED: 'Xavfsizlik signali yopildi',
+  MASTER_BLOCKED: 'Usta bloklandi',
+  MASTER_UNBLOCKED: 'Usta blokdan chiqarildi',
+  USER_BLOCKED: 'Foydalanuvchi bloklandi',
+  USER_UNBLOCKED: 'Foydalanuvchi blokdan chiqarildi',
+  PII_VIEWED: 'Telefon raqami ochildi',
+};
+
+export const auditActionLabel = (action: string): string =>
+  AUDIT_ACTION_LABELS[action] ?? action;
+
+/** Audit filtridagi amallar — eng koʻp qidiriladiganlari. */
+export const AUDIT_ACTION_FILTERS: readonly string[] = [
+  'PII_VIEWED',
+  'USER_BLOCKED',
+  'MASTER_BLOCKED',
+  'ADMIN_ORDER_CANCELLED',
+  'ADMIN_ORDER_REQUEUED',
+  'SAFETY_ALERT_RESOLVED',
+  'CATALOG_PRICE_CHANGED',
+  'SERVICE_AREA_UPDATED',
+];
+
+/**
+ * Oʻrtacha tayinlash vaqti — odam oʻqiydigan shaklda.
+ *
+ * `null` — bu davrda tayinlangan buyurtma yoʻq. «0 s» deb yozish
+ * «bir zumda tayinlandi» degan yolgʻon boʻlardi.
+ */
+export function assignSecondsLabel(seconds: number | null): string {
+  if (seconds === null) return 'maʼlumot yoʻq';
+  if (seconds < 60) return `${seconds} soniya`;
+
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return rest === 0 ? `${minutes} daqiqa` : `${minutes} daq ${rest} s`;
+}
+
+/** Foiz koʻrsatkichi; `null` — hisoblab boʻlmaydi. */
+export const percentLabel = (value: number | null): string =>
+  value === null ? '—' : `${value}%`;

@@ -398,17 +398,147 @@ export const resolveSafetyAlert = (
     body: { resolution, note },
   });
 
+// ───────────────────────────── foydalanuvchilar va hisobotlar (A5, A7) ──
+
+export interface AdminUserRow {
+  id: string;
+  fullName: string | null;
+  /** Roʻyxatda DOIM maskalangan — toʻliq raqam alohida amal bilan ochiladi. */
+  phoneMasked: string;
+  status: 'ACTIVE' | 'BLOCKED';
+  ordersCount: number;
+  isMaster: boolean;
+  createdAt: string;
+}
+
+export interface AdminUserOrderRow {
+  id: string;
+  shortId: string;
+  status: OrderStatus;
+  price: number;
+  createdAt: string;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  orders: AdminUserOrderRow[];
+}
+
+export interface AdminMasterRow {
+  id: string;
+  fullName: string;
+  phoneMasked: string;
+  isActive: boolean;
+  status: 'AVAILABLE' | 'BUSY' | 'OFFLINE';
+  ratingAvg: number;
+  ratingCount: number;
+  completedOrdersCount: number;
+  cancelledByMasterCount: number;
+  /** `null` — usta hali ishlamagan; nol foiz yolgʻon boʻlardi. */
+  cancelRatePercent: number | null;
+  enabledCategories: number;
+  isOnShift: boolean;
+}
+
+export const fetchAdminUsers = (token: string, search?: string): Promise<AdminUserRow[]> =>
+  apiRequest(`/admin/users${queryString({ search })}`, { token });
+
+export const fetchAdminUser = (token: string, id: string): Promise<AdminUserDetail> =>
+  apiRequest(`/admin/users/${id}`, { token });
+
+export const fetchAdminMasters = (token: string, search?: string): Promise<AdminMasterRow[]> =>
+  apiRequest(`/admin/masters${queryString({ search })}`, { token });
+
+/** Toʻliq raqamni ochish — har chaqiruv auditga yoziladi. */
+export const revealPhone = (
+  token: string,
+  kind: 'users' | 'masters',
+  id: string,
+): Promise<{ phoneNumber: string }> =>
+  apiRequest(`/admin/${kind}/${id}/reveal-phone`, { method: 'POST', token });
+
+export const setUserBlocked = (
+  token: string,
+  id: string,
+  blocked: boolean,
+  reason: string,
+): Promise<AdminUserRow> =>
+  apiRequest(`/admin/users/${id}/${blocked ? 'block' : 'unblock'}`, {
+    method: 'POST',
+    token,
+    body: { reason },
+  });
+
 export const setMasterBlocked = (
   token: string,
   masterId: string,
   blocked: boolean,
   reason: string,
 ): Promise<{ id: string; fullName: string; isActive: boolean }> =>
-  apiRequest(`/admin/safety-alerts/masters/${masterId}/${blocked ? 'block' : 'unblock'}`, {
+  apiRequest(`/admin/masters/${masterId}/${blocked ? 'block' : 'unblock'}`, {
     method: 'POST',
     token,
     body: { reason },
   });
+
+export interface AdminStats {
+  from: string;
+  to: string;
+  ordersTotal: number;
+  byStatus: { status: OrderStatus; count: number }[];
+  byCategory: { name: string; count: number }[];
+  cancelReasons: { name: string; count: number }[];
+  /** `null` — bu davrda tayinlangan buyurtma yoʻq. */
+  avgAssignSeconds: number | null;
+  mastersActive: number;
+  mastersOnShift: number;
+  openProblems: {
+    escalatedOrders: number;
+    openSafetyAlerts: number;
+    pendingApplications: number;
+  };
+}
+
+export interface AuditRow {
+  id: string;
+  action: string;
+  actorType: 'CLIENT' | 'MASTER' | 'ADMIN' | 'SYSTEM';
+  actorId: string | null;
+  orderId: string | null;
+  metadata: unknown;
+  createdAt: string;
+}
+
+export const fetchAdminStats = (token: string, from?: string, to?: string): Promise<AdminStats> =>
+  apiRequest(`/admin/stats${queryString({ from, to })}`, { token });
+
+export interface AuditFilters extends Record<string, string | number | undefined> {
+  action?: string;
+  actorType?: string;
+  limit?: number;
+}
+
+/**
+ * Audit CSV — matn sifatida.
+ *
+ * Oddiy `<a href>` ishlamaydi: soʻrovga `Authorization` sarlavhasi
+ * kerak, uni esa havolaga qoʻyib boʻlmaydi. Tokenni URL ga yozish
+ * mumkin edi, lekin u brauzer tarixida va serverning kirish
+ * jurnalida qolib ketardi.
+ */
+export async function fetchAuditCsv(token: string, filters: AuditFilters = {}): Promise<string> {
+  const response = await fetch(`${resolveBaseUrl() ?? ''}/api/v1/admin/audit.csv${queryString(filters)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) throw new ApiError('server', 'CSV yuklab boʻlmadi', response.status);
+  return response.text();
+}
+
+export const fetchAudit = (
+  token: string,
+  filters: AuditFilters = {},
+): Promise<{ items: AuditRow[]; total: number }> =>
+  apiRequest(`/admin/audit${queryString(filters)}`, { token });
 
 /**
  * Platforma ishlaydigan hudud.

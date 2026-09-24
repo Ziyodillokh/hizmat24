@@ -16,7 +16,6 @@ import {
   ListAlertsQueryDto,
   ListOrdersQueryDto,
   ResolveAlertDto,
-  SetMasterActiveDto,
 } from './dto/operations.dto';
 
 /**
@@ -81,7 +80,11 @@ export class AdminOrdersController {
  *
  * Buyurtma holati bu yerdan OʻZGARTIRILMAYDI: `SAFETY_FLAGGED` terminal
  * holat va hodisa tarixda oʻz holicha qolishi kerak. Operator faqat
- * xulosa yozadi va kerak boʻlsa ustani bloklaydi.
+ * xulosa yozadi.
+ *
+ * Ustani bloklash bu yerda EMAS — u `/admin/masters/:id/block` da
+ * (A5). Ikkita endpoint bir xil ishni qilsa, ular bir kun kelib
+ * ajralib ketardi.
  */
 @ApiTags('admin-safety')
 @ApiBearerAuth()
@@ -108,27 +111,4 @@ export class AdminSafetyController {
     return this.safety.resolve(alertId, dto.resolution, dto.note, admin, requestContextOf(request));
   }
 
-  @Post('masters/:masterId/block')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Ustani bloklash — yangi taklif olmaydi' })
-  block(
-    @Param('masterId', new ParseUUIDPipe({ version: '4' })) masterId: string,
-    @Body() dto: SetMasterActiveDto,
-    @CurrentAdmin() admin: AdminIdentity,
-    @Req() request: FastifyRequest,
-  ) {
-    return this.safety.setMasterActive(masterId, false, dto.reason, admin, requestContextOf(request));
-  }
-
-  @Post('masters/:masterId/unblock')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Blokdan chiqarish' })
-  unblock(
-    @Param('masterId', new ParseUUIDPipe({ version: '4' })) masterId: string,
-    @Body() dto: SetMasterActiveDto,
-    @CurrentAdmin() admin: AdminIdentity,
-    @Req() request: FastifyRequest,
-  ) {
-    return this.safety.setMasterActive(masterId, true, dto.reason, admin, requestContextOf(request));
-  }
 }

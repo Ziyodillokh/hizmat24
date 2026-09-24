@@ -45,7 +45,9 @@ describe('panel boʻlimlari', () => {
       'applications',
       'orders',
       'safety',
+      'users',
       'catalog',
+      'reports',
       'settings',
     ]);
   });
