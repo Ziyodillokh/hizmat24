@@ -1,4 +1,4 @@
-import { allowedOrigins, buildCorsOptions, CORS_METHODS } from './cors-options';
+import { allowedOrigins, buildCorsOptions, CORS_METHODS, WEBVIEW_ORIGINS } from './cors-options';
 
 describe('allowedOrigins', () => {
   it('vergulli roʻyxat va admin manzilini birlashtiradi', () => {
@@ -10,6 +10,7 @@ describe('allowedOrigins', () => {
 
     // Assert
     expect(result).toEqual([
+      'https://localhost',
       'https://hizmat24.uz',
       'https://www.hizmat24.uz',
       'https://admin.hizmat24.uz',
@@ -17,14 +18,38 @@ describe('allowedOrigins', () => {
   });
 
   it("bo'sh qiymatlar tashlab yuboriladi", () => {
-    expect(allowedOrigins(',, ,', '')).toEqual([]);
-    expect(allowedOrigins('', 'https://admin.hizmat24.uz')).toEqual(['https://admin.hizmat24.uz']);
+    expect(allowedOrigins(',, ,', '')).toEqual([...WEBVIEW_ORIGINS]);
+    expect(allowedOrigins('', 'https://admin.hizmat24.uz')).toEqual([
+      'https://localhost',
+      'https://admin.hizmat24.uz',
+    ]);
+  });
+
+  /*
+   * Android ilovasi WebView'dan `https://localhost` bilan keladi. Bu
+   * manzil roʻyxatdan tushib qolsa ilova serverga UMUMAN ulana olmaydi —
+   * production'da aynan shunday boʻlgan edi.
+   */
+  it('ilovaning WebView manzili har doim roʻyxatda boʻladi', () => {
+    expect(allowedOrigins('', '')).toContain('https://localhost');
+    expect(allowedOrigins('https://hizmat24.uz', 'https://admin.hizmat24.uz')).toContain(
+      'https://localhost',
+    );
+  });
+
+  it('bir manzil ikki marta yozilsa takrorlanmaydi', () => {
+    const result = allowedOrigins('https://localhost, https://hizmat24.uz', 'https://hizmat24.uz');
+
+    expect(result).toEqual(['https://localhost', 'https://hizmat24.uz']);
   });
 });
 
 describe('buildCorsOptions', () => {
-  it("ro'yxat bo'sh bo'lsa CORS yoqilmaydi", () => {
-    expect(buildCorsOptions('', '')).toBeNull();
+  it('sozlama boʻsh boʻlsa ham ilova uchun CORS yoqiladi', () => {
+    const options = buildCorsOptions('', '');
+
+    expect(options).not.toBeNull();
+    expect(options?.origin).toEqual([...WEBVIEW_ORIGINS]);
   });
 
   /*

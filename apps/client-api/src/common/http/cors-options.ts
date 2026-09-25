@@ -9,15 +9,37 @@
 export const CORS_METHODS = ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'] as const;
 
 /**
+ * Android ilovasining Origin'i.
+ *
+ * Capacitor sahifani WebView ichida `https://localhost` dan ochadi
+ * (`capacitor.config.ts` da `server` bloki yoʻq, demak sukut qiymatlar:
+ * androidScheme `https`, hostname `localhost`). Ya'ni ilovadan API ga
+ * har bir soʻrov CROSS-ORIGIN boʻladi va brauzerdagi kabi CORS talab
+ * qiladi — «mobil ilova brauzer emas, unga CORS kerak emas» degan
+ * taxmin NOTOʻGʻRI edi va ilova serverga umuman ulana olmasdi.
+ *
+ * Roʻyxat kodda turadi, server `.env` ida emas: `.env` repoda
+ * koʻrinmaydi, shuning uchun ilovaning ulana olishi qayta joylashda
+ * jimgina yoʻqolib ketardi.
+ */
+export const WEBVIEW_ORIGINS = ['https://localhost'] as const;
+
+/**
  * Ruxsat etilgan Origin'lar roʻyxatini yigʻadi.
  *
- * Admin paneli alohida manzilda (admin.hizmat24.uz) turadi va API bilan
- * cross-origin gaplashadi, shuning uchun uning manzili ham shu yerga
- * qoʻshiladi — mobil ilova uchun `CORS_ORIGINS` boʻsh qoladi va panel
- * aks holda bu roʻyxatda unutilib ketardi.
+ * Admin paneli alohida manzilda (admin.hizmat24.uz) turadi, shuning uchun
+ * uning manzili alohida `ADMIN_WEB_ORIGIN` dan qoʻshiladi — aks holda u
+ * `CORS_ORIGINS` da unutilib ketardi.
+ *
+ * Takrorlar olib tashlanadi: bir manzil ikki sozlamada ham yozilgan
+ * boʻlishi mumkin.
  */
 export function allowedOrigins(corsOrigins: string, adminWebOrigin: string): string[] {
-  return [...corsOrigins.split(','), adminWebOrigin].map((origin) => origin.trim()).filter(Boolean);
+  const configured = [...corsOrigins.split(','), adminWebOrigin]
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  return [...new Set([...WEBVIEW_ORIGINS, ...configured])];
 }
 
 /**
@@ -32,8 +54,10 @@ export interface AppCorsOptions {
 }
 
 /**
- * CORS sozlamalari. Roʻyxat boʻsh boʻlsa `null` — CORS umuman yoqilmaydi
- * (mobil ilova brauzer emas, unga kerak emas).
+ * CORS sozlamalari.
+ *
+ * Roʻyxat hech qachon boʻsh boʻlmaydi — ichida kamida ilovaning WebView
+ * Origin'i turadi. `null` faqat nazariy holat uchun qoldirilgan.
  *
  * Har qanday Origin'ni `credentials` bilan qaytarish klassik CORS xatosi,
  * shuning uchun `*` hech qachon ishlatilmaydi.
