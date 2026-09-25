@@ -17,6 +17,8 @@ import {
 } from '@/lib/servicePresentation';
 import type { ServiceCategory } from '@/mocks/types';
 import { useCatalog } from '../catalog-store';
+import { useServicePage } from '../useServicePage';
+import { ServicePageBlocks } from './ServicePageBlocks';
 import { useSelectService } from '../useSelectService';
 
 /**
@@ -35,6 +37,10 @@ export function ServiceDetailScreen() {
   const select = useSelectService();
 
   const category = findCategory(categoryId ?? null);
+  // Hook shartli chaqirilmasligi kerak, shuning uchun `categoryId` bilan
+  // — xizmat topilmasa ham chaqiriladi va soʻrov yuborilmaydi.
+  const { page, isFailed, retry } = useServicePage(category ? category.id : null);
+
   if (!category) return <Navigate to="/app/services" replace />;
 
   const duration = durationLabel(category.durationMinutes);
@@ -91,6 +97,21 @@ export function ServiceDetailScreen() {
         items={category.excludes ?? []}
         icon={<XCircle size={18} weight="fill" className="mt-2 shrink-0 text-text-disabled" aria-hidden />}
       />
+
+      {page && <ServicePageBlocks page={page} />}
+
+      {/*
+        Xato JIMGINA yutilmaydi: bloklar koʻrinmay qolsa, foydalanuvchi
+        xizmatda ular umuman yoʻq deb oʻylardi.
+      */}
+      {isFailed && (
+        <p className="mt-24 px-4 text-body-sm text-text-secondary">
+          Qoʻshimcha maʼlumotni yuklab boʻlmadi.{' '}
+          <button type="button" onClick={retry} className="text-primary underline">
+            Qayta urinish
+          </button>
+        </p>
+      )}
 
       <p className="mt-24 px-4 text-caption text-text-secondary">
         Yakuniy summa ish hajmiga qarab oʻzgarishi mumkin — usta joyida aytadi.
