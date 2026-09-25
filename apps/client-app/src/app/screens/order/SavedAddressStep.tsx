@@ -54,7 +54,7 @@ export function SavedAddressStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={1} />
+      <StepDots currentStep={0} />
       <ServiceSummaryCard service={category} basePrice={category.basePrice} className="mt-16" />
 
       <StepSection title="Qayerga kelsin?" hint="Faqat shu qurilmada saqlanadi. Oxirgi ishlatilgani yuqorida turadi">

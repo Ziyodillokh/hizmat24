@@ -51,9 +51,11 @@ export function buildNewOrder(
     categoryId: category.id,
     categoryName: category.name,
     categoryIconKey: category.iconKey,
-    description: draft.description,
+    // Mock rejimida ham tavsif boʻsh: uni soʻraydigan qadam yoʻq.
+    description: '',
     invoice: buildInvoice({
       base: category.basePrice,
+      quantity: draft.quantity,
       isUrgent: draft.isUrgent,
       discountPercent,
     }),
@@ -88,7 +90,7 @@ export function buildNewOrder(
  */
 export const DEMO_DRAFT: OrderDraft = {
   categoryId: 'c-tap',
-  description: 'Sinov buyurtmasi — usta rejimini tekshirish uchun berildi.',
+  quantity: 1,
   isUrgent: false,
   address: { label: 'Demo manzil' },
   preferredMasterId: null,

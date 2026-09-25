@@ -3,7 +3,7 @@ import { EMPTY_DRAFT } from '@/app/types';
 import { buildInvoice } from './pricing';
 import type { SavedAddress } from './savedAddress';
 import {
-  descriptionHint, firstMissingStep, invoiceRows, ORDER_STEP_ROUTES,
+  firstMissingStep, invoiceRows, ORDER_STEP_ROUTES,
   preselectedAddressId, resolveNextRoute, saveOfferHint,
 } from './orderFlow';
 
@@ -11,17 +11,7 @@ const saved = (id: string, label: string, name = ''): SavedAddress => ({
   id, kind: 'home', name, address: { label }, createdAt: new Date(2026, 0, 1), lastUsedAt: null,
 });
 
-describe('descriptionHint', () => {
-  it('returns hint for empty, short and whitespace text', () => {
-    expect(descriptionHint('')).toBe('Kamida 10 belgi yozing');
-    expect(descriptionHint('123456789')).toBe('Kamida 10 belgi yozing');
-    expect(descriptionHint('          ')).toBe('Kamida 10 belgi yozing');
-  });
-  it('returns null at the minimum and hint above the maximum', () => {
-    expect(descriptionHint('1234567890')).toBeNull();
-    expect(descriptionHint('x'.repeat(2001))).toBe('Koʻpi bilan 2000 belgi');
-  });
-});
+
 
 describe('firstMissingStep', () => {
   it('reports category → address → payment in order', () => {

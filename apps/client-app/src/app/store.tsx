@@ -90,7 +90,7 @@ interface AppActions {
   /** Boʻsh satr `null` ga aylantiriladi — "ism yoʻq" bitta koʻrinishda. */
   setFullName: (name: string) => void;
   setDraftCategory: (categoryId: string) => void;
-  setDraftDetails: (description: string) => void;
+  setDraftQuantity: (quantity: number) => void;
   setDraftAddress: (address: OrderAddress) => void;
   /** Sevimli roʻyxatidan tanlangan usta; `null` — tanlov yoʻq. */
   setDraftMaster: (masterId: string | null) => void;

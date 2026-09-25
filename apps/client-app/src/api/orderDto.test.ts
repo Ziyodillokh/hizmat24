@@ -9,7 +9,7 @@ const raw: ServerOrder = {
   status: 'SEARCHING',
   description: 'Sifon oqmoqda',
   isUrgent: true,
-  invoice: { base: 120_000, urgentFee: 20_000, discountPercent: 2, discount: 2_400, total: 137_600 },
+  invoice: { unitPrice: 120_000, quantity: 1, base: 120_000, urgentFee: 20_000, discountPercent: 2, discount: 2_400, total: 137_600 },
   paymentMethod: 'cash',
   scheduledAt: null,
   preferredMasterId: null,
@@ -130,7 +130,7 @@ describe('toCreatePayload', () => {
   const draft = {
     ...EMPTY_DRAFT,
     categoryId: 'c-1',
-    description: '  Sifon oqmoqda  ',
+    quantity: 1,
     isUrgent: true,
     paymentMethod: 'cash' as const,
     address: { label: 'Chilonzor 42-uy' },
@@ -140,11 +140,13 @@ describe('toCreatePayload', () => {
     const payload = toCreatePayload(draft);
     expect(payload).toEqual({
       categoryId: 'c-1',
-      description: 'Sifon oqmoqda',
+      quantity: 1,
       isUrgent: true,
       paymentMethod: 'cash',
       clientAddress: { label: 'Chilonzor 42-uy' },
     });
+    // Tavsif yuborilmaydi: oqimda uni soʻraydigan qadam yoʻq.
+    expect(JSON.stringify(payload)).not.toContain('description');
     expect(JSON.stringify(payload)).not.toContain('price');
     expect(JSON.stringify(payload)).not.toContain('invoice');
   });

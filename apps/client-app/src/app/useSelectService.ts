@@ -3,23 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from './store';
 
 /**
- * Xizmat tanlash: qoralamaga kategoriya yoziladi va tafsilotlar ekraniga
- * oʻtiladi.
+ * Xizmat tanlash: qoralamaga kategoriya va miqdor yoziladi, soʻng manzil
+ * qadamiga oʻtiladi.
  *
  * Bosh sahifa kartasi = guruh sahifasi qatori = "Barcha xizmatlar" qatori.
  * Uch ekran bir xil ikki qatorni takrorlardi; bittasi oʻzgarsa qolganlari
  * jimgina orqada qolardi.
+ *
+ * Miqdor berilmasa 1 — roʻyxatdan toʻgʻridan-toʻgʻri boshlangan buyurtma
+ * uchun shu toʻgʻri, sonni tanlash faqat xizmat sahifasida bor.
  */
-export function useSelectService(): (categoryId: string) => void {
+export function useSelectService(): (categoryId: string, quantity?: number) => void {
   const navigate = useNavigate();
-  const { setDraftCategory } = useApp();
+  const { setDraftCategory, setDraftQuantity } = useApp();
 
   return useCallback(
-    (categoryId: string) => {
+    (categoryId: string, quantity = 1) => {
       setDraftCategory(categoryId);
-      navigate('/app/new/details');
+      setDraftQuantity(quantity);
+      navigate('/app/new/address');
     },
-    [navigate, setDraftCategory],
+    [navigate, setDraftCategory, setDraftQuantity],
   );
 }
 

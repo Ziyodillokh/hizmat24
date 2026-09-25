@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '@/api/client';
 import { Button } from '@/components/Button';
+import { QuantityStepper } from '@/components/QuantityStepper';
 import { Card } from '@/components/Card';
 import { Header } from '@/components/Header';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
@@ -40,6 +41,7 @@ export function ServiceDetailScreen() {
   // Hook shartli chaqirilmasligi kerak, shuning uchun `categoryId` bilan
   // — xizmat topilmasa ham chaqiriladi va soʻrov yuborilmaydi.
   const { page, isFailed, retry } = useServicePage(category ? category.id : null);
+  const [quantity, setQuantity] = useState(1);
 
   if (!category) return <Navigate to="/app/services" replace />;
 
@@ -50,14 +52,38 @@ export function ServiceDetailScreen() {
       header={<Header variant="inner" title={category.name} onBack={() => navigate(-1)} />}
       footer={
         <StickyFooter>
-          <div className="flex items-center justify-between gap-12">
+          {/*
+            Miqdor SHU YERDA — mijoz narxni koʻrib turib oʻzgartiradi va
+            summaning nega ikki barobar boʻlganini darhol tushunadi.
+          */}
+          <div className="flex items-center justify-between gap-12 border-b border-border pb-12">
+            <div className="min-w-0">
+              <p className="text-body text-text-primary">Nechta kerak?</p>
+              <p className="text-caption text-text-secondary">
+                Masalan ikkita quvur boʻlsa — 2 ta qoʻying
+              </p>
+            </div>
+            <QuantityStepper value={quantity} onChange={setQuantity} />
+          </div>
+
+          <div className="flex items-center justify-between gap-12 pt-12">
             <div className="min-w-0">
               <p className="text-caption text-text-secondary">Narx</p>
               <p className="truncate text-h3 text-text-primary">
-                {priceLabel(formatPrice(category.basePrice), category.priceKind)}
+                {priceLabel(formatPrice(category.basePrice * quantity), category.priceKind)}
               </p>
+              {quantity > 1 && (
+                <p className="text-caption text-text-secondary">
+                  {formatPrice(category.basePrice)} × {quantity}
+                </p>
+              )}
             </div>
-            <Button variant="primary" fullWidth={false} className="px-24" onClick={() => select(category.id)}>
+            <Button
+              variant="primary"
+              fullWidth={false}
+              className="px-24"
+              onClick={() => select(category.id, quantity)}
+            >
               Buyurtma berish
             </Button>
           </div>

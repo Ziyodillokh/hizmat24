@@ -12,27 +12,20 @@ import {
  * Buyurtma oqimining sof qoidalari — REACT YOʻQ.
  * Ekranlar faqat shu yerdagi qarorlarni chizadi; matnlar bir joyda turadi,
  * shuning uchun toʻlov, tasdiqlash va chek bir xil gapiradi.
+ *
+ * Oqim TOʻRT qadam: manzil → vaqt → toʻlov → tasdiqlash. Beshinchi
+ * «muammoni tavsiflab bering» qadami olib tashlandi: xizmat nomi va
+ * manzil ustaga yetarli, ortiqcha yozuv esa buyurtma berishni
+ * sekinlashtirardi.
  */
-export const DESCRIPTION_MIN = 10;
-export const DESCRIPTION_MAX = 2000;
-
 export const ORDER_STEP_ROUTES = {
   services: '/app/services',
-  details: '/app/new/details',
   address: '/app/new/address',
   addressNew: '/app/new/address/new',
   schedule: '/app/new/schedule',
   payment: '/app/new/payment',
   confirm: '/app/new/confirm',
 } as const;
-
-/** Tugma nega oʻchiq. `null` — hammasi joyida. */
-export function descriptionHint(text: string): string | null {
-  const length = text.trim().length;
-  if (length < DESCRIPTION_MIN) return `Kamida ${DESCRIPTION_MIN} belgi yozing`;
-  if (length > DESCRIPTION_MAX) return `Koʻpi bilan ${DESCRIPTION_MAX} belgi`;
-  return null;
-}
 
 export type MissingStep = 'category' | 'address' | 'payment';
 
@@ -94,7 +87,14 @@ export interface InvoiceRow {
 
 /** Uch ekran (toʻlov, tasdiqlash, chek) AYNAN bir xil qatorlarni chizadi. */
 export function invoiceRows(invoice: OrderInvoice): InvoiceRow[] {
-  const rows: InvoiceRow[] = [{ key: 'base', label: 'Xizmat narxi', value: formatPrice(invoice.base) }];
+  /*
+   * Bittadan koʻp boʻlsa hisob KOʻRSATILADI («120 000 soʻm × 2»): aks
+   * holda mijoz ikki barobar summani koʻrib, sababini tushunmasdi.
+   */
+  const baseLabel =
+    invoice.quantity > 1 ? `Xizmat narxi · ${formatPrice(invoice.unitPrice)} × ${invoice.quantity}` : 'Xizmat narxi';
+
+  const rows: InvoiceRow[] = [{ key: 'base', label: baseLabel, value: formatPrice(invoice.base) }];
   if (invoice.urgentFee > 0) {
     rows.push({ key: 'urgent', label: 'Shoshilinch yuborish', value: formatPrice(invoice.urgentFee) });
   }

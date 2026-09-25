@@ -3,10 +3,16 @@ import type { OrderInvoice } from '@/lib/pricing';
 import type { OrderRating } from '@/lib/rating';
 import type { Master, OrderAddress } from '@/mocks/types';
 
-/** Buyurtma qoralamasi — tavsif → manzil → vaqt → toʻlov oqimi davomida toʻldiriladi. */
+/** Buyurtma qoralamasi — manzil → vaqt → toʻlov oqimi davomida toʻldiriladi. */
 export interface OrderDraft {
   categoryId: string | null;
-  description: string;
+  /**
+   * Nechta xuddi shu ish. Xizmat sahifasida tanlanadi.
+   *
+   * Masalan «kanalizatsiya tozalash» ikkita quvur uchun boʻlishi mumkin.
+   * Kamida 1 — nol buyurtma degan tushuncha yoʻq.
+   */
+  quantity: number;
   /**
    * `scheduledAt !== null` boʻlganda HAR DOIM `false`.
    *
@@ -102,7 +108,7 @@ export interface LiveOrder {
 
 export const EMPTY_DRAFT: OrderDraft = {
   categoryId: null,
-  description: '',
+  quantity: 1,
   isUrgent: false,
   address: null,
   preferredMasterId: null,

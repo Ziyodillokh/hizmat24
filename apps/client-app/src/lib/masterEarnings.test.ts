@@ -27,7 +27,7 @@ const order = (
 ): EarningsOrder => ({
   status: (patch.status ?? ORDER_STATUS.CLOSED) as OrderStatus,
   handledByMaster: patch.handledByMaster ?? true,
-  invoice: { base: 100_000, urgentFee: 0, discountPercent: 0, discount: 0, total: patch.total ?? 96_000 },
+  invoice: { unitPrice: 100_000, quantity: 1, base: 100_000, urgentFee: 0, discountPercent: 0, discount: 0, total: patch.total ?? 96_000 },
   completedAt: patch.completedAt === undefined ? NOW : patch.completedAt,
   createdAt: NOW,
   rating: patch.stars === undefined || patch.stars === null ? null : { stars: patch.stars, comment: '', tags: [] },

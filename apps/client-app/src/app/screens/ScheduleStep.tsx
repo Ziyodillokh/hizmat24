@@ -182,7 +182,7 @@ export function ScheduleStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={2} />
+      <StepDots currentStep={1} />
       <ServiceSummaryCard service={category} basePrice={category.basePrice} className="mt-16" />
 
       <StepSection title="Qachon kelsin?">

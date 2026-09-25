@@ -61,7 +61,7 @@ function makeOrder(overrides: Partial<LiveOrder> = {}): LiveOrder {
     categoryName: 'Kran taʼmirlash',
     categoryIconKey: 'tap',
     description: 'Kran oqmoqda',
-    invoice: { base: 100_000, urgentFee: 0, discountPercent: 0, discount: 0, total: 100_000 },
+    invoice: { unitPrice: 100_000, quantity: 1, base: 100_000, urgentFee: 0, discountPercent: 0, discount: 0, total: 100_000 },
     paymentMethod: 'cash',
     preferredMasterId: null,
     scheduledAt: null,

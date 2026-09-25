@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { buildInvoice, MONEY_STEP, URGENT_FEE } from './pricing';
+import { buildInvoice, MAX_QUANTITY, MONEY_STEP, URGENT_FEE } from './pricing';
 
 describe('buildInvoice', () => {
   it('oddiy buyurtmada shoshilinch qoʻshimchasi yoʻq', () => {
     const invoice = buildInvoice({ base: 150_000, isUrgent: false, discountPercent: 0 });
 
     expect(invoice).toEqual({
+      unitPrice: 150_000,
+      quantity: 1,
       base: 150_000,
       urgentFee: 0,
       discountPercent: 0,
@@ -56,5 +58,38 @@ describe('buildInvoice', () => {
         }
       }
     }
+  });
+});
+
+/*
+ * Miqdor qoidalari SERVER bilan aynan bir xil boʻlishi shart: ikki tomon
+ * boshqacha hisoblasa, mijoz ekranda bir summani koʻrib, chekda
+ * boshqasini olardi.
+ */
+describe('buildInvoice — miqdor', () => {
+  it('asosiy narx miqdorga koʻpaytiriladi', () => {
+    const invoice = buildInvoice({ base: 120_000, quantity: 2, isUrgent: false, discountPercent: 0 });
+
+    expect(invoice.unitPrice).toBe(120_000);
+    expect(invoice.base).toBe(240_000);
+    expect(invoice.total).toBe(240_000);
+  });
+
+  it('shoshilinch qoʻshimchasi koʻpaytirilmaydi', () => {
+    const invoice = buildInvoice({ base: 100_000, quantity: 3, isUrgent: true, discountPercent: 0 });
+
+    expect(invoice.total).toBe(320_000);
+  });
+
+  it('chegirma koʻpaytirilgan summadan olinadi', () => {
+    const invoice = buildInvoice({ base: 100_000, quantity: 2, isUrgent: false, discountPercent: 10 });
+
+    expect(invoice.discount).toBe(20_000);
+    expect(invoice.total).toBe(180_000);
+  });
+
+  it('chegaradan tashqaridagi miqdor qisiladi', () => {
+    expect(buildInvoice({ base: 10_000, quantity: 0, isUrgent: false, discountPercent: 0 }).quantity).toBe(1);
+    expect(buildInvoice({ base: 10_000, quantity: 99, isUrgent: false, discountPercent: 0 }).quantity).toBe(MAX_QUANTITY);
   });
 });

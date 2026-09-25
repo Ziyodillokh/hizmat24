@@ -128,7 +128,8 @@ export function toLiveOrder(raw: ServerOrder): LiveOrder {
 
 export interface CreateOrderPayload {
   categoryId: string;
-  description: string;
+  /** Nechta xuddi shu ish. Server chegarani oʻzi ham tekshiradi. */
+  quantity: number;
   isUrgent: boolean;
   paymentMethod: PaymentMethod;
   scheduledAt?: string;
@@ -149,7 +150,9 @@ export function toCreatePayload(draft: OrderDraft): CreateOrderPayload | null {
 
   return {
     categoryId: draft.categoryId,
-    description: draft.description.trim(),
+    // Tavsif YUBORILMAYDI: oqimda uni soʻraydigan qadam yoʻq. Server uni
+    // ixtiyoriy qabul qiladi va boʻsh satr yozadi.
+    quantity: draft.quantity,
     isUrgent: draft.isUrgent,
     paymentMethod: draft.paymentMethod,
     ...(draft.scheduledAt ? { scheduledAt: draft.scheduledAt.toISOString() } : {}),

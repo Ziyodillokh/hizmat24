@@ -98,7 +98,7 @@ export function AddressStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={1} />
+      <StepDots currentStep={0} />
       <ServiceSummaryCard service={category} basePrice={category.basePrice} className="mt-16" />
 
       <StepSection title="Manzil" hint="Koʻcha, uy va mahalla — usta aynan shu matnni oʻqiydi">

@@ -6,7 +6,6 @@ import { HomeTab } from './screens/HomeTab';
 import { AllServicesTab, GroupServicesTab } from './screens/CatalogScreens';
 import { AddressStep } from './screens/order/AddressStep';
 import { ConfirmStep } from './screens/order/ConfirmStep';
-import { OrderDetailsStep } from './screens/order/OrderDetailsStep';
 import { SavedAddressStep } from './screens/order/SavedAddressStep';
 import { ScheduleStep } from './screens/ScheduleStep';
 import { PaymentStep } from './screens/PaymentStep';
@@ -106,7 +105,6 @@ export const PROTECTED_ROUTES: AppRoute[] = [
   { path: 'masters/:masterId', element: <MasterProfile /> },
 
   // Buyurtma berish oqimi
-  { path: 'new/details', element: <OrderDetailsStep /> },
   { path: 'new/address', element: <SavedAddressStep /> },
   { path: 'new/address/new', element: <AddressStep /> },
   { path: 'new/schedule', element: <ScheduleStep /> },

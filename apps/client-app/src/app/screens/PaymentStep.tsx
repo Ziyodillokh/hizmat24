@@ -157,7 +157,7 @@ export function PaymentStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={3} />
+      <StepDots currentStep={2} />
       <ServiceSummaryCard
         service={category}
         basePrice={category.basePrice}

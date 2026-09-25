@@ -148,7 +148,14 @@ export function PaymentReceipt() {
             detail="Soʻrov — tayinlanishi hali tasdiqlanmagan"
           />
         ) : null}
-        <DetailRow icon={ChatText} label="Muammo" value={order.description} />
+        {/*
+          Izoh endi IXTIYORIY — oqimda uni soʻraydigan qadam yoʻq.
+          Boʻsh boʻlsa qator umuman chizilmaydi, aks holda chekda
+          sarlavhasi bor, qiymati boʻsh qator turardi.
+        */}
+        {order.description.trim().length > 0 && (
+          <DetailRow icon={ChatText} label="Mijoz izohi" value={order.description} />
+        )}
         <DetailRow
           icon={MapPin}
           label="Manzil"

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { MAX_QUANTITY } from '@/lib/pricing';
 import { EMPTY_DRAFT, type OrderDraft, type PaymentMethod } from './types';
 import type { OrderAddress } from '@/mocks/types';
 
@@ -17,7 +18,8 @@ interface StateWithDraft {
 
 export interface DraftActions {
   setDraftCategory: (categoryId: string) => void;
-  setDraftDetails: (description: string) => void;
+  /** Miqdor xizmat sahifasida tanlanadi; chegara `MAX_QUANTITY`. */
+  setDraftQuantity: (quantity: number) => void;
   setDraftAddress: (address: OrderAddress) => void;
   setDraftMaster: (masterId: string | null) => void;
   setDraftSchedule: (scheduledAt: Date | null, isUrgent: boolean) => void;
@@ -33,7 +35,8 @@ export function buildDraftActions<S extends StateWithDraft>(
 
   return {
     setDraftCategory: (categoryId) => patch({ categoryId }),
-    setDraftDetails: (description) => patch({ description }),
+    setDraftQuantity: (quantity) =>
+      patch({ quantity: Math.max(1, Math.min(MAX_QUANTITY, Math.round(quantity))) }),
     setDraftAddress: (address) => patch({ address }),
     setDraftMaster: (preferredMasterId) => patch({ preferredMasterId }),
     // Invariant SHU YERDA saqlanadi: rejalashtirilgan buyurtma shoshilinch

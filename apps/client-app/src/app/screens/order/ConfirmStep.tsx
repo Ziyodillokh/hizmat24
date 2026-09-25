@@ -1,4 +1,4 @@
-import { CalendarX, ChatText, Clock, Lightning, MapPin, Money, Wrench, X } from '@phosphor-icons/react';
+import { CalendarX, Clock, Lightning, MapPin, Money, Wrench, X } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -97,7 +97,7 @@ export function ConfirmStep() {
         </StickyFooter>
       }
     >
-      <StepDots currentStep={4} />
+      <StepDots currentStep={3} />
 
       {isStale && (
         <Banner variant="warning" icon={CalendarX} className="mt-16">
@@ -129,7 +129,6 @@ export function ConfirmStep() {
             onAction={() => setDraftMaster(null)}
           />
         )}
-        <DetailRow icon={ChatText} label="Muammo" value={draft.description} actionLabel="Tavsifni oʻzgartirish" onAction={() => edit(ORDER_STEP_ROUTES.details)} />
         <DetailRow icon={MapPin} label="Manzil" value={draft.address.label} detail={details ?? undefined} actionLabel="Manzilni oʻzgartirish" onAction={() => edit(ORDER_STEP_ROUTES.address)} />
         <DetailRow
           icon={draft.isUrgent ? Lightning : Clock}

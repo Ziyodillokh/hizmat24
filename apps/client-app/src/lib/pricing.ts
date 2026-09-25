@@ -23,7 +23,11 @@ export const URGENT_FEE = 20_000;
 export const MONEY_STEP = 100;
 
 export interface OrderInvoice {
-  /** Katalogdagi asosiy narx — mijoz butun oqim davomida shuni koʻrgan. */
+  /** Katalogdagi BIR DONA narxi — mijoz butun oqim davomida shuni koʻrgan. */
+  unitPrice: number;
+  /** Nechta ish buyurtma qilinmoqda. */
+  quantity: number;
+  /** `unitPrice × quantity` — chegirma aynan shundan olinadi. */
   base: number;
   /** Shoshilinch qoʻshimchasi; oddiy buyurtmada 0. */
   urgentFee: number;
@@ -36,11 +40,17 @@ export interface OrderInvoice {
 }
 
 export interface InvoiceInput {
+  /** Katalogdagi bir dona narxi. */
   base: number;
+  /** Nechta ish. Berilmasa 1. */
+  quantity?: number;
   isUrgent: boolean;
   /** Foydalanuvchi darajasining chegirmasi; daraja yoʻq boʻlsa 0. */
   discountPercent: number;
 }
+
+/** Bir buyurtmada koʻpi bilan shuncha ish — server bilan BIR XIL. */
+export const MAX_QUANTITY = 10;
 
 /**
  * Hisob-fakturani yigʻadi.
@@ -50,8 +60,21 @@ export interface InvoiceInput {
  * platforma haqiqatan sarflaydigan yuborish xarajati. Undan chegirma berish
  * formulani tushuntirib boʻlmaydigan qilardi.
  */
-export function buildInvoice({ base, isUrgent, discountPercent }: InvoiceInput): OrderInvoice {
-  const safeBase = Math.max(0, Math.round(base));
+export function buildInvoice({
+  base,
+  quantity = 1,
+  isUrgent,
+  discountPercent,
+}: InvoiceInput): OrderInvoice {
+  const unitPrice = Math.max(0, Math.round(base));
+  const safeQuantity = Math.max(1, Math.min(MAX_QUANTITY, Math.round(quantity)));
+  const safeBase = unitPrice * safeQuantity;
+
+  /*
+   * Shoshilinch qoʻshimchasi miqdorga KOʻPAYTIRILMAYDI: u ustani darhol
+   * yuborish xarajati va usta baribir bir marta chiqadi. Server ham
+   * xuddi shunday hisoblaydi.
+   */
   const urgentFee = isUrgent ? URGENT_FEE : 0;
   const safePercent = Math.max(0, Math.min(100, discountPercent));
 
@@ -60,6 +83,8 @@ export function buildInvoice({ base, isUrgent, discountPercent }: InvoiceInput):
   const discount = Math.min(safeBase, Math.round(raw / MONEY_STEP) * MONEY_STEP);
 
   return {
+    unitPrice,
+    quantity: safeQuantity,
     base: safeBase,
     urgentFee,
     discountPercent: safePercent,

@@ -33,7 +33,7 @@ export function FavoritesScreen() {
     void tapFeedback();
     showToast(`${name} tanlandi`, 'success');
     // Kategoriya allaqachon tanlangan boʻlsa oqimni buzmaymiz.
-    navigate(draft.categoryId ? '/app/new/details' : '/app/services');
+    navigate(draft.categoryId ? '/app/new/address' : '/app/services');
   };
 
   return (
