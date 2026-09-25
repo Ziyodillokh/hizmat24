@@ -8,6 +8,7 @@ import { ApplicationDetailScreen } from '@/screens/ApplicationDetailScreen';
 import { CategoryEditScreen } from '@/screens/CategoryEditScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { OrdersScreen } from '@/screens/OrdersScreen';
+import { UserDetailScreen } from '@/screens/UserDetailScreen';
 import { MasterDetailScreen } from '@/screens/MasterDetailScreen';
 import { OrderDetailScreen } from '@/screens/OrderDetailScreen';
 import { SafetyScreen } from '@/screens/SafetyScreen';
@@ -80,6 +81,7 @@ export function AdminApp() {
         )}
         {allowed.has('orders') && <Route path="/orders/:id" element={<OrderDetailScreen />} />}
         {allowed.has('users') && <Route path="/users/masters/:id" element={<MasterDetailScreen />} />}
+        {allowed.has('users') && <Route path="/users/:id" element={<UserDetailScreen />} />}
         <Route path="*" element={<Navigate to={home} replace />} />
       </Route>
     </Routes>

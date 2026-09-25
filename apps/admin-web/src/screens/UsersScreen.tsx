@@ -208,7 +208,14 @@ function UserCard({ user }: { user: AdminUserRow }) {
     <Card className="p-20">
       <div className="flex flex-wrap items-start justify-between gap-12">
         <div>
-          <p className="text-h3 text-text-primary">{user.fullName ?? 'Ism kiritilmagan'}</p>
+          {/* Ism — tafsilotga yoʻl. Telefon qatori havola ICHIDA emas:
+              raqamni ochish alohida amal va bosish niyati aralashib ketardi. */}
+          <Link
+            to={`/users/${user.id}`}
+            className="text-h3 text-primary underline-offset-2 hover:underline"
+          >
+            {user.fullName ?? 'Ism kiritilmagan'}
+          </Link>
           <div className="mt-4 text-body">
             <PhoneCell kind="users" id={user.id} masked={user.phoneMasked} />
           </div>
