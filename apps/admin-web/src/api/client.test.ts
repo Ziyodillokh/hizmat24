@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, apiRequest, resolveBaseUrl } from './client';
+import { ApiError, apiRequest, resolveBaseUrl, setUnauthorizedHandler } from './client';
 
 describe('ApiError', () => {
   it('turini va matnini saqlaydi', () => {
@@ -108,5 +108,58 @@ describe('sozlanmagan server', () => {
     expect(error.kind).toBe('not-configured');
     expect(fetchSpy).not.toHaveBeenCalled();
     vi.unstubAllEnvs();
+  });
+});
+
+/*
+ * Sessiya ish paytida tugaganda admin CHIQARILISHI kerak. Ilgari 401
+ * faqat ilova ochilganda tekshirilardi va admin xato bannerlariga qarab
+ * qolar, nima boʻlganini tushunmasdi.
+ */
+describe('sessiya tugaganini bildirish', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_API_URL', 'http://test.local');
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({ success: false, data: null, error: {} }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })) as typeof fetch;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    setUnauthorizedHandler(null);
+  });
+
+  it('token bilan yuborilgan soʻrov 401 qaytarsa ishlov chaqiriladi', async () => {
+    // Arrange
+    const handler = vi.fn();
+    setUnauthorizedHandler(handler);
+
+    // Act
+    await apiRequest('/test', { token: 'seans-tokeni' }).catch(() => undefined);
+
+    // Assert
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  /* Kirish soʻrovi ham 401 qaytaradi — parol notoʻgʻri. U «sessiya tugadi» emas. */
+  it('tokensiz soʻrov (kirish) chiqarishga sabab boʻlmaydi', async () => {
+    const handler = vi.fn();
+    setUnauthorizedHandler(handler);
+
+    await apiRequest('/admin/auth/login', { method: 'POST', body: {} }).catch(() => undefined);
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it('ishlov olib tashlansa chaqirilmaydi', async () => {
+    const handler = vi.fn();
+    setUnauthorizedHandler(handler);
+    setUnauthorizedHandler(null);
+
+    await apiRequest('/test', { token: 'seans-tokeni' }).catch(() => undefined);
+
+    expect(handler).not.toHaveBeenCalled();
   });
 });

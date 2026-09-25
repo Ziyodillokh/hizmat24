@@ -130,6 +130,15 @@ function PhoneCell({ kind, id, masked }: { kind: 'users' | 'masters'; id: string
       >
         {reveal.isPending ? 'ochilmoqda…' : 'toʻliq koʻrsatish'}
       </button>
+      {/*
+        Xato JIMGINA yutilmasin: tugma bosilib hech narsa oʻzgarmasa,
+        admin raqam ochilmaganini emas, tugma ishlamayotganini oʻylardi.
+      */}
+      {reveal.isError && (
+        <span className="text-caption text-danger">
+          {reveal.error instanceof ApiError ? reveal.error.message : 'Raqamni ochib boʻlmadi'}
+        </span>
+      )}
     </span>
   );
 }

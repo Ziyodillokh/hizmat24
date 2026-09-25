@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ServiceMediaKind, ServicePriceKind } from '@prisma/client';
+import type { ServiceMediaKind, ServiceMediaRole, ServicePriceKind } from '@prisma/client';
 import { CURRENCY, type Currency } from '@shared/index';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import { CATALOG_CACHE_KEYS, CatalogCacheService } from './catalog-cache.service';
@@ -25,7 +25,7 @@ export interface GroupedCategoryView {
   priceKind: ServicePriceKind;
   /** Roʻyxatdagi karta rasmi; `null` boʻlsa ilova ikonka chizadi. */
   coverUrl: string | null;
-  media: Array<{ kind: ServiceMediaKind; url: string }>;
+  media: Array<{ kind: ServiceMediaKind; url: string; role: ServiceMediaRole }>;
 }
 
 export interface ServiceGroupView {
@@ -82,7 +82,7 @@ export class ServiceGroupsService {
           durationMinutes: category.durationMinutes,
           priceKind: category.priceKind,
           coverUrl: category.media.find((item) => item.isCover)?.url ?? null,
-          media: category.media.map((item) => ({ kind: item.kind, url: item.url })),
+          media: category.media.map((item) => ({ kind: item.kind, url: item.url, role: item.role })),
         })),
       }));
     });

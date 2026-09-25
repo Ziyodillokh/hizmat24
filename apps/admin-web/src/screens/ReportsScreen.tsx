@@ -109,6 +109,15 @@ export function ReportsScreen() {
 
       {audit.isPending && <p className="mt-16 text-body text-text-secondary">Yuklanmoqda…</p>}
 
+      {/* Panelning boshqa roʻyxatlarida bor, bu yerda unutilgan edi. */}
+      {audit.isError && (
+        <div className="mt-16">
+          <Notice>
+            {audit.error instanceof ApiError ? audit.error.message : 'Jurnalni yuklab boʻlmadi'}
+          </Notice>
+        </div>
+      )}
+
       {audit.data && <AuditTable rows={audit.data.items} total={audit.data.total} />}
     </>
   );

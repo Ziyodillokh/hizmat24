@@ -28,17 +28,38 @@ const LIVE_REFRESH_MS = 5_000;
  * kanali yoʻq va uni faqat hisoblagich uchun qurish ortiqcha edi. Soʻrov
  * — bitta `COUNT`, u ham 5 soniyada bir marta.
  */
+/** Server ham shu chegarani ishlatadi (`admin-orders.service.ts`). */
+const PAGE_SIZE = 50;
+
 export function OrdersScreen() {
   const { token } = useAuth();
   const [filter, setFilter] = useState<OrderStatusFilter>('ALL');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+
+  /*
+   * Filtr yoki qidiruv oʻzgarganda sahifa birinchiga qaytadi: aks holda
+   * 5-sahifada turib filtrni almashtirsangiz, bitta sahifalik natijada
+   * boʻsh jadval koʻrinardi.
+   */
+  const applyFilter = (next: OrderStatusFilter) => {
+    setFilter(next);
+    setPage(1);
+  };
+
+  const applySearch = (next: string) => {
+    setSearch(next);
+    setPage(1);
+  };
 
   const orders = useQuery({
-    queryKey: ['admin', 'orders', filter, search],
+    queryKey: ['admin', 'orders', filter, search, page],
     queryFn: () =>
       fetchAdminOrders(token as string, {
         status: filter === 'ALL' ? undefined : filter,
         search: search.trim() || undefined,
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
       }),
     enabled: Boolean(token),
     refetchInterval: LIVE_REFRESH_MS,
@@ -94,7 +115,7 @@ export function OrdersScreen() {
             <Button
               key={item.key}
               variant={filter === item.key ? 'primary' : 'ghost'}
-              onClick={() => setFilter(item.key)}
+              onClick={() => applyFilter(item.key)}
             >
               {item.label}
             </Button>
@@ -104,7 +125,7 @@ export function OrdersScreen() {
           <Field
             label="Qidiruv"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => applySearch(event.target.value)}
             placeholder="HZ-104901 yoki +998901234567"
             hint="Buyurtma raqami yoki mijoz telefoni"
           />
@@ -119,19 +140,57 @@ export function OrdersScreen() {
         </Notice>
       )}
 
-      {orders.data && <OrdersTable page={orders.data.items} total={orders.data.total} />}
+      {orders.data && (
+        <OrdersTable
+          page={orders.data.items}
+          total={orders.data.total}
+          pageNumber={page}
+          onPage={setPage}
+        />
+      )}
     </>
   );
 }
 
-function OrdersTable({ page, total }: { page: AdminOrderRow[]; total: number }) {
+function OrdersTable({
+  page,
+  total,
+  pageNumber,
+  onPage,
+}: {
+  page: AdminOrderRow[];
+  total: number;
+  pageNumber: number;
+  onPage: (page: number) => void;
+}) {
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  /*
+   * Boʻsh sahifa va boʻsh natija — IKKI XIL holat. Ikkinchi sahifada
+   * turib roʻyxat qisqarsa, «topilmadi» degan xabar notoʻgʻri boʻlardi:
+   * yozuvlar bor, faqat bu sahifada emas.
+   */
+  if (page.length === 0 && pageNumber > 1) {
+    return (
+      <Notice tone="neutral">
+        Bu sahifada yozuv qolmadi.{' '}
+        <button type="button" onClick={() => onPage(1)} className="underline">
+          Birinchi sahifaga qaytish
+        </button>
+      </Notice>
+    );
+  }
+
   if (page.length === 0) {
     return <Notice tone="neutral">Bu filtr boʻyicha buyurtma topilmadi.</Notice>;
   }
 
   return (
     <>
-      <p className="mb-12 text-body text-text-secondary">{total} ta yozuv</p>
+      <p className="mb-12 text-body text-text-secondary">
+        {total} ta yozuv
+        {totalPages > 1 && ` — ${pageNumber} / ${totalPages}-sahifa`}
+      </p>
       <Card className="overflow-x-auto">
         <table className="w-full min-w-[860px] border-collapse text-body">
           <thead>
@@ -197,6 +256,24 @@ function OrdersTable({ page, total }: { page: AdminOrderRow[]; total: number }) 
           </tbody>
         </table>
       </Card>
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center gap-12">
+          <Button variant="secondary" disabled={pageNumber <= 1} onClick={() => onPage(pageNumber - 1)}>
+            Oldingi
+          </Button>
+          <span className="text-caption text-text-secondary">
+            {pageNumber} / {totalPages}
+          </span>
+          <Button
+            variant="secondary"
+            disabled={pageNumber >= totalPages}
+            onClick={() => onPage(pageNumber + 1)}
+          >
+            Keyingi
+          </Button>
+        </div>
+      )}
     </>
   );
 }

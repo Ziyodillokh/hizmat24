@@ -126,6 +126,13 @@ function CategoryForm({
             >
               {category.isActive ? 'Oʻchirish' : 'Yoqish'}
             </Button>
+            {toggleActive.isError && (
+              <p className="pt-8 text-caption text-danger">
+                {toggleActive.error instanceof ApiError
+                  ? toggleActive.error.message
+                  : 'Holatni oʻzgartirib boʻlmadi'}
+              </p>
+            )}
           </div>
         )}
       </div>

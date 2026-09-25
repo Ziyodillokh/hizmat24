@@ -2,10 +2,20 @@ import type { OrderStatus } from '@/lib/orderStateMachine';
 
 export type ServicePriceKind = 'FIXED' | 'FROM';
 
+/** Rasm xizmat sahifasining qaysi blokida chizilishi. */
+export type ServiceMediaRole = 'GALLERY' | 'BEFORE' | 'AFTER' | 'EQUIPMENT';
+
 export interface ServiceMedia {
   kind: 'IMAGE' | 'VIDEO';
   /** Serverga nisbatan yoʻl: `/media/x.webp`. */
   url: string;
+  /**
+   * Boʻsh boʻlsa — galereya.
+   *
+   * Eski server bu maydonni yubormaydi, shuning uchun ixtiyoriy: ilova
+   * yangilanib, API eskiroq qolgan paytda galereya yiqilmasligi kerak.
+   */
+  role?: ServiceMediaRole;
 }
 
 export interface ServiceCategory {

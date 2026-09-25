@@ -45,6 +45,25 @@ const STATUS_MESSAGES: Record<number, string> = {
 const KINDS: Record<number, ApiErrorKind> = { 401: 'unauthorized', 403: 'forbidden' };
 
 /**
+ * Sessiya oʻlganda chaqiriladigan ishlov.
+ *
+ * TanStack Query keshiga emas, SHU YERGA ulanadi: har bir soʻrov shu
+ * funksiyadan oʻtadi, shuning uchun bitta joyda ushlash yetarli va
+ * yangi ekran qoʻshilganda uni ulashni unutib boʻlmaydi.
+ *
+ * Ilgari 401 faqat ilova ochilganda tekshirilardi: admin ishlab
+ * turganda sessiya tugasa, u chiqarilmasdan xato bannerlariga qarab
+ * qolardi va nima boʻlganini tushunmasdi.
+ */
+type UnauthorizedHandler = () => void;
+
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  onUnauthorized = handler;
+}
+
+/**
  * SOF: `VITE_API_URL` dan tozalangan asos manzil; sozlanmagan boʻlsa `null`.
  *
  * Har soʻrovda qaytadan oʻqiladi, modul yuklanganda BIR MARTA emas.
@@ -82,6 +101,13 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const envelope = (await response.json().catch(() => null)) as Envelope<T> | null;
 
   if (!response.ok || !envelope?.success) {
+    /*
+     * Faqat TOKEN BILAN yuborilgan soʻrov chiqarishga sabab boʻladi.
+     * Kirish soʻrovi ham 401 qaytaradi (parol notoʻgʻri) — u «sessiya
+     * tugadi» degani emas va foydalanuvchini chalgʻitardi.
+     */
+    if (response.status === 401 && options.token) onUnauthorized?.();
+
     throw new ApiError(
       KINDS[response.status] ?? 'server',
       pickMessage(envelope?.error?.message, response.status),

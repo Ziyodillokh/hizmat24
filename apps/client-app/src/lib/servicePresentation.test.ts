@@ -101,3 +101,38 @@ describe('mediaSrc', () => {
     expect(mediaSrc(null, '/media/a.webp')).toBe('/media/a.webp');
   });
 });
+
+/*
+ * Galereyada FAQAT umumiy rasmlar. «Oldin/keyin» va uskuna rasmlari
+ * sahifada oʻz boʻlimida yorligʻi bilan chiziladi; galereyaga ham
+ * tushsa, foydalanuvchi ularni kontekstsiz koʻrib chalgʻirdi.
+ */
+describe('buildGallery — rasm rollari', () => {
+  const media = [
+    { kind: 'IMAGE' as const, url: '/umumiy.webp', role: 'GALLERY' as const },
+    { kind: 'IMAGE' as const, url: '/oldin.webp', role: 'BEFORE' as const },
+    { kind: 'IMAGE' as const, url: '/keyin.webp', role: 'AFTER' as const },
+    { kind: 'IMAGE' as const, url: '/mato.webp', role: 'EQUIPMENT' as const },
+  ];
+
+  it('oldin/keyin va uskuna rasmlari galereyaga tushmaydi', () => {
+    const gallery = buildGallery({ media, coverUrl: null } as never);
+
+    expect(gallery.items.map((item) => item.url)).toEqual(['/umumiy.webp']);
+  });
+
+  it('roli yoʻq rasm galereyada qoladi — eski server uni yubormaydi', () => {
+    const gallery = buildGallery({
+      media: [{ kind: 'IMAGE' as const, url: '/eski.webp' }],
+      coverUrl: null,
+    } as never);
+
+    expect(gallery.items.map((item) => item.url)).toEqual(['/eski.webp']);
+  });
+
+  it('muqova galereyada bir marta, birinchi boʻlib turadi', () => {
+    const gallery = buildGallery({ media, coverUrl: '/umumiy.webp' } as never);
+
+    expect(gallery.items.map((item) => item.url)).toEqual(['/umumiy.webp']);
+  });
+});

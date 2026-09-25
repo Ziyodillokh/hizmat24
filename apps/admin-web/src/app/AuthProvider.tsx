@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ApiError } from '@/api/client';
+import { ApiError, setUnauthorizedHandler } from '@/api/client';
 import { fetchMe, logout as logoutRequest, type AdminIdentity } from '@/api/admin';
 import { clearToken, readToken, writeToken } from '@/api/session';
 
@@ -62,6 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
+
+  /*
+   * Sessiya ish paytida tugasa — darhol chiqarish. Har bir soʻrov
+   * `apiRequest` dan oʻtadi, shuning uchun ushlash bitta joyda.
+   */
+  useEffect(() => {
+    setUnauthorizedHandler(() => signOut('expired'));
+    return () => setUnauthorizedHandler(null);
+  }, [signOut]);
 
   useEffect(() => {
     const stored = readToken();

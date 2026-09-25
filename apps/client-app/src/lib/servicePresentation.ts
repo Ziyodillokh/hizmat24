@@ -1,4 +1,4 @@
-import type { ServiceCategory } from '@/mocks/types';
+import type { ServiceCategory, ServiceMedia } from '@/mocks/types';
 
 /**
  * Xizmat kartasini ekranga tayyorlash — SOF funksiyalar.
@@ -46,11 +46,30 @@ export interface ServiceGallery {
  * bor — ikki marta chizilmasligi uchun roʻyxat muqovadan boshlanadi va
  * qolganlari oʻz tartibida ergashadi.
  */
+/**
+ * Galereyada FAQAT umumiy rasmlar koʻrinadi.
+ *
+ * «Oldin/keyin» juftligi va uskuna rasmlari sahifada oʻz boʻlimida,
+ * yorligʻi bilan chiziladi. Galereyaga ham tushsa, foydalanuvchi ularni
+ * kontekstsiz koʻrardi: ifloslangan kran rasmi xizmatning oʻzi kabi
+ * koʻrinib, chalgʻitardi.
+ *
+ * Roli yoʻq rasm — galereya: eski server bu maydonni yubormaydi.
+ */
+const isGallery = (item: ServiceMedia): boolean => (item.role ?? 'GALLERY') === 'GALLERY';
+
 export function buildGallery(category: ServiceCategory): ServiceGallery {
-  const media = category.media ?? [];
+  const media = (category.media ?? []).filter(isGallery);
   const cover = category.coverUrl ?? null;
 
-  if (!cover) return { cover: null, items: media };
+  // Muqova boshqa rolda boʻlishi mumkin emas (u roʻyxat kartasining
+  // rasmi), lekin u galereyadan filtrlanib ketgan boʻlsa, uni qaytarib
+  // qoʻshmaymiz — aks holda boʻlim rasmi galereyada takrorlanardi.
+  const hasCover = cover !== null && (category.media ?? []).some(
+    (item) => item.url === cover && isGallery(item),
+  );
+
+  if (!hasCover) return { cover, items: media };
 
   return {
     cover,
