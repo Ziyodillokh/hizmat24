@@ -6,7 +6,8 @@ import {
   CANCEL_SHEET_HINT,
   CANCEL_SHEET_TITLE,
   CANCEL_TOAST,
-  CLIENT_CONTACT_HINT,
+  clientContactView,
+  CLIENT_CONTACT_LOCKED_HINT,
   COMMISSION_HINT,
   DEPART_TOAST,
   FINISH_TOAST,
@@ -343,7 +344,7 @@ describe('M3 matnlari', () => {
       ADDRESS_HINT,
       PRICE_FIXED_HINT,
       COMMISSION_HINT,
-      CLIENT_CONTACT_HINT,
+      CLIENT_CONTACT_LOCKED_HINT,
       DEPART_TOAST,
       ARRIVE_TOAST,
       CANCEL_TOAST,
@@ -436,4 +437,32 @@ describe('server boʻlimlari', () => {
     expect(isOffer(order, ['o-1'], true)).toBe(false);
   });
 });
+});
+
+/*
+ * Ilgari «Mijoz» blokida ustaning OʻZINING ismi va raqami chizilardi —
+ * mock davrida ikkalasi bitta hisob edi. Server ulangach bu xatoga
+ * aylandi va usta mijozga qoʻngʻiroq qila olmasdi.
+ */
+describe('clientContactView', () => {
+  it('kontakt kelgan boʻlsa koʻrsatiladi', () => {
+    const view = clientContactView({ fullName: 'Dilnoza Karimova', phoneNumber: '+998901112233' });
+
+    expect(view).toEqual({ kind: 'ready', name: 'Dilnoza Karimova', phone: '+998901112233' });
+  });
+
+  it('ismsiz kontakt ham koʻrsatiladi — raqam muhimroq', () => {
+    const view = clientContactView({ fullName: null, phoneNumber: '+998901112233' });
+
+    expect(view).toMatchObject({ kind: 'ready', name: null });
+  });
+
+  /* Taklif bosqichida server kontaktni ataylab yubormaydi. */
+  it('kontakt yoʻq boʻlsa sabab aytiladi', () => {
+    for (const value of [null, undefined, { fullName: 'X', phoneNumber: '  ' }]) {
+      const view = clientContactView(value);
+      expect(view.kind).toBe('locked');
+      if (view.kind === 'locked') expect(view.hint).toContain('QABUL QILGANINGIZDAN');
+    }
+  });
 });

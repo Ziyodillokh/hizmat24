@@ -456,8 +456,36 @@ export const PRICE_FIXED_HINT = 'Narx buyurtma berilganda belgilangan va oʻzgar
 export const COMMISSION_HINT =
   'Platforma komissiyasi foizi hali belgilanmagan — sof daromad koʻrsatilmaydi.';
 
-export const CLIENT_CONTACT_HINT =
-  'Bu qurilmada mijoz ham, usta ham — bitta raqam. Shuning uchun qoʻngʻiroq tugmasi chizilmaydi.';
+export const CLIENT_CONTACT_LOCKED_HINT =
+  'Mijozning ismi va raqami ishni QABUL QILGANINGIZDAN keyin ochiladi.';
+
+export interface ClientContact {
+  fullName: string | null;
+  phoneNumber: string;
+}
+
+export type ClientContactView =
+  | { kind: 'locked'; hint: string }
+  | { kind: 'ready'; name: string | null; phone: string };
+
+/**
+ * Mijozning kontakti koʻrsatiladimi.
+ *
+ * Taklif bosqichida server uni ATAYLAB yubormaydi: ish hali ustaniki
+ * emas va rad etilgan taklifdan keyin begona odamning raqami ustada
+ * qolib ketmasligi kerak.
+ *
+ * Ilgari bu yerda ustaning OʻZINING ismi va raqami chizilardi — mock
+ * davrida mijoz ham, usta ham bitta hisob edi. Server ulangach bu
+ * xatoga aylandi: usta oʻzining raqamini mijozniki deb koʻrardi.
+ */
+export function clientContactView(contact: ClientContact | null | undefined): ClientContactView {
+  if (!contact || contact.phoneNumber.trim().length === 0) {
+    return { kind: 'locked', hint: CLIENT_CONTACT_LOCKED_HINT };
+  }
+
+  return { kind: 'ready', name: contact.fullName, phone: contact.phoneNumber };
+}
 
 export const DEPART_TOAST = 'Yoʻlga chiqdingiz — mijoz ekranida holat yangilandi.';
 

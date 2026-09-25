@@ -1,4 +1,4 @@
-import { CalendarBlank, MapPin } from '@phosphor-icons/react';
+import { CalendarBlank, MapPin, Phone } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
@@ -25,7 +25,7 @@ import {
   CANCEL_SHEET_HINT,
   CANCEL_SHEET_TITLE,
   CANCEL_TOAST,
-  CLIENT_CONTACT_HINT,
+  clientContactView,
   COMMISSION_HINT,
   DEPART_TOAST,
   ETA_OPTIONS,
@@ -64,13 +64,14 @@ export function MasterJobScreen() {
   const { orderId } = useParams<{ orderId: string }>();
   const now = useMinuteClock();
   const showToast = useToast();
-  const { findOrder, masterJobs, setRole, fullName, phoneNumber } =
-    useApp();
+  const { findOrder, masterJobs, setRole } = useApp();
 
   const [etaOpen, setEtaOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
   const order = orderId ? findOrder(orderId) : undefined;
+
+  const contact = clientContactView(order?.clientContact);
 
   // Rol almashtirilganda buyurtma bekor qilingan boʻlishi mumkin — ekran
   // yiqilmaydi, roʻyxatga qaytadi.
@@ -236,18 +237,35 @@ export function MasterJobScreen() {
         </Card>
       </StepSection>
 
-      <StepSection title="Mijoz" hint={CLIENT_CONTACT_HINT}>
-        <Card className="flex items-center gap-12">
-          <Avatar name={fullName ?? undefined} size={44} />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-title text-text-primary">
-              {orEmpty(fullName ?? undefined)}
-            </p>
-            <p className="tabular mt-2 truncate text-body-sm text-text-secondary">
-              {formatPhone(phoneNumber)}
-            </p>
-          </div>
-        </Card>
+      <StepSection title="Mijoz">
+        {contact.kind === 'locked' ? (
+          <Card>
+            <p className="text-body-sm text-text-secondary">{contact.hint}</p>
+          </Card>
+        ) : (
+          <Card className="flex items-center gap-12">
+            <Avatar name={contact.name ?? undefined} size={44} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-title text-text-primary">
+                {orEmpty(contact.name ?? undefined)}
+              </p>
+              <p className="tabular mt-2 truncate text-body-sm text-text-secondary">
+                {formatPhone(contact.phone)}
+              </p>
+            </div>
+            {/*
+              Qoʻngʻiroq — ustaning eng koʻp ishlatadigan amali: manzilni
+              topolmasa yoki eshik ochilmasa u mijozga qoʻngʻiroq qiladi.
+            */}
+            <a
+              href={`tel:${contact.phone}`}
+              aria-label="Mijozga qoʻngʻiroq qilish"
+              className="flex size-44 shrink-0 items-center justify-center rounded-full bg-primary text-text-inverse"
+            >
+              <Phone size={20} weight="fill" aria-hidden />
+            </a>
+          </Card>
+        )}
       </StepSection>
 
       {order.status === ORDER_STATUS.CLOSED && order.rating && (

@@ -52,6 +52,10 @@ interface MasterContextValue {
   openShift: () => void;
   /** Smenani yopadi; boshlanish vaqti tozalanadi. */
   closeShift: () => void;
+  /** Soʻrov ketayotgan payt — tugma ikki marta bosilmasin. */
+  isShiftPending: boolean;
+  /** Oxirgi urinish xatosi; `null` — muammo yoʻq. */
+  shiftProblem: string | null;
 }
 
 const MasterContext = createContext<MasterContextValue | null>(null);
@@ -174,6 +178,15 @@ export function MasterProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const [isShiftPending, setIsShiftPending] = useState(false);
+  const [shiftProblem, setShiftProblem] = useState<string | null>(null);
+
+  /**
+   * Smenani ochish/yopish.
+   *
+   * Xato JIMGINA yutilmaydi: ilgari `catch` boʻsh edi va tugma bosilgach
+   * ekranda hech narsa oʻzgarmasdi — usta tugma buzuq deb oʻylardi.
+   */
   const setShift = useCallback(
     (isOpen: boolean) => {
       if (!isApiEnabled()) {
@@ -181,12 +194,22 @@ export function MasterProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      setIsShiftPending(true);
+      setShiftProblem(null);
+
       void setMasterShift(isOpen)
-        .then((shift) => applyShift(shift.isOpen, shift.since ? new Date(shift.since) : null))
-        .catch(() => {
-          // Jim qolmaymiz: ekrandagi kalit oʻzgarmaydi va usta smenasi
-          // ochilmaganini koʻradi. Xato matni amal tugmasida chiqadi.
-        });
+        .then((shift) => {
+          applyShift(shift.isOpen, shift.since ? new Date(shift.since) : null);
+          setShiftProblem(null);
+        })
+        .catch((error: unknown) => {
+          setShiftProblem(
+            error instanceof Error && error.message
+              ? error.message
+              : 'Smenani oʻzgartirib boʻlmadi — tarmoqni tekshiring',
+          );
+        })
+        .finally(() => setIsShiftPending(false));
     },
     [applyShift],
   );
@@ -243,6 +266,8 @@ export function MasterProvider({ children }: { children: ReactNode }) {
       undeclineOffer,
       openShift,
       closeShift,
+      isShiftPending,
+      shiftProblem,
     }),
     [
       state,
@@ -254,6 +279,8 @@ export function MasterProvider({ children }: { children: ReactNode }) {
       undeclineOffer,
       openShift,
       closeShift,
+      isShiftPending,
+      shiftProblem,
     ],
   );
 

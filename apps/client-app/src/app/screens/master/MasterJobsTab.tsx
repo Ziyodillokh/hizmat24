@@ -89,6 +89,8 @@ export function MasterJobsTab() {
     declineOffer,
     openShift,
     closeShift,
+    isShiftPending,
+    shiftProblem,
   } = useMaster();
 
   // Ekran ochilganda faol ish boʻlsa — oʻsha filtr. Usta bir vaqtda bitta
@@ -234,6 +236,8 @@ export function MasterJobsTab() {
         now={now}
         onOpen={openShift}
         onClose={closeShift}
+        isPending={isShiftPending}
+        problem={shiftProblem}
         className="mt-4 shrink-0"
       />
 

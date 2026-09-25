@@ -18,6 +18,7 @@ import {
   AdminPeopleController,
   AdminReportsController,
 } from './people/admin-people.controller';
+import { AdminMasterDetailService } from './people/admin-master-detail.service';
 import { AdminPeopleService } from './people/admin-people.service';
 import { AdminReportsService } from './reports/admin-reports.service';
 import { AdminSafetyService } from './operations/admin-safety.service';
@@ -52,6 +53,7 @@ import { AdminSettingsService } from './settings/admin-settings.service';
     AdminOrdersService,
     AdminSafetyService,
     AdminPeopleService,
+    AdminMasterDetailService,
     AdminReportsService,
     AdminGuard,
   ],

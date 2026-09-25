@@ -12,6 +12,10 @@ import {
   type AuditRow,
 } from '@client/modules/admin/reports/admin-reports.service';
 import {
+  AdminMasterDetailService,
+  type AdminMasterDetail,
+} from './admin-master-detail.service';
+import {
   AdminPeopleService,
   type AdminMasterRow,
   type AdminUserDetail,
@@ -33,6 +37,7 @@ import { AuditQueryDto, BlockDto, SearchQueryDto, StatsQueryDto } from './dto/pe
 export class AdminPeopleController {
   constructor(
     private readonly people: AdminPeopleService,
+    private readonly masterDetails: AdminMasterDetailService,
     private readonly safety: AdminSafetyService,
   ) {}
 
@@ -89,6 +94,14 @@ export class AdminPeopleController {
   @ApiOperation({ summary: 'Ustalar — reyting, bajarilgan ish va bekor qilish ulushi' })
   listMasters(@Query() query: SearchQueryDto): Promise<AdminMasterRow[]> {
     return this.people.listMasters(query.search, query.limit);
+  }
+
+  @Get('masters/:masterId')
+  @ApiOperation({ summary: 'Ustaning toʻliq kartasi — profil, xizmatlar, ishlar, sharhlar' })
+  masterDetail(
+    @Param('masterId', new ParseUUIDPipe({ version: '4' })) masterId: string,
+  ): Promise<AdminMasterDetail> {
+    return this.masterDetails.read(masterId);
   }
 
   @Post('masters/:masterId/reveal-phone')

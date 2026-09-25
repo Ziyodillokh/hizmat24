@@ -24,8 +24,15 @@ export const COLLECTED_BANNER =
 
 export const COMMISSION_ROW_HINT = 'Hali belgilanmagan';
 
+/**
+ * Roʻyxat NIMANI oʻz ichiga olishini aytadi.
+ *
+ * Server oxirgi ishlarni beradi — eski tarix hali sahifalanmaydi, va
+ * buni yashirmaslik kerak: usta oʻz daromadini toʻliq deb oʻylab,
+ * kamaygan summadan hayron boʻlardi.
+ */
 export const HISTORY_SOURCE_CAPTION =
-  'Roʻyxatda faqat siz qabul qilgan ishlar bor. Demo taymer mock ustaga bergan buyurtmalar bu yerga tushmaydi.';
+  'Roʻyxatda faqat siz qabul qilgan ishlar bor. Hozircha oxirgi ishlar koʻrsatiladi — eski tarix keyingi yangilanishda qoʻshiladi.';
 
 export type EarningsOrder = Pick<
   LiveOrder,

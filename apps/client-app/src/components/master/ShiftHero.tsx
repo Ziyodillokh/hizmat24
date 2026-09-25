@@ -20,6 +20,10 @@ export interface ShiftHeroProps {
   onOpen: () => void;
   onClose: () => void;
   className?: string;
+  /** Soʻrov ketayotgan payt — tugma ikki marta bosilmasin. */
+  isPending?: boolean;
+  /** Oxirgi urinish xatosi; `null` — muammo yoʻq. */
+  problem?: string | null;
 }
 
 export function ShiftHero({
@@ -28,6 +32,8 @@ export function ShiftHero({
   onOpen,
   onClose,
   className,
+  isPending = false,
+  problem = null,
 }: ShiftHeroProps) {
   const sinceLine = shiftSinceLine(profile, now);
 
@@ -54,9 +60,16 @@ export function ShiftHero({
             'bg-on-primary-deep/[0.16] text-on-primary-deep ring-1 ring-inset ring-on-primary-deep/[0.45] active:bg-on-primary-deep/[0.24]',
         )}
         onClick={profile.isAvailable ? onClose : onOpen}
+        loading={isPending}
       >
         {shiftActionLabel(profile)}
       </Button>
+
+      {/*
+        Xato JIMGINA yutilmasin: ilgari tugma bosilgach ekranda hech
+        narsa oʻzgarmasdi va usta tugmani buzuq deb oʻylardi.
+      */}
+      {problem && <p className="mt-8 text-body-sm text-on-primary-deep">{problem}</p>}
     </section>
   );
 }
