@@ -139,3 +139,19 @@ function pickMessage(message: string | undefined, status: number): string {
 
   return STATUS_MESSAGES[status] ?? 'Kutilmagan xato';
 }
+
+/**
+ * Soʻrov qatorini yigʻadi.
+ *
+ * Boʻsh va `undefined` qiymatlar tushirib qoldiriladi: `?search=` degan
+ * boʻsh parametr serverda boʻsh qidiruv deb oʻqilardi.
+ */
+export const queryString = (query: Record<string, string | number | undefined>): string => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  }
+
+  const text = params.toString();
+  return text ? `?${text}` : '';
+};

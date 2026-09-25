@@ -1,4 +1,4 @@
-import { ApiError, apiRequest, resolveBaseUrl } from './client';
+import { ApiError, apiRequest, queryString, resolveBaseUrl } from './client';
 
 export interface AdminIdentity {
   id: string;
@@ -374,15 +374,6 @@ export interface OrdersQuery extends Record<string, string | number | undefined>
   offset?: number;
 }
 
-const queryString = (query: Record<string, string | number | undefined>): string => {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined && value !== '') params.set(key, String(value));
-  }
-  const text = params.toString();
-  return text ? `?${text}` : '';
-};
-
 export const fetchAdminOrders = (token: string, query: OrdersQuery = {}): Promise<AdminOrdersPage> =>
   apiRequest(`/admin/orders${queryString(query)}`, { token });
 
@@ -449,85 +440,6 @@ export const resolveSafetyAlert = (
 
 // ───────────────────────────── foydalanuvchilar va hisobotlar (A5, A7) ──
 
-export interface AdminUserRow {
-  id: string;
-  fullName: string | null;
-  /** Roʻyxatda DOIM maskalangan — toʻliq raqam alohida amal bilan ochiladi. */
-  phoneMasked: string;
-  status: 'ACTIVE' | 'BLOCKED';
-  ordersCount: number;
-  isMaster: boolean;
-  createdAt: string;
-}
-
-export interface AdminUserOrderRow {
-  id: string;
-  shortId: string;
-  status: OrderStatus;
-  price: number;
-  createdAt: string;
-}
-
-export interface AdminUserDetail extends AdminUserRow {
-  orders: AdminUserOrderRow[];
-}
-
-export interface AdminMasterRow {
-  id: string;
-  fullName: string;
-  phoneMasked: string;
-  isActive: boolean;
-  status: 'AVAILABLE' | 'BUSY' | 'OFFLINE';
-  ratingAvg: number;
-  ratingCount: number;
-  completedOrdersCount: number;
-  cancelledByMasterCount: number;
-  /** `null` — usta hali ishlamagan; nol foiz yolgʻon boʻlardi. */
-  cancelRatePercent: number | null;
-  enabledCategories: number;
-  isOnShift: boolean;
-}
-
-export const fetchAdminUsers = (token: string, search?: string): Promise<AdminUserRow[]> =>
-  apiRequest(`/admin/users${queryString({ search })}`, { token });
-
-export const fetchAdminUser = (token: string, id: string): Promise<AdminUserDetail> =>
-  apiRequest(`/admin/users/${id}`, { token });
-
-export const fetchAdminMasters = (token: string, search?: string): Promise<AdminMasterRow[]> =>
-  apiRequest(`/admin/masters${queryString({ search })}`, { token });
-
-/** Toʻliq raqamni ochish — har chaqiruv auditga yoziladi. */
-export const revealPhone = (
-  token: string,
-  kind: 'users' | 'masters',
-  id: string,
-): Promise<{ phoneNumber: string }> =>
-  apiRequest(`/admin/${kind}/${id}/reveal-phone`, { method: 'POST', token });
-
-export const setUserBlocked = (
-  token: string,
-  id: string,
-  blocked: boolean,
-  reason: string,
-): Promise<AdminUserRow> =>
-  apiRequest(`/admin/users/${id}/${blocked ? 'block' : 'unblock'}`, {
-    method: 'POST',
-    token,
-    body: { reason },
-  });
-
-export const setMasterBlocked = (
-  token: string,
-  masterId: string,
-  blocked: boolean,
-  reason: string,
-): Promise<{ id: string; fullName: string; isActive: boolean }> =>
-  apiRequest(`/admin/masters/${masterId}/${blocked ? 'block' : 'unblock'}`, {
-    method: 'POST',
-    token,
-    body: { reason },
-  });
 
 export interface AdminStats {
   from: string;

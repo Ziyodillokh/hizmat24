@@ -47,13 +47,19 @@ export class ServiceGroupsService {
    * Guruhlar va ular ichidagi xizmatlar — bosh sahifa plitkalari va
    * kategoriya ekrani uchun bitta so'rovda.
    *
-   * Bo'sh guruhlar qaytarilmaydi: mijoz ochganda hech narsa yoʻq ekranga
-   * tushmasin.
+   * Boʻsh guruh ham QAYTARILADI — lekin ilova uni «Tez kunda» deb
+   * qulflab koʻrsatadi va ochtirmaydi. Shu tufayli yoʻnalish hali
+   * tayyor emasligi mijozga ochiq aytiladi, boʻsh ekran esa baribir
+   * chiqmaydi.
+   *
+   * Ilgari bunday guruh umuman yuborilmasdi va «tez kunda» kartani
+   * ilovaga kodda yozishga toʻgʻri kelardi — katalog esa faqat
+   * paneldan boshqarilishi kerak.
    */
   listActive(): Promise<ServiceGroupView[]> {
     return this.cache.readThrough(CATALOG_CACHE_KEYS.groups, async () => {
       const groups = await this.prisma.serviceGroup.findMany({
-        where: { isActive: true, categories: { some: { isActive: true } } },
+        where: { isActive: true },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
         include: {
           categories: {

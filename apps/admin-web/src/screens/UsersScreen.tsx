@@ -8,7 +8,7 @@ import {
   setUserBlocked,
   type AdminMasterRow,
   type AdminUserRow,
-} from '@/api/admin';
+} from '@/api/adminPeople';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/app/AuthProvider';
 import { formatDateTime } from '@/lib/format';

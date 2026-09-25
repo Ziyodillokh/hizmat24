@@ -4,10 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchSafetyAlerts,
   resolveSafetyAlert,
-  setMasterBlocked,
   type SafetyAlert,
   type SafetyResolution,
 } from '@/api/admin';
+import {
+  setMasterBlocked,
+} from '@/api/adminPeople';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/app/AuthProvider';
 import { formatDateTime } from '@/lib/format';

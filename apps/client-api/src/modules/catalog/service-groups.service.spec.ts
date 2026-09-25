@@ -82,13 +82,16 @@ describe('ServiceGroupsService', () => {
     expect(Object.keys(group.categories[0])).not.toContain('complexityLevel');
   });
 
-  it("boʻsh guruhlarni qaytarmaydi", async () => {
+  /*
+   * Boʻsh guruh ham qaytariladi — ilova uni «Tez kunda» deb qulflaydi.
+   * Ilgari u umuman yuborilmasdi va «tez kunda» kartani ilovaga KODDA
+   * yozishga toʻgʻri kelardi, holbuki katalog faqat paneldan boshqariladi.
+   */
+  it('boʻsh guruh ham qaytariladi — ilova uni qulflab koʻrsatadi', async () => {
     await service.listActive();
 
     expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { isActive: true, categories: { some: { isActive: true } } },
-      }),
+      expect.objectContaining({ where: { isActive: true } }),
     );
   });
 

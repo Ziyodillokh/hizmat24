@@ -5,22 +5,20 @@ import { Icon } from '@/components/Icon';
 import { OrderListCard } from '@/components/order/OrderListCard';
 import { PremiumMastersRail } from '@/components/PremiumMastersRail';
 import { ReviewCard } from '@/components/ReviewCard';
-import { ServiceTile } from '@/components/ServiceTile';
 import { StatusBar } from '@/preview/StatusBar';
 import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
-import { MORE_ICON, serviceIcon } from '@/lib/serviceIcons';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
-import { ALL_SERVICES_IMAGE, SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { DirectionCard } from '@/components/DirectionCard';
+import { lockedMessage, toDirectionCards } from '@/lib/serviceDirections';
+import { useToast } from '../ToastHost';
 import { MASTER_LIST } from '@/mocks/masters';
 import { HomeBanner } from '@/screens/stage1/HomeBanner';
 import aiRobot from '@/assets/brand/ai-robot.webp';
 import { useCatalog } from '../catalog-store';
 import { useApp } from '../store';
-import { useOpenService } from '../useSelectService';
-import { API_BASE_URL } from '@/api/client';
-import { mediaSrc } from '@/lib/servicePresentation';
 import { cityBadge } from '@/lib/serviceArea';
 import { useServiceCity } from '../service-area-store';
 
@@ -35,7 +33,13 @@ import { useServiceCity } from '../service-area-store';
  * tozalash, isitish) "Barcha xizmatlar" orqali — /app/services. "Mashhur"
  * demaymiz: mashhurlik maʼlumoti yoʻq, bu shunchaki roʻyxatning boshi.
  */
-const HOME_SERVICE_COUNT = 5;
+/**
+ * Yoʻnalish kartasining rasmi.
+ *
+ * Guruhda hozircha media yoʻq — rasm ilova ichidagi toʻplamdan ikon
+ * kaliti boʻyicha olinadi. Topilmasa karta glif chizadi, boʻsh joy emas.
+ */
+const directionImage = (iconKey: string): string | undefined => SERVICE_IMAGES[iconKey];
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda
@@ -77,9 +81,9 @@ export function HomeTab() {
    * Guruh `id` si qattiq yozilmaydi: server ulanganda u UUID boʻlib keladi
    * va qattiq yozilgan `g-plumbing` panjarani boʻshatib qoʻyardi.
    */
-  const homeServices = (groups[0]?.categories ?? []).slice(0, HOME_SERVICE_COUNT);
+  const directions = toDirectionCards(groups);
+  const showToast = useToast();
   const now = useMinuteClock();
-  const selectService = useOpenService();
   const city = useServiceCity();
 
   return (
@@ -159,37 +163,27 @@ export function HomeTab() {
           </section>
         )}
 
-        {/* Sarlavha guruh nomidan: katalog serverdan kelganda ham mos qoladi. */}
-        <SectionTitleRow
-          title={groups[0] ? `${groups[0].name} xizmatlari` : 'Xizmatlar'}
-          onMore={() => navigate(groups[0] ? `/app/groups/${groups[0].id}` : '/app/services')}
-        />
-        {/* 3×2 panjara (egasining maketi). Ixcham rejimda qatorlar orasi 4px. */}
-        <div className="mt-8 grid grid-cols-3 gap-8 [@media(max-height:800px)]:gap-y-4">
-          {homeServices.map((category) => (
-            <ServiceTile
-              key={category.id}
-              label={category.name}
-              icon={serviceIcon(category.iconKey ?? 'plumber')}
-              imageUrl={
-                // Paneldan qoʻyilgan muqova ustun; boʻlmasa ilova ichidagi rasm.
-                category.coverUrl
-                  ? mediaSrc(API_BASE_URL, category.coverUrl)
-                  : category.iconKey
-                    ? SERVICE_IMAGES[category.iconKey]
-                    : undefined
+        {/*
+          Bosh ekranda YOʻNALISHLAR koʻrsatiladi, alohida xizmatlar emas.
+          Ilgari bu yerda beshta xizmat va «Barcha xizmatlar» katagi
+          turardi: mijoz nima izlayotganini bilmasdan turib beshta nomni
+          oʻqishga majbur edi.
+        */}
+        <SectionTitleRow title="Xizmatlar" onMore={() => navigate('/app/services')} />
+
+        <div className="mt-8 grid grid-cols-2 gap-12">
+          {directions.map((direction) => (
+            <DirectionCard
+              key={direction.id}
+              direction={direction}
+              imageUrl={directionImage(direction.iconKey)}
+              onClick={() =>
+                direction.isLocked
+                  ? showToast(lockedMessage(direction.name))
+                  : navigate(`/app/groups/${direction.id}`)
               }
-              onClick={() => selectService(category.id)}
             />
           ))}
-          {/* Neytral: xizmat emas, toʻliq katalogga (barcha guruhlar) yoʻl. */}
-          <ServiceTile
-            label="Barcha xizmatlar"
-            icon={MORE_ICON}
-            imageUrl={ALL_SERVICES_IMAGE}
-            tone="neutral"
-            onClick={() => navigate('/app/services')}
-          />
         </div>
 
         <SectionTitleRow title="Mijozlarimiz fikrlari" onMore={() => navigate('/app/reviews')} />
