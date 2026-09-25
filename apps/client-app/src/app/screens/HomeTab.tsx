@@ -10,7 +10,7 @@ import { AppTabBar } from '../AppTabBar';
 import { BottomInset } from '@/screens/_shared/ScreenShell';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { reviewDate, SAMPLE_REVIEWS } from '@/mocks/reviews';
-import { SERVICE_IMAGES } from '@/mocks/serviceImages';
+import { DIRECTION_IMAGES } from '@/mocks/directionImages';
 import { DirectionCard } from '@/components/DirectionCard';
 import { lockedMessage, toDirectionCards } from '@/lib/serviceDirections';
 import { useToast } from '../ToastHost';
@@ -39,7 +39,7 @@ import { useServiceCity } from '../service-area-store';
  * Guruhda hozircha media yoʻq — rasm ilova ichidagi toʻplamdan ikon
  * kaliti boʻyicha olinadi. Topilmasa karta glif chizadi, boʻsh joy emas.
  */
-const directionImage = (iconKey: string): string | undefined => SERVICE_IMAGES[iconKey];
+const directionImage = (iconKey: string): string | undefined => DIRECTION_IMAGES[iconKey];
 
 /**
  * Premium tarifni sotib olgan ustalar — bosh sahifa yuqorisidagi qatorda

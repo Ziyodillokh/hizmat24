@@ -39,7 +39,13 @@ export function DirectionCard({
           <img
             src={imageUrl}
             alt=""
-            className={cn('h-full w-full object-cover', direction.isLocked && 'opacity-40')}
+            className={cn(
+              'h-full w-full object-cover',
+              // Kulrang + yengil xiralik: shunchaki shaffoflik rasmni
+              // «yuklanmagan» yoki buzuq kabi koʻrsatardi, kulrang esa
+              // ATAYLAB oʻchirilganini aytadi.
+              direction.isLocked && 'opacity-70 grayscale',
+            )}
           />
         ) : (
           <span className="flex h-full w-full items-center justify-center">
@@ -58,10 +64,12 @@ export function DirectionCard({
 
       <span className="flex flex-col gap-2 p-12">
         <span className="text-title text-text-primary">{direction.name}</span>
+        {/* Qulflangan yoʻnalishda izoh — vaʼda, shuning uchun u
+            xizmatlar sonidan koʻra koʻrinarli boʻladi. */}
         <span
           className={cn(
             'text-caption',
-            direction.isLocked ? 'text-text-secondary' : 'text-text-secondary',
+            direction.isLocked ? 'text-caption-strong text-warning' : 'text-text-secondary',
           )}
         >
           {directionHint(direction)}
