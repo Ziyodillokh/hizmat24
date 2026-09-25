@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchAdminMasters,
@@ -246,7 +247,14 @@ function MasterCard({ master }: { master: AdminMasterRow }) {
     <Card className="p-20">
       <div className="flex flex-wrap items-start justify-between gap-12">
         <div>
-          <p className="text-h3 text-text-primary">{master.fullName}</p>
+          {/* Ism — tafsilotga yoʻl. Telefon qatori alohida amal, shuning
+              uchun havola ichida EMAS: bosish niyati aralashib ketardi. */}
+          <Link
+            to={`/users/masters/${master.id}`}
+            className="text-h3 text-primary underline-offset-2 hover:underline"
+          >
+            {master.fullName}
+          </Link>
           <div className="mt-4 text-body">
             <PhoneCell kind="masters" id={master.id} masked={master.phoneMasked} />
           </div>
