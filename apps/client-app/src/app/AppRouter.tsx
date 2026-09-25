@@ -9,6 +9,7 @@ import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
 import { SessionReadyProvider, useSessionOutcome } from './session-ready';
 import { isRestoreSettled, shouldSignOut } from '@/lib/sessionGuard';
+import { getAccessToken } from '@/api/session';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -82,7 +83,7 @@ function AppRoutes() {
    * Tarmoq uzilishi bunga sabab boʻlmaydi — u alohida holat.
    */
   useEffect(() => {
-    if (shouldSignOut(outcome, isAuthenticated)) signOut();
+    if (shouldSignOut(outcome, isAuthenticated, getAccessToken() !== null)) signOut();
   }, [outcome, isAuthenticated, signOut]);
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.

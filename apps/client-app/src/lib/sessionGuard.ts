@@ -21,12 +21,22 @@ export type SessionOutcome =
 /**
  * Foydalanuvchini chiqarish kerakmi.
  *
- * Faqat sessiya HAQIQATAN yaroqsiz boʻlganda. Tarmoq uzilishi sabab
- * boʻlmaydi: bir lahzalik uzilish uchun odamni chiqarib yuborish va
- * qaytadan SMS soʻrash — eng yomon javob.
+ * Uch shart BIRGA: sessiya yaroqsiz, ilova oʻzini kirgan deb hisoblaydi
+ * VA tokenning oʻzi ham yoʻq.
+ *
+ * `hasToken` SHART. `outcome` ilova ishga tushganda BIR MARTA
+ * hisoblanadi va kirish tugagach ham `expired` boʻlib qoladi — usiz
+ * foydalanuvchi SMS kodini kiritishi bilan darhol chiqarib yuborilardi.
+ * Token esa kirish paytida oʻrnatiladi va haqiqiy holatni koʻrsatadi.
+ *
+ * Tarmoq uzilishi sabab boʻlmaydi: bir lahzalik uzilish uchun odamni
+ * chiqarib yuborish va qaytadan SMS soʻrash — eng yomon javob.
  */
-export const shouldSignOut = (outcome: SessionOutcome, isAuthenticated: boolean): boolean =>
-  outcome === 'expired' && isAuthenticated;
+export const shouldSignOut = (
+  outcome: SessionOutcome,
+  isAuthenticated: boolean,
+  hasToken: boolean,
+): boolean => outcome === 'expired' && isAuthenticated && !hasToken;
 
 /**
  * Serverga soʻrov yuborsa boʻladimi.

@@ -6,22 +6,32 @@ describe('shouldSignOut', () => {
    * Asosiy xato: token yoʻq boʻlsa ham ilova «kirgan» deb koʻrsatardi va
    * har bir soʻrov 401 qaytarardi.
    */
-  it('sessiya yaroqsiz boʻlsa chiqariladi', () => {
-    expect(shouldSignOut('expired', true)).toBe(true);
+  it('sessiya yaroqsiz va token yoʻq boʻlsa chiqariladi', () => {
+    expect(shouldSignOut('expired', true, false)).toBe(true);
+  });
+
+  /*
+   * REGRESSIYA: `outcome` ishga tushganda BIR MARTA hisoblanadi va
+   * kirish tugagach ham `expired` boʻlib qoladi. Token esa kirish
+   * paytida oʻrnatiladi — usiz foydalanuvchi SMS kodini kiritishi bilan
+   * darhol chiqarib yuborilardi.
+   */
+  it('token bor boʻlsa chiqarilmaydi — kirish endi tugagan boʻlishi mumkin', () => {
+    expect(shouldSignOut('expired', true, true)).toBe(false);
   });
 
   /* Bir lahzalik uzilish uchun odamni chiqarib, qaytadan SMS soʻrash — eng yomon javob. */
   it('tarmoq uzilishi chiqarishga sabab boʻlmaydi', () => {
-    expect(shouldSignOut('offline', true)).toBe(false);
+    expect(shouldSignOut('offline', true, false)).toBe(false);
   });
 
-  it('token bor boʻlsa yoki hali tekshirilayotgan boʻlsa tegilmaydi', () => {
-    expect(shouldSignOut('active', true)).toBe(false);
-    expect(shouldSignOut('pending', true)).toBe(false);
+  it('sessiya joyida yoki hali tekshirilayotgan boʻlsa tegilmaydi', () => {
+    expect(shouldSignOut('active', true, true)).toBe(false);
+    expect(shouldSignOut('pending', true, false)).toBe(false);
   });
 
   it('allaqachon chiqqan foydalanuvchi qayta chiqarilmaydi', () => {
-    expect(shouldSignOut('expired', false)).toBe(false);
+    expect(shouldSignOut('expired', false, false)).toBe(false);
   });
 });
 
