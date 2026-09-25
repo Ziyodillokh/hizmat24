@@ -1,5 +1,4 @@
-import { apiRequest } from './client';
-import { getAccessToken } from './session';
+import { authed } from './authed';
 import { toLiveOrder, type ServerOrder } from './orderDto';
 import type { LiveOrder } from '@/app/types';
 
@@ -10,8 +9,6 @@ import type { LiveOrder } from '@/app/types';
  * yangilanadi: mahalliy taxmin yasab, keyin serverdan boshqa natija
  * kelishi ekranda sakrash boʻlib koʻrinardi.
  */
-const authed = <T>(path: string, options: Parameters<typeof apiRequest>[1] = {}) =>
-  apiRequest<T>(path, { ...options, token: getAccessToken() });
 
 /** Ish ustaning ekranida qaysi roʻyxatga tushadi — serverdagi nom bilan bir xil. */
 export type MasterBucket = 'offer' | 'active' | 'history';

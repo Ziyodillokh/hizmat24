@@ -7,7 +7,8 @@ import { ToastHost } from './ToastHost';
 import { useBackButton } from './useBackButton';
 import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
-import { SessionReadyProvider, useSessionReady } from './session-ready';
+import { SessionReadyProvider, useSessionOutcome } from './session-ready';
+import { isRestoreSettled, shouldSignOut } from '@/lib/sessionGuard';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -59,16 +60,30 @@ function ScrollToTop() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, hasOnboarded, role } = useApp();
+  const { isAuthenticated, hasOnboarded, role, signOut } = useApp();
   useBackButton();
   // Sessiya `AppRouter` da tiklanadi va kontekst orqali keladi: uni shu
   // yerda tiklash ustа smenasi kabi provayderlardan YUQORIDA turgan
   // holatni koʻrmay qoldirardi.
-  const isSessionReady = useSessionReady();
+  const outcome = useSessionOutcome();
   // Sessiya masalasi HAL BOʻLGACH (tiklandi yoki yoʻq edi) buyurtmalar
   // serverdan oʻqiladi va jonli yangilanish ulanadi. Mock rejimda
   // ikkalasi ham hech narsa qilmaydi.
-  useServerSync(isSessionReady !== null);
+  useServerSync(isRestoreSettled(outcome));
+
+  /*
+   * Sessiya yaroqsiz boʻlsa foydalanuvchi CHIQARILADI.
+   *
+   * Ilgari «kirganmi» bayrogʻi alohida saqlangan seansdan oʻqilardi va
+   * token yoʻq boʻlsa ham `true` boʻlib qolaverardi: ilova toʻliq
+   * ochilar, har bir soʻrov esa 401 qaytarardi — «usta chaqirish»
+   * tugmasi sababsiz «unauthorized» xatosi berardi.
+   *
+   * Tarmoq uzilishi bunga sabab boʻlmaydi — u alohida holat.
+   */
+  useEffect(() => {
+    if (shouldSignOut(outcome, isAuthenticated)) signOut();
+  }, [outcome, isAuthenticated, signOut]);
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });

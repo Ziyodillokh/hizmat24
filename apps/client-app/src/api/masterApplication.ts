@@ -1,5 +1,4 @@
-import { apiRequest } from './client';
-import { getAccessToken } from './session';
+import { authed } from './authed';
 
 /**
  * Usta arizasi — serverga.
@@ -29,8 +28,6 @@ export interface RemoteApplication {
   reviewedAt: string | null;
 }
 
-const authed = <T>(path: string, options: Parameters<typeof apiRequest>[1] = {}) =>
-  apiRequest<T>(path, { ...options, token: getAccessToken() });
 
 export const submitApplication = (payload: SubmitApplicationPayload): Promise<RemoteApplication> =>
   authed('/api/v1/master/applications', { method: 'POST', body: payload });

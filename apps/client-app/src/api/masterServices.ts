@@ -1,5 +1,4 @@
-import { apiRequest } from './client';
-import { getAccessToken } from './session';
+import { authed } from './authed';
 
 export interface MasterService {
   categoryId: string;
@@ -14,8 +13,6 @@ export interface MasterService {
   isNew: boolean;
 }
 
-const authed = <T>(path: string, options: Parameters<typeof apiRequest>[1] = {}) =>
-  apiRequest<T>(path, { ...options, token: getAccessToken() });
 
 export const fetchMasterServices = (): Promise<MasterService[]> =>
   authed('/api/v1/master/me/services');
