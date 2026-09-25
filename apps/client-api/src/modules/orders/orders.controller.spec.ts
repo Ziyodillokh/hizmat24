@@ -45,6 +45,7 @@ describe('OrdersController (HTTP qobiq)', () => {
         'client-1',
         'category-1',
         'Kran oqmoqda',
+        1,
         [],
         false,
         address,

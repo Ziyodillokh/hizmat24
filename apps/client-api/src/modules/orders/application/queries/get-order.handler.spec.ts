@@ -185,6 +185,8 @@ describe('GetOrderReceiptHandler (TZ 3.9)', () => {
     // Assert
     expect(result.shortId).toBe('HZ-104901');
     expect(result.invoice).toEqual({
+      unitPrice: 100_000,
+      quantity: 1,
       base: 100_000,
       urgentFee: 20_000,
       discountPercent: 2,

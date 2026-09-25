@@ -5,13 +5,15 @@ import {
   IsArray,
   IsBoolean,
   IsIn,
+  IsInt,
   IsISO8601,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   IsUrl,
   Length,
+  Max,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import {
@@ -21,6 +23,7 @@ import {
   ORDER_MAX_ATTACHMENTS,
   type ApiPaymentMethod,
 } from '@shared/index';
+import { MAX_QUANTITY } from '../domain/pricing';
 import { AddressDto } from './address.dto';
 
 export class CreateOrderDto {
@@ -28,15 +31,31 @@ export class CreateOrderDto {
   @IsUUID('4')
   categoryId: string;
 
-  @ApiProperty({
-    description: 'Muammo tavsifi — majburiy',
+  /**
+   * Mijozning izohi — IXTIYORIY.
+   *
+   * Buyurtma oqimida alohida «muammoni tavsiflab bering» qadami yoʻq:
+   * xizmat nomi va manzil yetarli, ortiqcha qadam esa buyurtma berishni
+   * sekinlashtirardi. Yozilsa — eng kam uzunlik saqlanadi, chunki ikki
+   * harflik izoh ustaga hech narsa bermaydi.
+   */
+  @ApiPropertyOptional({
+    description: 'Mijozning izohi — ixtiyoriy',
     minLength: ORDER_DESCRIPTION_MIN_LENGTH,
     maxLength: ORDER_DESCRIPTION_MAX_LENGTH,
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: "Muammo tavsifi boʻsh boʻlishi mumkin emas" })
   @Length(ORDER_DESCRIPTION_MIN_LENGTH, ORDER_DESCRIPTION_MAX_LENGTH)
-  description: string;
+  description?: string;
+
+  /** Nechta xuddi shu ish. Masalan ikkita quvurni tozalash. */
+  @ApiPropertyOptional({ minimum: 1, maximum: MAX_QUANTITY, default: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(MAX_QUANTITY)
+  quantity?: number;
 
   @ApiPropertyOptional({ type: [String], maxItems: ORDER_MAX_ATTACHMENTS })
   @IsOptional()

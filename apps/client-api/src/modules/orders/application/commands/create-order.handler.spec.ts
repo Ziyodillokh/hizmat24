@@ -65,6 +65,7 @@ const buildCommand = ({
     'client-1',
     'category-1',
     "Kran oqmoqda va suv toʻplanyapti",
+    1,
     [],
     isUrgent,
     clientAddress,

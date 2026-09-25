@@ -59,6 +59,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
     const discountPercent = await this.levels.percentForClient(command.clientId);
     const invoice = buildInvoice({
       base: category.basePrice,
+      quantity: command.quantity,
       isUrgent: command.isUrgent,
       discountPercent,
     });
@@ -154,6 +155,9 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand, O
           clientId: command.clientId,
           categoryId: command.categoryId,
           description: command.description,
+          // Miqdor chekdagi summani tushuntiradi, shuning uchun u ham
+          // narx bilan BIRGA muzlatiladi.
+          quantity: invoice.quantity,
           attachmentUrls: command.attachmentUrls,
           isUrgent: command.isUrgent,
           price: invoice.total,

@@ -412,7 +412,15 @@ model Order {
   clientId        String         @map("client_id") @db.Uuid
   masterId        String?        @map("master_id") @db.Uuid
   categoryId      String         @map("category_id") @db.Uuid
-  description     String         @db.Text
+  /// Bir buyurtmada nechta xuddi shu ish bor.
+  ///
+  /// Masalan «kanalizatsiya tozalash» ikkita quvur uchun boʻlishi mumkin.
+  /// `priceBase` shu songa koʻpaytirilgan holda MUZLATILADI, shuning
+  /// uchun keyin narx oʻzgarsa ham chek oʻzgarmaydi.
+  quantity        Int            @default(1)
+  /// Mijozning izohi. Majburiy EMAS: buyurtma oqimida alohida «muammoni
+  /// tavsiflang» qadami yoʻq — xizmat nomi va manzil yetarli.
+  description     String         @default("") @db.Text
   /// Surat/video havolalari (S3-compatible storage)
   attachmentUrls  String[]       @map("attachment_urls")
   isUrgent        Boolean        @default(false) @map("is_urgent")

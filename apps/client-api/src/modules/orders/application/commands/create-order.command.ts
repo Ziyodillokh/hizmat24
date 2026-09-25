@@ -4,7 +4,10 @@ export class CreateOrderCommand {
   constructor(
     readonly clientId: string,
     readonly categoryId: string,
+    /** Mijozning izohi — boʻsh boʻlishi mumkin (alohida qadam yoʻq). */
     readonly description: string,
+    /** Nechta xuddi shu ish. Kamida 1. */
+    readonly quantity: number,
     readonly attachmentUrls: string[],
     readonly isUrgent: boolean,
     readonly clientAddress: ClientAddress,

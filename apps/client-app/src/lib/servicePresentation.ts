@@ -54,9 +54,14 @@ export interface ServiceGallery {
  * kontekstsiz koʻrardi: ifloslangan kran rasmi xizmatning oʻzi kabi
  * koʻrinib, chalgʻitardi.
  *
- * Roli yoʻq rasm — galereya: eski server bu maydonni yubormaydi.
+ * Filtr TESKARI yozilgan: faqat MAʼLUM rollar chiqariladi. «Roli
+ * GALLERY boʻlsa qoldir» deyilganda, kelajakda serverga qoʻshilgan yangi
+ * rol eski ilovada rasmni jimgina yoʻqotardi — roli yoʻq eski media ham
+ * shu sabab galereyada qoladi.
  */
-const isGallery = (item: ServiceMedia): boolean => (item.role ?? 'GALLERY') === 'GALLERY';
+const HIDDEN_ROLES: readonly string[] = ['BEFORE', 'AFTER', 'EQUIPMENT'];
+
+const isGallery = (item: ServiceMedia): boolean => !HIDDEN_ROLES.includes(item.role ?? '');
 
 export function buildGallery(category: ServiceCategory): ServiceGallery {
   const media = (category.media ?? []).filter(isGallery);

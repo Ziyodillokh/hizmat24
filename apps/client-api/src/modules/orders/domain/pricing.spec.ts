@@ -1,5 +1,5 @@
 import { MONEY_STEP_UZS, URGENT_FEE_UZS } from '@shared/index';
-import { buildInvoice } from './pricing';
+import { buildInvoice, MAX_QUANTITY } from './pricing';
 
 describe('buildInvoice (TZ 4.1 — narxni faqat server hisoblaydi)', () => {
   it('oddiy buyurtmada qoʻshimcha ham, chegirma ham yoʻq', () => {
@@ -8,6 +8,8 @@ describe('buildInvoice (TZ 4.1 — narxni faqat server hisoblaydi)', () => {
 
     // Assert
     expect(invoice).toEqual({
+      unitPrice: 100_000,
+      quantity: 1,
       base: 100_000,
       urgentFee: 0,
       discountPercent: 0,
@@ -61,5 +63,48 @@ describe('buildInvoice (TZ 4.1 — narxni faqat server hisoblaydi)', () => {
     const invoice = buildInvoice({ base: 250_000, isUrgent: true, discountPercent: 4 });
 
     expect(invoice.total).toBe(invoice.base + invoice.urgentFee - invoice.discount);
+  });
+});
+
+describe('buildInvoice — miqdor', () => {
+  it('asosiy narx miqdorga koʻpaytiriladi', () => {
+    // Arrange / Act
+    const invoice = buildInvoice({ base: 120_000, quantity: 2, isUrgent: false, discountPercent: 0 });
+
+    // Assert
+    expect(invoice.unitPrice).toBe(120_000);
+    expect(invoice.quantity).toBe(2);
+    expect(invoice.base).toBe(240_000);
+    expect(invoice.total).toBe(240_000);
+  });
+
+  /*
+   * Shoshilinch qoʻshimchasi ustani yuborish xarajati — usta ikkita ish
+   * uchun ham bir marta chiqadi, shuning uchun u koʻpaytirilmaydi.
+   */
+  it('shoshilinch qoʻshimchasi miqdorga koʻpaytirilmaydi', () => {
+    const invoice = buildInvoice({ base: 100_000, quantity: 3, isUrgent: true, discountPercent: 0 });
+
+    expect(invoice.base).toBe(300_000);
+    expect(invoice.urgentFee).toBe(20_000);
+    expect(invoice.total).toBe(320_000);
+  });
+
+  it('chegirma koʻpaytirilgan summadan olinadi', () => {
+    const invoice = buildInvoice({ base: 100_000, quantity: 2, isUrgent: false, discountPercent: 10 });
+
+    expect(invoice.discount).toBe(20_000);
+    expect(invoice.total).toBe(180_000);
+  });
+
+  it('miqdor berilmasa bitta deb hisoblanadi', () => {
+    expect(buildInvoice({ base: 50_000, isUrgent: false, discountPercent: 0 }).quantity).toBe(1);
+  });
+
+  /* Ilova buzilgan qiymat yuborsa ham chek toʻgʻri qolishi kerak. */
+  it('chegaradan tashqaridagi miqdor qisiladi', () => {
+    expect(buildInvoice({ base: 10_000, quantity: 0, isUrgent: false, discountPercent: 0 }).quantity).toBe(1);
+    expect(buildInvoice({ base: 10_000, quantity: -5, isUrgent: false, discountPercent: 0 }).quantity).toBe(1);
+    expect(buildInvoice({ base: 10_000, quantity: 999, isUrgent: false, discountPercent: 0 }).quantity).toBe(MAX_QUANTITY);
   });
 });

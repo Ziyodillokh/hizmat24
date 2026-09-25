@@ -46,6 +46,12 @@ const category: ServiceCategory = {
   excludes: [],
   durationMinutes: null,
   priceKind: ServicePriceKind.FIXED,
+  steps: null,
+  faq: null,
+  requirements: [],
+  highlights: [],
+  warrantyNote: null,
+  warrantyAmount: null,
   sortOrder: 0,
   isActive: true,
   createdAt: new Date(),
@@ -62,6 +68,7 @@ const buildOrder = (
   masterId: 'master-1',
   categoryId: 'category-1',
   description: 'Kran oqmoqda',
+  quantity: 1,
   attachmentUrls: [],
   isUrgent: true,
   price: 114_000,
@@ -116,6 +123,8 @@ describe('presentOrder', () => {
     const view = presentOrder(buildOrder(OrderStatus.ASSIGNED));
 
     expect(view.invoice).toEqual({
+      unitPrice: 100_000,
+      quantity: 1,
       base: 100_000,
       urgentFee: 20_000,
       discountPercent: 6,

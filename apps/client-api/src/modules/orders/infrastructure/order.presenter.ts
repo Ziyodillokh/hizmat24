@@ -115,7 +115,19 @@ function presentCategory(category: OrderCategoryWithGroup): OrderCategoryView {
  * oʻzgarib ketmasligi kerak.
  */
 export function presentInvoice(order: Order): OrderInvoice {
+  /*
+   * Bir dona narxi ustunda saqlanmaydi — u `priceBase / quantity` dan
+   * ANIQ chiqadi, chunki `priceBase` aynan shu koʻpaytma sifatida
+   * yozilgan. Ortiqcha ustun ikki manba yaratardi.
+   */
+  // `Math.max(1, undefined)` NaN beradi va u butun chekni buzardi —
+  // shuning uchun qiymat AVVAL son ekani tekshiriladi.
+  const quantity =
+    Number.isFinite(order.quantity) && order.quantity > 0 ? Math.round(order.quantity) : 1;
+
   return {
+    unitPrice: Math.round(order.priceBase / quantity),
+    quantity,
     base: order.priceBase,
     urgentFee: order.priceUrgentFee,
     discountPercent: order.discountPercent,

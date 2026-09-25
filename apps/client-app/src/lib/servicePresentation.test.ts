@@ -136,3 +136,16 @@ describe('buildGallery — rasm rollari', () => {
     expect(gallery.items.map((item) => item.url)).toEqual(['/umumiy.webp']);
   });
 });
+
+/*
+ * Kelajakda serverga yangi rol qoʻshilsa, eski ilova rasmni YOʻQOTMASLIGI
+ * kerak. Shuning uchun filtr teskari: faqat maʼlum rollar chiqariladi.
+ */
+it('notanish rol galereyada qoladi', () => {
+  const gallery = buildGallery({
+    media: [{ kind: 'IMAGE' as const, url: '/yangi.webp', role: 'KELAJAK' as never }],
+    coverUrl: null,
+  } as never);
+
+  expect(gallery.items.map((item) => item.url)).toEqual(['/yangi.webp']);
+});

@@ -62,7 +62,8 @@ export class OrdersController {
       new CreateOrderCommand(
         clientId,
         dto.categoryId,
-        dto.description,
+        dto.description ?? '',
+        dto.quantity ?? 1,
         dto.attachmentUrls ?? [],
         dto.isUrgent ?? false,
         dto.clientAddress,

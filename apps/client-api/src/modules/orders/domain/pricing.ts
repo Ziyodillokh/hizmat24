@@ -13,7 +13,11 @@ import { MONEY_STEP_UZS, URGENT_FEE_UZS } from '@shared/index';
  */
 
 export interface OrderInvoice {
-  /** Katalogdagi asosiy narx — mijoz butun oqim davomida shuni koʻrgan. */
+  /** Katalogdagi BIR DONA narxi — mijoz butun oqim davomida shuni koʻrgan. */
+  unitPrice: number;
+  /** Nechta ish buyurtma qilindi. */
+  quantity: number;
+  /** `unitPrice × quantity` — chegirma aynan shundan olinadi. */
   base: number;
   /** Shoshilinch qoʻshimchasi; oddiy buyurtmada 0. */
   urgentFee: number;
@@ -26,11 +30,17 @@ export interface OrderInvoice {
 }
 
 export interface InvoiceInput {
+  /** Katalogdagi bir dona narxi. */
   base: number;
+  /** Nechta ish. Berilmasa 1 — eski chaqiruvlar oʻzgarmaydi. */
+  quantity?: number;
   isUrgent: boolean;
   /** Foydalanuvchi darajasining chegirmasi; daraja yoʻq boʻlsa 0. */
   discountPercent: number;
 }
+
+/** Bir buyurtmada koʻpi bilan shuncha ish. */
+export const MAX_QUANTITY = 10;
 
 /**
  * Hisob-fakturani yigʻadi.
@@ -40,8 +50,20 @@ export interface InvoiceInput {
  * platforma haqiqatan sarflaydigan yuborish xarajati. Undan chegirma berish
  * formulani tushuntirib boʻlmaydigan qilardi.
  */
-export function buildInvoice({ base, isUrgent, discountPercent }: InvoiceInput): OrderInvoice {
-  const safeBase = Math.max(0, Math.round(base));
+export function buildInvoice({
+  base,
+  quantity = 1,
+  isUrgent,
+  discountPercent,
+}: InvoiceInput): OrderInvoice {
+  const unitPrice = Math.max(0, Math.round(base));
+  const safeQuantity = Math.max(1, Math.min(MAX_QUANTITY, Math.round(quantity)));
+  const safeBase = unitPrice * safeQuantity;
+
+  /*
+   * Shoshilinch qoʻshimchasi miqdorga KOʻPAYTIRILMAYDI: u ustani darhol
+   * yuborish xarajati va usta baribir bir marta chiqadi.
+   */
   const urgentFee = isUrgent ? URGENT_FEE_UZS : 0;
   const safePercent = Math.max(0, Math.min(100, Math.round(discountPercent)));
 
@@ -50,6 +72,8 @@ export function buildInvoice({ base, isUrgent, discountPercent }: InvoiceInput):
   const discount = Math.min(safeBase, Math.round(raw / MONEY_STEP_UZS) * MONEY_STEP_UZS);
 
   return {
+    unitPrice,
+    quantity: safeQuantity,
     base: safeBase,
     urgentFee,
     discountPercent: safePercent,
