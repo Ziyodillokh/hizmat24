@@ -232,6 +232,28 @@ model ServiceCategory {
   /// Taxminiy davomiylik (daqiqa). `null` — vaqt aytilmaydi, taxmin qilinmaydi.
   durationMinutes Int?             @map("duration_minutes")
   priceKind       ServicePriceKind @default(FIXED) @map("price_kind")
+  /// «Bizning jarayonimiz» — tartiblangan bosqichlar.
+  /// Shakl: `[{ "title": "Nam tozalash", "description": "..." }]`.
+  ///
+  /// Json ATAYLAB tanlandi: bu roʻyxat faqat koʻrsatish uchun, hech qachon
+  /// alohida soʻralmaydi va doim kategoriya bilan BIRGA saqlanadi. Alohida
+  /// jadval bu yerda yetim qatorlar va qoʻshimcha endpointlar keltirardi.
+  /// Shakl DTO chegarasida qatʼiy tekshiriladi.
+  steps           Json?
+  /// Tez-tez beriladigan savollar.
+  /// Shakl: `[{ "question": "...", "answer": "..." }]`.
+  faq             Json?
+  /// «Sizdan bizga nima kerak boʻladi» — mijoz oldindan tayyorlaydigan narsalar.
+  requirements    String[]         @default([])
+  /// Xizmat haqidagi ishonch bandlari («100+ soat oʻqitilgan usta»).
+  /// Reyting va sharhlar soni bu yerga YOZILMAYDI — ular haqiqiy
+  /// buyurtmalardan hisoblanadi.
+  highlights      String[]         @default([])
+  /// Zarar qoplanishi haqidagi izoh. Boʻsh boʻlsa blok umuman koʻrinmaydi.
+  warrantyNote    String?          @map("warranty_note") @db.VarChar(300)
+  /// Qoplama chegarasi (soʻm). Izohsiz oʻzi maʼnosiz, shuning uchun ikkalasi
+  /// ham boʻlgandagina koʻrsatiladi.
+  warrantyAmount  Int?             @map("warranty_amount")
   sortOrder       Int              @default(0) @map("sort_order")
   isActive        Boolean          @default(true) @map("is_active")
   createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -679,6 +701,13 @@ model ServiceMedia {
   sortOrder  Int              @default(0) @map("sort_order")
   /// Roʻyxatdagi kartada koʻrinadigan asosiy rasm. Kategoriyada bitta.
   isCover    Boolean          @default(false) @map("is_cover")
+  /// Rasm sahifaning QAYSI joyida ishlatilishi.
+  ///
+  /// `BEFORE`/`AFTER` — «oldin/keyin» solishtiruvchi juftlik; `EQUIPMENT` —
+  /// «bizning uskunalarimiz» tasmasi; qolgani oddiy galereya.
+  role       ServiceMediaRole @default(GALLERY)
+  /// Rasm ostidagi qisqa yorliq («Mikrofiber matolar»). Asosan `EQUIPMENT` uchun.
+  caption    String?          @db.VarChar(80)
   createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
 
   category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -690,6 +719,14 @@ model ServiceMedia {
 enum ServiceMediaKind {
   IMAGE
   VIDEO
+}
+
+/// Rasm xizmat sahifasining qaysi blokiga tegishli ekani.
+enum ServiceMediaRole {
+  GALLERY
+  BEFORE
+  AFTER
+  EQUIPMENT
 }
 
 /// Platforma ishlaydigan HUDUD.

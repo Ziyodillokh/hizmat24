@@ -5,6 +5,7 @@ import {
   ComplexityLevel,
   Prisma,
   ServiceMediaKind,
+  ServiceMediaRole,
   ServicePriceKind,
 } from '@prisma/client';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
@@ -13,8 +14,15 @@ import { CatalogCacheService } from '@client/modules/catalog/catalog-cache.servi
 import type { RequestContext } from '@client/common/http/request-context';
 import type { AdminIdentity } from '@client/modules/admin/auth/admin-auth.service';
 import { MAX_MEDIA_PER_CATEGORY, type MediaKind } from './domain/media-rules';
+import {
+  parseFaq,
+  parseSteps,
+  type ServiceFaqItem,
+  type ServiceStep,
+} from '@client/modules/catalog/domain/service-content';
 import { MediaStorageService } from './media-storage.service';
-import type { UpsertCategoryDto, UpsertGroupDto } from './dto/catalog.dto';
+import type { UpdateMediaDto, UpsertCategoryDto, UpsertGroupDto } from './dto/catalog.dto';
+import { orNull, toData, toUpdateData } from './admin-catalog.mappers';
 
 export interface AdminMediaView {
   id: string;
@@ -22,6 +30,10 @@ export interface AdminMediaView {
   url: string;
   sortOrder: number;
   isCover: boolean;
+  /** Rasm sahifaning qaysi blokida ishlatilishi. */
+  role: ServiceMediaRole;
+  /** Rasm ostidagi yorliq — asosan uskunalar tasmasi uchun. */
+  caption: string | null;
 }
 
 export interface AdminCategoryView {
@@ -41,6 +53,12 @@ export interface AdminCategoryView {
   iconKey: string | null;
   isActive: boolean;
   sortOrder: number;
+  steps: ServiceStep[];
+  faq: ServiceFaqItem[];
+  requirements: string[];
+  highlights: string[];
+  warrantyNote: string | null;
+  warrantyAmount: number | null;
   media: AdminMediaView[];
   /** Shu xizmatni YOQIB qoʻygan ustalar soni — narx qoʻyishda muhim. */
   masterCount: number;
@@ -80,12 +98,21 @@ const toView = (category: CategoryRow): AdminCategoryView => ({
   iconKey: category.iconKey,
   isActive: category.isActive,
   sortOrder: category.sortOrder,
+  // Json ustuniga ishonilmaydi — shakli shu yerda tekshiriladi.
+  steps: parseSteps(category.steps),
+  faq: parseFaq(category.faq),
+  requirements: category.requirements,
+  highlights: category.highlights,
+  warrantyNote: category.warrantyNote,
+  warrantyAmount: category.warrantyAmount,
   media: category.media.map((item) => ({
     id: item.id,
     kind: item.kind,
     url: item.url,
     sortOrder: item.sortOrder,
     isCover: item.isCover,
+    role: item.role,
+    caption: item.caption,
   })),
   masterCount: category._count.masters,
 });
@@ -299,6 +326,35 @@ export class AdminCatalogService {
     return this.findCategory(media.categoryId);
   }
 
+  /**
+   * Rasmning sahifadagi oʻrni va yorligʻi.
+   *
+   * Muqova (`isCover`) bu yerda TEGILMAYDI: u alohida soʻrov bilan
+   * qoʻyiladi va bazada kategoriyaga bitta muqova qoldiradigan qisman
+   * unique indeks bor — ikkalasini bitta yoʻlga qoʻshish oʻsha indeksni
+   * kutilmaganda buzardi.
+   */
+  async updateMedia(mediaId: string, dto: UpdateMediaDto): Promise<AdminCategoryView> {
+    const media = await this.prisma.serviceMedia.findUnique({
+      where: { id: mediaId },
+      select: { categoryId: true },
+    });
+
+    if (!media) throw new NotFoundException('Fayl topilmadi.');
+
+    await this.prisma.serviceMedia.update({
+      where: { id: mediaId },
+      data: {
+        ...(dto.role !== undefined ? { role: dto.role } : {}),
+        ...(dto.caption !== undefined ? { caption: orNull(dto.caption) } : {}),
+      },
+    });
+
+    await this.cache.invalidateAll();
+
+    return this.findCategory(media.categoryId);
+  }
+
   async removeMedia(mediaId: string): Promise<AdminCategoryView> {
     const media = await this.prisma.serviceMedia.findUnique({ where: { id: mediaId } });
     if (!media) throw new NotFoundException('Fayl topilmadi');
@@ -339,67 +395,4 @@ export class AdminCatalogService {
       ...entry.context,
     });
   }
-}
-
-/** Boʻsh satr — «qiymat yoʻq», boʻsh matn emas. */
-const orNull = (value: string | undefined): string | null => value?.trim() || null;
-
-/**
- * `description` `summary` dan nusxalanadi.
- *
- * Eski maydon ilovaning hozirgi versiyalarida ishlatiladi; yangi
- * `summary` uning oʻrnini bosadi. Ikkovini bir vaqtda yozib turamiz —
- * eski APK oʻrnatilgan telefonlarda karta boʻsh qolmasin.
- */
-/**
- * PATCH — QISMAN yangilash: faqat yuborilgan maydonlar tegadi.
- *
- * Ilgari bu yerda ham `toData` ishlatilardi va u yuborilmagan maydonni
- * standart qiymatga tushirardi. Jonli serverda bu koʻrindi: guruhsiz
- * yuborilgan PATCH xizmatni guruhdan chiqarib yubordi va u mijoz
- * katalogidan butunlay yoʻqoldi (mijoz endpointi guruhlar boʻyicha
- * oʻqiydi). Qiymatni TOZALASH uchun uni ataylab `null`/boʻsh qilib
- * yuborish kerak — jim tushib qolish emas.
- */
-function toUpdateData(dto: UpsertCategoryDto): Prisma.ServiceCategoryUncheckedUpdateInput {
-  const data: Prisma.ServiceCategoryUncheckedUpdateInput = { name: dto.name, basePrice: dto.basePrice };
-
-  if (dto.summary !== undefined) {
-    data.summary = orNull(dto.summary);
-    // Eski maydon ilovaning hozirgi versiyalarida ishlatiladi.
-    data.description = orNull(dto.summary);
-  }
-  if (dto.details !== undefined) data.details = orNull(dto.details);
-  if (dto.includes !== undefined) data.includes = dto.includes;
-  if (dto.excludes !== undefined) data.excludes = dto.excludes;
-  if (dto.priceKind !== undefined) data.priceKind = dto.priceKind;
-  if (dto.durationMinutes !== undefined) data.durationMinutes = dto.durationMinutes;
-  if (dto.complexityLevel !== undefined) data.complexityLevel = dto.complexityLevel;
-  if (dto.groupId !== undefined) data.groupId = dto.groupId;
-  if (dto.iconKey !== undefined) data.iconKey = orNull(dto.iconKey);
-  if (dto.sortOrder !== undefined) data.sortOrder = dto.sortOrder;
-  if (dto.isActive !== undefined) data.isActive = dto.isActive;
-
-  return data;
-}
-
-function toData(dto: UpsertCategoryDto): Prisma.ServiceCategoryUncheckedCreateInput {
-  const summary = orNull(dto.summary);
-
-  return {
-    name: dto.name,
-    summary,
-    description: summary,
-    details: orNull(dto.details),
-    includes: dto.includes ?? [],
-    excludes: dto.excludes ?? [],
-    basePrice: dto.basePrice,
-    priceKind: dto.priceKind ?? ServicePriceKind.FIXED,
-    durationMinutes: dto.durationMinutes ?? null,
-    complexityLevel: dto.complexityLevel ?? ComplexityLevel.SIMPLE,
-    groupId: dto.groupId ?? null,
-    iconKey: orNull(dto.iconKey),
-    sortOrder: dto.sortOrder ?? 0,
-    isActive: dto.isActive ?? true,
-  };
 }

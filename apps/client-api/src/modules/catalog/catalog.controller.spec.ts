@@ -4,7 +4,7 @@ import { ServiceGroupsController } from './service-groups.controller';
 describe('Katalog controllerlari', () => {
   it("kategoriyalarning tekis roʻyxatini qaytaradi", async () => {
     const listActive = jest.fn().mockResolvedValue([{ id: 'category-1' }]);
-    const controller = new ServiceCategoriesController({ listActive } as never);
+    const controller = new ServiceCategoriesController({ listActive } as never, { read: jest.fn() } as never);
 
     await expect(controller.list()).resolves.toEqual([{ id: 'category-1' }]);
   });

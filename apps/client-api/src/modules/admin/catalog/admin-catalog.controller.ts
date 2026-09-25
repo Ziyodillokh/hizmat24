@@ -22,7 +22,12 @@ import {
   type AdminCategoryView,
   type AdminGroupView,
 } from './admin-catalog.service';
-import { ReorderMediaDto, UpsertCategoryDto, UpsertGroupDto } from './dto/catalog.dto';
+import {
+  ReorderMediaDto,
+  UpdateMediaDto,
+  UpsertCategoryDto,
+  UpsertGroupDto,
+} from './dto/catalog.dto';
 
 /**
  * Katalog boʻlimi — xizmat kartalarini yaratish va tahrirlash.
@@ -155,6 +160,15 @@ export class AdminCatalogController {
     @Param('mediaId', new ParseUUIDPipe({ version: '4' })) mediaId: string,
   ): Promise<AdminCategoryView> {
     return this.catalog.setCover(mediaId);
+  }
+
+  @Patch('media/:mediaId')
+  @ApiOperation({ summary: 'Rasmning sahifadagi oʻrni va yorligʻi' })
+  updateMedia(
+    @Param('mediaId', new ParseUUIDPipe({ version: '4' })) mediaId: string,
+    @Body() dto: UpdateMediaDto,
+  ): Promise<AdminCategoryView> {
+    return this.catalog.updateMedia(mediaId, dto);
   }
 
   @Delete('media/:mediaId')
