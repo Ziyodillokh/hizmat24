@@ -43,6 +43,7 @@ export interface AdminOrderTimelineEntry {
 
 export interface AdminOrderDetail extends AdminOrderRow {
   description: string;
+  quantity: number;
   /**
    * Qaysi amal mumkinligini SERVER aytadi.
    *
@@ -148,6 +149,7 @@ export class AdminOrdersService {
       select: {
         ...LIST_SELECT,
         description: true,
+        quantity: true,
         paymentMethod: true,
         workNote: true,
         cancelReason: true,
@@ -173,6 +175,7 @@ export class AdminOrdersService {
     return {
       ...toRow(order),
       description: order.description,
+      quantity: Math.max(1, order.quantity),
       canRequeue: requeueBlocked === null,
       requeueBlockedReason: requeueBlocked,
       canCancel: cancelBlocked === null,

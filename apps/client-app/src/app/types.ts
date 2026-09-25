@@ -52,6 +52,8 @@ export interface LiveOrder {
   categoryName: string;
   categoryIconKey: string;
   description: string;
+  /** Nechta xuddi shu ish — usta nima kutishini bilishi kerak. */
+  quantity: number;
   /**
    * MUZLATILGAN hisob-faktura: buyurtma yaratilganda bir marta hisoblanadi
    * va qayta hisoblanmaydi. Aks holda foydalanuvchi Kumush darajaga

@@ -53,6 +53,7 @@ export function buildNewOrder(
     categoryIconKey: category.iconKey,
     // Mock rejimida ham tavsif boʻsh: uni soʻraydigan qadam yoʻq.
     description: '',
+    quantity: draft.quantity,
     invoice: buildInvoice({
       base: category.basePrice,
       quantity: draft.quantity,

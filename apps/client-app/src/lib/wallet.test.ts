@@ -53,6 +53,7 @@ function order(status: LiveOrder['status'], options: Partial<LiveOrder> = {}): L
     categoryName: "Kran taʼmirlash",
     categoryIconKey: 'tap',
     description: '',
+    quantity: 1,
     invoice: buildInvoice({ base: 100_000, isUrgent: false, discountPercent: 0 }),
     paymentMethod: 'escrow' as PaymentMethod,
     preferredMasterId: null,

@@ -111,10 +111,23 @@ function OrderCard({ order }: { order: AdminOrderDetail }) {
                 <dd className="text-text-primary">{formatDateTime(order.scheduledAt)}</dd>
               </>
             )}
+            {order.quantity > 1 && (
+              <>
+                <dt className="text-text-secondary">Miqdor</dt>
+                <dd className="text-text-primary">{order.quantity} ta</dd>
+              </>
+            )}
           </dl>
-          <p className="mt-16 whitespace-pre-line text-body text-text-primary">
-            {order.description}
-          </p>
+          {/*
+            Izoh IXTIYORIY — buyurtma oqimida uni soʻraydigan qadam yoʻq.
+            Boʻsh boʻlsa xatboshi chizilmaydi, aks holda ekranda sababsiz
+            boʻsh joy qolardi.
+          */}
+          {order.description.trim().length > 0 && (
+            <p className="mt-16 whitespace-pre-line text-body text-text-primary">
+              {order.description}
+            </p>
+          )}
           {order.workNote && (
             <p className="mt-12 text-body-sm text-text-secondary">
               Ustaning izohi: {order.workNote}

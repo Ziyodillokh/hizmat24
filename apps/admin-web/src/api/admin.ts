@@ -346,6 +346,8 @@ export interface AdminOrderTimelineEntry {
 
 export interface AdminOrderDetail extends AdminOrderRow {
   description: string;
+  /** Nechta xuddi shu ish. */
+  quantity: number;
   /** Qaysi amal mumkinligini server aytadi — panel qoidani takrorlamaydi. */
   canRequeue: boolean;
   requeueBlockedReason: string | null;

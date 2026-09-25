@@ -125,6 +125,14 @@ export function MasterJobCard({
         </span>
       </p>
 
+      {/*
+        Miqdor — ustaga ENG muhim maʼlumotlardan biri: ikkita quvur
+        uchun u boshqa asbob va boshqa vaqt bilan chiqadi.
+      */}
+      {order.quantity > 1 && (
+        <p className="mt-8 text-body-sm text-text-primary">{order.quantity} ta ish</p>
+      )}
+
       {order.description.trim().length > 0 && (
         <p className="mt-8 line-clamp-2 text-body-sm text-text-secondary">
           {order.description.trim()}

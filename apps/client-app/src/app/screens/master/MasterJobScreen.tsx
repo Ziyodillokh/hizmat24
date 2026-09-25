@@ -197,6 +197,10 @@ export function MasterJobScreen() {
         </Banner>
       )}
 
+      {order.quantity > 1 && (
+        <p className="mt-12 text-body-strong text-text-primary">{order.quantity} ta ish</p>
+      )}
+
       {order.description.trim().length > 0 && (
         <StepSection title="Mijoz yozgani">
           <Card>

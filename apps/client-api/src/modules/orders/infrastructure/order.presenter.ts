@@ -42,6 +42,8 @@ export interface OrderView {
   shortId: string;
   status: Order['status'];
   description: string;
+  /** Nechta xuddi shu ish. Usta nima kutishini bilishi kerak. */
+  quantity: number;
   attachmentUrls: string[];
   isUrgent: boolean;
   /** Toʻlanadigan yakuniy summa — `invoice.total` bilan bir xil. */
@@ -142,6 +144,7 @@ export function presentOrder(order: OrderWithRelations): OrderView {
     shortId: order.shortId,
     status: order.status,
     description: order.description,
+    quantity: Math.max(1, order.quantity ?? 1),
     attachmentUrls: order.attachmentUrls,
     isUrgent: order.isUrgent,
     price: order.price,

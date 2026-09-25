@@ -28,6 +28,7 @@ function order(extra: Partial<LiveOrder> = {}): LiveOrder {
     categoryName: 'Kran taʼmirlash',
     categoryIconKey: 'tap',
     description: 'Oshxonadagi kran oqmoqda',
+    quantity: 1,
     invoice: buildInvoice({ base: 150_000, isUrgent: false, discountPercent: 0 }),
     paymentMethod: 'cash' as PaymentMethod,
     preferredMasterId: null,

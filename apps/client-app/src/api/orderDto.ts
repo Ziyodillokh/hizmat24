@@ -17,6 +17,7 @@ export interface ServerOrder {
   shortId: string;
   status: string;
   description: string;
+  quantity?: number;
   isUrgent: boolean;
   invoice: OrderInvoice;
   paymentMethod: PaymentMethod | null;
@@ -102,6 +103,8 @@ export function toLiveOrder(raw: ServerOrder): LiveOrder {
     // Ikona ham, xizmat fotosi ham shu kalit boʻyicha topiladi.
     categoryIconKey: raw.category?.iconKey ?? 'plumber',
     description: raw.description,
+    // Eski server bu maydonni yubormaydi — bitta ish deb qaraladi.
+    quantity: Math.max(1, raw.quantity ?? 1),
     invoice: raw.invoice,
     // Eski buyurtmalarda usul yozilmagan boʻlishi mumkin — naqd eng xavfsiz
     // taxmin emas, balki HAQIQAT: ilova boshqa usulni hali qabul qilmaydi.
