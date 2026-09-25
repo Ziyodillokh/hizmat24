@@ -65,13 +65,15 @@ describe('validateForm', () => {
 });
 
 describe('toCategoryInput', () => {
-  it('boʻsh ixtiyoriy maydonlarni YUBORMAYDI', () => {
+  /*
+   * Boʻsh maydon ATAYLAB yuboriladi. Ilgari u soʻrovdan tushib qolardi va
+   * server PATCH ni qisman qilgani uchun admin qisqa izohni yoki guruhni
+   * hech qachon tozalay olmasdi.
+   */
+  it('boʻsh ixtiyoriy maydonlarni boʻsh qiymat bilan yuboradi', () => {
     const input = toCategoryInput(valid());
 
-    expect(input).not.toHaveProperty('summary');
-    expect(input).not.toHaveProperty('details');
-    expect(input).not.toHaveProperty('durationMinutes');
-    expect(input).not.toHaveProperty('groupId');
+    expect(input).toMatchObject({ summary: '', details: '', durationMinutes: null, groupId: null });
   });
 
   it('roʻyxatlardagi boʻsh qatorlarni tashlab yuboradi', () => {
@@ -141,5 +143,54 @@ describe('priceLabel', () => {
 
   it('«shundan boshlab» qoʻshimcha bilan', () => {
     expect(priceLabel('120 000 soʻm', 'FROM')).toBe('120 000 soʻmdan');
+  });
+});
+
+/*
+ * Regressiya: admin toʻldirilgan maydonni tozalay olishi SHART.
+ *
+ * Ilgari boʻsh maydon soʻrovdan tushib qolardi, server esa PATCH ni
+ * qisman qiladi — natijada qisqa izohni yoki guruhni oʻchirib boʻlmasdi:
+ * maydon boʻshatilib saqlangach, eski qiymat joyida qolaverardi.
+ */
+describe('toCategoryInput — tozalash', () => {
+  const filled = {
+    ...EMPTY_FORM,
+    name: 'Lavabo tozalash',
+    basePrice: '120000',
+  };
+
+  it('boʻshatilgan maydonlar ATAYLAB yuboriladi', () => {
+    const input = toCategoryInput({ ...filled, summary: '', details: '', groupId: '', durationMinutes: '' });
+
+    expect(input).toMatchObject({
+      summary: '',
+      details: '',
+      groupId: null,
+      durationMinutes: null,
+    });
+  });
+
+  it('toʻldirilgan maydonlar oʻz qiymati bilan ketadi', () => {
+    const input = toCategoryInput({
+      ...filled,
+      summary: '  Qisqa izoh  ',
+      durationMinutes: '30',
+      groupId: 'g-1',
+    });
+
+    expect(input).toMatchObject({ summary: 'Qisqa izoh', durationMinutes: 30, groupId: 'g-1' });
+  });
+
+  it('mazmun bloklari ham soʻrovga qoʻshiladi', () => {
+    const input = toCategoryInput({
+      ...filled,
+      steps: [{ title: 'Nam tozalash', description: 'Nam mato bilan' }],
+      warrantyNote: 'Zarar qoplanadi',
+      warrantyAmount: '5000000',
+    });
+
+    expect(input?.steps).toEqual([{ title: 'Nam tozalash', description: 'Nam mato bilan' }]);
+    expect(input?.warrantyAmount).toBe(5_000_000);
   });
 });

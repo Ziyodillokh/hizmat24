@@ -22,6 +22,7 @@ import {
   type CategoryFormState,
 } from '@/lib/catalogForm';
 import { ListEditor } from '@/components/ListEditor';
+import { ServiceContentFields } from '@/components/ServiceContentFields';
 import { MediaManager } from '@/components/MediaManager';
 import { Button, Card, Field, Notice, PageTitle, Pill } from '@/components/ui';
 
@@ -223,6 +224,8 @@ function CategoryForm({
             placeholder="Yangi kran narxi"
           />
         </Card>
+
+        <ServiceContentFields form={form} patch={patch} />
       </div>
 
       {touched && problems.length > 0 && (

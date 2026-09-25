@@ -1,4 +1,10 @@
-import type { AdminCategory, CategoryInput, PriceKind } from '@/api/admin';
+import type { AdminCategory, CategoryInput, MediaRole, PriceKind } from '@/api/admin';
+import {
+  EMPTY_CONTENT,
+  toContentInput,
+  validateContent,
+  type ContentFormState,
+} from './catalogContent';
 
 /**
  * Xizmat kartasi shaklining sof mantiqi — React yoʻq, tarmoq yoʻq.
@@ -24,7 +30,7 @@ export const MAX_VIDEO_BYTES = 60 * 1024 * 1024;
 export const MAX_MEDIA_PER_CATEGORY = 8;
 export const ACCEPTED_MEDIA = 'image/jpeg,image/png,image/webp,video/mp4';
 
-export interface CategoryFormState {
+export interface CategoryFormState extends ContentFormState {
   name: string;
   summary: string;
   details: string;
@@ -38,6 +44,7 @@ export interface CategoryFormState {
 }
 
 export const EMPTY_FORM: CategoryFormState = {
+  ...EMPTY_CONTENT,
   name: '',
   summary: '',
   details: '',
@@ -59,6 +66,15 @@ export const toFormState = (category: AdminCategory): CategoryFormState => ({
   priceKind: category.priceKind,
   durationMinutes: category.durationMinutes === null ? '' : String(category.durationMinutes),
   groupId: category.groupId ?? '',
+  // `?? []` — panel statik fayl, API esa alohida konteyner: joylash
+  // paytida bittasi ikkinchisidan eski boʻlishi mumkin. Eski API bu
+  // maydonlarni yubormaydi va tahrirlash ekrani yiqilib qolardi.
+  steps: (category.steps ?? []).map((step) => ({ ...step })),
+  faq: (category.faq ?? []).map((item) => ({ ...item })),
+  requirements: [...(category.requirements ?? [])],
+  highlights: [...(category.highlights ?? [])],
+  warrantyNote: category.warrantyNote ?? '',
+  warrantyAmount: category.warrantyAmount === null ? '' : String(category.warrantyAmount),
 });
 
 /**
@@ -112,29 +128,39 @@ export function validateForm(form: CategoryFormState): string[] {
     }
   }
 
+  problems.push(...validateContent(form, parseWholeNumber(form.warrantyAmount)));
+
   return problems;
 }
 
-/** Shakl → serverga yuboriladigan maʼlumot. Boʻsh maydon UMUMAN yuborilmaydi. */
+/**
+ * Shakl → serverga yuboriladigan maʼlumot.
+ *
+ * Har bir maydon DOIM yuboriladi — boʻsh boʻlsa ham. Ilgari boʻsh maydon
+ * tushirib qoldirilardi, server esa PATCH ni qisman qiladi
+ * (`if (dto.X !== undefined)`) — natijada admin toʻldirilgan qisqa
+ * izohni yoki guruhni HECH QACHON tozalay olmasdi: maydonni boʻshatib
+ * saqlagach, eski qiymat joyida qolardi.
+ */
 export function toCategoryInput(form: CategoryFormState): CategoryInput | null {
   if (validateForm(form).length > 0) return null;
 
   const price = parseWholeNumber(form.basePrice);
   if (price === null) return null;
 
-  const duration = parseWholeNumber(form.durationMinutes);
   const clean = (list: string[]) => list.map((item) => item.trim()).filter(Boolean);
 
   return {
     name: form.name.trim(),
-    ...(form.summary.trim() ? { summary: form.summary.trim() } : {}),
-    ...(form.details.trim() ? { details: form.details.trim() } : {}),
+    summary: form.summary.trim(),
+    details: form.details.trim(),
     includes: clean(form.includes),
     excludes: clean(form.excludes),
     basePrice: price,
     priceKind: form.priceKind,
-    ...(duration === null ? {} : { durationMinutes: duration }),
-    ...(form.groupId ? { groupId: form.groupId } : {}),
+    durationMinutes: parseWholeNumber(form.durationMinutes),
+    groupId: form.groupId || null,
+    ...toContentInput(form, parseWholeNumber(form.warrantyAmount)),
   };
 }
 
@@ -163,3 +189,22 @@ export const PRICE_KIND_LABELS: Record<PriceKind, string> = {
 /** Narx yorligʻi: «85 000 soʻm» yoki «85 000 soʻmdan». */
 export const priceLabel = (formatted: string, kind: PriceKind): string =>
   kind === 'FROM' ? `${formatted}dan` : formatted;
+
+/**
+ * Rasmning xizmat sahifasidagi oʻrni.
+ *
+ * `BEFORE`/`AFTER` faqat IKKALASI ham boʻlsa ishlaydi — ilova yolgʻiz
+ * «oldin» rasmidan solishtirgich chiza olmaydi.
+ */
+export const MEDIA_ROLE_LABELS: Record<MediaRole, string> = {
+  GALLERY: 'Galereya',
+  BEFORE: 'Oldin',
+  AFTER: 'Keyin',
+  EQUIPMENT: 'Uskuna',
+};
+
+export const MEDIA_ROLES: MediaRole[] = ['GALLERY', 'BEFORE', 'AFTER', 'EQUIPMENT'];
+
+/** Uskuna rasmi yorliqsiz maʼnosiz — ilovada u nomi bilan chiziladi. */
+export const captionProblem = (role: MediaRole, caption: string): string | null =>
+  role === 'EQUIPMENT' && caption.trim().length === 0 ? 'Uskuna rasmiga yorliq yozing.' : null;

@@ -38,12 +38,27 @@ export const logout = (token: string): Promise<void> =>
 export type PriceKind = 'FIXED' | 'FROM';
 export type MediaKind = 'IMAGE' | 'VIDEO';
 
+/** Rasm xizmat sahifasining qaysi blokida ishlatilishi. */
+export type MediaRole = 'GALLERY' | 'BEFORE' | 'AFTER' | 'EQUIPMENT';
+
 export interface AdminMedia {
   id: string;
   kind: MediaKind;
   url: string;
   sortOrder: number;
   isCover: boolean;
+  role: MediaRole;
+  caption: string | null;
+}
+
+export interface ServiceStep {
+  title: string;
+  description: string;
+}
+
+export interface ServiceFaqItem {
+  question: string;
+  answer: string;
 }
 
 export interface AdminCategory {
@@ -63,6 +78,12 @@ export interface AdminCategory {
   iconKey: string | null;
   isActive: boolean;
   sortOrder: number;
+  steps: ServiceStep[];
+  faq: ServiceFaqItem[];
+  requirements: string[];
+  highlights: string[];
+  warrantyNote: string | null;
+  warrantyAmount: number | null;
   media: AdminMedia[];
   /** Shu ishni YOQIB qoʻygan ustalar soni. */
   masterCount: number;
@@ -77,16 +98,34 @@ export interface AdminGroup {
   categoryCount: number;
 }
 
-export interface CategoryInput {
+/**
+ * Sahifa mazmuni — har bir maydon DOIM yuboriladi.
+ *
+ * Server PATCH ni qisman qiladi: tushirib qoldirilgan maydon
+ * «oʻzgarmasin» degani. Shuning uchun blokni TOZALASH uchun uni boʻsh
+ * qilib ataylab yuborish kerak.
+ */
+export interface CategoryContentInput {
+  steps: ServiceStep[];
+  faq: ServiceFaqItem[];
+  requirements: string[];
+  highlights: string[];
+  warrantyNote: string;
+  warrantyAmount: number;
+}
+
+export interface CategoryInput extends CategoryContentInput {
   name: string;
-  summary?: string;
-  details?: string;
-  includes?: string[];
-  excludes?: string[];
+  summary: string;
+  details: string;
+  includes: string[];
+  excludes: string[];
   basePrice: number;
-  priceKind?: PriceKind;
-  durationMinutes?: number;
-  groupId?: string;
+  priceKind: PriceKind;
+  /** `null` — vaqt aytilmaydi. Tushirib qoldirilsa eski qiymat qolardi. */
+  durationMinutes: number | null;
+  /** `null` — guruhdan chiqarish. */
+  groupId: string | null;
   isActive?: boolean;
 }
 
@@ -202,6 +241,14 @@ export const setCategoryActive = (
     method: 'POST',
     token,
   });
+
+/** Rasmning sahifadagi oʻrni va yorligʻi. */
+export const updateMedia = (
+  token: string,
+  mediaId: string,
+  body: { role?: MediaRole; caption?: string },
+): Promise<AdminCategory> =>
+  apiRequest(`/admin/catalog/media/${mediaId}`, { method: 'PATCH', token, body });
 
 export const setMediaCover = (token: string, mediaId: string): Promise<AdminCategory> =>
   apiRequest(`/admin/catalog/media/${mediaId}/cover`, { method: 'POST', token });

@@ -152,22 +152,24 @@ export class UpsertCategoryDto {
   @IsEnum(ServicePriceKind)
   priceKind?: ServicePriceKind;
 
-  @ApiPropertyOptional({ description: 'Taxminiy davomiylik (daqiqa)' })
+  /** `null` — «vaqt aytilmaydi». Tushirib qoldirish esa «oʻzgarmasin» degani. */
+  @ApiPropertyOptional({ description: 'Taxminiy davomiylik (daqiqa); tozalash uchun null' })
   @IsOptional()
   @IsInt()
   @Min(5)
   @Max(1440)
-  durationMinutes?: number;
+  durationMinutes?: number | null;
 
   @ApiPropertyOptional({ enum: ComplexityLevel })
   @IsOptional()
   @IsEnum(ComplexityLevel)
   complexityLevel?: ComplexityLevel;
 
-  @ApiPropertyOptional({ format: 'uuid' })
+  /** `null` — guruhdan chiqarish. */
+  @ApiPropertyOptional({ format: 'uuid', description: 'Guruhdan chiqarish uchun null' })
   @IsOptional()
   @IsUUID('4')
-  groupId?: string;
+  groupId?: string | null;
 
   @ApiPropertyOptional()
   @IsOptional()

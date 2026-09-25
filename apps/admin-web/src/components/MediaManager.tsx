@@ -4,13 +4,16 @@ import {
   deleteMedia,
   mediaSrc,
   setMediaCover,
+  updateMedia,
   uploadMedia,
   type AdminCategory,
+  type MediaRole,
 } from '@/api/admin';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/app/AuthProvider';
 import { ACCEPTED_MEDIA, fileProblem, MAX_MEDIA_PER_CATEGORY } from '@/lib/catalogForm';
 import { Button, Notice, Pill } from '@/components/ui';
+import { MediaRoleControls } from '@/components/MediaRoleControls';
 
 const errorText = (error: unknown, fallback: string): string =>
   error instanceof ApiError ? error.message : fallback;
@@ -45,6 +48,11 @@ export function MediaManager({ category }: { category: AdminCategory }) {
     mutationFn: (mediaId: string) => deleteMedia(token as string, mediaId),
     onSuccess: refresh,
   });
+  const role = useMutation({
+    mutationFn: ({ mediaId, patch }: { mediaId: string; patch: { role?: MediaRole; caption?: string } }) =>
+      updateMedia(token as string, mediaId, patch),
+    onSuccess: refresh,
+  });
 
   const pick = (file: File | undefined) => {
     if (!file) return;
@@ -54,7 +62,7 @@ export function MediaManager({ category }: { category: AdminCategory }) {
     if (fileInput.current) fileInput.current.value = '';
   };
 
-  const busy = upload.isPending || cover.isPending || remove.isPending;
+  const busy = upload.isPending || cover.isPending || remove.isPending || role.isPending;
 
   return (
     <div className="flex flex-col gap-12">
@@ -112,6 +120,14 @@ export function MediaManager({ category }: { category: AdminCategory }) {
                   Oʻchirish
                 </button>
               </div>
+
+              {item.kind === 'IMAGE' && (
+                <MediaRoleControls
+                  item={item}
+                  disabled={busy}
+                  onChange={(patch) => role.mutate({ mediaId: item.id, patch })}
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -121,6 +137,7 @@ export function MediaManager({ category }: { category: AdminCategory }) {
       {upload.isError && <Notice>{errorText(upload.error, 'Faylni yuklab boʻlmadi')}</Notice>}
       {remove.isError && <Notice>{errorText(remove.error, 'Faylni oʻchirib boʻlmadi')}</Notice>}
       {cover.isError && <Notice>{errorText(cover.error, 'Muqovani belgilab boʻlmadi')}</Notice>}
+      {role.isError && <Notice>{errorText(role.error, 'Rasm sozlamasini saqlab boʻlmadi')}</Notice>}
 
       <div>
         <input
