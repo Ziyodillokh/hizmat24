@@ -44,9 +44,17 @@ export function ConfirmStep() {
   const preferred = masterById(draft.preferredMasterId ?? undefined);
   const isStale = isScheduleStale(draft.scheduledAt, now);
 
+  // Miqdor SHU YERDA ham berilishi shart: usiz ekranda bitta ishning
+  // narxi turar, chekda esa koʻpaytirilgani chiqardi.
   const invoice = useMemo(
-    () => buildInvoice({ base: category?.basePrice ?? 0, isUrgent: draft.isUrgent, discountPercent: level.discountPercent }),
-    [category?.basePrice, draft.isUrgent, level.discountPercent],
+    () =>
+      buildInvoice({
+        base: category?.basePrice ?? 0,
+        quantity: draft.quantity,
+        isUrgent: draft.isUrgent,
+        discountPercent: level.discountPercent,
+      }),
+    [category?.basePrice, draft.quantity, draft.isUrgent, level.discountPercent],
   );
 
   const edit = (route: string) => navigate(route, { state: { returnTo: ORDER_STEP_ROUTES.confirm } });

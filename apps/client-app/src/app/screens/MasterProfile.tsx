@@ -11,6 +11,8 @@ import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
 import { cn } from '@/lib/cn';
 import { isMasterPhoneVisible } from '@/lib/orderStateMachine';
 import { MASTERS } from '@/mocks/masters';
+import { isApiEnabled } from '@/api/client';
+import { isServerMasterId } from '@/lib/orderList';
 import { useFavorites } from '../favorites-store';
 import { useApp } from '../store';
 import { useToast } from '../ToastHost';
@@ -43,9 +45,23 @@ export function MasterProfile() {
     isMasterPhoneVisible(activeOrder.status) &&
     Boolean(master.phoneNumber);
 
+  /*
+   * Ustalar katalogi hali MOCK, buyurtma esa haqiqiy serverga ketadi va
+   * u `@IsUUID('4')` talab qiladi. Mock identifikator yuborilsa butun
+   * buyurtma 400 bilan rad etilardi, shuning uchun soʻrov chegarada
+   * tushiriladi (`orderDto`). Demak vaʼda ham berilmaydi: «tanlandi»
+   * deyish yolgʻon boʻlardi.
+   */
+  const canRequestMaster = !isApiEnabled() || isServerMasterId(master.id);
+
   const order = () => {
-    setDraftMaster(master.id);
-    showToast(`${master.fullName} tanlandi`, 'success');
+    setDraftMaster(canRequestMaster ? master.id : null);
+    showToast(
+      canRequestMaster
+        ? `${master.fullName} tanlandi`
+        : 'Aniq ustani soʻrash hozircha ishlamaydi — buyurtma eng yaqin ustaga boradi',
+      canRequestMaster ? 'success' : undefined,
+    );
     navigate('/app/services');
   };
 

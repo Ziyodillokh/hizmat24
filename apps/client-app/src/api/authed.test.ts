@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { authed } from './authed';
-import { setAccessToken, setSessionRefresher } from './session';
+import { getAccessToken, setAccessToken, setSessionRefresher } from './session';
 
 const ok = (data: unknown) =>
   new Response(JSON.stringify({ success: true, data, error: null }), {
@@ -114,5 +114,49 @@ describe('authed', () => {
 
     await expect(authed('/api/v1/orders')).rejects.toThrow();
     expect(refresher).not.toHaveBeenCalled();
+  });
+});
+
+/*
+ * Roʻyxat parallel oʻqiladi (useServerSync). Access token 15 daqiqada
+ * eskirgach ikkala soʻrov ham BIRGA 401 oladi. Yangilash birlashtirilmasa,
+ * ikkalasi ham AYNI refresh tokenni yuborardi: server birinchisini qabul
+ * qilib tokenni almashtiradi, ikkinchisini «qayta ishlatilgan» deb rad
+ * etadi — va ilova saqlangan tokenni oʻchirib, foydalanuvchini chiqarib
+ * yuborardi.
+ */
+describe('authed — parallel 401', () => {
+  beforeEach(() => {
+    withWindow();
+    vi.stubEnv('VITE_API_URL', 'http://test.local');
+    setAccessToken('eski-token');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    setSessionRefresher(null);
+    setAccessToken(null);
+  });
+
+  it('bir vaqtdagi ikki 401 uchun yangilash BIR MARTA chaqiriladi', async () => {
+    const fetchSpy = vi.fn(async () => (getAccessToken() === 'yangi' ? ok({ id: 'o-1' }) : unauthorized()));
+    globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+    const refresher = vi.fn(async () => {
+      // Haqiqiy yangilash kabi — darhol emas, keyingi tikda tugaydi.
+      await Promise.resolve();
+      setAccessToken('yangi');
+      return true;
+    });
+    setSessionRefresher(refresher);
+
+    const [a, b] = await Promise.all([
+      authed<{ id: string }>('/api/v1/orders'),
+      authed<{ id: string }>('/api/v1/master/orders'),
+    ]);
+
+    expect(a).toEqual({ id: 'o-1' });
+    expect(b).toEqual({ id: 'o-1' });
+    expect(refresher).toHaveBeenCalledTimes(1);
   });
 });

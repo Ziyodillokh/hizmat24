@@ -1,12 +1,21 @@
 /**
  * Brauzer preflight'da soʻraydigan metodlar.
  *
- * `@fastify/cors` sukut bo'yicha faqat `GET,HEAD,POST` qaytaradi (Express'dagi
- * `cors` paketidan FARQLI). Panel esa bloklash, signalni hal qilish va
- * buyurtmani bekor qilishda PATCH/DELETE yuboradi — roʻyxat aniq
- * yozilmasa, brauzer bu soʻrovlarni serverga umuman uzatmaydi.
+ * `@fastify/cors` sukut bo'yicha faqat `GET,HEAD,POST` qaytaradi
+ * (Express'dagi `cors` paketidan FARQLI), shuning uchun roʻyxat SHU
+ * YERDA toʻliq sanaladi.
+ *
+ * Kim nimani ishlatadi:
+ * - PATCH/DELETE — panel: bloklash, signalni hal qilish, xizmatni
+ *   tahrirlash, faylni oʻchirish
+ * - PUT — ILOVA: ustaning smenasi (`/master/shift`) va «mening
+ *   xizmatlarim» (`/master/me/services`)
+ *
+ * Roʻyxatdan tushib qolgan metod jimgina yoʻqoladi: brauzer soʻrovni
+ * serverga UMUMAN uzatmaydi va ekranda sababsiz «ishlamadi» chiqadi.
+ * PUT aynan shunday unutilgan edi — APK'da smena ochilmasdi.
  */
-export const CORS_METHODS = ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'] as const;
+export const CORS_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
 
 /**
  * Android ilovasining Origin'i.

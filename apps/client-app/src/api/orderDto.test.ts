@@ -155,10 +155,23 @@ describe('toCreatePayload', () => {
     const payload = toCreatePayload({
       ...draft,
       scheduledAt: new Date('2026-09-22T09:00:00.000Z'),
-      preferredMasterId: 'm-1',
+      preferredMasterId: '94e0640f-3463-4e19-8b3e-eb17ae021e2b',
     });
     expect(payload?.scheduledAt).toBe('2026-09-22T09:00:00.000Z');
-    expect(payload?.preferredMasterId).toBe('m-1');
+    expect(payload?.preferredMasterId).toBe('94e0640f-3463-4e19-8b3e-eb17ae021e2b');
+  });
+
+  /*
+   * Ustalar katalogi hali MOCK (`m-sardor`), server esa UUID talab
+   * qiladi. Mock id yuborilsa server 400 qaytarar va BUTUN buyurtma
+   * yaratilmasdi — mijoz ekranda inglizcha texnik matnni koʻrardi.
+   * Soʻralgan usta ixtiyoriy, shuning uchun u tushiriladi.
+   */
+  it('mock usta identifikatori yuborilmaydi — buyurtma saqlanib qoladi', () => {
+    const payload = toCreatePayload({ ...draft, preferredMasterId: 'm-sardor' });
+
+    expect(payload).not.toBeNull();
+    expect(payload?.preferredMasterId).toBeUndefined();
   });
 
   it('toʻliq boʻlmagan qoralama yuborilmaydi', () => {

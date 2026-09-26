@@ -9,7 +9,7 @@ import { useServerSync } from './useServerSync';
 import { useSessionRestore } from './useSessionRestore';
 import { SessionReadyProvider, useSessionOutcome } from './session-ready';
 import { isRestoreSettled, shouldSignOut } from '@/lib/sessionGuard';
-import { getAccessToken } from '@/api/session';
+import { useHasAccessToken } from './useHasAccessToken';
 import { PROTECTED_ROUTES } from './appRoutes';
 import { landingRoute, modeRouteFor } from '@/lib/appMode';
 import type { UserRole } from './types';
@@ -67,6 +67,7 @@ function AppRoutes() {
   // yerda tiklash ustа smenasi kabi provayderlardan YUQORIDA turgan
   // holatni koʻrmay qoldirardi.
   const outcome = useSessionOutcome();
+  const hasToken = useHasAccessToken();
   // Sessiya masalasi HAL BOʻLGACH (tiklandi yoki yoʻq edi) buyurtmalar
   // serverdan oʻqiladi va jonli yangilanish ulanadi. Mock rejimda
   // ikkalasi ham hech narsa qilmaydi.
@@ -83,8 +84,8 @@ function AppRoutes() {
    * Tarmoq uzilishi bunga sabab boʻlmaydi — u alohida holat.
    */
   useEffect(() => {
-    if (shouldSignOut(outcome, isAuthenticated, getAccessToken() !== null)) signOut();
-  }, [outcome, isAuthenticated, signOut]);
+    if (shouldSignOut(outcome, isAuthenticated, hasToken)) signOut();
+  }, [outcome, isAuthenticated, hasToken, signOut]);
 
   // Rolsiz sessiya "mijoz" deb TAXMIN QILINMAYDI — u rejim tanlashga tushadi.
   const landing = landingRoute({ isAuthenticated, hasOnboarded, role });

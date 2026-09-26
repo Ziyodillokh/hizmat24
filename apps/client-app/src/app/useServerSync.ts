@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { isApiEnabled } from '@/api/client';
+import { ApiError, isApiEnabled } from '@/api/client';
 import { fetchMasterOrders } from '@/api/master';
 import { fetchOrders } from '@/api/orders';
 import { connectRealtime } from '@/api/realtime';
@@ -28,10 +28,20 @@ export function useServerSync(isReady: boolean): void {
   const reload = useCallback(() => {
     void Promise.all([
       fetchOrders().catch(() => null),
-      // Usta boʻlmagan odamda 404 — bu xato emas, holat.
-      fetchMasterOrders().catch(() => []),
+      /*
+       * Faqat 404 «siz hali usta emassiz» degani va boʻsh roʻyxat —
+       * HAQIQAT. Tarmoq uzilishi, 500 yoki kutish vaqti esa roʻyxatni
+       * oʻchirishga asos EMAS: ilgari ular ham boʻsh massiv berar va
+       * ustaning faol ishi, takliflari va tarixi ekrandan butunlay
+       * yoʻqolib, «taklif yoʻq» deb yozilardi.
+       */
+      fetchMasterOrders().catch((error: unknown) =>
+        error instanceof ApiError && error.status === 404 ? [] : null,
+      ),
     ]).then(([mine, assigned]) => {
-      if (mine === null) return;
+      // Ikkalasidan biri ham kelmasa roʻyxat TEGILMAYDI — ekrandagi
+      // maʼlumot eskirgani boʻsh ekrandan yaxshiroq.
+      if (mine === null || assigned === null) return;
 
       // Bitta buyurtma ikkala roʻyxatda ham boʻlishi mumkin (odam oʻziga
       // buyurtma bergan). Usta nusxasi ustun: unda `masterBucket` bor.
@@ -47,7 +57,8 @@ export function useServerSync(isReady: boolean): void {
     void fetchMasterOrders()
       .then((orders) => orders.forEach(upsertOrder))
       .catch(() => {
-        // Usta boʻlmagan odamda 404 — bu xato emas, holat.
+        // Bu yerda roʻyxat ALMASHTIRILMAYDI, faqat qoʻshiladi — xato
+        // boʻlsa ekrandagi maʼlumot oʻz joyida qoladi.
       });
   }, [upsertOrder]);
 

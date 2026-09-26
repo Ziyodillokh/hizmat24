@@ -1,6 +1,7 @@
 import type { LiveOrder, OrderDraft, PaymentMethod } from '@/app/types';
 import type { OrderInvoice } from '@/lib/pricing';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/orderStateMachine';
+import { isServerMasterId } from '@/lib/orderList';
 import type { ExperienceLevel, Master, OrderAddress } from '@/mocks/types';
 import { MASTER_PROFESSION } from '@/lib/masterProfile';
 
@@ -159,7 +160,17 @@ export function toCreatePayload(draft: OrderDraft): CreateOrderPayload | null {
     isUrgent: draft.isUrgent,
     paymentMethod: draft.paymentMethod,
     ...(draft.scheduledAt ? { scheduledAt: draft.scheduledAt.toISOString() } : {}),
-    ...(draft.preferredMasterId ? { preferredMasterId: draft.preferredMasterId } : {}),
+    /*
+     * Server `@IsUUID('4')` talab qiladi. Ustalar katalogi hali mock va
+     * uning identifikatorlari `m-sardor` koʻrinishida: shundayicha
+     * yuborilsa server 400 qaytarar va BUTUN buyurtma yaratilmasdi —
+     * mijoz ekranda inglizcha texnik matnni koʻrardi. Soʻralgan usta —
+     * ixtiyoriy maydon, shuning uchun uni tushirib qoldirish buyurtmani
+     * saqlab qoladi.
+     */
+    ...(isServerMasterId(draft.preferredMasterId)
+      ? { preferredMasterId: draft.preferredMasterId as string }
+      : {}),
     clientAddress: draft.address,
   };
 }

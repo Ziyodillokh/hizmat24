@@ -97,10 +97,11 @@ export function PaymentStep() {
     () =>
       buildInvoice({
         base: category?.basePrice ?? 0,
+        quantity: draft.quantity,
         isUrgent: draft.isUrgent,
         discountPercent: level.discountPercent,
       }),
-    [category?.basePrice, draft.isUrgent, level.discountPercent],
+    [category?.basePrice, draft.quantity, draft.isUrgent, level.discountPercent],
   );
 
   const missing = firstMissingStep(draft, ['category', 'address']);

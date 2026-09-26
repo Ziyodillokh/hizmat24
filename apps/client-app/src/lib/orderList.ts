@@ -317,6 +317,16 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const isServerOrder = (order: { id: string }): boolean => UUID.test(order.id);
 
 /**
+ * Usta identifikatori SERVERdanmi.
+ *
+ * Ustalar katalogi hali mock va uning identifikatorlari `m-sardor`
+ * koʻrinishida. Server esa `@IsUUID('4')` talab qiladi: mock id
+ * yuborilsa butun buyurtma 400 bilan rad etilardi.
+ */
+export const isServerMasterId = (id: string | null | undefined): boolean =>
+  typeof id === 'string' && UUID.test(id);
+
+/**
  * Server rejimida faqat serverdagi buyurtmalar qoladi.
  *
  * Mock rejimida roʻyxat toʻliq qaytariladi: u yerda serverning oʻzi yoʻq.
@@ -325,3 +335,28 @@ export const keepOrdersForMode = <T extends { id: string }>(
   orders: readonly T[],
   isServerMode: boolean,
 ): T[] => (isServerMode ? orders.filter(isServerOrder) : [...orders]);
+
+/**
+ * Kelgan yangilanishni mavjud yozuv ustiga BIRLASHTIRADI.
+ *
+ * Jonli `order.updated` hodisasi MIJOZ koʻrinishini yuboradi: unda
+ * ustaga tegishli maydonlar (`masterBucket`, `clientContact`) YOʻQ.
+ * Ilgari yozuv butunlay almashtirilardi va usta faol ish ustida
+ * turganda mijozning telefoni yoʻqolar, ish esa oʻz boʻlimidan
+ * («faol») tushib ketardi.
+ *
+ * Shuning uchun kelgan javobda boʻlmagan usta maydonlari eskisidan
+ * saqlanadi. Qolgan hamma narsa — serverdan kelgani.
+ */
+export function mergeOrder<T extends { masterBucket?: unknown; clientContact?: unknown }>(
+  existing: T | undefined,
+  incoming: T,
+): T {
+  if (!existing) return incoming;
+
+  return {
+    ...incoming,
+    masterBucket: incoming.masterBucket ?? existing.masterBucket,
+    clientContact: incoming.clientContact ?? existing.clientContact,
+  };
+}

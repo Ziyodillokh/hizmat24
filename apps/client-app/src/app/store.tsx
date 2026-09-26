@@ -17,7 +17,7 @@ import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 
 import { buildStepPatch } from './masterActions';
 import { isApiEnabled } from '@/api/client';
-import { keepOrdersForMode } from '@/lib/orderList';
+import { keepOrdersForMode, mergeOrder } from '@/lib/orderList';
 import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
 import { buildLocalMasterActions } from './localMasterActions';
 import { buildServerOrderActions } from './serverOrderActions';
@@ -225,12 +225,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
    */
   const upsertOrder = useCallback((order: LiveOrder) => {
     setState((prev) => {
-      const exists = prev.orders.some((item) => item.id === order.id);
+      const existing = prev.orders.find((item) => item.id === order.id);
+      // Almashtirilmaydi, BIRLASHTIRILADI: jonli hodisa mijoz
+      // koʻrinishini yuboradi va unda ustaning maydonlari yoʻq.
+      const next = mergeOrder(existing, order);
+
       return {
         ...prev,
-        orders: exists
-          ? prev.orders.map((item) => (item.id === order.id ? order : item))
-          : [order, ...prev.orders],
+        orders: existing
+          ? prev.orders.map((item) => (item.id === order.id ? next : item))
+          : [next, ...prev.orders],
       };
     });
   }, []);

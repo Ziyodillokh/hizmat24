@@ -18,6 +18,7 @@ import {
   sortByCreatedDesc,
   splitOrderList,
   keepOrdersForMode,
+  mergeOrder,
 } from './orderList';
 import {
   canCancel,
@@ -488,5 +489,48 @@ describe('keepOrdersForMode', () => {
   it('boʻsh roʻyxat ikkala rejimda ham boʻsh', () => {
     expect(keepOrdersForMode([], true)).toEqual([]);
     expect(keepOrdersForMode([], false)).toEqual([]);
+  });
+});
+
+/*
+ * Jonli `order.updated` MIJOZ koʻrinishini yuboradi — unda usta
+ * maydonlari yoʻq. Ilgari yozuv butunlay almashtirilar va usta faol ish
+ * ustida turganda mijozning telefoni yoʻqolar, ish esa «faol»
+ * boʻlimidan tushib ketardi.
+ */
+describe('mergeOrder', () => {
+  const existing = {
+    id: 'o-1',
+    status: 'ASSIGNED',
+    masterBucket: 'active',
+    clientContact: { fullName: 'Dilnoza', phoneNumber: '+998901112233' },
+  };
+
+  it('usta maydonlari kelmasa eskisidan saqlanadi', () => {
+    const merged = mergeOrder(existing, { id: 'o-1', status: 'MASTER_EN_ROUTE' } as never);
+
+    expect(merged).toMatchObject({
+      status: 'MASTER_EN_ROUTE',
+      masterBucket: 'active',
+      clientContact: { phoneNumber: '+998901112233' },
+    });
+  });
+
+  it('kelgan qiymat ustun — server yangisini bersa oʻsha olinadi', () => {
+    const merged = mergeOrder(existing, {
+      id: 'o-1',
+      masterBucket: 'history',
+      clientContact: null,
+    } as never);
+
+    expect(merged.masterBucket).toBe('history');
+    // `null` — «kontakt yoʻq» emas, «kelmadi»: eskisi saqlanadi.
+    expect(merged.clientContact).toMatchObject({ phoneNumber: '+998901112233' });
+  });
+
+  it('yangi buyurtma boʻlsa kelgani oʻzgarishsiz qaytadi', () => {
+    const incoming = { id: 'o-2', status: 'SEARCHING' } as never;
+
+    expect(mergeOrder(undefined, incoming)).toBe(incoming);
   });
 });

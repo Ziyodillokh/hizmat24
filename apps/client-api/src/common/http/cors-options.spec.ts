@@ -57,6 +57,17 @@ describe('buildCorsOptions', () => {
    * foydalanuvchini bloklashda PATCH, signalni hal qilishda DELETE
    * yuboradi — roʻyxat qisqarsa brauzer ularni to'sib qo'yadi.
    */
+  /*
+   * PUT ni ILOVA ishlatadi: ustaning smenasi va «mening xizmatlarim».
+   * U roʻyxatdan tushib qolganda APK'da smena jimgina ochilmasdi —
+   * brauzer soʻrovni serverga umuman uzatmagan.
+   */
+  it('mijozlar ishlatadigan HAR BIR metod roʻyxatda boʻladi', () => {
+    for (const method of ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']) {
+      expect(CORS_METHODS).toContain(method);
+    }
+  });
+
   it('PATCH va DELETE ruxsat etilgan metodlar ichida boʻladi', () => {
     const options = buildCorsOptions('', 'https://admin.hizmat24.uz');
 
