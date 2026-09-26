@@ -13,6 +13,15 @@ import {
   simulationStep,
 } from '@/lib/orderSimulation';
 import { NOTIFICATIONS } from '@/mocks/notifications';
+
+/**
+ * Boshlangʻich bildirishnomalar.
+ *
+ * Server rejimida MOCK roʻyxat koʻrsatilmaydi: bildirishnomalar oqimi
+ * hali serverda yoʻq va yettita toʻqilgan yozuv har bir yangi mijozga
+ * haqiqiy xabar kabi koʻrinardi («Ustangiz yoʻlga chiqdi» va hokazo).
+ */
+const seedNotifications = () => (isApiEnabled() ? [] : NOTIFICATIONS);
 import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 
 import { buildStepPatch } from './masterActions';
@@ -182,7 +191,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         role: null,
         draft: EMPTY_DRAFT,
         orders: [],
-        notifications: NOTIFICATIONS,
+        notifications: seedNotifications(),
         masterTakeover: false,
       };
     }
@@ -202,7 +211,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // qurilmada qolib ketar va bosilganda serverga mock id bilan
       // soʻrov ketardi — javob 404 boʻlib, ekranda sababsiz xato chiqardi.
       orders: keepOrdersForMode(restored.orders, isApiEnabled()),
-      notifications: NOTIFICATIONS.map((item) =>
+      notifications: seedNotifications().map((item) =>
         readIds.has(item.id) ? { ...item, readAt: item.readAt ?? new Date() } : item,
       ),
       // `MasterProvider` birinchi effektida haqiqiy qiymatni yozadi. Boshida

@@ -5,6 +5,8 @@ import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { Icon } from '@/components/Icon';
+import { Info } from '@phosphor-icons/react';
+import { Banner } from '@/components/Banner';
 import { StarRating } from '@/components/StarRating';
 import { NO_RATING_LABEL } from '@/lib/masterIdentity';
 import { ScreenShell, StickyFooter } from '@/screens/_shared/ScreenShell';
@@ -98,6 +100,21 @@ export function MasterProfile() {
         </StickyFooter>
       }
     >
+      {/*
+        Ustalar katalogi hali SERVERDA yoʻq — bu sahifadagi reyting,
+        bajarilgan ishlar soni va sertifikat ilova ichidagi namuna
+        maʼlumotdan olinadi. Server ulangan holatda buni AYTISH shart:
+        aks holda toʻqilgan raqamlar haqiqiy koʻrsatkich kabi oʻqilardi.
+      */}
+      {isApiEnabled() && (
+        <div className="mt-12">
+          <Banner variant="info" icon={Info}>
+            Bu profil namuna uchun koʻrsatilyapti — ustalar roʻyxati hali
+            serverga ulanmagan. Buyurtma eng yaqin ustaga boradi.
+          </Banner>
+        </div>
+      )}
+
       <div className="mt-16 flex flex-col items-center">
         {/* 120px avatar ekranning uchdan birini egallardi — 80px hero blokni
             ixchamlashtiradi va ostidagi maʼlumotga joy ochadi. */}

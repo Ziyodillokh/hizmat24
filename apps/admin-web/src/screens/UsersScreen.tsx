@@ -18,6 +18,8 @@ import {
   percentLabel,
   reasonProblem,
   USER_STATUS_LABELS,
+  searchParam,
+  searchProblem,
 } from '@/lib/operations';
 import { Button, Card, Field, Notice, PageTitle, Pill } from '@/components/ui';
 
@@ -37,13 +39,13 @@ export function UsersScreen() {
 
   const users = useQuery({
     queryKey: ['admin', 'users', search],
-    queryFn: () => fetchAdminUsers(token as string, search.trim() || undefined),
+    queryFn: () => fetchAdminUsers(token as string, searchParam(search)),
     enabled: Boolean(token) && tab === 'users',
   });
 
   const masters = useQuery({
     queryKey: ['admin', 'masters', search],
-    queryFn: () => fetchAdminMasters(token as string, search.trim() || undefined),
+    queryFn: () => fetchAdminMasters(token as string, searchParam(search)),
     enabled: Boolean(token) && tab === 'masters',
   });
 
@@ -74,7 +76,7 @@ export function UsersScreen() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="+99890 yoki ism"
-            hint="Telefon raqami yoki ism boʻyicha"
+            hint={searchProblem(search) ?? "Telefon raqami yoki ism boʻyicha"}
           />
         </div>
       </div>

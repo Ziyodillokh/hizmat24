@@ -305,9 +305,25 @@ export class MatchingService {
 
     await this.prisma.$transaction(async (tx) => {
       if (previousMasterId) {
+        /*
+         * Usta SMENASIGA qarab boʻshatiladi.
+         *
+         * Ilgari u shartsiz `AVAILABLE` qilinardi: javob bermagan usta
+         * (odatda telefoni yonida boʻlmagani uchun) smenasi YOPIQ boʻlsa
+         * ham «ishga tayyor» holatiga oʻtar va oʻzi soʻramagan yangi
+         * takliflarni olaverardi. Boʻshatish qoidasi ustaning oʻz
+         * amallaridagi (`releaseMaster`) bilan bir xil boʻlishi kerak.
+         */
+        const profile = await tx.masterProfile.findUnique({
+          where: { masterId: previousMasterId },
+          select: { availableSince: true },
+        });
+
         await tx.master.updateMany({
           where: { id: previousMasterId, status: MasterStatus.BUSY },
-          data: { status: MasterStatus.AVAILABLE },
+          data: {
+            status: profile?.availableSince ? MasterStatus.AVAILABLE : MasterStatus.OFFLINE,
+          },
         });
       }
 

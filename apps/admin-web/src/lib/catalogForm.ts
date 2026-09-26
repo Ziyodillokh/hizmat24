@@ -74,7 +74,16 @@ export const toFormState = (category: AdminCategory): CategoryFormState => ({
   requirements: [...(category.requirements ?? [])],
   highlights: [...(category.highlights ?? [])],
   warrantyNote: category.warrantyNote ?? '',
-  warrantyAmount: category.warrantyAmount === null ? '' : String(category.warrantyAmount),
+  /*
+   * Nol — «summa yoʻq», haqiqiy qiymat emas: kafolat tozalanganda server
+   * aynan 0 saqlaydi. Uni «0» deb koʻrsatsak maydon BOʻSH boʻlmay qoladi
+   * va tekshiruv «summa bilan birga izoh ham yozilsin» deb xizmat
+   * kartasini butunlay saqlatmay qoʻyardi.
+   */
+  warrantyAmount:
+    category.warrantyAmount === null || category.warrantyAmount === 0
+      ? ''
+      : String(category.warrantyAmount),
 });
 
 /**

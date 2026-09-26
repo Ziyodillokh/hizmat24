@@ -37,3 +37,16 @@ export const userStatusTone = (status: string): 'success' | 'danger' | 'neutral'
   if (status === 'BLOCKED') return 'danger';
   return 'neutral';
 };
+
+/**
+ * Platformaning standart ish vaqti.
+ *
+ * Usta arizasida vaqtni koʻrsatmasa aynan shu saqlanadi va keyin uni
+ * oʻzgartira olmaydi. Panelda buni AYTISH kerak: aks holda standart
+ * qiymat ustaning oʻz gapi kabi oʻqilardi.
+ */
+export const DEFAULT_WORK_FROM = 8;
+export const DEFAULT_WORK_TO = 20;
+
+export const isDefaultWorkHours = (from: number, to: number): boolean =>
+  from === DEFAULT_WORK_FROM && to === DEFAULT_WORK_TO;

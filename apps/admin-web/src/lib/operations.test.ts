@@ -21,6 +21,8 @@ import {
   rowTone,
   SAFETY_RESOLUTION_LABELS,
   SAFETY_RESOLUTIONS,
+  searchParam,
+  searchProblem,
 } from './operations';
 
 const ASCII_APOSTROPHE = /'/;
@@ -214,5 +216,38 @@ describe('matn qoidalari', () => {
       assignSecondsLabel(null),
     ];
     for (const text of texts) expect(ASCII_APOSTROPHE.test(text)).toBe(false);
+  });
+});
+
+/*
+ * Bitta belgi server tekshiruvidan oʻtmaydi va 400 qaytaradi. Panel uni
+ * yuborsa operator inglizcha texnik matnni koʻrar va roʻyxat yoʻqolardi;
+ * buyurtmalar ekranida bu har 5 soniyada takrorlanardi.
+ */
+describe('searchProblem', () => {
+  it('bitta belgi uchun sabab aytiladi', () => {
+    expect(searchProblem('a')).toBe('Qidiruv uchun kamida 2 belgi yozing.');
+    expect(searchProblem('  a  ')).not.toBeNull();
+  });
+
+  it('boʻsh matn muammo emas — u filtrsiz roʻyxat', () => {
+    expect(searchProblem('')).toBeNull();
+    expect(searchProblem('   ')).toBeNull();
+  });
+
+  it('ikki va undan koʻp belgi oʻtadi', () => {
+    expect(searchProblem('ab')).toBeNull();
+    expect(searchProblem('+99890')).toBeNull();
+  });
+});
+
+describe('searchParam', () => {
+  it('qisqa matn UMUMAN yuborilmaydi', () => {
+    expect(searchParam('a')).toBeUndefined();
+    expect(searchParam('')).toBeUndefined();
+  });
+
+  it('yaroqli matn qirqilib yuboriladi', () => {
+    expect(searchParam('  Akmal  ')).toBe('Akmal');
   });
 });

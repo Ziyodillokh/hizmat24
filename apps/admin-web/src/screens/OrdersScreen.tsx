@@ -11,6 +11,8 @@ import {
   ORDER_STATUS_TONES,
   rowTone,
   type OrderStatusFilter,
+  searchParam,
+  searchProblem,
 } from '@/lib/operations';
 import { Button, Card, Field, Notice, PageTitle, Pill } from '@/components/ui';
 
@@ -57,7 +59,7 @@ export function OrdersScreen() {
     queryFn: () =>
       fetchAdminOrders(token as string, {
         status: filter === 'ALL' ? undefined : filter,
-        search: search.trim() || undefined,
+        search: searchParam(search),
         limit: PAGE_SIZE,
         offset: (page - 1) * PAGE_SIZE,
       }),
@@ -73,6 +75,9 @@ export function OrdersScreen() {
   });
 
   const escalatedCount = orders.data?.escalatedCount ?? 0;
+  // Qisqa matn serverga UMUMAN yuborilmaydi — u 400 qaytarardi va
+  // soʻrov har 5 soniyada takrorlanib turardi.
+  const searchHint = searchProblem(search);
 
   return (
     <>
@@ -127,7 +132,7 @@ export function OrdersScreen() {
             value={search}
             onChange={(event) => applySearch(event.target.value)}
             placeholder="HZ-104901 yoki +998901234567"
-            hint="Buyurtma raqami yoki mijoz telefoni"
+            hint={searchHint ?? 'Buyurtma raqami yoki mijoz telefoni'}
           />
         </div>
       </div>

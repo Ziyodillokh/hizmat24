@@ -50,6 +50,8 @@ describe('MatchingService (TZ 3.4)', () => {
   let orderFindMany: jest.Mock;
   let orderUpdate: jest.Mock;
   let masterUpdateMany: jest.Mock;
+  /** Smena holati — usta boʻshatilganda unga qaraladi. */
+  let masterProfileFindUnique: jest.Mock;
   let orders: { findEntity: jest.Mock; applyTransition: jest.Mock };
   let finder: { findCandidates: jest.Mock; countActiveMastersInCategory: jest.Mock };
   let queuePosition: { add: jest.Mock; remove: jest.Mock; peek: jest.Mock };
@@ -62,6 +64,7 @@ describe('MatchingService (TZ 3.4)', () => {
     orderFindMany = jest.fn().mockResolvedValue([]);
     orderUpdate = jest.fn().mockResolvedValue({});
     masterUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    masterProfileFindUnique = jest.fn().mockResolvedValue({ availableSince: new Date() });
 
     orders = {
       findEntity: jest.fn().mockResolvedValue(buildEntity()),
@@ -86,7 +89,10 @@ describe('MatchingService (TZ 3.4)', () => {
       $transaction: jest
         .fn()
         .mockImplementation((callback: (tx: unknown) => unknown) =>
-          callback({ master: { updateMany: masterUpdateMany } }),
+          callback({
+            master: { updateMany: masterUpdateMany },
+            masterProfile: { findUnique: masterProfileFindUnique },
+          }),
         ),
     };
 
@@ -430,4 +436,47 @@ describe('MatchingService (TZ 3.4)', () => {
       });
     });
   });
+
+  /*
+   * Javob bermagan usta — odatda telefoni yonida boʻlmagan odam. Ilgari u
+   * shartsiz `AVAILABLE` qilinardi va smenasi YOPIQ boʻlsa ham oʻzi
+   * soʻramagan yangi takliflarni olaverardi.
+   */
+  describe('handleAckTimeout — ustani boʻshatish', () => {
+    it('smenasi yopiq usta OFFLINE boʻlib qoladi', async () => {
+      // Arrange
+      masterProfileFindUnique.mockResolvedValueOnce({ availableSince: null });
+      orderFindUnique.mockResolvedValue({
+        id: 'order-1',
+        status: OrderStatus.ASSIGNED,
+        masterAckedAt: null,
+        masterId: 'master-1',
+      });
+
+      // Act
+      await service.handleAckTimeout('order-1');
+
+      // Assert
+      expect(masterUpdateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { status: MasterStatus.OFFLINE } }),
+      );
+    });
+
+    it('smenasi ochiq usta AVAILABLE boʻladi', async () => {
+      masterProfileFindUnique.mockResolvedValueOnce({ availableSince: new Date() });
+      orderFindUnique.mockResolvedValue({
+        id: 'order-1',
+        status: OrderStatus.ASSIGNED,
+        masterAckedAt: null,
+        masterId: 'master-1',
+      });
+
+      await service.handleAckTimeout('order-1');
+
+      expect(masterUpdateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { status: MasterStatus.AVAILABLE } }),
+      );
+    });
+  });
+
 });

@@ -226,3 +226,28 @@ export function assignSecondsLabel(seconds: number | null): string {
 /** Foiz koʻrsatkichi; `null` — hisoblab boʻlmaydi. */
 export const percentLabel = (value: number | null): string =>
   value === null ? '—' : `${value}%`;
+
+/** Qidiruvda serverning eng kam uzunligi (`SearchQueryDto`, `ListOrdersQueryDto`). */
+export const SEARCH_MIN = 2;
+
+/**
+ * Qidiruv matni serverga yuborilsa boʻladimi.
+ *
+ * Bitta belgi server tekshiruvidan oʻtmaydi va 400 qaytaradi. Panel uni
+ * yuborsa, operator ekranda inglizcha texnik matnni koʻrar va roʻyxat
+ * yoʻqolardi — buyurtmalar ekranida bu har 5 soniyada takrorlanardi.
+ *
+ * `null` — yuborsa boʻladi (boʻsh matn ham: u shunchaki filtrsiz roʻyxat).
+ */
+export const searchProblem = (term: string): string | null => {
+  const trimmed = term.trim();
+  if (trimmed.length === 0 || trimmed.length >= SEARCH_MIN) return null;
+
+  return `Qidiruv uchun kamida ${SEARCH_MIN} belgi yozing.`;
+};
+
+/** Serverga yuboriladigan qiymat; qisqa matn UMUMAN yuborilmaydi. */
+export const searchParam = (term: string): string | undefined => {
+  const trimmed = term.trim();
+  return trimmed.length >= SEARCH_MIN ? trimmed : undefined;
+};

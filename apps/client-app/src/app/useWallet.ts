@@ -1,3 +1,4 @@
+import { isApiEnabled } from '@/api/client';
 import { useMemo } from 'react';
 import { useMinuteClock } from '@/lib/useMinuteClock';
 import { buildWalletView, type WalletView } from '@/lib/wallet';
@@ -29,8 +30,16 @@ export function useWallet(): WalletView {
    * qayta saralanib qatorlar siljib turardi.
    */
   const dayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  /*
+   * Server rejimida mock tranzaksiyalar UMUMAN yaratilmaydi.
+   *
+   * Ular mijozning «darajasi» ni koʻtarardi va tasdiqlash ekranida
+   * server bermaydigan chegirma koʻrsatilardi: mijoz bir summani koʻrib,
+   * chekda boshqasini olardi. Hamyon oqimi hali serverda yoʻq, demak
+   * jonli rejimda roʻyxat faqat haqiqiy buyurtmalardan quriladi.
+   */
   const mock = useMemo(
-    () => materializeTransactions(now.getTime()),
+    () => (isApiEnabled() ? [] : materializeTransactions(now.getTime())),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dayKey],
   );

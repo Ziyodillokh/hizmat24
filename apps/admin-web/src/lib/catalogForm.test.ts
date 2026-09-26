@@ -212,3 +212,45 @@ describe('validateForm — yoʻnalish majburiy', () => {
     expect(validateForm({ ...filled, groupId: 'g-1' })).toEqual([]);
   });
 });
+
+/*
+ * Kafolat tozalanganda server 0 saqlaydi. Uni «0» deb koʻrsatsak maydon
+ * boʻsh boʻlmay qoladi va tekshiruv «summa bilan birga izoh ham
+ * yozilsin» deb xizmatni BUTUNLAY saqlatmay qoʻyardi.
+ */
+describe('toFormState — tozalangan kafolat', () => {
+  const category = {
+    id: 'c-1',
+    name: 'Kran taʼmirlash',
+    summary: null,
+    details: null,
+    includes: [],
+    excludes: [],
+    description: null,
+    groupId: 'g-1',
+    groupName: 'Santexnika',
+    basePrice: 120000,
+    priceKind: 'FIXED' as const,
+    durationMinutes: null,
+    complexityLevel: 'SIMPLE' as const,
+    iconKey: null,
+    isActive: true,
+    sortOrder: 0,
+    steps: [],
+    faq: [],
+    requirements: [],
+    highlights: [],
+    warrantyNote: null,
+    warrantyAmount: 0,
+    media: [],
+    masterCount: 0,
+  };
+
+  it('nol summa BOʻSH maydon boʻlib koʻrinadi', () => {
+    expect(toFormState(category).warrantyAmount).toBe('');
+  });
+
+  it('tozalangan kafolat saqlashni bloklamaydi', () => {
+    expect(validateForm(toFormState(category))).toEqual([]);
+  });
+});

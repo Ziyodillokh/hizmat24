@@ -6,7 +6,7 @@ import { useAuth } from '@/app/AuthProvider';
 import { formatDateTime, formatPrice } from '@/lib/format';
 import { EXPERIENCE_LABELS } from '@/lib/applications';
 import { MASTER_STATUS_LABELS, ORDER_STATUS_LABELS, percentLabel } from '@/lib/operations';
-import { shiftLabel, workHoursLabel } from '@/lib/people';
+import { isDefaultWorkHours, shiftLabel, workHoursLabel } from '@/lib/people';
 import { Card, Notice, PageTitle, Pill } from '@/components/ui';
 
 /**
@@ -110,9 +110,10 @@ function MasterCard({ master }: { master: AdminMasterDetail }) {
         bir xil ishonch darajasida oʻqilardi.
       */}
       <section className="mt-24">
-        <h2 className="text-h3 text-text-primary">Ustaning oʻzi aytgani</h2>
+        <h2 className="text-h3 text-text-primary">Arizadagi maʼlumotlar</h2>
         <p className="mt-4 text-caption text-text-secondary">
-          Bu maʼlumotlar tasdiqlanmagan — ularni usta oʻzi yozgan.
+          Bu maʼlumotlar TASDIQLANMAGAN — ularni usta arizasida oʻzi yozgan.
+          Usta ularni keyin oʻzgartira olmaydi.
         </p>
 
         {master.profile === null ? (
@@ -123,6 +124,14 @@ function MasterCard({ master }: { master: AdminMasterDetail }) {
               <dt className="text-text-secondary">Ish vaqti</dt>
               <dd className="text-text-primary">
                 {workHoursLabel(master.profile.workFrom, master.profile.workTo)}
+                {/*
+                  Arizada vaqt soʻralmagan boʻlishi mumkin — unda
+                  platformaning standarti saqlanadi. Buni aytmasak,
+                  standart qiymat ustaning gapi kabi oʻqilardi.
+                */}
+                {isDefaultWorkHours(master.profile.workFrom, master.profile.workTo) && (
+                  <span className="text-text-secondary"> · platforma standarti</span>
+                )}
               </dd>
 
               <dt className="text-text-secondary">Tumanlar</dt>
