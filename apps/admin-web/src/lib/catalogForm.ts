@@ -111,6 +111,15 @@ export function validateForm(form: CategoryFormState): string[] {
   if (price === null) problems.push('Narx butun son boʻlsin (tiyin yoʻq).');
   else if (price > PRICE_MAX) problems.push('Narx juda katta.');
 
+  /*
+   * Guruh MAJBURIY. Ilova katalogni guruhlar boʻyicha oʻqiydi, shuning
+   * uchun guruhsiz xizmat mijozga HECH QACHON koʻrinmaydi: admin uni
+   * yaratadi, panelda koʻradi va nega ilovada yoʻqligini tushunmaydi.
+   */
+  if (form.groupId.trim().length === 0) {
+    problems.push('Yoʻnalishni tanlang — usiz xizmat ilovada koʻrinmaydi.');
+  }
+
   if (form.durationMinutes.trim().length > 0) {
     const duration = parseWholeNumber(form.durationMinutes);
     if (duration === null || duration < DURATION_MIN || duration > DURATION_MAX) {

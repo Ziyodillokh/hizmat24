@@ -17,6 +17,8 @@ const valid = (extra: Partial<CategoryFormState> = {}): CategoryFormState => ({
   ...EMPTY_FORM,
   name: 'Kran taʼmirlash',
   basePrice: '120000',
+  // Yoʻnalish MAJBURIY: usiz xizmat ilovada koʻrinmaydi.
+  groupId: 'g-1',
   ...extra,
 });
 
@@ -73,7 +75,7 @@ describe('toCategoryInput', () => {
   it('boʻsh ixtiyoriy maydonlarni boʻsh qiymat bilan yuboradi', () => {
     const input = toCategoryInput(valid());
 
-    expect(input).toMatchObject({ summary: '', details: '', durationMinutes: null, groupId: null });
+    expect(input).toMatchObject({ summary: '', details: '', durationMinutes: null });
   });
 
   it('roʻyxatlardagi boʻsh qatorlarni tashlab yuboradi', () => {
@@ -158,17 +160,15 @@ describe('toCategoryInput — tozalash', () => {
     ...EMPTY_FORM,
     name: 'Lavabo tozalash',
     basePrice: '120000',
+    groupId: 'g-1',
   };
 
   it('boʻshatilgan maydonlar ATAYLAB yuboriladi', () => {
-    const input = toCategoryInput({ ...filled, summary: '', details: '', groupId: '', durationMinutes: '' });
+    const input = toCategoryInput({ ...filled, summary: '', details: '', durationMinutes: '' });
 
-    expect(input).toMatchObject({
-      summary: '',
-      details: '',
-      groupId: null,
-      durationMinutes: null,
-    });
+    // Guruh bu roʻyxatda YOʻQ: u majburiy va uni tozalab boʻlmaydi —
+    // guruhsiz xizmat ilovada koʻrinmaydi.
+    expect(input).toMatchObject({ summary: '', details: '', durationMinutes: null });
   });
 
   it('toʻldirilgan maydonlar oʻz qiymati bilan ketadi', () => {
@@ -192,5 +192,23 @@ describe('toCategoryInput — tozalash', () => {
 
     expect(input?.steps).toEqual([{ title: 'Nam tozalash', description: 'Nam mato bilan' }]);
     expect(input?.warrantyAmount).toBe(5_000_000);
+  });
+});
+
+/*
+ * Ilova katalogni guruhlar boʻyicha oʻqiydi: guruhsiz xizmat mijozga
+ * HECH QACHON koʻrinmaydi. Admin uni yaratar, panelda koʻrar va nega
+ * ilovada yoʻqligini tushunmasdi.
+ */
+describe('validateForm — yoʻnalish majburiy', () => {
+  const filled = { ...EMPTY_FORM, name: 'Kran taʼmirlash', basePrice: '120000' };
+
+  it('guruhsiz xizmat saqlanmaydi', () => {
+    expect(validateForm(filled)).toContain('Yoʻnalishni tanlang — usiz xizmat ilovada koʻrinmaydi.');
+    expect(toCategoryInput(filled)).toBeNull();
+  });
+
+  it('guruh tanlansa muammo qolmaydi', () => {
+    expect(validateForm({ ...filled, groupId: 'g-1' })).toEqual([]);
   });
 });

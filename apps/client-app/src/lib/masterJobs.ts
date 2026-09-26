@@ -10,7 +10,7 @@
  */
 import type { LiveOrder } from '@/app/types';
 import { formatDateTime, formatDuration, formatTime } from './formatters';
-import { sortByCreatedDesc } from './orderList';
+import { isServerOrder, sortByCreatedDesc } from './orderList';
 import {
   isTerminal,
   ORDER_STATUS,
@@ -135,10 +135,31 @@ export function isOffer(
   return isSearching && !declinedIds.includes(order.id);
 }
 
+/**
+ * Buyurtma USTANIKImi.
+ *
+ * Serverdan kelgan buyurtmada boʻlim (`masterBucket`) BOʻLISHI shart —
+ * uni server hisoblab yuboradi. Boʻlim yoʻq server buyurtmasi mijozning
+ * OʻZ buyurtmasi: `handledByMaster` unda ham `true` boʻladi (ishni
+ * haqiqatan usta bajargan), shuning uchun oʻsha maydon bilan ajratib
+ * boʻlmaydi. Ilgari aynan shu sabab mijozning buyurtmasi usta ekranida
+ * koʻrinar va uning puli ustaning daromadiga qoʻshilardi.
+ *
+ * `handledByMaster` faqat MOCK oqimda hal qiladi — u yerda boʻlim yoʻq.
+ */
+export const isMasterOwned = (
+  order: Pick<MasterJobOrder, 'id' | 'masterBucket' | 'handledByMaster'>,
+): boolean => {
+  if (order.masterBucket) return true;
+  if (isServerOrder(order)) return false;
+
+  return order.handledByMaster;
+};
+
 /** Faol ish — usta qabul qilgan va hali yopilmagan buyurtma. */
 export const isMyJob = (order: MasterJobOrder): boolean => {
   if (order.masterBucket) return order.masterBucket === 'active';
-  return order.handledByMaster && !isTerminal(order.status);
+  return isMasterOwned(order) && !isTerminal(order.status);
 };
 
 export interface MasterJobsView<T> {

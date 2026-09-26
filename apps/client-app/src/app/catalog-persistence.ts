@@ -28,7 +28,18 @@ export function reviveCatalog(raw: unknown): ServiceGroup[] | null {
         typeof (category as { name?: unknown }).name === 'string' &&
         typeof (category as { basePrice?: unknown }).basePrice === 'number',
     );
-    if (categories.length === 0) return null;
+    /*
+     * Boʻsh guruh — HAQIQAT, buzilgan yozuv emas: xizmati hali yoʻq
+     * yoʻnalish («Elektrik xizmatlari») ataylab shunday keladi va ilova
+     * uni «Tez kunda» deb qulflab koʻrsatadi.
+     *
+     * Ilgari bunday guruh butun keshni rad etardi (`return null`) va
+     * ilova har ochilishda serverdagi katalog oʻrniga ichidagi MOCK
+     * roʻyxatni koʻrsatardi — narxlari ham, nomlari ham boshqa.
+     *
+     * Buzuq yozuv baribir rad etiladi: yuqoridagi tekshiruvlar
+     * (id, name, iconKey, categories massiv) oʻz kuchida.
+     */
 
     groups.push({ ...(group as ServiceGroup), categories });
   }

@@ -11,6 +11,7 @@
  * boʻlmaydi. Foiz belgilangan kunda faqat shu fayldagi konstanta oʻzgaradi.
  */
 import type { LiveOrder } from '@/app/types';
+import { isMasterOwned } from './masterJobs';
 import { ORDER_STATUS } from './orderStateMachine';
 import { percentOf } from './wallet';
 
@@ -36,7 +37,7 @@ export const HISTORY_SOURCE_CAPTION =
 
 export type EarningsOrder = Pick<
   LiveOrder,
-  'status' | 'handledByMaster' | 'invoice' | 'completedAt' | 'createdAt' | 'rating'
+  'id' | 'status' | 'handledByMaster' | 'masterBucket' | 'invoice' | 'completedAt' | 'createdAt' | 'rating'
 >;
 
 /**
@@ -45,8 +46,9 @@ export type EarningsOrder = Pick<
  * `COMPLETED_BY_MASTER` sanalmaydi — mijoz hali baho bermagan va buyurtma
  * yopilmagan; uni qoʻshsak raqam bir kunda ikki marta oʻzgarardi.
  */
-export const isEarningOrder = (order: Pick<EarningsOrder, 'status' | 'handledByMaster'>): boolean =>
-  order.handledByMaster && order.status === ORDER_STATUS.CLOSED;
+export const isEarningOrder = (
+  order: Pick<EarningsOrder, 'id' | 'status' | 'handledByMaster' | 'masterBucket'>,
+): boolean => isMasterOwned(order) && order.status === ORDER_STATUS.CLOSED;
 
 /** Toʻlov sanasi: yakunlangan vaqt, boʻlmasa yaratilgan vaqt. */
 const paidAtOf = (order: EarningsOrder): Date => order.completedAt ?? order.createdAt;

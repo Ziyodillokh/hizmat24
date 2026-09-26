@@ -25,6 +25,9 @@ const order = (
     stars: number | null;
   }> = {},
 ): EarningsOrder => ({
+  // Mock oqim: id mock shaklida, boʻlim yoʻq — `handledByMaster` hal qiladi.
+  id: 'live-1',
+  masterBucket: undefined,
   status: (patch.status ?? ORDER_STATUS.CLOSED) as OrderStatus,
   handledByMaster: patch.handledByMaster ?? true,
   invoice: { unitPrice: 100_000, quantity: 1, base: 100_000, urgentFee: 0, discountPercent: 0, discount: 0, total: patch.total ?? 96_000 },
@@ -35,10 +38,36 @@ const order = (
 
 describe('isEarningOrder', () => {
   it('faqat usta olgan va yopilgan ish', () => {
-    expect(isEarningOrder({ status: ORDER_STATUS.CLOSED, handledByMaster: true })).toBe(true);
-    expect(isEarningOrder({ status: ORDER_STATUS.CLOSED, handledByMaster: false })).toBe(false);
-    expect(isEarningOrder({ status: ORDER_STATUS.COMPLETED_BY_MASTER, handledByMaster: true })).toBe(false);
-    expect(isEarningOrder({ status: ORDER_STATUS.CANCELLED, handledByMaster: true })).toBe(false);
+    expect(isEarningOrder(order({ status: ORDER_STATUS.CLOSED, handledByMaster: true }))).toBe(true);
+    expect(isEarningOrder(order({ status: ORDER_STATUS.CLOSED, handledByMaster: false }))).toBe(false);
+    expect(isEarningOrder(order({ status: ORDER_STATUS.COMPLETED_BY_MASTER, handledByMaster: true }))).toBe(false);
+    expect(isEarningOrder(order({ status: ORDER_STATUS.CANCELLED, handledByMaster: true }))).toBe(false);
+  });
+
+  /*
+   * Serverdan kelgan buyurtmada boʻlim BOʻLISHI shart. Boʻlimsiz server
+   * buyurtmasi — mijozning OʻZ buyurtmasi: `handledByMaster` unda ham
+   * `true` (ishni haqiqatan usta bajargan). Ilgari mijoz toʻlagan pul
+   * ustaning daromadiga qoʻshilardi.
+   */
+  it('boʻlimsiz SERVER buyurtmasi daromadga qoʻshilmaydi', () => {
+    const clientOrder = {
+      ...order({ status: ORDER_STATUS.CLOSED, handledByMaster: true }),
+      id: '94e0640f-3463-4e19-8b3e-eb17ae021e2b',
+      masterBucket: undefined,
+    };
+
+    expect(isEarningOrder(clientOrder)).toBe(false);
+  });
+
+  it('boʻlimi bor server buyurtmasi qoʻshiladi', () => {
+    const masterOrder = {
+      ...order({ status: ORDER_STATUS.CLOSED, handledByMaster: true }),
+      id: '94e0640f-3463-4e19-8b3e-eb17ae021e2b',
+      masterBucket: 'history' as const,
+    };
+
+    expect(isEarningOrder(masterOrder)).toBe(true);
   });
 });
 

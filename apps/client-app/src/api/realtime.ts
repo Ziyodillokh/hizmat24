@@ -1,6 +1,6 @@
 import { io, type Socket } from 'socket.io-client';
 import { API_BASE_URL } from './client';
-import { getAccessToken } from './session';
+import { getAccessToken, refreshAccessToken } from './session';
 import { toLiveOrder, type ServerOrder } from './orderDto';
 import type { LiveOrder } from '@/app/types';
 
@@ -36,14 +36,29 @@ export interface RealtimeHandlers {
 }
 
 export function connectRealtime(handlers: RealtimeHandlers): () => void {
-  const token = getAccessToken();
-  if (!API_BASE_URL || !token) return () => undefined;
+  if (!API_BASE_URL || !getAccessToken()) return () => undefined;
 
   const socket: Socket = io(`${API_BASE_URL}/ws/client`, {
     transports: ['websocket'],
-    auth: { token },
+    /*
+     * `auth` FUNKSIYA sifatida beriladi: socket.io uni HAR BIR
+     * ulanishda qaytadan chaqiradi. Ilgari token bir marta olinardi va
+     * 15 daqiqadan keyin u eskirar — qayta ulanish oʻsha eski token
+     * bilan ketib, jonli yangilanish butunlay toʻxtardi. Ekran esa
+     * «ulangan» koʻrinishda qolaverardi.
+     */
+    auth: (cb: (data: { token: string | null }) => void) => cb({ token: getAccessToken() }),
     reconnectionDelay: 1000,
     reconnectionDelayMax: 10_000,
+  });
+
+  /*
+   * Server ulanishni rad etsa — token eskirgan boʻlishi mumkin. Uni
+   * yangilab, socket.io ning oʻz qayta urinishiga yaroqli token bilan
+   * kirishiga imkon beramiz.
+   */
+  socket.on('connect_error', () => {
+    void refreshAccessToken();
   });
 
   socket.on(WS_ORDER_UPDATED, (payload: ServerOrder) => {

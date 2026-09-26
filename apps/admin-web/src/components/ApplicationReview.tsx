@@ -42,18 +42,26 @@ export function ApproveForm({
   });
   const [selected, setSelected] = useState<string[]>(application.requestedCategoryIds);
 
+  // Faol roʻyxatda qolmagan soʻrovlar hisobga olinmaydi — server ularni
+  // baribir rad etardi (UNKNOWN_SERVICE_CATEGORY).
+  const activeIds = new Set((categories.data ?? []).map((category) => category.id));
+  const effectiveSelection = selected.filter((id) => activeIds.has(id));
+
   const mutation = useMutation({
-    mutationFn: () => approveApplication(token as string, application.id, selected),
+    /*
+     * Serverga FILTRLANGAN roʻyxat yuboriladi.
+     *
+     * Ilgari xom `selected` ketardi: ariza yuborilgandan keyin
+     * oʻchirilgan xizmat unda qolib, server butun tasdiqlashni rad
+     * etardi. Oʻsha identifikatorni UI dan olib tashlab ham boʻlmasdi —
+     * u roʻyxatda koʻrinmaydi. Natijada ariza ABADIY tasdiqlanmasdi.
+     */
+    mutationFn: () => approveApplication(token as string, application.id, effectiveSelection),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'applications'] });
       onDone();
     },
   });
-
-  // Faol roʻyxatda qolmagan soʻrovlar hisobga olinmaydi — server ularni
-  // baribir rad etardi (UNKNOWN_SERVICE_CATEGORY).
-  const activeIds = new Set((categories.data ?? []).map((category) => category.id));
-  const effectiveSelection = selected.filter((id) => activeIds.has(id));
   const problem = categories.data ? categorySelectionProblem(effectiveSelection.length) : null;
 
   return (

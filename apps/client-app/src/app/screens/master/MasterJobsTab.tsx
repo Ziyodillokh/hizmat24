@@ -91,6 +91,7 @@ export function MasterJobsTab() {
     closeShift,
     isShiftPending,
     shiftProblem,
+    undeclineOffer,
   } = useMaster();
 
   // Ekran ochilganda faol ish boʻlsa — oʻsha filtr. Usta bir vaqtda bitta
@@ -216,8 +217,19 @@ export function MasterJobsTab() {
    * faqat roʻyxatdan yashiriladi.
    */
   const decline = (orderId: string) => {
+    // Darhol yashiriladi — kutish paytida taklif ekranda turib qolmasin.
     declineOffer(orderId);
-    void masterJobs.decline(orderId).then((r) => report(r, DECLINE_TOAST));
+
+    void masterJobs.decline(orderId).then((result) => {
+      /*
+       * Server rad etsa taklif QAYTARILADI. Ilgari u mahalliy
+       * roʻyxatdan abadiy yoʻqolar, serverda esa oʻsha ustada qolardi:
+       * usta xatoni oʻqir, lekin ishni na koʻra olar, na qabul qila
+       * olardi.
+       */
+      if (!result.ok) undeclineOffer(orderId);
+      report(result, DECLINE_TOAST);
+    });
   };
 
   const createDemo = () => {

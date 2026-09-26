@@ -20,6 +20,18 @@ import { clearAuth, loadAuth, saveAuth } from './auth-persistence';
  *   uzilish uchun odamni chiqarib, qaytadan SMS soʻrash — eng yomon javob.
  *   Ilova fokusga qaytganda qayta urinamiz.
  */
+/**
+ * Saqlangan tokenni oʻchirish KERAKMI.
+ *
+ * Faqat server uni ochiq RAD ETGANDA (401). Tarmoq uzilishi, 429 (juda
+ * koʻp urinish), 500 yoki 502 — bularning hech biri tokenning
+ * yaroqsizligini anglatmaydi. Ilgari xato TURIGA qaralardi va `server`
+ * turidagi hamma narsa — jumladan serverning vaqtinchalik nosozligi —
+ * yaroqli sessiyani oʻchirib, odamdan qaytadan SMS soʻrardi.
+ */
+const isRejected = (error: unknown): boolean =>
+  error instanceof ApiError && error.status === 401;
+
 export function useSessionRestore(): SessionOutcome {
   const [outcome, setOutcome] = useState<SessionOutcome>('pending');
   const [attempt, setAttempt] = useState(0);
@@ -53,14 +65,15 @@ export function useSessionRestore(): SessionOutcome {
       .catch((error: unknown) => {
         if (!alive) return;
 
-        if (error instanceof ApiError && error.kind === 'offline') {
-          setAccessToken(null);
+        setAccessToken(null);
+
+        // Rad etilmagan xato — sessiya baribir yaroqli boʻlishi mumkin.
+        if (!isRejected(error)) {
           setOutcome('offline');
           return;
         }
 
         clearAuth();
-        setAccessToken(null);
         setOutcome('expired');
       });
 
@@ -87,8 +100,9 @@ export function useSessionRestore(): SessionOutcome {
         saveAuth({ ...stored, refreshToken: tokens.refreshToken });
         return true;
       } catch (error: unknown) {
-        // Tarmoq uzilishida saqlangan token QOLADI — keyin qayta uriniladi.
-        if (!(error instanceof ApiError) || error.kind !== 'offline') {
+        // Faqat RAD ETILGAN token oʻchiriladi. Tarmoq uzilishi, 429 yoki
+        // 500 da saqlangani qoladi va keyin qayta uriniladi.
+        if (isRejected(error)) {
           clearAuth();
           setAccessToken(null);
           setOutcome('expired');
