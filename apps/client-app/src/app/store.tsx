@@ -17,6 +17,7 @@ import type { AppNotification, Master, OrderAddress } from '@/mocks/types';
 
 import { buildStepPatch } from './masterActions';
 import { isApiEnabled } from '@/api/client';
+import { keepOrdersForMode } from '@/lib/orderList';
 import { buildNewOrder, DEMO_DRAFT, restoreCounter } from './orderFactory';
 import { buildLocalMasterActions } from './localMasterActions';
 import { buildServerOrderActions } from './serverOrderActions';
@@ -197,7 +198,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       hasOnboarded: restored.hasOnboarded,
       role: restored.role,
       draft: EMPTY_DRAFT,
-      orders: restored.orders,
+      // Server ulangan boʻlsa eski MOCK buyurtmalar tashlanadi: ular
+      // qurilmada qolib ketar va bosilganda serverga mock id bilan
+      // soʻrov ketardi — javob 404 boʻlib, ekranda sababsiz xato chiqardi.
+      orders: keepOrdersForMode(restored.orders, isApiEnabled()),
       notifications: NOTIFICATIONS.map((item) =>
         readIds.has(item.id) ? { ...item, readAt: item.readAt ?? new Date() } : item,
       ),

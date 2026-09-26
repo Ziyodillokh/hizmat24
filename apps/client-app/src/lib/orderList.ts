@@ -303,3 +303,25 @@ export function emptyStateFor(filter: HistoryFilter, counts: OrderCounts): Empty
       return null;
   }
 }
+
+/**
+ * Buyurtma SERVERda mavjudmi — id shaklidan.
+ *
+ * Mock rejimdagi buyurtmaning id si `live-7` koʻrinishida, serverniki esa
+ * UUID. Server ulanganda eski mock buyurtmalar qurilmada QOLIB ketardi va
+ * ularni bosgan foydalanuvchi serverga mock id bilan soʻrov yuborardi —
+ * javob 404/401 boʻlib, ekranda sababsiz xato chiqardi.
+ */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export const isServerOrder = (order: { id: string }): boolean => UUID.test(order.id);
+
+/**
+ * Server rejimida faqat serverdagi buyurtmalar qoladi.
+ *
+ * Mock rejimida roʻyxat toʻliq qaytariladi: u yerda serverning oʻzi yoʻq.
+ */
+export const keepOrdersForMode = <T extends { id: string }>(
+  orders: readonly T[],
+  isServerMode: boolean,
+): T[] => (isServerMode ? orders.filter(isServerOrder) : [...orders]);

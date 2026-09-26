@@ -361,6 +361,28 @@ describe('MatchingService (TZ 3.4)', () => {
       expect(events.emit).toHaveBeenCalledWith(ORDER_EVENTS.ASSIGNED, expect.anything());
     });
 
+    /*
+     * Urinishlari tugagan buyurtma allaqachon admin panelga eskalatsiya
+     * qilingan. Ilgari sweep uni har safar qaytadan topib, qaytadan
+     * eskalatsiya qilardi: jonli serverda ikki soatda 99 ta xato yozuvi
+     * yigʻilgan va haqiqiy nosozliklar shu shovqin ichida koʻrinmay
+     * qolgan. Navbatdan chiqarish yetarli emas — sweep navbatdan emas,
+     * BAZADAN holat boʻyicha oʻqiydi.
+     */
+    it('urinishlari tugagan buyurtmani soʻramaydi — u eskalatsiya qilingan', async () => {
+      // Act
+      await service.sweepQueue();
+
+      // Assert
+      expect(orderFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            assignmentAttempts: { lt: MAX_ASSIGNMENT_ATTEMPTS },
+          }),
+        }),
+      );
+    });
+
     it("vaqti kelmagan rejalashtirilgan buyurtmalarni umuman soʻramaydi", async () => {
       // Act
       await service.sweepQueue();

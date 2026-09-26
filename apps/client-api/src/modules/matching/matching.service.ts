@@ -349,6 +349,20 @@ export class MatchingService {
     const pending = await this.prisma.order.findMany({
       where: {
         status: { in: [...MATCHABLE_STATUSES] },
+        /*
+         * Urinishlari TUGAGAN buyurtma sweepʼga tushmaydi.
+         *
+         * U allaqachon admin panelga eskalatsiya qilingan va endi odam
+         * qaroriga muhtoj. Bu shart boʻlmaganda sweep uni har safar
+         * qaytadan topib, qaytadan eskalatsiya qilardi: ikki soatda 99 ta
+         * xato yozuvi — haqiqiy nosozliklar shu shovqin ichida koʻrinmay
+         * qolardi. (Navbatdan chiqarish yetarli emas: sweep navbatdan
+         * emas, BAZADAN holat boʻyicha oʻqiydi.)
+         *
+         * Admin «qaytadan qidirish» tugmasini bossa urinishlar nolga
+         * tushadi va buyurtma sweepʼga oʻzi qaytadi.
+         */
+        assignmentAttempts: { lt: MAX_ASSIGNMENT_ATTEMPTS },
         // Rejalashtirilgan buyurtma oʻz vaqti kelmaguncha sweepʼga tushmaydi.
         OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }],
       },
@@ -396,8 +410,11 @@ export class MatchingService {
 
   /**
    * Urinishlar tugadi — admin panelga eskalatsiya (TZ 3.4).
-   * Buyurtma navbatdan chiqariladi, aks holda har 10 soniyalik sweep uni
-   * qayta-qayta eskalatsiya qilib, mijozga takroriy xabar yuborardi.
+   *
+   * Buyurtma navbatdan chiqariladi, LEKIN takroriy eskalatsiyani
+   * toʻxtatadigan narsa bu emas: sweep navbatdan emas, bazadan holat
+   * boʻyicha oʻqiydi. Shuning uchun sweep soʻrovining oʻzi urinishlari
+   * tugagan buyurtmani chetlab oʻtadi.
    */
   private async escalate(order: OrderWithCategory): Promise<void> {
     await this.queuePosition.remove(order.id);

@@ -17,6 +17,7 @@ import {
   secondaryListAction,
   sortByCreatedDesc,
   splitOrderList,
+  keepOrdersForMode,
 } from './orderList';
 import {
   canCancel,
@@ -453,5 +454,39 @@ describe('adjacentHistoryFilter', () => {
       ['all'],
     );
     expect(walked).toEqual(HISTORY_FILTERS);
+  });
+});
+
+/*
+ * Server ulanganda eski mock buyurtmalar qurilmada qolib ketardi.
+ * Foydalanuvchi ularni bosganda ilova serverga `live-7` kabi mock id
+ * bilan soʻrov yuborar, javob esa 404 boʻlardi — ekranda sababsiz xato.
+ */
+describe('keepOrdersForMode', () => {
+  const orders = [
+    { id: 'live-104902' },
+    { id: '94e0640f-3463-4e19-8b3e-eb17ae021e2b' },
+    { id: 'live-7' },
+  ];
+
+  it('server rejimida faqat serverdagilar qoladi', () => {
+    expect(keepOrdersForMode(orders, true).map((o) => o.id)).toEqual([
+      '94e0640f-3463-4e19-8b3e-eb17ae021e2b',
+    ]);
+  });
+
+  it('mock rejimida hammasi qoladi — u yerda serverning oʻzi yoʻq', () => {
+    expect(keepOrdersForMode(orders, false)).toHaveLength(3);
+  });
+
+  it('nusxa qaytaradi — asl roʻyxat oʻzgarmaydi', () => {
+    const result = keepOrdersForMode(orders, false);
+    result.pop();
+    expect(orders).toHaveLength(3);
+  });
+
+  it('boʻsh roʻyxat ikkala rejimda ham boʻsh', () => {
+    expect(keepOrdersForMode([], true)).toEqual([]);
+    expect(keepOrdersForMode([], false)).toEqual([]);
   });
 });
