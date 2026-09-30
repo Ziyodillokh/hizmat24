@@ -75,8 +75,6 @@ const envSchema = z.object({
   ADMIN_TOKEN_SECRET: z.string().min(32, 'ADMIN_TOKEN_SECRET kamida 32 belgidan iborat boʻlsin'),
   /** Faolsizlik boʻyicha avtomatik chiqish (daqiqa). */
   ADMIN_SESSION_IDLE_MINUTES: z.coerce.number().int().positive().default(30),
-  /** Autentifikator ilovasida koʻrinadigan nom. */
-  ADMIN_TOTP_ISSUER: z.string().default('Hizmat24'),
   /**
    * Xizmat kartalari uchun yuklangan rasm va videolar katalogi.
    *

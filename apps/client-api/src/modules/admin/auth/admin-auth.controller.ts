@@ -6,8 +6,8 @@ import { Public } from '@client/common/decorators/public.decorator';
 import { requestContextOf } from '@client/common/http/request-context';
 import { AdminOnly } from '@client/common/decorators/admin.decorator';
 import { readBearerToken } from '../guards/admin.guard';
-import { AdminAuthService, type PasswordAccepted, type SignedIn } from './admin-auth.service';
-import { AdminLoginDto, AdminTotpDto } from './dto/admin-login.dto';
+import { AdminAuthService, type SignedIn } from './admin-auth.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
 
 @ApiTags('admin-auth')
 @Controller({ path: 'admin/auth', version: '1' })
@@ -23,18 +23,9 @@ export class AdminAuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: '1-bosqich: email va parol' })
-  login(@Body() dto: AdminLoginDto, @Req() request: FastifyRequest): Promise<PasswordAccepted> {
+  @ApiOperation({ summary: 'Kirish: email va parol' })
+  login(@Body() dto: AdminLoginDto, @Req() request: FastifyRequest): Promise<SignedIn> {
     return this.auth.signInWithPassword(dto.email, dto.password, requestContextOf(request));
-  }
-
-  @Public()
-  @Post('totp')
-  @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: '2-bosqich: autentifikator kodi' })
-  totp(@Body() dto: AdminTotpDto, @Req() request: FastifyRequest): Promise<SignedIn> {
-    return this.auth.signInWithTotp(dto.challengeToken, dto.code, requestContextOf(request));
   }
 
   @AdminOnly()

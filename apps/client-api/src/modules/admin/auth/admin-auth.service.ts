@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ActorType, AdminRole, AuditAction, type AdminUser } from '@prisma/client';
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes } from 'node:crypto';
 import { PrismaService } from '@client/infra/prisma/prisma.service';
 import type { RequestContext } from '@client/common/http/request-context';
 import type { AppEnv } from '@client/infra/config/env.validation';
@@ -11,7 +11,6 @@ import { lockStatus, registerFailure, clearedState } from './admin-lockout';
 import { isSessionAlive, secondsUntilIdleLogout, shouldTouch } from './admin-session';
 import { verifyPassword } from './admin-password';
 import { isLeakedPassword } from './password-policy';
-import { generateTotpSecret, totpUri, verifyTotp } from './admin-totp';
 
 /**
  * Kirish soʻrovining konteksti — audit yozuvi uchun.
@@ -31,36 +30,28 @@ export interface AdminIdentity {
   idleTimeoutSeconds: number;
 }
 
-/** Parol toʻgʻri, endi ikkinchi bosqich. */
-export interface PasswordAccepted {
-  stage: 'totp';
-  /** Ikkinchi bosqichga oʻtish uchun qisqa muddatli chipta. */
-  challengeToken: string;
-  /** Birinchi kirish: TOTP hali ulanmagan, QR koʻrsatiladi. */
-  enrollmentUri: string | null;
-}
-
 export interface SignedIn {
-  stage: 'ready';
   token: string;
   admin: AdminIdentity;
 }
 
-/** Ikki bosqich orasidagi chipta shu muddat ichida ishlatilishi kerak. */
-const CHALLENGE_TTL_MS = 5 * 60 * 1000;
-
 /**
- * Admin kirishi: email+parol → TOTP → sessiya tokeni.
+ * Admin kirishi: email + parol → sessiya tokeni.
  *
- * Parol toʻgʻri boʻlishi HALI kirish emas. Birinchi bosqich faqat qisqa
- * muddatli chipta beradi; sessiya tokeni ikkinchi bosqichdan keyin
- * tugʻiladi. Shu sababli oʻgʻirlangan parolning oʻzi yetarli emas.
+ * Autentifikator (TOTP) bosqichi 2026-09-30 da EGASINING qaroriga koʻra
+ * olib tashlandi — kirish sodda boʻlishi soʻralgan. Demak parol yagona
+ * toʻsiq, va uni himoyalaydigan qolgan choralar oʻz kuchida qoladi:
+ * ketma-ket 5 xatodan keyin 15 daqiqalik blok, IP boʻyicha cheklov,
+ * sizib chiqqan parollar taqiqi va faolsizlikdan avtomatik chiqish.
+ *
+ * Bazadagi `totpSecret` va `totpEnabledAt` ustunlari OʻCHIRILMADI:
+ * migratsiyalar faqat qoʻshimcha boʻladi va ikkinchi bosqich qaytarilsa
+ * ular oʻz joyida turadi.
  */
 @Injectable()
 export class AdminAuthService {
   private readonly secret: string;
   private readonly idleTtlMs: number;
-  private readonly issuer: string;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -69,15 +60,14 @@ export class AdminAuthService {
   ) {
     this.secret = config.get('ADMIN_TOKEN_SECRET', { infer: true });
     this.idleTtlMs = config.get('ADMIN_SESSION_IDLE_MINUTES', { infer: true }) * 60 * 1000;
-    this.issuer = config.get('ADMIN_TOTP_ISSUER', { infer: true });
   }
 
-  /** 1-bosqich: email + parol. */
+  /** Kirish: email + parol. */
   async signInWithPassword(
     email: string,
     password: string,
     context: RequestContext,
-  ): Promise<PasswordAccepted> {
+  ): Promise<SignedIn> {
     const normalized = email.trim().toLowerCase();
     const admin = await this.prisma.adminUser.findUnique({ where: { email: normalized } });
     const now = new Date();
@@ -131,56 +121,26 @@ export class AdminAuthService {
       throw new ForbiddenException(LEAKED_PASSWORD);
     }
 
-    // TOTP hali ulanmagan boʻlsa, sir SHU YERDA yaratiladi va saqlanadi,
-    // lekin `totpEnabledAt` boʻsh qoladi: u birinchi toʻgʻri koddan keyin
-    // toʻldiriladi. Aks holda QR ni koʻrgan-u skanerlamagan odam ikkinchi
-    // bosqichdan oʻtolmay, hisobidan butunlay ayrilardi.
-    const secret = admin.totpSecret ?? generateTotpSecret();
-    if (!admin.totpSecret) {
-      await this.prisma.adminUser.update({
-        where: { id: admin.id },
-        data: { totpSecret: secret },
-      });
-    }
-
-    return {
-      stage: 'totp',
-      challengeToken: this.issueChallenge(admin.id, now),
-      enrollmentUri: admin.totpEnabledAt ? null : totpUri(admin.email, secret, this.issuer),
-    };
+    return this.openSession(admin, now, context);
   }
 
-  /** 2-bosqich: autentifikator kodi. */
-  async signInWithTotp(
-    challengeToken: string,
-    code: string,
+  /**
+   * Sessiya yaratish — kirish muvaffaqiyatli tugaganda.
+   *
+   * Xato hisoblagichi SHU YERDA tozalanadi: bloklanishga olib kelgan
+   * urinishlar muvaffaqiyatli kirishdan keyin yashab qolmasligi kerak.
+   */
+  private async openSession(
+    admin: AdminUser,
+    now: Date,
     context: RequestContext,
   ): Promise<SignedIn> {
-    const now = new Date();
-    const adminId = this.readChallenge(challengeToken, now);
-    const admin = await this.prisma.adminUser.findUnique({ where: { id: adminId } });
-
-    if (!admin || !admin.isActive || !admin.totpSecret) {
-      throw new UnauthorizedException(INVALID_CREDENTIALS);
-    }
-
-    if (!verifyTotp(code, admin.totpSecret)) {
-      const next = registerFailure(admin, now);
-      await this.prisma.adminUser.update({ where: { id: admin.id }, data: next });
-      await this.recordFailure(admin.email, context, 'totp', admin.id);
-      throw new UnauthorizedException('Tasdiqlash kodi notoʻgʻri');
-    }
-
     const rawToken = randomBytes(48).toString('base64url');
 
     await this.prisma.$transaction([
       this.prisma.adminUser.update({
         where: { id: admin.id },
-        data: {
-          ...clearedState(),
-          lastLoginAt: now,
-          totpEnabledAt: admin.totpEnabledAt ?? now,
-        },
+        data: { ...clearedState(), lastLoginAt: now },
       }),
       this.prisma.adminSession.create({
         data: {
@@ -200,7 +160,7 @@ export class AdminAuthService {
       ...context,
     });
 
-    return { stage: 'ready', token: rawToken, admin: this.present(admin, this.idleTtlMs / 1000) };
+    return { token: rawToken, admin: this.present(admin, this.idleTtlMs / 1000) };
   }
 
   /**
@@ -282,37 +242,6 @@ export class AdminAuthService {
     return createHmac('sha256', this.secret).update(rawToken).digest('hex');
   }
 
-  /**
-   * Bosqichlararo chipta: `adminId.muddat.imzo`.
-   *
-   * Bazaga yozilmaydi — u bir marta, besh daqiqa ichida ishlatiladi va
-   * imzo uni soxtalashtirishdan himoya qiladi.
-   */
-  private issueChallenge(adminId: string, now: Date): string {
-    const expiresAt = now.getTime() + CHALLENGE_TTL_MS;
-    const payload = `${adminId}.${expiresAt}`;
-    return `${payload}.${createHmac('sha256', this.secret).update(payload).digest('base64url')}`;
-  }
-
-  private readChallenge(token: string, now: Date): string {
-    const parts = token.split('.');
-    if (parts.length !== 3) throw new UnauthorizedException(CHALLENGE_EXPIRED);
-
-    const [adminId, rawExpiry, signature] = parts;
-    const expected = createHmac('sha256', this.secret)
-      .update(`${adminId}.${rawExpiry}`)
-      .digest('base64url');
-
-    const given = Buffer.from(signature);
-    const wanted = Buffer.from(expected);
-    if (given.length !== wanted.length || !timingSafeEqual(given, wanted)) {
-      throw new UnauthorizedException(CHALLENGE_EXPIRED);
-    }
-
-    if (Number(rawExpiry) <= now.getTime()) throw new UnauthorizedException(CHALLENGE_EXPIRED);
-
-    return adminId;
-  }
 }
 
 /**
@@ -324,7 +253,6 @@ const DUMMY_HASH =
 
 /** Email yoʻqmi, parol notoʻgʻrimi — foydalanuvchiga bitta javob. */
 const INVALID_CREDENTIALS = 'Email yoki parol notoʻgʻri';
-const CHALLENGE_EXPIRED = 'Tasdiqlash muddati tugadi — qaytadan kiring';
 
 /**
  * NEGA kirish oʻrniga aniq matn: bu yerda "email yoki parol notoʻgʻri"

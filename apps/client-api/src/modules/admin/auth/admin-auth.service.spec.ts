@@ -1,7 +1,6 @@
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import { AdminRole, AuditAction, type AdminUser } from '@prisma/client';
-import { authenticator } from 'otplib';
 import type { AuditService } from '@client/modules/audit/audit.service';
 import type { PrismaService } from '@client/infra/prisma/prisma.service';
 import { AdminAuthService } from './admin-auth.service';
@@ -23,7 +22,6 @@ const CONTEXT = { ipAddress: '10.0.0.1', userAgent: 'jest' };
 const ENV: Record<string, unknown> = {
   ADMIN_TOKEN_SECRET: 'a'.repeat(48),
   ADMIN_SESSION_IDLE_MINUTES: 30,
-  ADMIN_TOTP_ISSUER: 'Hizmat24',
 };
 
 describe('AdminAuthService', () => {
@@ -42,8 +40,10 @@ describe('AdminAuthService', () => {
     fullName: 'Admin Boshqaruvchi',
     passwordHash: await hashPassword(PASSWORD),
     role: AdminRole.SUPERADMIN,
-    totpSecret: authenticator.generateSecret(),
-    totpEnabledAt: new Date('2026-09-01T00:00:00.000Z'),
+    // Ustunlar bazada QOLDI (migratsiyalar faqat qoʻshimcha), lekin
+    // ikkinchi bosqich olib tashlangani uchun ular ishlatilmaydi.
+    totpSecret: null,
+    totpEnabledAt: null,
     isActive: true,
     failedAttempts: 0,
     lockedUntil: null,
@@ -86,7 +86,7 @@ describe('AdminAuthService', () => {
 
   const loginOk = () => service.signInWithPassword(admin.email, PASSWORD, CONTEXT);
 
-  describe('1-bosqich: parol', () => {
+  describe('kirish: email va parol', () => {
     it('fikstura paroli repoda qolmaydi — taqiqlangan roʻyxatga tushmaydi', () => {
       // Qiymat har yugurishda yangi, shuning uchun uni hech kim oldindan
       // bila olmaydi va roʻyxatga qoʻshish shart emas.
@@ -109,7 +109,7 @@ describe('AdminAuthService', () => {
 
     it('sizib chiqqan parol chipta ham, TOTP sirini ham bermaydi', async () => {
       const leaked = LEAKED_PASSWORDS[0];
-      admin = await build({ passwordHash: await hashPassword(leaked), totpSecret: null });
+      admin = await build({ passwordHash: await hashPassword(leaked) });
 
       await expect(service.signInWithPassword(admin.email, leaked, CONTEXT)).rejects.toThrow(
         /ochiq manbada koʻringan/,
@@ -133,17 +133,40 @@ describe('AdminAuthService', () => {
       );
     });
 
-    it('toʻgʻri parol sessiya EMAS, chipta beradi', async () => {
+    it('toʻgʻri parol darhol sessiya tokeni beradi', async () => {
       const result = await loginOk();
 
-      expect(result.stage).toBe('totp');
-      expect(result.challengeToken).toContain(admin.id);
+      expect(result.token.length).toBeGreaterThan(40);
+    });
+
+    it('javobda admin roli va boʻlimlari boʻladi', async () => {
+      const { admin: identity } = await loginOk();
+
+      expect(identity.role).toBe(AdminRole.SUPERADMIN);
+      expect(identity.sections).toContain('catalog');
+      expect(identity.idleTimeoutSeconds).toBe(1800);
+    });
+
+    /* Token bazada faqat HASH koʻrinishida yashaydi. */
+    it('sessiya tokeni bazaga OCHIQ yozilmaydi', async () => {
+      const { token } = await loginOk();
+      const written = JSON.stringify(prisma.$transaction.mock.calls);
+
+      expect(written).not.toContain(token);
+    });
+
+    it('muvaffaqiyatli kirish auditga tushadi', async () => {
+      await loginOk();
+
+      expect(audit.record).toHaveBeenCalledWith(
+        expect.objectContaining({ action: AuditAction.ADMIN_LOGIN_SUCCEEDED }),
+      );
     });
 
     it('registri farq qilgan email ham topiladi', async () => {
       await expect(
         service.signInWithPassword('  ADMIN@Hizmat24.UZ ', PASSWORD, CONTEXT),
-      ).resolves.toMatchObject({ stage: 'totp' });
+      ).resolves.toMatchObject({ admin: { email: 'admin@hizmat24.uz' } });
     });
 
     it('notoʻgʻri parolda 401 va bir xil matn', async () => {
@@ -196,95 +219,6 @@ describe('AdminAuthService', () => {
       });
 
       await expect(loginOk()).rejects.toThrow(/bloklandi/);
-    });
-
-    it('TOTP ulanmagan boʻlsa QR havolasini beradi va sirni saqlaydi', async () => {
-      admin = await build({ totpSecret: null, totpEnabledAt: null });
-
-      const result = await loginOk();
-
-      expect(result.enrollmentUri).toContain('otpauth://totp/');
-      expect(prisma.adminUser.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({ totpSecret: expect.any(String) }),
-        }),
-      );
-    });
-
-    it('TOTP allaqachon ulangan boʻlsa QR qaytarmaydi', async () => {
-      expect((await loginOk()).enrollmentUri).toBeNull();
-    });
-  });
-
-  describe('2-bosqich: TOTP', () => {
-    const passTotp = async () => {
-      const { challengeToken } = await loginOk();
-      return service.signInWithTotp(
-        challengeToken,
-        authenticator.generate(admin.totpSecret as string),
-        CONTEXT,
-      );
-    };
-
-    it('toʻgʻri kod sessiya tokeni beradi', async () => {
-      const result = await passTotp();
-
-      expect(result.stage).toBe('ready');
-      expect(result.token.length).toBeGreaterThan(40);
-    });
-
-    it('javobda admin roli va boʻlimlari boʻladi', async () => {
-      const { admin: identity } = await passTotp();
-
-      expect(identity.role).toBe(AdminRole.SUPERADMIN);
-      expect(identity.sections).toContain('catalog');
-      expect(identity.idleTimeoutSeconds).toBe(1800);
-    });
-
-    it('sessiya tokeni bazaga OCHIQ yozilmaydi', async () => {
-      const { token } = await passTotp();
-      const written = JSON.stringify(prisma.$transaction.mock.calls);
-
-      expect(written).not.toContain(token);
-    });
-
-    it('notoʻgʻri kodni rad etadi', async () => {
-      const { challengeToken } = await loginOk();
-
-      await expect(service.signInWithTotp(challengeToken, '000000', CONTEXT)).rejects.toThrow(
-        'Tasdiqlash kodi notoʻgʻri',
-      );
-    });
-
-    it('soxta chiptani rad etadi', async () => {
-      await expect(
-        service.signInWithTotp(`${admin.id}.${Date.now() + 60_000}.soxta`, '123456', CONTEXT),
-      ).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('muddati oʻtgan chiptani rad etadi', async () => {
-      const { challengeToken } = await loginOk();
-
-      // Xizmat `new Date()` ishlatadi, `Date.now()` ni emas — shuning uchun
-      // soatni butunlay oldinga suramiz. `jest.spyOn(Date, 'now')` bu yerda
-      // hech narsa qilmaydi va mok keyingi testlarga oqib ketardi.
-      jest.useFakeTimers().setSystemTime(new Date(Date.now() + 10 * 60 * 1000));
-
-      await expect(
-        service.signInWithTotp(
-          challengeToken,
-          authenticator.generate(admin.totpSecret as string),
-          CONTEXT,
-        ),
-      ).rejects.toThrow(/muddati tugadi/);
-    });
-
-    it('muvaffaqiyatli kirish auditga tushadi', async () => {
-      await passTotp();
-
-      expect(audit.record).toHaveBeenCalledWith(
-        expect.objectContaining({ action: AuditAction.ADMIN_LOGIN_SUCCEEDED }),
-      );
     });
   });
 

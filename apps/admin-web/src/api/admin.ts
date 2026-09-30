@@ -10,24 +10,14 @@ export interface AdminIdentity {
   idleTimeoutSeconds: number;
 }
 
-export interface PasswordAccepted {
-  stage: 'totp';
-  challengeToken: string;
-  /** Birinchi kirish: autentifikator ilovasiga qoʻshish uchun havola. */
-  enrollmentUri: string | null;
-}
-
 export interface SignedIn {
-  stage: 'ready';
   token: string;
   admin: AdminIdentity;
 }
 
-export const loginWithPassword = (email: string, password: string): Promise<PasswordAccepted> =>
+/** Kirish bitta qadam: parol toʻgʻri boʻlsa sessiya darhol beriladi. */
+export const loginWithPassword = (email: string, password: string): Promise<SignedIn> =>
   apiRequest('/admin/auth/login', { method: 'POST', body: { email, password } });
-
-export const loginWithTotp = (challengeToken: string, code: string): Promise<SignedIn> =>
-  apiRequest('/admin/auth/totp', { method: 'POST', body: { challengeToken, code } });
 
 export const fetchMe = (token: string): Promise<AdminIdentity> =>
   apiRequest('/admin/me', { token });

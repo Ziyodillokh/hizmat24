@@ -159,11 +159,13 @@ async function main(): Promise<void> {
   const passwordHash = await hashPassword(password);
 
   /*
-   * Parol yangilanganda TOTP siri ham tozalanadi va barcha sessiyalar
-   * bekor qilinadi. Sabab: bu buyruq odatda "hisob oʻgʻirlandi" yoki
-   * "parol unutildi" holatida ishlatiladi — eski telefondagi
-   * autentifikator va ochiq qolgan sessiyalar bilan kirish yoʻli
-   * yopilishi kerak.
+   * Parol yangilanganda barcha sessiyalar bekor qilinadi. Sabab: bu
+   * buyruq odatda "hisob oʻgʻirlandi" yoki "parol unutildi" holatida
+   * ishlatiladi — ochiq qolgan sessiyalar bilan kirish yoʻli yopilishi
+   * kerak.
+   *
+   * Eski TOTP ustunlari ham tozalanadi: ikkinchi bosqich olib tashlangan,
+   * lekin ustunlar bazada qoldi va eski sir u yerda yashab qolmasin.
    */
   const admin = await prisma.adminUser.upsert({
     where: { email },
@@ -180,7 +182,7 @@ async function main(): Promise<void> {
   console.log(`Rol: ${admin.role}`);
   console.log(`Boʻlimlar: ${sectionsFor(admin.role).join(', ')}`);
   if (revoked.count > 0) console.log(`Bekor qilingan sessiyalar: ${revoked.count}`);
-  console.log('\nBirinchi kirishda QR kod koʻrsatiladi — uni autentifikator ilovasiga qoʻshing.');
+  console.log('\nKirish: email va parol. Autentifikator kodi soʻralmaydi.');
 }
 
 main()

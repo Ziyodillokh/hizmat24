@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, Length, Matches, MaxLength } from 'class-validator';
+import { IsEmail, IsString, Length, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { MAX_PASSWORD_LENGTH } from '../password-policy';
 
@@ -28,16 +28,4 @@ export class AdminLoginDto {
     message: `Parol kamida ${LOGIN_MIN_PASSWORD_LENGTH} belgidan iborat boʻlsin`,
   })
   password!: string;
-}
-
-export class AdminTotpDto {
-  @ApiProperty({ description: 'Parol bosqichidan qaytgan chipta' })
-  @IsString()
-  @MaxLength(400)
-  challengeToken!: string;
-
-  @ApiProperty({ example: '123456' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.replace(/\s+/g, '') : value))
-  @Matches(/^\d{6}$/, { message: 'Kod 6 ta raqamdan iborat boʻlsin' })
-  code!: string;
 }

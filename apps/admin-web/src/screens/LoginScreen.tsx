@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { ApiError } from '@/api/client';
-import { loginWithPassword, loginWithTotp } from '@/api/admin';
+import { loginWithPassword } from '@/api/admin';
 import { Button, Card, Field, Notice } from '@/components/ui';
 import { BrandMark } from '@/components/BrandMark';
-import { TotpEnrollment } from '@/components/TotpEnrollment';
 import { useAuth, type SignOutReason } from '@/app/AuthProvider';
 
 const SIGN_OUT_MESSAGES: Record<SignOutReason, string> = {
@@ -11,54 +10,35 @@ const SIGN_OUT_MESSAGES: Record<SignOutReason, string> = {
   expired: 'Sessiya muddati tugadi — qaytadan kiring',
 };
 
-interface Challenge {
-  challengeToken: string;
-  enrollmentUri: string | null;
-}
-
 /**
- * Kirish — ikki bosqich, bitta ekran.
+ * Kirish — email va parol.
  *
- * Bosqichlar alohida marshrut EMAS: chipta faqat besh daqiqa yashaydi va
- * uni URL da olib yurish (yangilash, orqaga qaytish, havolani ulashish)
- * faqat muammo tugʻdirardi.
+ * Autentifikator (TOTP) bosqichi 2026-09-30 da olib tashlandi: kirish
+ * sodda boʻlishi soʻralgan. Parolni himoyalaydigan qolgan choralar oʻz
+ * kuchida — ketma-ket 5 xatodan keyin 15 daqiqalik blok, IP boʻyicha
+ * cheklov va faolsizlikdan avtomatik chiqish.
  */
 export function LoginScreen() {
   const { signIn, signOutReason } = useAuth();
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
-  const run = async (action: () => Promise<void>) => {
+  const submit = async (form: FormData) => {
     setIsBusy(true);
     setError(null);
+
     try {
-      await action();
+      const result = await loginWithPassword(
+        String(form.get('email') ?? ''),
+        String(form.get('password') ?? ''),
+      );
+      signIn(result.token, result.admin);
     } catch (cause) {
       setError(cause instanceof ApiError ? cause.message : 'Kutilmagan xato');
     } finally {
       setIsBusy(false);
     }
   };
-
-  const submitPassword = (form: FormData) =>
-    run(async () => {
-      const result = await loginWithPassword(
-        String(form.get('email') ?? ''),
-        String(form.get('password') ?? ''),
-      );
-      setChallenge({
-        challengeToken: result.challengeToken,
-        enrollmentUri: result.enrollmentUri,
-      });
-    });
-
-  const submitTotp = (form: FormData) =>
-    run(async () => {
-      if (!challenge) return;
-      const result = await loginWithTotp(challenge.challengeToken, String(form.get('code') ?? ''));
-      signIn(result.token, result.admin);
-    });
 
   return (
     <main className="flex min-h-full items-center justify-center bg-surface px-20 py-48">
@@ -75,7 +55,7 @@ export function LoginScreen() {
           </div>
         </div>
 
-        {signOutReason && !challenge && !error && (
+        {signOutReason && !error && (
           <div className="mb-16">
             <Notice tone="warning">{SIGN_OUT_MESSAGES[signOutReason]}</Notice>
           </div>
@@ -87,95 +67,33 @@ export function LoginScreen() {
           </div>
         )}
 
-        {challenge ? (
-          <TotpStep
-            enrollmentUri={challenge.enrollmentUri}
-            isBusy={isBusy}
-            onSubmit={submitTotp}
-            onBack={() => {
-              setChallenge(null);
-              setError(null);
-            }}
+        <form
+          className="flex flex-col gap-16"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit(new FormData(event.currentTarget));
+          }}
+        >
+          <Field
+            label="Email"
+            name="email"
+            type="email"
+            autoComplete="username"
+            required
+            autoFocus
           />
-        ) : (
-          <PasswordStep isBusy={isBusy} onSubmit={submitPassword} />
-        )}
+          <Field
+            label="Parol"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+          <Button type="submit" loading={isBusy} fullWidth>
+            Kirish
+          </Button>
+        </form>
       </Card>
     </main>
-  );
-}
-
-function PasswordStep({
-  isBusy,
-  onSubmit,
-}: {
-  isBusy: boolean;
-  onSubmit: (form: FormData) => void;
-}) {
-  return (
-    <form
-      className="flex flex-col gap-16"
-      onSubmit={(event) => {
-        event.preventDefault();
-        onSubmit(new FormData(event.currentTarget));
-      }}
-    >
-      <Field label="Email" name="email" type="email" autoComplete="username" required autoFocus />
-      <Field
-        label="Parol"
-        name="password"
-        type="password"
-        autoComplete="current-password"
-        required
-      />
-      <Button type="submit" loading={isBusy} fullWidth>
-        Davom etish
-      </Button>
-      <p className="text-caption text-text-secondary">
-        Keyingi qadamda autentifikator ilovasidagi kod soʻraladi.
-      </p>
-    </form>
-  );
-}
-
-function TotpStep({
-  enrollmentUri,
-  isBusy,
-  onSubmit,
-  onBack,
-}: {
-  enrollmentUri: string | null;
-  isBusy: boolean;
-  onSubmit: (form: FormData) => void;
-  onBack: () => void;
-}) {
-  return (
-    <form
-      className="flex flex-col gap-16"
-      onSubmit={(event) => {
-        event.preventDefault();
-        onSubmit(new FormData(event.currentTarget));
-      }}
-    >
-      {enrollmentUri && <TotpEnrollment uri={enrollmentUri} />}
-
-      <Field
-        label="Tasdiqlash kodi"
-        name="code"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        maxLength={7}
-        placeholder="000000"
-        required
-        autoFocus
-        className="font-mono tracking-[0.3em]"
-      />
-      <Button type="submit" loading={isBusy} fullWidth>
-        Kirish
-      </Button>
-      <Button variant="ghost" onClick={onBack} fullWidth>
-        Orqaga
-      </Button>
-    </form>
   );
 }
